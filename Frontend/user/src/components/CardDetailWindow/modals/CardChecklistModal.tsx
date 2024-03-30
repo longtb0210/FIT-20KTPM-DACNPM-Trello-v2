@@ -7,9 +7,12 @@ import { useTheme } from '~/components/Theme/themeContext'
 import { Card } from '@trello-v2/shared/src/schemas/CardList'
 import { Feature_Checklist } from '@trello-v2/shared/src/schemas/Feature'
 import { Activity } from '@trello-v2/shared/src/schemas/Activity'
+import { CardApiRTQ } from '~/api'
 
 interface CreateCardChecklistModalProps {
   anchorEl: (EventTarget & HTMLDivElement) | null
+  cardlistId: string
+  cardId: string
   currentCard: Card
   setCurrentCard: (newState: Card) => void
   handleClose: () => void
@@ -17,6 +20,8 @@ interface CreateCardChecklistModalProps {
 
 export function CreateCardChecklistModal({
   anchorEl,
+  cardlistId,
+  cardId,
   currentCard,
   setCurrentCard,
   handleClose
@@ -27,6 +32,9 @@ export function CreateCardChecklistModal({
   function handleTextFieldChange(event: React.ChangeEvent<HTMLInputElement>) {
     setTextFieldValue(event.target.value)
   }
+
+  // API
+  const [addCardFeatureAPI] = CardApiRTQ.CardApiSlice.useAddCardFeatureMutation()
 
   function createChecklist() {
     const trimmedValue = textFieldValue.replace(/\s+/g, ' ').trim()
@@ -49,6 +57,14 @@ export function CreateCardChecklistModal({
       activities: [...currentCard.activities, newActivity]
     }
     setCurrentCard(updatedCard)
+    addCardFeatureAPI({
+      cardlist_id: cardlistId,
+      card_id: cardId,
+      feature: {
+        type: 'checklist',
+        items: []
+      }
+    })
   }
 
   return (

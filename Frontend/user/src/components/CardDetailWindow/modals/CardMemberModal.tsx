@@ -1,12 +1,12 @@
 import { useEffect, useState } from 'react'
-import { _Feature_Activity } from '..'
 import { Box, Grid, Popover } from '@mui/material'
 import { MemberAvatar, bgColors } from '../CardMemberList'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { faXmark } from '@fortawesome/free-solid-svg-icons'
-import moment from 'moment'
 import { useTheme } from '~/components/Theme/themeContext'
 import { Card } from '@trello-v2/shared/src/schemas/CardList'
+import { Activity } from '@trello-v2/shared/src/schemas/Activity'
+import { CardApiRTQ } from '~/api'
 
 interface MemberAvatarAndNameProps {
   email: string
@@ -35,6 +35,8 @@ function MemberAvatarAndName({ email, bgColor, onClick }: MemberAvatarAndNamePro
 
 interface CardMemberModalProps {
   anchorEl: (EventTarget & HTMLDivElement) | null
+  cardlistId: string
+  cardId: string
   currentCard: Card
   setCurrentCard: (newState: Card) => void
   boardMembers: string[]
@@ -43,6 +45,8 @@ interface CardMemberModalProps {
 
 export function CardMemberModal({
   anchorEl,
+  cardlistId,
+  cardId,
   currentCard,
   setCurrentCard,
   boardMembers,
@@ -56,6 +60,10 @@ export function CardMemberModal({
   const [boardMemberListState, setBoardMemberListState] = useState(
     boardMembers.filter((member) => !currentCard.watcher_email.includes(member))
   )
+
+  // API
+  const [addCardWatcherAPI] = CardApiRTQ.CardApiSlice.useAddCardWatcherMutation()
+  const [deleteCardWatcherAPI] = CardApiRTQ.CardApiSlice.useDeleteCardWatcherMutation()
 
   function filterMemberLists(event: React.ChangeEvent<HTMLInputElement>) {
     setSearchValue(event.currentTarget.value)
@@ -72,30 +80,35 @@ export function CardMemberModal({
   }
 
   function addMemberToCard(member: string) {
-    const newActivity: _Feature_Activity = {
+    const newActivity: Activity = {
       workspace_id: '0',
       board_id: '0',
       cardlist_id: '0',
       card_id: '0',
-      content: `TrelloUser added ${member} to this card`,
-      time: moment().format()
+      content: `TrelloUser added ${member} to this card`
+      //time: moment().format()
     }
-    const updatedCard = {
+    const updatedCard: Card = {
       ...currentCard,
       watcher_email: [...currentCard.watcher_email, member],
       activities: [...currentCard.activities, newActivity]
     }
     setCurrentCard(updatedCard)
+    addCardWatcherAPI({
+      cardlist_id: cardlistId,
+      card_id: cardId,
+      watcher_email: member
+    })
   }
 
   function removeMemberFromCard(member: string) {
-    const newActivity: _Feature_Activity = {
+    const newActivity: Activity = {
       workspace_id: '0',
       board_id: '0',
       cardlist_id: '0',
       card_id: '0',
-      content: `TrelloUser removed ${member} from this card`,
-      time: moment().format()
+      content: `TrelloUser removed ${member} from this card`
+      //time: moment().format()
     }
     const updatedCard = {
       ...currentCard,
@@ -103,6 +116,11 @@ export function CardMemberModal({
       activities: [...currentCard.activities, newActivity]
     }
     setCurrentCard(updatedCard)
+    deleteCardWatcherAPI({
+      cardlist_id: cardlistId,
+      card_id: cardId,
+      watcher_email: member
+    })
   }
 
   useEffect(() => {

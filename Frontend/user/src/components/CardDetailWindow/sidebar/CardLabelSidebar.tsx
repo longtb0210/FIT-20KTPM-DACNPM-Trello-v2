@@ -5,9 +5,12 @@ import { Box } from '@mui/material'
 import { Card } from '@trello-v2/shared/src/schemas/CardList'
 import { Feature_CardLabel } from '@trello-v2/shared/src/schemas/Feature'
 import { BoardLabel } from '@trello-v2/shared/src/schemas/Board'
+import { CardApiRTQ } from '~/api'
 
 interface SidebarButtonLabelsProps {
   type: ButtonType
+  cardlistId: string
+  cardId: string
   currentCard: Card
   setCurrentCard: (newState: Card) => void
   boardLabelState: BoardLabel[]
@@ -16,6 +19,8 @@ interface SidebarButtonLabelsProps {
 
 export function SidebarButtonLabels({
   type,
+  cardlistId,
+  cardId,
   currentCard,
   setCurrentCard,
   boardLabelState,
@@ -25,6 +30,9 @@ export function SidebarButtonLabels({
   const [anchorEl, setAnchorEl] = useState<null | HTMLDivElement>(null)
   const [modalState, setModalState] = useState<boolean[]>([false, false, false])
   const [selectedLabel, setSelectedLabel] = useState<BoardLabel>(boardLabelState[0])
+
+  // API
+  const [addCardFeatureAPI] = CardApiRTQ.CardApiSlice.useAddCardFeatureMutation()
 
   function openModal(modalIndex: number) {
     const updatedOpenModal = modalState.map((state, index) => (index === modalIndex ? true : state))
@@ -75,6 +83,14 @@ export function SidebarButtonLabels({
       features: [...currentCard.features, newCardLabel]
     }
     setCurrentCard(updatedCard)
+    addCardFeatureAPI({
+      cardlist_id: cardlistId,
+      card_id: cardId,
+      feature: {
+        type: 'label',
+        label_id: boardLabel._id!
+      }
+    })
   }
 
   function handleExcludeLabel(boardLabel: BoardLabel) {

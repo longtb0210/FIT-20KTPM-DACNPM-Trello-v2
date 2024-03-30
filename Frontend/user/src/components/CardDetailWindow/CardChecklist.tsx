@@ -609,12 +609,20 @@ function ChecklistItem({
 }
 
 interface CardChecklistProps {
+  cardlistId: string
+  cardId: string
   currentChecklist: Feature_Checklist
   currentCard: Card
   setCurrentCard: (newState: Card) => void
 }
 
-export default function CardChecklist({ currentChecklist, currentCard, setCurrentCard }: CardChecklistProps) {
+export default function CardChecklist({
+  cardlistId,
+  cardId,
+  currentChecklist,
+  currentCard,
+  setCurrentCard
+}: CardChecklistProps) {
   const { colors } = useTheme()
   // START: Handle edit Checklist name
   const [checklistNameState, setChecklistNameState] = useState<string>('Checklist name')

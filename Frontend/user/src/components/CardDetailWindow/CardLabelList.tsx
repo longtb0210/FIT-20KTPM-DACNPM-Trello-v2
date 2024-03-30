@@ -8,6 +8,7 @@ import { Card } from '@trello-v2/shared/src/schemas/CardList'
 import { Feature_CardLabel } from '@trello-v2/shared/src/schemas/Feature'
 import React from 'react'
 import { BoardLabel } from '@trello-v2/shared/src/schemas/Board'
+import { CardApiRTQ } from '~/api'
 
 // eslint-disable-next-line react-refresh/only-export-components
 export const labelColors: string[] = [
@@ -118,6 +119,8 @@ export function CardLabelItem({ title, bgColor }: CardLabelItemProps) {
 }
 
 interface CardLabelListProps {
+  cardlistId: string
+  cardId: string
   currentCard: Card
   setCurrentCard: (newState: Card) => void
   boardLabelState: BoardLabel[]
@@ -125,6 +128,8 @@ interface CardLabelListProps {
 }
 
 export default function CardLabelList({
+  cardlistId,
+  cardId,
   currentCard,
   setCurrentCard,
   boardLabelState,
@@ -135,6 +140,9 @@ export default function CardLabelList({
   const [anchorEl, setAnchorEl] = useState<null | HTMLDivElement>(null)
   const [modalState, setModalState] = useState<boolean[]>([false, false, false])
   const [selectedLabel, setSelectedLabel] = useState<BoardLabel>(boardLabelState[0])
+
+  // API
+  const [addCardFeatureAPI] = CardApiRTQ.CardApiSlice.useAddCardFeatureMutation()
 
   function openModal(modalIndex: number) {
     const updatedOpenModal = modalState.map((state, index) => (index === modalIndex ? true : state))
@@ -185,6 +193,14 @@ export default function CardLabelList({
       features: [...currentCard.features, newCardLabel]
     }
     setCurrentCard(updatedCard)
+    addCardFeatureAPI({
+      cardlist_id: cardlistId,
+      card_id: cardId,
+      feature: {
+        type: 'label',
+        label_id: boardLabel._id!
+      }
+    })
   }
 
   function handleExcludeLabel(boardLabel: BoardLabel) {

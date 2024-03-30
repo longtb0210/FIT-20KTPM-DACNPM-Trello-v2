@@ -55,12 +55,14 @@ export function MemberAvatar({ memberName, bgColor }: MemberAvatarProps) {
 }
 
 interface AddMemberButtonProps {
+  cardlistId: string
+  cardId: string
   currentCard: Card
   setCurrentCard: (newState: Card) => void
   boardMembers: string[]
 }
 
-function AddMemberButton({ currentCard, setCurrentCard, boardMembers }: AddMemberButtonProps) {
+function AddMemberButton({ cardlistId, cardId, currentCard, setCurrentCard, boardMembers }: AddMemberButtonProps) {
   const { colors } = useTheme()
   const [anchorEl, setAnchorEl] = useState<null | HTMLDivElement>(null)
   const [isOpenCardMemberModal, setIsOpenCardMemberModal] = useState(false)
@@ -97,6 +99,8 @@ function AddMemberButton({ currentCard, setCurrentCard, boardMembers }: AddMembe
       {isOpenCardMemberModal && (
         <CardMemberModal
           anchorEl={anchorEl}
+          cardlistId={cardlistId}
+          cardId={cardId}
           currentCard={currentCard}
           setCurrentCard={setCurrentCard}
           boardMembers={boardMembers}
@@ -108,12 +112,20 @@ function AddMemberButton({ currentCard, setCurrentCard, boardMembers }: AddMembe
 }
 
 interface CardMemberListProps {
+  cardlistId: string
+  cardId: string
   currentCard: Card
   setCurrentCard: (newState: Card) => void
   boardMembers: string[]
 }
 
-export default function CardMemberList({ currentCard, setCurrentCard, boardMembers }: CardMemberListProps) {
+export default function CardMemberList({
+  cardlistId,
+  cardId,
+  currentCard,
+  setCurrentCard,
+  boardMembers
+}: CardMemberListProps) {
   const { colors } = useTheme()
   return (
     <React.Fragment>
@@ -123,7 +135,7 @@ export default function CardMemberList({ currentCard, setCurrentCard, boardMembe
             Members
           </h2>
           <div className='flex flex-row space-x-1'>
-            {currentCard.watcher_email.map((email, index) => (
+            {currentCard!.watcher_email.map((email, index) => (
               <Tooltip
                 arrow
                 key={index}
@@ -147,7 +159,13 @@ export default function CardMemberList({ currentCard, setCurrentCard, boardMembe
                 </div>
               </Tooltip>
             ))}
-            <AddMemberButton currentCard={currentCard} setCurrentCard={setCurrentCard} boardMembers={boardMembers} />
+            <AddMemberButton
+              cardlistId={cardlistId}
+              cardId={cardId}
+              currentCard={currentCard}
+              setCurrentCard={setCurrentCard}
+              boardMembers={boardMembers}
+            />
           </div>
         </Box>
       )}

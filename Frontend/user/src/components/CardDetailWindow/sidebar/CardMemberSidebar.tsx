@@ -6,12 +6,21 @@ import { Card } from '@trello-v2/shared/src/schemas/CardList'
 
 interface SidebarButtonMembersProps {
   type: ButtonType
+  cardlistId: string
+  cardId: string
   currentCard: Card
   setCurrentCard: (newState: Card) => void
   boardMembers: string[]
 }
 
-export function SidebarButtonMembers({ type, currentCard, setCurrentCard, boardMembers }: SidebarButtonMembersProps) {
+export function SidebarButtonMembers({
+  type,
+  cardlistId,
+  cardId,
+  currentCard,
+  setCurrentCard,
+  boardMembers
+}: SidebarButtonMembersProps) {
   const boxRef = useRef(null)
   const [anchorEl, setAnchorEl] = useState<null | HTMLDivElement>(null)
   const [isOpenCardMemberModal, setIsOpenCardMemberModal] = useState(false)
@@ -38,6 +47,8 @@ export function SidebarButtonMembers({ type, currentCard, setCurrentCard, boardM
       {isOpenCardMemberModal && (
         <CardMemberModal
           anchorEl={anchorEl}
+          cardlistId={cardlistId}
+          cardId={cardId}
           currentCard={currentCard}
           setCurrentCard={setCurrentCard}
           boardMembers={boardMembers}

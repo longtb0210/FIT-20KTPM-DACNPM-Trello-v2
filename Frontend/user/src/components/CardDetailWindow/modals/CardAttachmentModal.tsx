@@ -219,3 +219,83 @@ export function CardAttachmentModal({ anchorEl, currentCard, setCurrentCard, han
     </Popover>
   )
 }
+
+interface RemoveAttachmentModalProps {
+  anchorEl: (EventTarget & HTMLDivElement) | null
+  handleRemove: () => void
+  handleClose: () => void
+}
+
+export function RemoveAttachmentModal({ anchorEl, handleRemove, handleClose }: RemoveAttachmentModalProps) {
+  const { colors } = useTheme()
+  function handleDeleteAndClose() {
+    handleRemove()
+    handleClose()
+  }
+
+  return (
+    <Popover
+      open={true}
+      anchorEl={anchorEl}
+      anchorOrigin={{
+        vertical: 'bottom',
+        horizontal: 'left'
+      }}
+      transformOrigin={{
+        vertical: 'top',
+        horizontal: 'left'
+      }}
+      onClose={handleClose}
+      sx={{ margin: '6px 0 0 0' }}
+    >
+      <Box
+        sx={{
+          width: 304,
+          height: 'fit-content',
+          padding: '4px 8px 12px 8px',
+          color: colors.text,
+          backgroundColor: colors.background_modal_secondary
+        }}
+        className='flex flex-col'
+      >
+        {/* START: Modal heading */}
+        <Grid container sx={{ width: '100%', margin: '4px 0 8px 0' }}>
+          <Grid item xs={2}></Grid>
+          <Grid item xs={8} className='flex items-center justify-center'>
+            <h2 className='overflow-hidden overflow-ellipsis whitespace-nowrap text-sm font-semibold'>
+              Remove attachment?
+            </h2>
+          </Grid>
+          <Grid item xs={2} className='flex items-center justify-end'>
+            <Box
+              sx={{ width: 32, height: 32, '&:hover': { bgcolor: colors.button_hover } }}
+              className='flex cursor-pointer items-center justify-center rounded-lg'
+              onMouseDown={handleClose}
+            >
+              <FontAwesomeIcon icon={faXmark} />
+            </Box>
+          </Grid>
+        </Grid>
+        {/* END: Modal heading */}
+        {/* Warning */}
+        <p className='mb-4 mt-1 text-sm'>Remove this attachment? There is no undo.</p>
+        {/* Button */}
+        <Box
+          sx={{
+            width: '100%',
+            height: 32,
+            padding: '0 8px',
+            bgcolor: '#f00',
+            '&:hover': {
+              filter: 'brightness(90%)'
+            }
+          }}
+          className='flex cursor-pointer items-center justify-center rounded'
+          onClick={handleDeleteAndClose}
+        >
+          <h2 className='text-sm font-semibold text-white'>Remove</h2>
+        </Box>
+      </Box>
+    </Popover>
+  )
+}
