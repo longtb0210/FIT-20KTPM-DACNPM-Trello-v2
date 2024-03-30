@@ -1,5 +1,5 @@
 import * as _ from 'lodash'
-import { Model } from 'mongoose'
+import { Model, Types } from 'mongoose'
 
 import { InjectModel } from '@nestjs/mongoose'
 import { DbSchemas, TrelloApi } from '@trello-v2/shared'
@@ -112,7 +112,7 @@ export class BoardServiceMock implements IBoardService {
     return new Promise<DbSchemas.BoardSchema.Board>((res) => {
       res({
         ...data,
-        _id: 'Mock-id',
+        _id: new Types.ObjectId().toString(),
         watcher_email: [],
         activities: [],
         members_email: [],
@@ -134,7 +134,7 @@ export class BoardServiceMock implements IBoardService {
     return new Promise<DbSchemas.BoardSchema.Board[]>((res) => {
       res([
         {
-          _id: 'Mock-id',
+          _id: new Types.ObjectId().toString(),
           watcher_email: [],
           activities: [],
           members_email: [],
@@ -159,7 +159,7 @@ export class BoardServiceMock implements IBoardService {
         members_email: [],
         labels: [],
         is_star: false,
-        workspace_id: 'Mock-id',
+        workspace_id: new Types.ObjectId().toString(),
         name: '',
         visibility: 'private',
         background: '',
@@ -185,7 +185,7 @@ export class BoardServiceMock implements IBoardService {
         members_email: [],
         labels: [],
         is_star: false,
-        workspace_id: 'Mock-id',
+        workspace_id: new Types.ObjectId().toString(),
         name: '',
         visibility: 'private',
         background: '',
@@ -208,7 +208,7 @@ export class BoardServiceMock implements IBoardService {
 
   createLabel(data: TrelloApi.BoardApi.CreateLabel) {
     return new Promise<DbSchemas.BoardSchema.BoardLabel>((res) => {
-      const label = { _id: 'Mock-id', name: '', color: '' }
+      const label = { _id: new Types.ObjectId().toString(), name: '', color: '' }
       res(
         Object.assign(
           label,
