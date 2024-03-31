@@ -93,8 +93,8 @@ export function Board() {
   //   }
   // })
   useEffect(() => {
-    // if (!cardlistData) return
-    const updatedLists_placeHolder = MOCK_CARD_DATA.data.map((list) => ({
+    if (!cardlistData) return
+    const updatedLists_placeHolder = cardlistData.data.map((list) => ({
       ...list,
       cards: list.cards.map(
         (card) =>
