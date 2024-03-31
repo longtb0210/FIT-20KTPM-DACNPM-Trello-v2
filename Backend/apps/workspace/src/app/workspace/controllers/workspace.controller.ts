@@ -60,8 +60,7 @@ export class WorkspaceController {
 
     const workspace = await this.workspaceService.getAdminWorkspacesByEmail(email)
 
-    if (!workspace) throw new NotFoundException("Can't find of workspace's admin")
-
+    if (!workspace) return { data: [] }
     return { data: workspace }
   }
 
@@ -71,8 +70,7 @@ export class WorkspaceController {
 
     const workspace = await this.workspaceService.getGuestWorkspacesByEmail(email)
 
-    if (!workspace) throw new NotFoundException("Can't find of workspace's guest")
-
+    if (!workspace) return { data: [] }
     return { data: workspace }
   }
 
@@ -82,8 +80,7 @@ export class WorkspaceController {
 
     const workspace = await this.workspaceService.getMemberWorkspacesByEmail(email)
 
-    if (!workspace) throw new NotFoundException("Can't find of workspace's member")
-
+    if (!workspace) return { data: [] }
     return { data: workspace }
   }
 
@@ -93,8 +90,7 @@ export class WorkspaceController {
 
     const workspace = await this.workspaceService.getOwnerWorkspacesByEmail(email)
 
-    if (!workspace) throw new NotFoundException("Can't find of workspace's owner")
-
+    if (!workspace) return { data: [] }
     return { data: workspace }
   }
 
@@ -104,8 +100,7 @@ export class WorkspaceController {
 
     const workspace = await this.workspaceService.getPendingWorkspacesByEmail(email)
 
-    if (!workspace) throw new NotFoundException("Can't find of workspace's peding")
-
+    if (!workspace) return { data: [] }
     return { data: workspace }
   }
 
@@ -150,8 +145,8 @@ export class WorkspaceController {
     return { data: workspaceUpdated }
   }
 
-  @InjectRoute(workspaceRoutes.deleteWorspaceById)
-  async deleteWorspaceById(
+  @InjectRoute(workspaceRoutes.deleteWorkspaceById)
+  async deleteWorkspaceById(
     @AuthenticatedUser() user: UserInfoDto,
     @Param('id', IdParamValidationPipe)
     id: string,

@@ -1,5 +1,5 @@
 import * as Joi from 'joi'
-import { AuthGuard, KeycloakConnectModule, ResourceGuard, RoleGuard } from 'nest-keycloak-connect'
+import { AuthGuard, KeycloakConnectModule } from 'nest-keycloak-connect'
 
 import { configuration } from '@app/common'
 import { AuthModule } from '@app/common/auth/auth.module'
@@ -8,9 +8,9 @@ import { Module } from '@nestjs/common'
 import { ConfigModule } from '@nestjs/config'
 import { APP_GUARD } from '@nestjs/core'
 import { MongooseModule } from '@nestjs/mongoose'
+import { ServeStaticModule } from '@nestjs/serve-static'
 
 import { WorkspaceModule } from './app/workspace/workspace.module'
-import { ServeStaticModule } from '@nestjs/serve-static'
 
 const EnvSchema = {
   PORT: Joi.number(),
@@ -29,7 +29,7 @@ const EnvSchema = {
     }),
     KeycloakConnectModule.registerAsync({
       useExisting: KeycloakConfigService,
-      imports: [AuthModule]
+      imports: [AuthModule],
     }),
     ServeStaticModule.forRoot({
       rootPath: './public',
@@ -44,14 +44,6 @@ const EnvSchema = {
     {
       provide: APP_GUARD,
       useClass: AuthGuard,
-    },
-    {
-      provide: APP_GUARD,
-      useClass: ResourceGuard,
-    },
-    {
-      provide: APP_GUARD,
-      useClass: RoleGuard,
     },
   ],
 })
