@@ -15,18 +15,20 @@ import {
   useSensors,
   DragMoveEvent,
   rectIntersection,
-  closestCenter
+  closestCenter,
+  Active,
+  Over
 } from '@dnd-kit/core'
 import { arrayMove } from '@dnd-kit/sortable'
 
 import { cloneDeep, isEmpty } from 'lodash'
-import { BoardLayout } from '~/layouts'
-import { generatePlaceHolderCard } from '~/utils/fomatter'
-import LoadingComponent from '~/components/Loading'
+import { BoardLayout } from '../../layouts'
+import { generatePlaceHolderCard } from '../../utils/fomatter'
+import LoadingComponent from '../../components/Loading'
 import { CardComponent, ListComponent } from './components'
-import { useTheme } from '~/components/Theme/themeContext'
-import { getAllListAPI } from '~/api/List'
-import { CardlistApiRTQ } from '~/api'
+import { useTheme } from '../../components/Theme/themeContext'
+import { getAllListAPI } from '../../api/List'
+import { CardlistApiRTQ } from '../../api'
 import { TrelloApi } from '@trello-v2/shared'
 const MOCK_CARD_DATA: TrelloApi.CardlistApi.GetallCardlistResponse = {
   data: [
@@ -189,10 +191,10 @@ export function Board() {
   //   // You can call your API update function here
   // }, [])
 
-  function findListByCardId(cardId: any) {
+  function findListByCardId(cardId: string) {
     return listsData?.find((list) => list?.cards?.map((card) => card._id)?.includes(cardId))
   }
-  function isCard(obj: any): obj is Card {
+  function isCard(obj: Card): obj is Card {
     return 'cards' in obj == false
   }
   function handleUpdateAfterDragging() {
@@ -201,8 +203,8 @@ export function Board() {
   function handleMoveCardBetweenDifferenceColumn(
     overList: List,
     overCardId: UniqueIdentifier,
-    active: any,
-    over: any,
+    active: Active,
+    over: Over,
     activeList: List,
     activeDragingCardId: UniqueIdentifier,
     activeDraggingCardData: any
@@ -251,7 +253,7 @@ export function Board() {
     setActiveDragItemData(e?.active?.data?.current)
 
     if (e?.active?.data?.current?.list_id) {
-      setOldListWhenDraggingCard(findListByCardId(e?.active?.id))
+      setOldListWhenDraggingCard(findListByCardId(e?.active?.id as string))
     }
   }
 
@@ -272,8 +274,8 @@ export function Board() {
     } = active
     const { id: overCardId } = over
 
-    const activeList = findListByCardId(activeDragingCardId)
-    const overList = findListByCardId(overCardId)
+    const activeList = findListByCardId(activeDragingCardId as string)
+    const overList = findListByCardId(overCardId as string)
     if (!activeList || !overList) {
       console.log('!activeColumn')
       return
@@ -303,8 +305,8 @@ export function Board() {
       } = active
       const { id: overCardId } = over
 
-      const activeList = findListByCardId(activeDragingCardId)
-      const overList = findListByCardId(overCardId)
+      const activeList = findListByCardId(activeDragingCardId as string)
+      const overList = findListByCardId(overCardId as string)
       if (!activeList || !overList || !oldListWhenDragging) {
         console.log('!activeColumn')
         return
