@@ -75,6 +75,7 @@ export const UpdateCardDetailRequestSchema = z
     CardSchema.partial().pick({
       name: true,
       cover: true,
+      description: true,
     })
   );
 export type UpdateCardDetailRequest = z.infer<
@@ -208,3 +209,40 @@ export const MoveCardSamelistResponseSchema = z.object({
 export type MoveCardSamelistResponse = z.infer<
   typeof MoveCardSamelistResponseSchema
 >;
+
+// Move card new
+export const MoveCardRequestSchema = z.object({
+  data: z.object({
+    source_list: z.object({
+      cardlist_id: z.string(),
+      target_card_id: z.string(),
+      cards_id_index: z.string().array(),
+    }),
+    destination_new_list: z
+      .object({
+        cardlist_id: z.string(),
+        cards_id_index: z.string().array(),
+      })
+      .nullish(),
+  }),
+});
+export const MoveCardResponseSchema = z.object({
+  data: CardlistSchema.pick({
+    _id: true,
+    cards: true,
+  }).array(),
+});
+export type MoveCardRequest = z.infer<typeof MoveCardRequestSchema>;
+export type MoveCardResponse = z.infer<typeof MoveCardResponseSchema>;
+
+//Delete feature
+export const DeleteFeatureRequestSchema = z.object({
+  cardlist_id: z.string(),
+  card_id: z.string(),
+  feature_id: z.string(),
+});
+export const DeleteFeatureResponseSchema = z.object({
+  data: CardSchema,
+});
+export type DeleteFeatureRequest = z.infer<typeof DeleteFeatureRequestSchema>;
+export type DeleteFeatureResponse = z.infer<typeof DeleteFeatureResponseSchema>;

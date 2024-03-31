@@ -13,6 +13,7 @@ export const FeatureLabelSchema = z.object({
 
 export const FeatureChecklistSchema = z.object({
   _id: z.string().optional(),
+  name: z.string().default(""),
   type: z.literal("checklist"),
   items: z
     .object({ name: z.string(), is_check: z.boolean().default(false) })

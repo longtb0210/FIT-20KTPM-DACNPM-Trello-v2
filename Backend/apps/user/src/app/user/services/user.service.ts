@@ -57,7 +57,7 @@ export class UserService {
 
   async deleteActivity(email: string, id: number | string) {
     const result = await this.ActivityMModel.findOneAndDelete({
-      _id: id,
+      _id: id.toString(),
     }).exec()
 
     await this.UserMModel.updateOne({ email }, { $pull: { activities: { _id: id } } })
