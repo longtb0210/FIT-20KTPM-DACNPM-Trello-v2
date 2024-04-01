@@ -203,6 +203,27 @@ export type SortCardlistByNameResponse = z.infer<
   typeof SortCardlistByNameResponseSchema
 >;
 
+export const SortCardByOldestDateResponseSchema = z.object({
+  data: CardlistSchema,
+});
+export type SortCardByOldestDateResponse = z.infer<
+  typeof SortCardByOldestDateResponseSchema
+>;
+
+export const SortCardByNewestDateResponseSchema = z.object({
+  data: CardlistSchema,
+});
+export type SortCardByNewestDateResponse = z.infer<
+  typeof SortCardByNewestDateResponseSchema
+>;
+
+export const SortCardByNameResponseSchema = z.object({
+  data: CardlistSchema,
+});
+export type SortCardByNameResponse = z.infer<
+  typeof SortCardByNameResponseSchema
+>;
+
 export const BoardIdRequestParamsSchema = z.object({
   board_id: z.string(),
 });

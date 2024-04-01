@@ -107,6 +107,36 @@ export class CardlistController {
     }
   }
 
+  @InjectRoute(CardlistRoutes.sortCardsByOldestDate)
+  async sortCardsByOldestDate(
+    @Param('cardlistId', IdParamValidationPipe) cardlistId: string,
+  ): Promise<TrelloApi.CardlistApi.SortCardByOldestDateResponse> {
+    const data = await this.cardlistService.sortCardByOldestDate(cardlistId)
+    return {
+      data: data,
+    }
+  }
+
+  @InjectRoute(CardlistRoutes.sortCardsByNewestDate)
+  async sortCardsByNewestDate(
+    @Param('cardlistId', IdParamValidationPipe) cardlistId: string,
+  ): Promise<TrelloApi.CardlistApi.SortCardByNewestDateResponse> {
+    const data = await this.cardlistService.sortCardByNewestDate(cardlistId)
+    return {
+      data: data,
+    }
+  }
+
+  @InjectRoute(CardlistRoutes.sortCardsByName)
+  async sortCardsByName(
+    @Param('cardlistId', IdParamValidationPipe) cardlistId: string,
+  ): Promise<TrelloApi.CardlistApi.SortCardByNameResponse> {
+    const data = await this.cardlistService.sortCardByName(cardlistId)
+    return {
+      data: data,
+    }
+  }
+
   @InjectRoute(CardlistRoutes.updateCardlists)
   async update(
     @Body(new ZodValidationPipe(TrelloApi.CardlistApi.UpdateCardlistRequestSchema))

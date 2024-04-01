@@ -16,9 +16,13 @@ export abstract class ICardlistService {
   abstract getAllCardlistArchivedByBoardId(board_id: string): Promise<DbSchemas.CardlistSchema.CardList[]>
 
   abstract getAllCardlistNonArchivedByBoardId(board_id: string): Promise<DbSchemas.CardlistSchema.CardList[]>
-  abstract sortCardlistByOldestDate(board_id: string): Promise<DbSchemas.CardlistSchema.CardList[]>
-  abstract sortCardlistByNewestDate(board_id: string): Promise<DbSchemas.CardlistSchema.CardList[]>
-  abstract sortCardlistByName(board_id: string): Promise<DbSchemas.CardlistSchema.CardList[]>
+  abstract sortCardlistByOldestDate(cardlist_id: string): Promise<DbSchemas.CardlistSchema.CardList[]>
+  abstract sortCardlistByNewestDate(cardlist_id: string): Promise<DbSchemas.CardlistSchema.CardList[]>
+  abstract sortCardlistByName(cardlist_id: string): Promise<DbSchemas.CardlistSchema.CardList[]>
+
+  abstract sortCardByOldestDate(board_id: string): Promise<DbSchemas.CardlistSchema.CardList>
+  abstract sortCardByNewestDate(board_id: string): Promise<DbSchemas.CardlistSchema.CardList>
+  abstract sortCardByName(board_id: string): Promise<DbSchemas.CardlistSchema.CardList>
 
   abstract archiveCardsInlist(cardlist_id: string): Promise<DbSchemas.CardlistSchema.CardList>
   abstract archiveCardlist(cardlist_id: string): Promise<DbSchemas.CardlistSchema.CardList>
@@ -186,6 +190,82 @@ export class CardlistService implements ICardlistService {
     return cardlists
   }
 
+  async sortCardByOldestDate(cardlist_id: string) {
+    const cardlist = await this.CardlistMModel.findById(cardlist_id).exec()
+    cardlist.cards.sort((a, b) => {
+      const dateA = a.created_at ? new Date(a.created_at).getTime() : null
+      const dateB = b.created_at ? new Date(b.created_at).getTime() : null
+
+      if (dateA === null && dateB === null) {
+        return 0
+      } else if (dateA === null) {
+        return -1
+      } else if (dateB === null) {
+        return 1
+      }
+
+      return dateA - dateB
+    })
+    for (let index = 0; index < cardlist.cards.length; index++) {
+      const item = cardlist.cards[index]
+      const card = await this.CardMModel.findById(item._id).exec()
+      card.index = index
+      item.index = index
+      await card.save()
+    }
+
+    await cardlist.save()
+    return cardlist
+  }
+
+  async sortCardByNewestDate(cardlist_id: string) {
+    const cardlist = await this.CardlistMModel.findById(cardlist_id).exec()
+    cardlist.cards.sort((a, b) => {
+      const dateA = a.created_at ? new Date(a.created_at).getTime() : null
+      const dateB = b.created_at ? new Date(b.created_at).getTime() : null
+
+      if (dateA === null && dateB === null) {
+        return 0
+      } else if (dateA === null) {
+        return -1
+      } else if (dateB === null) {
+        return 1
+      }
+
+      return dateB - dateA
+    })
+    for (let index = 0; index < cardlist.cards.length; index++) {
+      const item = cardlist.cards[index]
+      const card = await this.CardMModel.findById(item._id).exec()
+      card.index = index
+      item.index = index
+      await card.save()
+    }
+
+    await cardlist.save()
+    return cardlist
+  }
+
+  async sortCardByName(cardlist_id: string) {
+    const cardlist = await this.CardlistMModel.findById(cardlist_id).exec()
+    cardlist.cards.sort((a, b) => {
+      const nameA = a.name.toLowerCase()
+      const nameB = b.name.toLowerCase()
+
+      return nameA.localeCompare(nameB)
+    })
+
+    for (let index = 0; index < cardlist.cards.length; index++) {
+      const item = cardlist.cards[index]
+      const card = await this.CardMModel.findById(item._id).exec()
+      card.index = index
+      item.index = index
+      await card.save()
+    }
+
+    await cardlist.save()
+    return cardlist
+  }
   async archiveCardsInlist(cardlist_id: string) {
     const cardlist = await this.CardlistMModel.findById(cardlist_id)
     const currentDate = new Date()
@@ -252,7 +332,6 @@ export class CardlistService implements ICardlistService {
       description: data.description,
       created_at: new Date(),
     })
-    console.log(card)
     await card.save()
     cardlist.cards.push(card)
     return cardlist.save()
@@ -410,6 +489,42 @@ export class CardlistServiceMock implements ICardlistService {
   sortCardlistByName(): Promise<DbSchemas.CardlistSchema.CardList[]> {
     return new Promise<DbSchemas.CardlistSchema.CardList[]>((res) => {
       res([])
+    })
+  }
+
+  sortCardByOldestDate(): Promise<DbSchemas.CardlistSchema.CardList> {
+    return new Promise<DbSchemas.CardlistSchema.CardList>((res) => {
+      res({
+        _id: 'Mock cardlist-id',
+        board_id: 'Mock-id',
+        watcher_email: [],
+        cards: [],
+        name: 'Mock-name',
+      })
+    })
+  }
+
+  sortCardByNewestDate(): Promise<DbSchemas.CardlistSchema.CardList> {
+    return new Promise<DbSchemas.CardlistSchema.CardList>((res) => {
+      res({
+        _id: 'Mock cardlist-id',
+        board_id: 'Mock-id',
+        watcher_email: [],
+        cards: [],
+        name: 'Mock-name',
+      })
+    })
+  }
+
+  sortCardByName(): Promise<DbSchemas.CardlistSchema.CardList> {
+    return new Promise<DbSchemas.CardlistSchema.CardList>((res) => {
+      res({
+        _id: 'Mock cardlist-id',
+        board_id: 'Mock-id',
+        watcher_email: [],
+        cards: [],
+        name: 'Mock-name',
+      })
     })
   }
   archiveCardsInlist(cardlist_id: string): Promise<DbSchemas.CardlistSchema.CardList> {
