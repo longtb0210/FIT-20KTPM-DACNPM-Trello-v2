@@ -46,13 +46,13 @@ export class UserService {
   async createActivity(email: string, data: TrelloApi.UserApi.CreateActivityRequest) {
     const model = new this.ActivityMModel(data)
 
-    await this.UserMModel.updateOne({ email }, { $push: { activities: model } })
+    await this.UserMModel.updateOne({ email }, { $push: { activities: model } }, { upsert: true })
 
     return model.save()
   }
 
   async getAllActivities(email: string) {
-    return this.UserMModel.findOne({ email }).select('activities')
+    return this.UserMModel.findOne({ email }, undefined, { upsert: true }).select('activities')
   }
 
   async deleteActivity(email: string, id: number | string) {
