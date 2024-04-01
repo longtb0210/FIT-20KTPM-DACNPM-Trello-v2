@@ -51,6 +51,7 @@ export class CardService {
         $set: {
           ...(data.name ? { 'cards.$.name': data.name } : {}),
           ...(data.cover ? { 'cards.$.cover': data.cover } : {}),
+          ...(data.description ? { 'cards.$.cover': data.description } : {}),
         },
       },
       { new: true },
