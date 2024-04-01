@@ -1,7 +1,4 @@
-import { readdirSync } from 'fs'
-import { join, resolve } from 'path'
-
-import { initProtos, initSwagger } from '@app/common'
+import { initSwagger } from '@app/common'
 import { NestFactory } from '@nestjs/core'
 import { TrelloApi } from '@trello-v2/shared'
 

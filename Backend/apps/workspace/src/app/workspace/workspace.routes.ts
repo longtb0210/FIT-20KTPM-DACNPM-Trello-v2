@@ -67,7 +67,7 @@ export default {
       body: {
         schema: { $ref: getSchemaPath('CreateWorkspaceRequestSchema') },
       },
-      responses: [{ status: HttpStatus.OK, schema: { $ref: getSchemaPath('CreateWorspaceResponseSchema') } }],
+      responses: [{ status: HttpStatus.OK, schema: { $ref: getSchemaPath('CreateWorkspaceResponseSchema') } }],
     },
   },
   updateWorkspaceInfo: <IRouteParams>{
@@ -87,7 +87,7 @@ export default {
       responses: [{ status: HttpStatus.OK, schema: { $ref: getSchemaPath('UpdateWorkspaceInfoResponseSchema') } }],
     },
   },
-  deleteWorspaceById: <IRouteParams>{
+  deleteWorkspaceById: <IRouteParams>{
     path: '/:id',
     method: RequestMethod.DELETE,
     swaggerInfo: {
