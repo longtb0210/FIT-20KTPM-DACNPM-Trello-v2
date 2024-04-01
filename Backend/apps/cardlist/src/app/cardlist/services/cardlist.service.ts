@@ -244,13 +244,15 @@ export class CardlistService implements ICardlistService {
     const card = new this.CardMModel({
       name: data.name,
       index: data.index,
-      watcher_email: [],
+      watcher_email: data.watcher_email,
       archive_at: null,
       activities: [],
       features: [],
       cover: data.cover,
       description: data.description,
+      created_at: new Date(),
     })
+    console.log(card)
     await card.save()
     cardlist.cards.push(card)
     return cardlist.save()
@@ -455,7 +457,7 @@ export class CardlistServiceMock implements ICardlistService {
         cards: [],
         watcher_email: [],
         archive_at: null,
-        created_at: null,
+        created_at: new Date(),
       })
     })
   }

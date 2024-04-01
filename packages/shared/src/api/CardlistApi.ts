@@ -75,10 +75,10 @@ export type MoveCardlistRequest = z.infer<typeof MoveCardlistRequestSchema>;
 
 export const AddCardToListRequestSchema = CardSchema.omit({
   _id: true,
-  watcher_email: true,
   archive_at: true,
   activities: true,
   features: true,
+  created_at: true,
 }).merge(
   z.object({
     index: z.number().default(0),
