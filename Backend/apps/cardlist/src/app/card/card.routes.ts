@@ -1,5 +1,6 @@
 import { IRouteParams } from '@app/common/decorators'
 import { RequestMethod } from '@nestjs/common'
+import { getSchemaPath } from '@nestjs/swagger'
 
 export const CardRoutes = {
   createCard: {
@@ -66,5 +67,23 @@ export const CardRoutes = {
     path: 'feature',
     method: RequestMethod.DELETE,
     jwtSecure: false,
+  } as IRouteParams,
+  addMemberToCard: {
+    path: 'member',
+    method: RequestMethod.POST,
+    jwtSecure: false,
+    swaggerInfo: {
+      body: { schema: { $ref: getSchemaPath('AddCardMemberRequestSchema') } },
+      responses: [{ status: 200, schema: { $ref: getSchemaPath('AddCardMemberResponseSchema') } }],
+    },
+  } as IRouteParams,
+  deleteMemberToCard: {
+    path: 'member',
+    method: RequestMethod.DELETE,
+    jwtSecure: false,
+    swaggerInfo: {
+      body: { schema: { $ref: getSchemaPath('AddCardMemberRequestSchema') } },
+      responses: [{ status: 200, schema: { $ref: getSchemaPath('AddCardMemberResponseSchema') } }],
+    },
   } as IRouteParams,
 } as const

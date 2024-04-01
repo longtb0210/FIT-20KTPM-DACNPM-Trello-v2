@@ -15,6 +15,7 @@ export const CardMSchema = new Schema<DbSchemas.CardlistSchema.Card>({
   index: Number,
   watcher_email: [String],
   archive_at: Date,
+  member_email: [String],
   activities: [ActivityMSchema],
   features: [FeatureMSchema],
 })

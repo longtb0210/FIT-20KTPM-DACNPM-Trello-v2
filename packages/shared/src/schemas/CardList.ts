@@ -8,6 +8,7 @@ export const CardSchema = z.object({
   name: z.string(),
   index: z.number().nullish(),
   watcher_email: z.string().array().default([]),
+  member_email: z.string().array().default([]),
   archive_at: z.coerce.date().nullish(),
   activities: ActivitySchema.array().default([]),
   features: FeatureSchema.array().default([]),
