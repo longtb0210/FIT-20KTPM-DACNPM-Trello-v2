@@ -95,7 +95,7 @@ describe('WorkspaceController', () => {
           serveRoot: '/api/workspace/swagger',
           exclude: ['/api/workspace/swagger/index.html'],
         }),
-        MongooseModule.forRoot('mongodb://MONGO_USER:MONGO_123@localhost:7001/trello?authSource=admin'),
+        MongooseModule.forRoot('mongodb://MONGO_USER:MONGO_123@localhost:7000/trello?authSource=admin'),
         MemberMModule,
         WorkspaceMModule,
       ],

@@ -30,6 +30,7 @@ export abstract class ICardlistService {
   abstract addWatcher(data: TrelloApi.CardlistApi.AddWatcherRequest): Promise<DbSchemas.CardlistSchema.CardList>
 
   abstract addCardToList(data: TrelloApi.CardlistApi.AddCardToListRequest): Promise<DbSchemas.CardlistSchema.CardList>
+  abstract cloneCardlistsToNewBoard(board_id_input: string, board_id_output: string): Promise<DbSchemas.CardlistSchema.CardList[]>
 
   abstract deleteCardlistsByBoardId(data: TrelloApi.CardlistApi.DeleteCardlistsByBoardIdRequest): Promise<{ status: string; msg: string }>
 }
@@ -452,50 +453,120 @@ export class CardlistServiceMock implements ICardlistService {
 
   getAllCardlist() {
     return new Promise<DbSchemas.CardlistSchema.CardList[]>((res) => {
-      res([])
+      res([
+        {
+          _id: 'Mock-id',
+          name: 'Mock-name',
+          board_id: 'Mock-id',
+          watcher_email: [],
+          cards: [],
+          archive_at: null,
+          created_at: new Date(),
+        },
+      ])
     })
   }
 
-  getAllCardlistByBoardId() {
+  getAllCardlistByBoardId(board_id: string) {
     return new Promise<DbSchemas.CardlistSchema.CardList[]>((res) => {
-      res([])
+      res([
+        {
+          _id: 'Mock-id',
+          name: 'Mock-name',
+          board_id: board_id,
+          watcher_email: [],
+          cards: [],
+          archive_at: null,
+          created_at: new Date(),
+        },
+      ])
     })
   }
 
-  getAllCardlistArchivedByBoardId() {
+  getAllCardlistArchivedByBoardId(board_id: string) {
     return new Promise<DbSchemas.CardlistSchema.CardList[]>((res) => {
-      res([])
+      res([
+        {
+          _id: 'Mock-id',
+          name: 'Mock-name',
+          board_id: board_id,
+          watcher_email: [],
+          cards: [],
+          archive_at: null,
+          created_at: new Date(),
+        },
+      ])
     })
   }
 
-  getAllCardlistNonArchivedByBoardId() {
+  getAllCardlistNonArchivedByBoardId(board_id: string) {
     return new Promise<DbSchemas.CardlistSchema.CardList[]>((res) => {
-      res([])
+      res([
+        {
+          _id: 'Mock-id',
+          name: 'Mock-name',
+          board_id: board_id,
+          watcher_email: [],
+          cards: [],
+          archive_at: null,
+          created_at: new Date(),
+        },
+      ])
     })
   }
 
-  sortCardlistByOldestDate(): Promise<DbSchemas.CardlistSchema.CardList[]> {
+  sortCardlistByOldestDate(board_id: string): Promise<DbSchemas.CardlistSchema.CardList[]> {
     return new Promise<DbSchemas.CardlistSchema.CardList[]>((res) => {
-      res([])
+      res([
+        {
+          _id: 'Mock-id',
+          name: 'Mock-name',
+          board_id: board_id,
+          watcher_email: [],
+          cards: [],
+          archive_at: null,
+          created_at: new Date(),
+        },
+      ])
     })
   }
 
-  sortCardlistByNewestDate(): Promise<DbSchemas.CardlistSchema.CardList[]> {
+  sortCardlistByNewestDate(board_id: string): Promise<DbSchemas.CardlistSchema.CardList[]> {
     return new Promise<DbSchemas.CardlistSchema.CardList[]>((res) => {
-      res([])
+      res([
+        {
+          _id: 'Mock-id',
+          name: 'Mock-name',
+          board_id: board_id,
+          watcher_email: [],
+          cards: [],
+          archive_at: null,
+          created_at: new Date(),
+        },
+      ])
     })
   }
 
-  sortCardlistByName(): Promise<DbSchemas.CardlistSchema.CardList[]> {
+  sortCardlistByName(board_id: string): Promise<DbSchemas.CardlistSchema.CardList[]> {
     return new Promise<DbSchemas.CardlistSchema.CardList[]>((res) => {
-      res([])
+      res([
+        {
+          _id: 'Mock-id',
+          name: 'Mock-name',
+          board_id: board_id,
+          watcher_email: [],
+          cards: [],
+          archive_at: null,
+          created_at: new Date(),
+        },
+      ])
     })
   }
 
-  sortCardByOldestDate(): Promise<DbSchemas.CardlistSchema.CardList> {
+  sortCardByOldestDate(cardlist_id: string): Promise<DbSchemas.CardlistSchema.CardList> {
     return new Promise<DbSchemas.CardlistSchema.CardList>((res) => {
       res({
-        _id: 'Mock cardlist-id',
+        _id: cardlist_id,
         board_id: 'Mock-id',
         watcher_email: [],
         cards: [],
@@ -504,10 +575,10 @@ export class CardlistServiceMock implements ICardlistService {
     })
   }
 
-  sortCardByNewestDate(): Promise<DbSchemas.CardlistSchema.CardList> {
+  sortCardByNewestDate(cardlist_id: string): Promise<DbSchemas.CardlistSchema.CardList> {
     return new Promise<DbSchemas.CardlistSchema.CardList>((res) => {
       res({
-        _id: 'Mock cardlist-id',
+        _id: cardlist_id,
         board_id: 'Mock-id',
         watcher_email: [],
         cards: [],
@@ -516,10 +587,10 @@ export class CardlistServiceMock implements ICardlistService {
     })
   }
 
-  sortCardByName(): Promise<DbSchemas.CardlistSchema.CardList> {
+  sortCardByName(cardlist_id: string): Promise<DbSchemas.CardlistSchema.CardList> {
     return new Promise<DbSchemas.CardlistSchema.CardList>((res) => {
       res({
-        _id: 'Mock cardlist-id',
+        _id: cardlist_id,
         board_id: 'Mock-id',
         watcher_email: [],
         cards: [],
@@ -574,6 +645,22 @@ export class CardlistServiceMock implements ICardlistService {
         archive_at: null,
         created_at: new Date(),
       })
+    })
+  }
+
+  cloneCardlistsToNewBoard(board_id_input: string, board_id_output: string): Promise<DbSchemas.CardlistSchema.CardList[]> {
+    return new Promise<DbSchemas.CardlistSchema.CardList[]>((res) => {
+      res([
+        {
+          _id: 'Mock-id',
+          name: 'Mock-name',
+          board_id: board_id_input ? board_id_input : board_id_output,
+          watcher_email: [],
+          cards: [],
+          archive_at: null,
+          created_at: new Date(),
+        },
+      ])
     })
   }
   async deleteCardlistsByBoardId(data: TrelloApi.CardlistApi.DeleteCardlistsByBoardIdRequest): Promise<{ status: string; msg: string }> {
