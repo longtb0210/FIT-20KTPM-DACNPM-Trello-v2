@@ -1,9 +1,9 @@
-import { Model } from 'mongoose'
+import { Model } from 'mongoose';
 
-import { UserInfoDto } from '@app/common/auth/user-info.dto'
-import { NotFoundException, UnauthorizedException } from '@nestjs/common'
-import { InjectModel } from '@nestjs/mongoose'
-import { DbSchemas, TrelloApi } from '@trello-v2/shared'
+import { UserInfoDto } from '@app/common/auth/user-info.dto';
+import { NotFoundException, UnauthorizedException } from '@nestjs/common';
+import { InjectModel } from '@nestjs/mongoose';
+import { DbSchemas, TrelloApi } from '@trello-v2/shared';
 
 export abstract class IWorkspaceService {
   abstract getWorkspaceById(workspace_id: string): Promise<DbSchemas.WorkspaceSchema.Workspace | null>
@@ -162,10 +162,13 @@ export class WorkspaceService implements IWorkspaceService {
       email: email_owner,
       role: DbSchemas.WorkspaceSchema.ROLE_WORKSPACE.admin,
       status: DbSchemas.WorkspaceSchema.STATUS_WORKSPACE.owner,
-      visibility: DbSchemas.WorkspaceSchema.VISIBILITY_WORKSPACE.private,
     })
 
-    const newWorkspace = new this.workspaceModel({ ...body, members: [owner] })
+    const newWorkspace = new this.workspaceModel({
+      ...body,
+      visibility: DbSchemas.WorkspaceSchema.VISIBILITY_WORKSPACE.private,
+      members: [owner],
+    })
 
     return await newWorkspace.save()
   }
