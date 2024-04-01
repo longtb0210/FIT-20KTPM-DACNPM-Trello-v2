@@ -283,7 +283,7 @@ export class BoardController {
     ],
   })
   @UseInterceptors(FileInterceptor('background'))
-  async updateBackground(
+  async addBackground(
     @Param('board_id', IdParamValidationPipe)
     board_id: TrelloApi.BoardApi.BoardIdRequest,
     @UploadedFile(
