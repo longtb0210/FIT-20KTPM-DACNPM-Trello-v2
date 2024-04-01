@@ -12,16 +12,21 @@ import { useTheme } from '~/components/Theme/themeContext'
 // import { createCardAPI } from '~/api/Card'
 import { CardApiRTQ, CardlistApiRTQ } from '~/api'
 import { TrelloApi } from '@trello-v2/shared'
+import { board_id } from '~/api/getInfo'
 export default function ListComponent({
   list,
   index,
   cardSelected,
   maxHeight,
-  setOpenCardSetting
+  setOpenCardSetting,
+  setResetManually,
+  resetManually
 }: ListComponentProps) {
   const [createCard] = CardApiRTQ.CardApiSlice.useCreateCardMutation()
   const [updateCardList] = CardlistApiRTQ.CardListApiSlice.useUpdateCardListMutation()
-  const [getAllCardlist] = CardlistApiRTQ.CardListApiSlice.useLazyGetAllCardlistQuery()
+  // const [getAllCardlist] = CardlistApiRTQ.CardListApiSlice.useLazyGetAllCardlistQuery()
+  const [getCardListByBoardId, { data: cardlistDataByBoardId }] =
+    CardlistApiRTQ.CardListApiSlice.useLazyGetCardlistByBoardIdQuery()
   const { colors, darkMode } = useTheme()
   const [listSettingOpen, setListSettingOpen] = useState<string>()
   const [addCardOpenAt, setAddCardOpenAt] = useState<string>('')
@@ -64,15 +69,16 @@ export default function ListComponent({
     // If the input is blurred without any changes, revert to list name
     if (!inputValue.trim() || inputValue === list.name) {
       setInputValue(list.name)
-      updateCardList({
-        _id: list._id,
-        index: list.index || undefined,
-        name: inputValue,
-        archive_at: new Date()
-      }).then(() => {
-        getAllCardlist()
-      })
     }
+    updateCardList({
+      _id: list._id,
+      index: list.index || undefined,
+      name: inputValue,
+      archive_at: new Date()
+    }).then(() => {
+      getCardListByBoardId({ id: board_id })
+    })
+    setResetManually(!resetManually)
     setEditName(false)
     setIsInputFocused(false)
   }
@@ -91,7 +97,7 @@ export default function ListComponent({
     }).then(() => {
       setAddCardOpenAt('')
       setNewCardName('')
-      getAllCardlist()
+      getCardListByBoardId({ id: board_id })
     })
   }
   const { attributes, listeners, setNodeRef, transform, isDragging } = useSortable({

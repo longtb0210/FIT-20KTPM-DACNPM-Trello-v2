@@ -7,9 +7,18 @@ import { SortableContext, horizontalListSortingStrategy } from '@dnd-kit/sortabl
 import { useEffect, useRef, useState } from 'react'
 import { UniqueIdentifier } from '@dnd-kit/core'
 import { CardlistApiRTQ } from '~/api'
+import { board_id } from '~/api/getInfo'
 
-export default function ListsComponent({ lists, cardSelected, setOpenCardSetting }: ListsComponentProps) {
+export default function ListsComponent({
+  lists,
+  setResetManually,
+  cardSelected,
+  setOpenCardSetting,
+  resetManually
+}: ListsComponentProps) {
   const [getAllCardlist, { data: cardlistData }] = CardlistApiRTQ.CardListApiSlice.useLazyGetAllCardlistQuery()
+  const [getCardListByBoardId, { data: cardlistDataByBoardId }] =
+    CardlistApiRTQ.CardListApiSlice.useLazyGetCardlistByBoardIdQuery()
   const [createCardlist] = CardlistApiRTQ.CardListApiSlice.useCreateCardlistMutation()
   const { colors, darkMode } = useTheme()
   const [showAddListForm, setShowAddListForm] = useState(false)
@@ -53,7 +62,7 @@ export default function ListsComponent({ lists, cardSelected, setOpenCardSetting
     }
   }, [lists])
   useEffect(() => {
-    if (!cardlistData) getAllCardlist()
+    if (!cardlistDataByBoardId) getCardListByBoardId({ id: board_id })
     document.addEventListener('mousedown', handleClickOutside)
     return () => {
       document.removeEventListener('mousedown', handleClickOutside)
@@ -68,10 +77,12 @@ export default function ListsComponent({ lists, cardSelected, setOpenCardSetting
   async function createList() {
     createCardlist({
       name: newListName,
-      board_id: 'demo_board',
-      index: cardlistData?.data.length || 0,
-      watcher_email: []
-    }).then(() => getAllCardlist())
+      board_id: board_id,
+      index: cardlistDataByBoardId?.data.length || 0,
+      watcher_email: [],
+      archive_at: undefined,
+      created_at: new Date()
+    }).then(() => getCardListByBoardId({ id: board_id }))
     // const res = await createListAPI(data)
     // console.log(res)
   }
@@ -90,6 +101,8 @@ export default function ListsComponent({ lists, cardSelected, setOpenCardSetting
                 maxHeight={biggestHeight}
                 index={index}
                 list={list}
+                resetManually={resetManually}
+                setResetManually={setResetManually}
                 setOpenCardSetting={setOpenCardSetting}
               />
             </div>

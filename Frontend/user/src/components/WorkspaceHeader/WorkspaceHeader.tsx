@@ -16,11 +16,12 @@ interface HeaderWpSetting {
 export const WorkspaceHeader: React.FC<HeaderWpSetting> = ({ visibility }) => {
   const { colors, darkMode } = useTheme()
   const [workspaceInfo, setWorkspaceInfo] = useState<Workspace>()
-  const [resetUseStateManual, setResetUseStateManual] = useState<boolean>(false)
+  const [visibilityState, setVisibilityState] = useState<string>('')
+  const [getWorkspaceInfo, { data: workspaceInfoRes }] =
+    WorkspaceApiRTQ.WorkspaceApiSlice.useLazyGetWorkspaceInfoQuery()
+  const [resetWorkspaceManually, setResetWorkspaceManually] = useState<boolean>(false)
   const [isEditing, setIsEditing] = useState<boolean>(false)
   const [updateWorkspaceInfo] = WorkspaceApiRTQ.WorkspaceApiSlice.useUpdateWorkspaceMutation()
-  const [getWorkspaceInfo, { data: workspaceInfoRes }] =
-    WorkspaceApiRTQ.WorkspaceApiSlice.useLazyGetOwnerWorkspacebyEmailQuery()
   const [formData, setFormData] = useState<UpdateWorkspaceInfoRequest>({
     _id: 'string',
     name: '123',
@@ -31,9 +32,21 @@ export const WorkspaceHeader: React.FC<HeaderWpSetting> = ({ visibility }) => {
     members: []
   })
   useEffect(() => {
-    getWorkspaceInfo({ email: 'botomtinlon@gmail.com' })
+    getWorkspaceInfo({ id: '6609a3b0e9b24bc694e69cf8' })
+  }, [resetWorkspaceManually])
+  useEffect(() => {
     setWorkspaceInfo(workspaceInfoRes?.data)
-  }, [resetUseStateManual])
+    console.log('My workspace123',workspaceInfoRes?.data)
+    setFormData({
+      _id: '6609a3b0e9b24bc694e69cf8',
+      name: workspaceInfoRes?.data.name,
+      short_name: workspaceInfoRes?.data.short_name,
+      description: workspaceInfoRes?.data.description,
+      website: workspaceInfoRes?.data.website,
+      logo: workspaceInfoRes?.data.logo,
+      members: workspaceInfoRes?.data.members
+    })
+  }, [workspaceInfoRes])
   const isFormValid = formData.name?.trim() !== '' && formData.short_name?.trim() !== ''
   const handleEditClick = () => {
     setIsEditing(true)
@@ -41,7 +54,7 @@ export const WorkspaceHeader: React.FC<HeaderWpSetting> = ({ visibility }) => {
 
   const handleSaveClick = () => {
     updateWorkspaceInfo(formData).then(() => {
-      setResetUseStateManual(!resetUseStateManual)
+      setResetWorkspaceManually(!resetWorkspaceManually)
       setIsEditing(false)
     })
   }
@@ -57,7 +70,11 @@ export const WorkspaceHeader: React.FC<HeaderWpSetting> = ({ visibility }) => {
         {!isEditing ? (
           <>
             <LogoSection />
-            <WorkspaceInfo visibility={visibility} handleEditClick={handleEditClick} />
+            <WorkspaceInfo
+              workspaceName={workspaceInfo?.name}
+              visibility={workspaceInfo?.visibility}
+              handleEditClick={handleEditClick}
+            />
           </>
         ) : (
           <EditForm

@@ -30,6 +30,7 @@ import { useTheme } from '../../components/Theme/themeContext'
 import { getAllListAPI } from '../../api/List'
 import { CardlistApiRTQ } from '../../api'
 import { TrelloApi } from '@trello-v2/shared'
+import { board_id } from '~/api/getInfo'
 const MOCK_CARD_DATA: TrelloApi.CardlistApi.GetallCardlistResponse = {
   data: [
     {
@@ -63,13 +64,17 @@ const ACTIVE_DRAG_ITEM_TYPE = {
 // const LazyListComponent = lazy(() => import('./components/List'))
 const LazyListsComponent = lazy(() => import('./components/Lists'))
 export function Board() {
-  const [getAllCardlist, { data: cardlistData }] = CardlistApiRTQ.CardListApiSlice.useLazyGetAllCardlistQuery()
+  // const [getAllCardlist, { data: cardlistData }] = CardlistApiRTQ.CardListApiSlice.useLazyGetAllCardlistQuery()
+  const [getCardListByBoardId, { data: cardlistDataByBoardId }] =
+    CardlistApiRTQ.CardListApiSlice.useLazyGetCardlistByBoardIdQuery()
   // const { colors, darkMode } = useTheme()
   const [oldListWhenDragging, setOldListWhenDraggingCard] = useState<List>()
   const [listsData, setListsData] = useState<Array<List>>()
   const [activeDragItemId, setActiveDragItemId] = useState<string>('')
   const [activeDragItemType, setActiveDragItemType] = useState<string>('')
   const [activeDragItemData, setActiveDragItemData] = useState<any>()
+  const [openCardSetting, setOpenCardSetting] = useState<string>('')
+  const [resetManually, setResetManually] = useState<boolean>(false)
   // const [overListData, setOverListData] = useState<List>()
   // const [cardsData, setCardsData] = useState<Card[]>(cards)
   const [selectedCard, setSelectedCard] = useState<Card>()
@@ -93,8 +98,8 @@ export function Board() {
   //   }
   // })
   useEffect(() => {
-    if (!cardlistData) return
-    const updatedLists_placeHolder = cardlistData.data.map((list) => ({
+    if (!cardlistDataByBoardId) return
+    const updatedLists_placeHolder = cardlistDataByBoardId.data.map((list) => ({
       ...list,
       cards: list.cards.map(
         (card) =>
@@ -118,7 +123,7 @@ export function Board() {
       return list
     })
     setListsData(updatedLists)
-  }, [cardlistData])
+  }, [cardlistDataByBoardId])
   const sensors = useSensors(
     useSensor(PointerSensor, {
       activationConstraint: {
@@ -127,69 +132,16 @@ export function Board() {
     })
   )
   async function getAllList() {
-    getAllCardlist()
-    // const res = await getAllListAPI()
-    // if (res.status === 200) {
-    //   const updatedLists_placeHolder = res.data.map((list: List) => ({
-    //     ...list,
-    //     data: list.cards.map((task) => ({
-    //       ...task,
-    //       placeHolder: false // Set your default value for placeHolder
-    //     }))
-    //   }))
-    //   const updatedLists = updatedLists_placeHolder?.map((list: List) => {
-    //     // Check if data array is empty
-    //     if (list.cards.length === 0) {
-    //       // Add a new item to data array
-    //       const newItem = generatePlaceHolderCard(list)
-
-    //       return {
-    //         ...list,
-    //         data: [newItem]
-    //       }
-    //     }
-
-    //     return list // If data array is not empty, keep it unchanged
-    //   })
-
-    //   setListsData(updatedLists)
-    // }
+    // getAllCardlist()
+    getCardListByBoardId({ id: board_id })
   }
   useEffect(() => {
     console.log('update list')
     getAllList()
 
     // You can call your API update function here
-  }, [])
-  // useEffect(() => {
-  //   console.log('update list')
-
-  //   const updatedLists_placeHolder = lists.map((list) => ({
-  //     ...list,
-  //     data: list.data.map((task) => ({
-  //       ...task,
-  //       placeHolder: false // Set your default value for placeHolder
-  //     }))
-  //   }))
-  //   const updatedLists = updatedLists_placeHolder.map((list) => {
-  //     // Check if data array is empty
-  //     if (list.data.length === 0) {
-  //       // Add a new item to data array
-  //       const newItem = generatePlaceHolderCard(list)
-
-  //       return {
-  //         ...list,
-  //         data: [newItem]
-  //       }
-  //     }
-
-  //     return list // If data array is not empty, keep it unchanged
-  //   })
-  //   setListsData(updatedLists)
-  //   console.log(updatedLists)
-
-  //   // You can call your API update function here
-  // }, [])
+  }, [openCardSetting])
+  
 
   function findListByCardId(cardId: string) {
     return listsData?.find((list) => list?.cards?.map((card) => card._id)?.includes(cardId))
@@ -365,7 +317,7 @@ export function Board() {
       }
     })
   }
-  const [openCardSetting, setOpenCardSetting] = useState<string>('')
+
   // useEffect(() => {
   //   console.log(openCardSetting)
   //   if (openCardSetting) {
@@ -390,6 +342,8 @@ export function Board() {
                 <LazyListsComponent
                   cardSelected={setSelectedCard}
                   lists={listsData || []}
+                  resetManually={resetManually}
+                  setResetManually={setResetManually}
                   setOpenCardSetting={setOpenCardSetting}
                 />
               </Suspense>
@@ -401,6 +355,8 @@ export function Board() {
                     maxHeight={10}
                     list={activeDragItemData}
                     cardSelected={(defaultCard) => {}}
+                    setResetManually={() => {}}
+                    resetManually={false}
                     setOpenCardSetting={(data) => setOpenCardSetting(data)}
                   />
                 )}

@@ -68,9 +68,13 @@ export interface ListComponentProps {
   maxHeight: number
   cardSelected: (card: Card) => void | undefined
   setOpenCardSetting: (data: string) => void
+  resetManually: boolean
+  setResetManually: (data: boolean) => void
 }
 export interface ListsComponentProps {
   lists: List[]
   cardSelected: (card: Card) => void | undefined
   setOpenCardSetting: (data: string) => void
+  resetManually: boolean
+  setResetManually: (data: boolean) => void
 }

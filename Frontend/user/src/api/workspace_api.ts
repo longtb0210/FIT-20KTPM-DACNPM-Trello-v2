@@ -1,6 +1,7 @@
 import { createApi, fetchBaseQuery } from '@reduxjs/toolkit/query/react'
 import { TrelloApi } from '@trello-v2/shared'
-const token = ''
+import { token } from './getInfo'
+
 interface InviteMembers2WorkspaceRequestWithId extends TrelloApi.WorkspaceApi.InviteMembers2WorkspaceRequest {
   id: string | undefined
 }
@@ -52,9 +53,9 @@ const WorkspaceApiSlice = createApi({
         body: data
       })
     }),
-    getWorkspaceInfo: builder.query<TrelloApi.WorkspaceApi.WorspaceResponse, void>({
-      query: () => ({
-        url: '/api/workspace',
+    getWorkspaceInfo: builder.query<TrelloApi.WorkspaceApi.WorspaceResponse, { id: string }>({
+      query: ({ id }) => ({
+        url: `/api/workspace/${id}`,
         method: 'GET'
       })
     }),

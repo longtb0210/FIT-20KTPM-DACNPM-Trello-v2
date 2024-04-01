@@ -12,14 +12,19 @@ export default function CardComponent({ card, cardSelected, setOpenCardSetting }
   const { colors, darkMode } = useTheme()
   const [bgColorEmailWatcher, setBgColorEmailWatcher] = useState<Array<string>>([])
   const [updateCard] = CardApiRTQ.CardApiSlice.useUpdateCardMutation()
+  const [editedName, setEditedName] = useState<string>() // State to track edited name
   useEffect(() => {
     const bgColorCode = []
+    setEditedName(card.name)
     for (let i = 0; i < card.watcher_email.length; i++) {
       const randomBgColor = randomColor({ luminosity: 'dark' })
       bgColorCode.push(randomBgColor)
     }
     setBgColorEmailWatcher(bgColorCode)
   }, [])
+  function handleNameChange(event: React.ChangeEvent<HTMLInputElement>) {
+    setEditedName(event.target.value) // Update edited name state
+  }
 
   const { attributes, transition, listeners, setNodeRef, transform, isDragging } = useSortable({
     id: card._id,
@@ -80,7 +85,7 @@ export default function CardComponent({ card, cardSelected, setOpenCardSetting }
     updateCard({
       cardlist_id: card.list_id,
       card_id: card._id,
-      name: 'string',
+      name: editedName,
       cover: card.cover
     }).then(() => {
       alert('edit successful')
@@ -186,6 +191,8 @@ export default function CardComponent({ card, cardSelected, setOpenCardSetting }
                       }}
                       className={` w-full border-0 px-2 pb-7 text-left focus:border-0 focus:outline-none  `}
                       autoFocus
+                      value={editedName}
+                      onChange={handleNameChange}
                     ></input>
                   </div>
                   {card.watcher_email && card.watcher_email.length > 0 && (

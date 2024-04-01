@@ -115,7 +115,7 @@ export const ActivityComponent: React.FC<ActivityProps> = ({ userInfo }) => {
             </div>
           </div>
         ))}
-        {activityCount && activityCount < activityData.length && (
+        {activityCount && activityData && activityData.data && activityCount < activityData.data.length && (
           <div className='my-5 ml-16'>
             <button
               className={`rounded ${darkMode ? 'bg-gray-800 hover:bg-gray-700' : 'bg-gray-200 hover:bg-gray-300'} `}

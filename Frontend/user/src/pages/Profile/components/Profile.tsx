@@ -115,7 +115,91 @@ export const Profile: React.FC<ProfileProps> = ({ userInfo, handleUpdateProfile 
             Save
           </button>
         </div>
-        {/* Rest of the component remains unchanged */}
+        <div>
+          <h1
+            className={`mb-2 border-b-2 ${darkMode ? 'border-gray-700' : 'border-gray-300'}  pb-2 text-xl font-semibold `}
+          >
+            Email Notification
+          </h1>
+        </div>
+        <div className={`w-full text-sm`}>
+          <div className={`inline-flex items-center space-x-1`}>
+            <AiOutlineClockCircle />
+            <p className={`font-semibold`}>Email frequency</p>
+          </div>
+          <p className={`my-2`}>
+            Email notifications can be sent ‘Instantly’ (as soon as they occur) or ‘Periodically’ (hourly). If you’d
+            like to opt-out of all notification emails, set the frequency as ‘Never’.
+          </p>
+          <div className={`my-2 `}>
+            <p className={`text-[12px] font-semibold`}>Frequency </p>
+            <div className='relative mt-1 flex w-40 flex-col'>
+              <div
+                className={`flex cursor-pointer items-center rounded border-[3px] px-3 py-2 ${
+                  darkMode
+                    ? isOpen
+                      ? ' border-blue-500  bg-[#282e33] hover:bg-[#333c43]'
+                      : ' border-[#282e33] bg-[#282e33] hover:border-[#333c43] hover:bg-[#333c43]'
+                    : isOpen
+                      ? ' border-blue-500 bg-white'
+                      : 'border-gray-100 bg-gray-100 hover:border-[#dcdfe4] hover:bg-[#dcdfe4]'
+                }`}
+                onClick={() => setIsOpen(!isOpen)}
+              >
+                <div style={{ color: colors.text }} className='inline-flex items-center space-x-16 '>
+                  <p>{selectedOption}</p>
+                  <RiArrowDropDownLine size={`25px`} />
+                </div>
+              </div>
+              {isOpen && (
+                <div className={`z-10 mt-1 rounded ${darkMode ? 'bg-[#282e33]' : 'bg-white'}  shadow-lg `}>
+                  <ul>
+                    <li
+                      className={` ${
+                        darkMode
+                          ? selectedOption === 'Never'
+                            ? 'bg-[#1c2b41] text-[#b6c2cf]'
+                            : ' hover:bg-[#333c43]'
+                          : selectedOption === 'Never'
+                            ? 'bg-blue-100 text-blue-600 hover:bg-blue-200'
+                            : ' hover:bg-[#dcdfe4]'
+                      }  px-4 py-2 `}
+                      onClick={() => handleOptionClick('Never')}
+                    >
+                      Never
+                    </li>
+                    <li
+                      className={` ${
+                        darkMode
+                          ? selectedOption === 'Instantly'
+                            ? 'bg-[#1c2b41] text-[#b6c2cf]'
+                            : ' hover:bg-[#333c43]'
+                          : selectedOption === 'Instantly'
+                            ? 'bg-blue-100 text-blue-600 hover:bg-blue-200'
+                            : ' hover:bg-[#dcdfe4]'
+                      }  px-4 py-2 `}
+                      onClick={() => handleOptionClick('Instantly')}
+                    >
+                      Instantly
+                    </li>
+                  </ul>
+                </div>
+              )}
+            </div>
+          </div>
+        </div>
+      </div>
+      <div className='   mt-10 flex'>
+        <button
+          className={`flex items-center rounded px-5 py-2 ${
+            darkMode ? 'bg-[#282e33] hover:bg-[#333c43]' : 'bg-gray-100 hover:bg-[#dcdfe4]'
+          } `}
+          onClick={() => deleteAccount()}
+        >
+          <p style={{ color: colors.text }} className={`font-semibold`}>
+            Delete your account
+          </p>
+        </button>
       </div>
     </div>
   )

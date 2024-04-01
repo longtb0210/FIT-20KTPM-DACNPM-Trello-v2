@@ -16,7 +16,8 @@ export const store = configureStore({
       BoardApiRTQ.BoardApiSlice.middleware,
       WorkspaceApiRTQ.WorkspaceApiSlice.middleware,
       CardApiRTQ.CardApiSlice.middleware,
-      CardlistApiRTQ.CardListApiSlice.middleware
+      CardlistApiRTQ.CardListApiSlice.middleware,
+      UserApiRTQ.UserApiSlice.middleware
     )
 })
 

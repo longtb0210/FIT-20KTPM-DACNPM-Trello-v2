@@ -12,7 +12,7 @@ export const Settings: React.FC = () => {
   // const [visibility, setVisibility] = useState<string>('private')
   const [workspaceInfo, setWorkspaceInfo] = useState<Workspace>()
   const [getWorkspaceInfo, { data: workspaceInfoRes }] =
-    WorkspaceApiRTQ.WorkspaceApiSlice.useLazyGetOwnerWorkspacebyEmailQuery()
+    WorkspaceApiRTQ.WorkspaceApiSlice.useLazyGetWorkspaceInfoQuery()
   const [changeVisibility] = WorkspaceApiRTQ.WorkspaceApiSlice.useChangeWorkspaceVisibilityMutation()
   const [deleteWorkspace] = WorkspaceApiRTQ.WorkspaceApiSlice.useDeleteWorkspaceMutation()
   const [showForm, setShowForm] = useState<boolean>(false)
@@ -20,8 +20,9 @@ export const Settings: React.FC = () => {
   const [deleteWorkspaceName, setDeleteWorkspaceName] = useState<string>('')
   const [resetUseStateManual, setResetUseStateManual] = useState<boolean>(false)
   useEffect(() => {
-    getWorkspaceInfo({ email: 'botomtinlon@gmail.com' })
-    setWorkspaceInfo(workspaceInfoRes?.data)
+    getWorkspaceInfo({ id: '6609a3b0e9b24bc694e69cf8' }).then(() => {
+      setWorkspaceInfo(workspaceInfoRes?.data)
+    })
   }, [resetUseStateManual])
 
   const handleVisibilityChange = (newVisibility: string) => {
