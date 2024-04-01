@@ -9,11 +9,7 @@ const b = 'https://trello.com/assets/45d7253154299d327a17.png'
 const Login = () => {
   const authContext = useContext(AuthContext)
 
-  const handleLogin = () => {
-    if (authContext) {
-      authContext.login()
-    }
-  }
+  const handleLogin = () => authContext?.login()
 
   return (
     <Box sx={{ position: 'relative', backgroundColor: '#f1f2f4', width: '100vw', height: '100vh' }}>

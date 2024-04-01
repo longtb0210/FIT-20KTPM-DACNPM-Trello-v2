@@ -16,7 +16,7 @@ import { AuthContext } from '~/components/AuthProvider/AuthProvider'
 export const Navigation = () => {
   // localStorage.clear()
   const authContext = useContext(AuthContext)
-  const isLoggedIn = authContext?.isLoggedIn
+  const isLoggedIn = !!authContext?.isLoggedIn
 
   // const isLoggedIn = JSON.parse(localStorage.getItem('isLogin') || 'false')
 
@@ -24,7 +24,7 @@ export const Navigation = () => {
 
   return (
     <Routes>
-      <Route element={<PrivateRoute isAllowed={!isLoggedIn} redirectPath='/' />}>
+      <Route element={<PrivateRoute isAllowed={true} redirectPath='/' />}>
         <Route path='/login' element={<Login />} />
       </Route>
       <Route element={<PrivateRoute isAllowed={isLoggedIn ?? false} redirectPath='/login' />}>
