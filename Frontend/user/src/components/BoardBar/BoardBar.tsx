@@ -1,40 +1,25 @@
-import { Avatar, AvatarGroup, Box, Chip, Drawer } from '@mui/material'
-import DashboardIcon from '@mui/icons-material/Dashboard'
+import { Avatar, AvatarGroup, Box, Chip } from '@mui/material'
 import StarBorderIcon from '@mui/icons-material/StarBorder'
 import { MdOutlineLock } from 'react-icons/md'
 import GroupTrelloIcon from '~/assets/GroupTrelloIcon.svg'
 import Tooltip from '@mui/material/Tooltip'
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore'
-import BoltIcon from '@mui/icons-material/Bolt'
 import FilterListIcon from '@mui/icons-material/FilterList'
 import { Unstable_Popup as BasePopup } from '@mui/base/Unstable_Popup'
 import * as React from 'react'
-import { useState } from 'react'
-import ChangeVisibility from './ChangeVisibility'
+import ShareIcon from '@mui/icons-material/Share'
 import CustomizeViews from './CustomizeViews'
-import Automation from './Automation'
 import MoreHorizIcon from '@mui/icons-material/MoreHoriz'
 import Filter from './Filter'
 import { useTheme } from '../Theme/themeContext'
 import More from './MoreMenu'
-//pop up
+import { useRef, useState } from 'react'
+import { MdGroups2 } from 'react-icons/md'
+import { MdPublic } from 'react-icons/md'
+import { BoardApiRTQ, WorkspaceApiRTQ } from '~/api'
+import ChangeVisibility from './ChangeVisibility'
 
-const Menu_Style = {
-  color: 'white',
-  fontSize: '18px',
-  bgcolor: 'rgba(54, 55, 61, 0.1)',
-  // paddingX: '5px',
-  fontWeight: 'bold',
-  borderRadius: '8px',
-  marginRight: '3px',
-  height: '32px',
-  '& .MuiSvgIcon-root': {
-    color: 'white'
-  },
-  '&:hover': {
-    bgcolor: 'rgba(160, 160, 160, 0.25)'
-  }
-}
+// UserApiRTQ
 
 function stringToColor(string: string) {
   let hash = 0
@@ -72,23 +57,114 @@ function stringAvatar(name: string) {
   }
 }
 
-function BoardBar() {
-  const { darkMode, colors } = useTheme()
-  const [anchor, setAnchor] = React.useState<null | HTMLElement>(null)
-  const [popupContent, setPopupContent] = useState(<div>Hello kien</div>)
-  const [openMenu, setOpenMenu] = React.useState(false)
-  const toggleDrawer = (newOpen) => () => {
-    setOpenMenu(newOpen)
-  }
+// interface Props {
+//   open: boolean
+//   handleDrawerClose: () => void
+// }
 
+function BoardBar() {
+  //get id
+  const url = window.location.href
+  const workspaceIndex = url.indexOf('workspace/')
+  const idsPart = url.substring(workspaceIndex + 'workspace/'.length)
+  const [workspaceId, boardId] = idsPart.split('&')
+
+  console.log('Workspace ID:', workspaceId)
+  console.log('Board ID:', boardId)
+
+  //theme
+  const { darkMode } = useTheme()
+
+  //get api board
+  const [getBoardById, { data: boardData }] = BoardApiRTQ.BoardApiSlice.useLazyGetBoardByIdQuery()
+  // const [getUserById] = UserApiRTQ.UserApiSlice.useLazyGetUserByIdQuery()
+  React.useEffect(() => {
+    getBoardById(boardId).then((a) => console.log(a))
+  }, [boardId, getBoardById])
+  console.log(boardData?.data)
+  const [starred, setStarred] = useState<boolean>(boardData?.data?.is_star || false)
+
+  const [anchor, setAnchor] = React.useState<null | HTMLElement>(null)
+  const [popupContent, setPopupContent] = useState(<div>Kine</div>)
   const handleClick = (event: React.MouseEvent<HTMLElement>, customPopupContent: JSX.Element) => {
     setPopupContent(customPopupContent)
-    console.log(popupContent)
     setAnchor(anchor ? null : event.currentTarget)
   }
 
   const open = Boolean(anchor)
+  const [openMore, setOpen] = React.useState(false)
   const id = open ? 'simple-popup' : undefined
+  const [ChangeVisibilityApi] = WorkspaceApiRTQ.WorkspaceApiSlice.useChangeVisibilityMutation()
+  const [editBoardById] = BoardApiRTQ.BoardApiSlice.useEditBoardByIdMutation()
+
+  const [visibility, setVisibility] = useState('private')
+
+  const handleVisibilityChange = (newVisibility: string) => {
+    console.log('newVisibility: ' + newVisibility)
+    setVisibility(newVisibility)
+    ChangeVisibilityApi({ visibility: newVisibility, _id: workspaceId }).then(() => console.log('Updated'))
+    setAnchor(null)
+  }
+
+  let Icon: React.ReactNode
+  switch (visibility) {
+    case 'private':
+      Icon = <MdOutlineLock color='white' className='absolute left-[3px]' />
+      break
+    case 'workspace':
+      Icon = <MdGroups2 color='white' className='absolute left-[3px]' />
+      break
+    case 'public':
+      Icon = <MdPublic color='white' className='absolute left-[3px]' />
+      break
+    default:
+      Icon = <MdOutlineLock color='white' className='absolute left-[3px]' />
+  }
+
+  const handleDrawerOpen = () => {
+    setOpen(true)
+  }
+
+  const handleDrawerClose = () => {
+    setOpen(false)
+  }
+
+  const inputRef = useRef<HTMLInputElement>(null)
+
+  const handleChangeName = (event: React.KeyboardEvent) => {
+    if (event.key == 'Enter') {
+      event.preventDefault()
+      const updatedName = inputRef.current?.value
+      console.log(updatedName)
+      if (updatedName) {
+        editBoardById({
+          _id: boardId,
+          name: updatedName
+        })
+          .unwrap()
+          .then((response) => {
+            console.log(response)
+            alert('Thay đổi thành công')
+            window.location.reload()
+          })
+          .catch((error) => {
+            console.error('Lỗi khi chỉnh sửa bảng:', error)
+            alert('Đã xảy ra lỗi khi thay đổi tên bảng')
+          })
+      }
+    }
+  }
+
+  const handleClickToStar = () => {
+    setStarred(!starred)
+    editBoardById({
+      _id: boardId,
+      is_star: !boardData?.data?.is_star
+    }).then((response) => {
+      console.log(response)
+      alert('Thay đổi thành công')
+    })
+  }
 
   return (
     <>
@@ -102,7 +178,16 @@ function BoardBar() {
         }}
       >
         <Box sx={{ display: 'flex', alignItems: 'center', gap: '2' }}>
-          <Chip sx={Menu_Style} icon={<DashboardIcon />} label='Project Trello' onClick={() => {}} />
+          <Box>
+            <input
+              defaultValue={boardData?.data?.name}
+              id='text'
+              ref={inputRef}
+              className='mr-1 flex h-9 cursor-pointer content-center rounded-md border-none bg-[rgba(58,58,75,0.1)] px-1 py-1 text-[18px] font-bold leading-9 text-white hover:bg-[rgba(58,58,75,0.4)]'
+              onKeyDown={handleChangeName}
+              style={{ width: `${Math.max(boardData?.data?.name.length, 1) * 10}px` }}
+            />
+          </Box>
           <Tooltip title='Click to star or unstar this board'>
             <Chip
               sx={{
@@ -116,7 +201,7 @@ function BoardBar() {
                 paddingLeft: '12px',
                 marginRight: '4px',
                 '& .MuiSvgIcon-root': {
-                  color: 'white'
+                  color: starred ? '#FF991F' : 'white' // Điều chỉnh màu của icon
                 },
                 '&:hover': {
                   bgcolor: 'rgba(160, 160, 160, 0.25)'
@@ -129,11 +214,14 @@ function BoardBar() {
                     '&:hover': {
                       color: '#FF991F',
                       fontSize: '20px'
+                    },
+                    '&:active': {
+                      color: '#FF991F'
                     }
                   }}
                 />
               }
-              onClick={() => {}}
+              onClick={handleClickToStar}
             />
           </Tooltip>
 
@@ -155,8 +243,10 @@ function BoardBar() {
                   bgcolor: 'rgba(160, 160, 160, 0.25)'
                 }
               }}
-              icon={<MdOutlineLock color='white' className='absolute left-[3px]' />}
-              onClick={(e) => handleClick(e, <ChangeVisibility />)}
+              icon={Icon}
+              onClick={(e: React.MouseEvent<HTMLElement>) =>
+                handleClick(e, <ChangeVisibility onVisibilityChange={handleVisibilityChange} />)
+              }
             />
           </Tooltip>
 
@@ -219,39 +309,6 @@ function BoardBar() {
         </Box>
 
         <Box sx={{ display: 'flex', alignItems: 'center', gap: '2' }}>
-          <Tooltip title='Automations'>
-            <Chip
-              sx={{
-                color: '#cccc',
-                fontSize: '18px',
-                bgcolor: 'rgba(54, 55, 61, 0.1)',
-                paddingLeft: '12px',
-                fontWeight: 'bold',
-                borderRadius: '8px',
-                width: '32px',
-                height: '32px',
-                marginRight: '2px',
-                '& .MuiSvgIcon-root': {
-                  color: 'white'
-                },
-                '&:hover': {
-                  bgcolor: 'rgba(160, 160, 160, 0.25)'
-                }
-              }}
-              icon={
-                <BoltIcon
-                  sx={{
-                    fontSize: '18px',
-                    '&:hover': {
-                      fontSize: '20px'
-                    }
-                  }}
-                />
-              }
-              onClick={(e) => handleClick(e, <Automation />)}
-            />
-          </Tooltip>
-
           <Tooltip title='Filter'>
             <Chip
               sx={{
@@ -297,8 +354,14 @@ function BoardBar() {
               padding: '0'
             }}
           >
+            {/* {boardData &&
+              boardData.data &&
+                boardData.data.members_email.map(async (email) => {
+
+                })
+              } */}
             <Tooltip title='Trung kien'>
-              <Avatar {...stringAvatar('Nguyen Trung Kien')} />
+              <Avatar {...stringAvatar('Trần Khương')} />
             </Tooltip>
             <Tooltip title='Hữu Chính'>
               <Avatar {...stringAvatar('Hữu Chính')} />
@@ -319,8 +382,7 @@ function BoardBar() {
               <Avatar {...stringAvatar('Bảo Long')} />
             </Tooltip>
           </AvatarGroup>
-
-          <Tooltip title='More'>
+          <Tooltip title='Share'>
             <Chip
               sx={{
                 color: '#cccc',
@@ -339,6 +401,37 @@ function BoardBar() {
                 }
               }}
               icon={
+                <ShareIcon
+                  sx={{
+                    fontSize: '18px',
+                    '&:hover': {
+                      fontSize: '20px'
+                    }
+                  }}
+                />
+              }
+            />
+          </Tooltip>
+          <Tooltip title='More'>
+            <Chip
+              sx={{
+                color: '#cccc',
+                fontSize: '18px',
+                bgcolor: 'rgba(54, 55, 61, 0.1)',
+                paddingLeft: '12px',
+                fontWeight: 'bold',
+                borderRadius: '8px',
+                width: '32px',
+                height: '32px',
+                '& .MuiSvgIcon-root': {
+                  color: 'white'
+                },
+                '&:hover': {
+                  bgcolor: 'rgba(160, 160, 160, 0.25)'
+                },
+                ...(openMore && { display: 'none' })
+              }}
+              icon={
                 <MoreHorizIcon
                   sx={{
                     fontSize: '18px',
@@ -348,7 +441,7 @@ function BoardBar() {
                   }}
                 />
               }
-              onClick={() => {setOpenMenu(true)}}
+              onClick={handleDrawerOpen}
             />
           </Tooltip>
         </Box>
@@ -359,13 +452,11 @@ function BoardBar() {
         anchor={anchor}
         placement={'bottom-start'}
         disablePortal
-        className={`z-50 mt-2 rounded-lg border border-solid border-slate-200 bg-white p-3 font-sans text-sm font-medium shadow-md ${darkMode ? 'dark:bg-[#282E33]' : ''}`}
+        className={`z-50 mt-2 rounded-lg border border-solid border-slate-200 bg-white p-3 font-sans text-sm font-medium shadow-md ${darkMode ? 'dark:bg-[#23262A]' : ''}`}
       >
         {popupContent}
       </BasePopup>
-      <Drawer open={false} sx={{ position: 'relative', bgcolor:colors.backgroundSecond, color: colors.text }} anchor='right' onClose={toggleDrawer(false)}>
-        {<More />}
-      </Drawer>
+      <More open={openMore} handleDrawerClose={handleDrawerClose} />
     </>
   )
 }

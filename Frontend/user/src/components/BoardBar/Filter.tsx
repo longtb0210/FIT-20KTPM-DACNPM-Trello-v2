@@ -9,10 +9,7 @@ import {
   FormControl,
   FormControlLabel,
   FormHelperText,
-  Input,
-  InputLabel,
   Stack,
-  TextField,
   Typography
 } from '@mui/material'
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore'
@@ -20,11 +17,10 @@ import SelectMembers from './SelectMembers'
 import { useTheme } from '../Theme/themeContext'
 
 export default function Filter() {
-  const { darkMode, colors } = useTheme()
+  const { colors } = useTheme()
   return (
     <Box
       sx={{
-        color: '#44546F',
         width: '384px',
         bgcolor: colors.backgroundSecond,
         color: colors.text,
@@ -68,8 +64,11 @@ export default function Filter() {
 
           <Box className='mt-3'>
             <Stack direction='row' alignItems='center'>
-              <Typography component='div' sx={{ fontWeight: '400', fontSize: '14px', color: colors.text }}>
-                Due date
+              <Typography
+                component='div'
+                sx={{ fontWeight: '400', fontSize: '14px', color: colors.text, marginLeft: '10px' }}
+              >
+                Members
               </Typography>
             </Stack>
             <Box
@@ -82,23 +81,22 @@ export default function Filter() {
               <Stack direction='row' alignItems='center'>
                 <FormControlLabel
                   value='end'
-                  control={<Checkbox sx={{ color: colors.text }} />}
+                  control={<Checkbox sx={{ color: colors.text, marginLeft: '18px' }} />}
                   label=''
                   labelPlacement='end'
                 />
-                <Avatar
-                  alt='Remy Sharp'
-                  src='/static/images/avatar/1.jpg'
-                  sx={{ width: 24, height: 24, marginRight: 1 }}
-                />
-                <Typography component='div' sx={{ fontWeight: '400', fontSize: '14px', color: colors.text }}>
+                <Avatar sx={{ width: 24, height: 24, marginRight: 1 }} />
+                <Typography
+                  component='div'
+                  sx={{ fontWeight: '400', fontSize: '14px', color: colors.text, marginLeft: '10px' }}
+                >
                   No members
                 </Typography>
               </Stack>
               <Stack direction='row' alignItems='center'>
                 <FormControlLabel
                   value='end'
-                  control={<Checkbox sx={{ color: colors.text }} />}
+                  control={<Checkbox sx={{ color: colors.text, marginLeft: '18px' }} />}
                   label=''
                   labelPlacement='end'
                 />
@@ -107,49 +105,18 @@ export default function Filter() {
                   src='/static/images/avatar/1.jpg'
                   sx={{ width: 24, height: 24, marginRight: 1 }}
                 />
-                <Typography component='div' sx={{ fontWeight: '400', fontSize: '14px', color: colors.text }}>
+                <Typography
+                  component='div'
+                  sx={{ fontWeight: '400', fontSize: '14px', color: colors.text, marginLeft: '10px' }}
+                >
                   Card assigned to me
                 </Typography>
               </Stack>
-              <FormControlLabel
-                value='end'
-                control={<Checkbox sx={{ color: colors.text }} />}
-                label='Select members'
-                labelPlacement='end'
-              />
-            </Box>
-          </Box>
-
-          <Box className='mt-3'>
-            <Stack direction='row' alignItems='center'>
-              <Typography component='div' sx={{ fontWeight: '400', fontSize: '14px', color: colors.text }}>
-                Due date
-              </Typography>
-            </Stack>
-            <Box
-              sx={{
-                display: 'flex',
-                alignItems: 'flex-start',
-                flexDirection: 'column'
-              }}
-            >
-              <FormControlLabel
-                value='end'
-                control={<Checkbox sx={{ color: colors.text }} />}
-                label='No members'
-                labelPlacement='end'
-              />
-              <FormControlLabel
-                value='end'
-                control={<Checkbox sx={{ color: colors.text }} />}
-                label='Cards assigned to me'
-                labelPlacement='end'
-              />
-              <Stack direction='row' alignItems='center'>
+              <Stack direction='row' alignItems='center' marginTop='3px'>
                 <FormControlLabel
                   sx={{ marginRight: '0' }}
                   value='end'
-                  control={<Checkbox sx={{ color: colors.text }} />}
+                  control={<Checkbox sx={{ color: colors.text, marginLeft: '18px' }} />}
                   label=''
                   labelPlacement='end'
                 />
@@ -160,7 +127,10 @@ export default function Filter() {
 
           <Box className='mt-3'>
             <Stack direction='row' alignItems='center'>
-              <Typography component='div' sx={{ fontWeight: '400', fontSize: '14px', color: colors.text }}>
+              <Typography
+                component='div'
+                sx={{ fontWeight: '400', fontSize: '14px', color: colors.text, marginLeft: '10px' }}
+              >
                 Due date
               </Typography>
             </Stack>
@@ -173,70 +143,52 @@ export default function Filter() {
             >
               <FormControlLabel
                 value='end'
-                control={<Checkbox sx={{ color: colors.text }} />}
-                label='No members'
+                control={<Checkbox sx={{ color: colors.text, marginLeft: '18px' }} />}
+                label='No dates'
                 labelPlacement='end'
               />
               <FormControlLabel
                 value='end'
-                control={<Checkbox sx={{ color: colors.text }} />}
-                label='Cards assigned to me'
+                control={<Checkbox sx={{ color: colors.text, marginLeft: '18px' }} />}
+                label='Overdue'
                 labelPlacement='end'
               />
               <FormControlLabel
                 value='end'
-                sx={{ bgcolor: colors.backgroundSecond, color: colors.text }}
-                control={<Checkbox sx={{ color: colors.text }} />}
-                label='Select members'
+                control={<Checkbox sx={{ color: colors.text, marginLeft: '18px' }} />}
+                label='Due in the next day'
                 labelPlacement='end'
               />
-            </Box>
-          </Box>
 
-          <Box className='mt-3'>
-            <Stack direction='row' alignItems='center'>
-              <Typography component='div' sx={{ fontWeight: '400', fontSize: '14px', color: colors.text }}>
-                Due date
-              </Typography>
-            </Stack>
-            <Box
-              sx={{
-                display: 'flex',
-                alignItems: 'flex-start',
-                flexDirection: 'column'
-              }}
-            >
-              <FormControlLabel
-                value='end'
-                control={<Checkbox sx={{ color: colors.text }} />}
-                label='End'
-                labelPlacement='end'
-              />
-              <FormControlLabel
-                value='end'
-                control={<Checkbox sx={{ color: colors.text }} />}
-                label='End'
-                labelPlacement='end'
-              />
-              <FormControlLabel
-                value='end'
-                control={<Checkbox sx={{ color: colors.text }} />}
-                label='End'
-                labelPlacement='end'
-              />
-              <Accordion>
-                <AccordionSummary
-                  expandIcon={<ExpandMoreIcon sx={{ marginRight: '230px' }} />}
-                  aria-controls='panel1-content'
-                  id='panel1-header'
-                >
-                  <Typography>Accordion 1</Typography>
+              <Accordion sx={{ width: '100%', bgcolor: colors.backgroundSecond, color: colors.text }}>
+                <AccordionSummary expandIcon={<ExpandMoreIcon />} aria-controls='panel1-content' id='panel1-header'>
+                  <Typography className='w-[230px]'>Show more options</Typography>
                 </AccordionSummary>
                 <AccordionDetails>
-                  <Typography>
-                    Lorem ipsum dolor sit amet, consectetur adipiscing elit. Suspendisse malesuada lacus ex, sit amet
-                    blandit leo lobortis eget.
-                  </Typography>
+                  <FormControlLabel
+                    value='end'
+                    control={<Checkbox sx={{ color: colors.text }} />}
+                    label='Due in the next week'
+                    labelPlacement='end'
+                  />
+                  <FormControlLabel
+                    value='end'
+                    control={<Checkbox sx={{ color: colors.text }} />}
+                    label='Due in the next month'
+                    labelPlacement='end'
+                  />
+                  <FormControlLabel
+                    value='end'
+                    control={<Checkbox sx={{ color: colors.text }} />}
+                    label='Marked as complete'
+                    labelPlacement='end'
+                  />
+                  <FormControlLabel
+                    value='end'
+                    control={<Checkbox sx={{ color: colors.text }} />}
+                    label='Not marked as complete'
+                    labelPlacement='end'
+                  />
                 </AccordionDetails>
               </Accordion>
             </Box>
