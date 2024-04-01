@@ -2,7 +2,7 @@ import { createApi, fetchBaseQuery } from '@reduxjs/toolkit/query/react'
 import { TrelloApi } from '@trello-v2/shared'
 const BoardApiSlice = createApi({
   reducerPath: 'BoardApi',
-  baseQuery: fetchBaseQuery({ baseUrl: 'http://localhost:10000' }),
+  baseQuery: fetchBaseQuery({ baseUrl: import.meta.env.VITE_URL_API }),
   endpoints: (builder) => ({
     createBoard: builder.mutation<TrelloApi.BoardApi.CreateBoardResponse, TrelloApi.BoardApi.CreateBoard>({
       query: (data) => ({

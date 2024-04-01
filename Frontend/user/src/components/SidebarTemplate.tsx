@@ -3,13 +3,13 @@ import React, { useEffect, useState } from 'react'
 import { Sidebar, Menu, MenuItem, SubMenu } from 'react-pro-sidebar'
 import WorkspacesIcon from '@mui/icons-material/Workspaces'
 import AddOutlinedIcon from '@mui/icons-material/AddOutlined'
-import {faTrello } from '@fortawesome/free-brands-svg-icons'
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { faTrello } from '@fortawesome/free-brands-svg-icons'
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { Button } from '@mui/base'
 import { Link, useParams } from 'react-router-dom'
 import axios from 'axios'
 import { WorkspaceApiRTQ } from '~/api'
-import {faChessBoard, faGear, faTableCells, faUserGroup, faHome } from '@fortawesome/free-solid-svg-icons'
+import { faChessBoard, faGear, faTableCells, faUserGroup, faHome } from '@fortawesome/free-solid-svg-icons'
 import { faHeart } from '@fortawesome/free-regular-svg-icons'
 
 interface WorkspaceData {
@@ -31,8 +31,10 @@ function SidebarTemplate() {
     getALlWorkspace().then((v) => console.log(v))
   }, [])
 
+  console.log(workspaceData)
+
   return (
-    <div className='detail-sidebar-container fixed ml-20 mt-2 max-h-90vh max-h-screen overflow-y-auto w-100px text-sm'>
+    <div className='detail-sidebar-container w-100px fixed ml-20 mt-2 max-h-90vh max-h-screen overflow-y-auto text-sm'>
       <Sidebar>
         <Menu>
           <MenuItem
@@ -41,7 +43,7 @@ function SidebarTemplate() {
           >
             <Link to={'/workspace/1'}>
               <div className='flex items-center'>
-                <FontAwesomeIcon icon={faTrello} fontSize='small' className='mr-2'/>
+                <FontAwesomeIcon icon={faTrello} fontSize='small' className='mr-2' />
                 Boards
               </div>
             </Link>
@@ -51,7 +53,7 @@ function SidebarTemplate() {
               <span className='menu-item rounded-md bg-white font-bold hover:border-0 hover:text-blue-500'>
                 <Link to={'/template'}>
                   <div className='flex items-center'>
-                    <FontAwesomeIcon icon={faChessBoard} fontSize='small' className='mr-2'/>
+                    <FontAwesomeIcon icon={faChessBoard} fontSize='small' className='mr-2' />
                     Templates
                   </div>
                 </Link>
@@ -81,7 +83,7 @@ function SidebarTemplate() {
           >
             <Link to={'/'}>
               <div className='flex items-center'>
-              <FontAwesomeIcon icon={faHome} fontSize='small' className='mr-2'/>
+                <FontAwesomeIcon icon={faHome} fontSize='small' className='mr-2' />
                 Home
               </div>
             </Link>
@@ -108,27 +110,27 @@ function SidebarTemplate() {
                   <Link to={`/workspace/${w._id}`}>
                     <MenuItem style={{ height: '32px', width: '200px' }}>
                       <div className='flex items-center'>
-                        <FontAwesomeIcon icon={faTrello} fontSize='small' className='mr-2'/>
+                        <FontAwesomeIcon icon={faTrello} fontSize='small' className='mr-2' />
                         Boards
                       </div>
                     </MenuItem>
                   </Link>
                   <MenuItem style={{ height: '32px', width: '200px' }}>
                     <div className='flex items-center'>
-                      <FontAwesomeIcon icon={faHeart} fontSize='small' className='mr-2'/>
+                      <FontAwesomeIcon icon={faHeart} fontSize='small' className='mr-2' />
                       Highlights
                     </div>
                   </MenuItem>
                   <MenuItem style={{ height: '32px', width: '200px' }}>
                     <div className='flex items-center'>
-                      <FontAwesomeIcon icon={faTableCells} fontSize='small' className='mr-2'/>
+                      <FontAwesomeIcon icon={faTableCells} fontSize='small' className='mr-2' />
                       Views
                     </div>
                   </MenuItem>
                   <MenuItem style={{ height: '32px', width: '200px' }}>
                     <div className='flex w-full items-center justify-between'>
                       <div className='flex items-center'>
-                        <FontAwesomeIcon icon={faUserGroup} fontSize='small' className='mr-2'/>
+                        <FontAwesomeIcon icon={faUserGroup} fontSize='small' className='mr-2' />
                         Members
                       </div>
                       <div>
@@ -140,7 +142,7 @@ function SidebarTemplate() {
                   </MenuItem>
                   <MenuItem style={{ height: '32px', width: '200px' }}>
                     <div className='flex items-center'>
-                      <FontAwesomeIcon icon={faGear} fontSize='small' className='mr-2'/>
+                      <FontAwesomeIcon icon={faGear} fontSize='small' className='mr-2' />
                       Setting
                     </div>
                   </MenuItem>

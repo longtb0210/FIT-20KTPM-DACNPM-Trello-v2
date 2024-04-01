@@ -2,7 +2,7 @@ import { createApi, fetchBaseQuery } from '@reduxjs/toolkit/query/react'
 import { TrelloApi } from '@trello-v2/shared'
 export const CardListApiSlice = createApi({
   reducerPath: 'CardlistApi',
-  baseQuery: fetchBaseQuery({ baseUrl: 'http://localhost:3333' }),
+  baseQuery: fetchBaseQuery({ baseUrl: import.meta.env.VITE_URL_API }),
   endpoints: (build) => ({
     getAllCardlist: build.query<TrelloApi.CardlistApi.GetallCardlistResponse, void>({
       query: () => ({

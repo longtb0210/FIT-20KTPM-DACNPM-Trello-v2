@@ -2,13 +2,13 @@ import * as React from 'react'
 import { Box, ClickAwayListener, Grow, Paper, Popper, MenuList, Stack, Typography } from '@mui/material'
 import { Link } from 'react-router-dom'
 import { useTheme } from './../../Theme/themeContext'
-import { useAuth0 } from '@auth0/auth0-react'
+import { AuthContext } from '~/components/AuthProvider/AuthProvider'
 
 export default function Account() {
   const [open, setOpen] = React.useState(false)
   const anchorRef = React.useRef<HTMLButtonElement>(null)
   const { darkMode, toggleDarkMode, colors } = useTheme()
-  const { logout } = useAuth0()
+  const authContext = React.useContext(AuthContext)
 
   const handleToggle = () => {
     setOpen((prevOpen) => !prevOpen)
@@ -40,6 +40,12 @@ export default function Account() {
 
     prevOpen.current = open
   }, [open])
+
+  const handleLogout = () => {
+    if (authContext) {
+      authContext.logout()
+    }
+  }
 
   return (
     <Stack direction='row' spacing={2}>
@@ -208,7 +214,7 @@ export default function Account() {
                         </Typography>
 
                         <Typography
-                          onClick={() => logout({ logoutParams: { returnTo: window.location.origin + '/login' } })}
+                          onClick={handleLogout}
                           variant='body1'
                           sx={{
                             cursor: 'pointer',

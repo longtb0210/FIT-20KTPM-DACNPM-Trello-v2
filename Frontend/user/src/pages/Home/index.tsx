@@ -6,18 +6,27 @@ import './home.css'
 import SidebarTemplate from '~/components/SidebarTemplate'
 import { Box } from '@mui/material'
 import { useTheme } from '../../components/Theme/themeContext'
+import { useSelector } from 'react-redux'
+import { selectExample } from '~/store/reducers'
+import { useContext } from 'react'
+import { AuthContext } from '~/components/AuthProvider/AuthProvider'
 
 export default function HomePage() {
   const { darkMode, colors } = useTheme()
+  const authContext = useContext(AuthContext)
+
+  // const test = useSelector(selectExample)
+  console.log(authContext?.keycloak.token)
 
   return (
     <>
-      <Box className='home-container' 
-      sx={{
-        color: colors.text,
-        backgroundColor: colors.background,
-        transition: darkMode ? 'all 0.2s ease-in' : 'all 0.2s ease-in',
-      }}
+      <Box
+        className='home-container'
+        sx={{
+          color: colors.text,
+          backgroundColor: colors.background,
+          transition: darkMode ? 'all 0.2s ease-in' : 'all 0.2s ease-in'
+        }}
       >
         <div className='home-sticky-container -p'>
           <nav className='home-left-sidebar-container'>
@@ -35,7 +44,9 @@ export default function HomePage() {
                       <StarBorderIcon fontSize='medium' />
                     </span>
                   </div>
-                  <div className='content-highlight' style={{color: colors.text }}>Highlights</div>
+                  <div className='content-highlight' style={{ color: colors.text }}>
+                    Highlights
+                  </div>
                 </div>
                 {/* end */}
 
@@ -79,7 +90,9 @@ export default function HomePage() {
                     <AccessTimeIcon />
                   </span>
                 </div>
-                <div className='content-highlight' style={{color: colors.text }}>Recently viewed</div>
+                <div className='content-highlight' style={{ color: colors.text }}>
+                  Recently viewed
+                </div>
               </div>
 
               {/* card home tile */}
@@ -99,15 +112,19 @@ export default function HomePage() {
               {/* end home tile */}
             </div>
 
-            <div className='iSLLvvYdGSEgKr' >
+            <div className='iSLLvvYdGSEgKr'>
               <div className='div-title-recently'>
-                <div className='content-highlight' style={{color: colors.text }}>Links</div>
+                <div className='content-highlight' style={{ color: colors.text }}>
+                  Links
+                </div>
               </div>
               <div className='div-card-project-viewed'>
                 <button className='div-content-card'>
                   <span className='icon-add icon-sm dhuVRdSD87x8HI'></span>
                   <span className='div-content-reveiwed'>
-                    <span className='BLp8MvEmT8PnRm' style={{color: colors.text }}>Create a board</span>
+                    <span className='BLp8MvEmT8PnRm' style={{ color: colors.text }}>
+                      Create a board
+                    </span>
                   </span>
                 </button>
               </div>

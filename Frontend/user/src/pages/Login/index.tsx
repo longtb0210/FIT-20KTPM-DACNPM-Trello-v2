@@ -1,11 +1,19 @@
 import { Box, Button } from '@mui/material'
-import { useAuth0 } from '@auth0/auth0-react'
+import { useContext } from 'react'
+import { UserApiRTQ } from '~/api'
+import { AuthContext } from '~/components/AuthProvider/AuthProvider'
 
 const a = 'https://trello.com/assets/da0d6fb7fd0a5918d5e8.svg'
 const b = 'https://trello.com/assets/45d7253154299d327a17.png'
 
 const Login = () => {
-  const { loginWithRedirect } = useAuth0()
+  const authContext = useContext(AuthContext)
+
+  const handleLogin = () => {
+    if (authContext) {
+      authContext.login()
+    }
+  }
 
   return (
     <Box sx={{ position: 'relative', backgroundColor: '#f1f2f4', width: '100vw', height: '100vh' }}>
@@ -32,7 +40,7 @@ const Login = () => {
           </p>
 
           <Button
-            onClick={() => loginWithRedirect()}
+            onClick={handleLogin}
             sx={{
               backgroundColor: '#0c66e4',
               color: '#fff',
