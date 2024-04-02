@@ -9,15 +9,6 @@ export interface UserInfoDto {
   azp: string
   session_state: string
   acr: string
-  'allowed-origins': string[]
-  realm_access: {
-    roles: string[]
-  }
-  resource_access: {
-    account: {
-      roles: string[]
-    }
-  }
   scope: string
   sid: string
   email_verified: boolean

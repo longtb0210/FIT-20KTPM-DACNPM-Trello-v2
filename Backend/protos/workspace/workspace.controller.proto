@@ -1,0 +1,84 @@
+syntax = "proto3";
+package trello.workspace_service;
+
+import "workspace.proto";
+import "../auth.proto";
+import "google/protobuf/empty.proto";
+
+message WorkspaceObjectResponse {
+    repeated trello.workspace.WorkspaceSchema owner=1;
+    repeated trello.workspace.WorkspaceSchema admin=2;
+    repeated trello.workspace.WorkspaceSchema member=3;
+    repeated trello.workspace.WorkspaceSchema guest=4;
+}
+
+message WorkspaceListByEmailResponse{
+    WorkspaceObjectResponse data=1;
+}
+
+message WorkspaceListResponse {
+    repeated trello.workspace.WorkspaceSchema data=1;
+}
+
+message WorkspaceResponse {
+    trello.workspace.WorkspaceSchema data=1;
+}
+
+message WorkspaceId{
+    string workspace_id=1;
+}
+
+message DeleteWorkspaceResponse {
+    WorkspaceId data=1;
+}
+
+message WorkspaceByEmailRequest {
+    string email=1;
+}
+
+message WorkspaceByIdRequest{
+    string id=1;
+}
+
+message CreateWorkspaceRequest {
+  string name=1;
+  optional string description=2;
+  optional string members=3;
+}
+
+message UpdateWorkspaceRequest {
+    string _id=1;
+    optional string name=1;
+    optional string short_name=2;
+    optional string description=3;
+    optional string logo=5;
+    optional string website=6;
+    optional string logo=7;
+}
+  
+message UpdateVisibilityRequest {
+    string _id=1;
+    string visibility=2;
+}
+
+message InviteMember2WorkspaceRequest {
+    string status=1;
+    string role=2;
+    string email=3;
+}
+
+service WorkspaceController {
+    rpc getAll(trello.auth.UserAuthSchema) returns (WorkspaceListResponse);
+    rpc getAllWorkspacesByEmail(trello.auth.UserAuthSchema) returns (WorkspaceListByEmailResponse);
+    rpc getWorkspaceById(WorkspaceByIdRequest) returns (WorkspaceResponse);
+    rpc getAdminWorkspacesByEmail(trello.auth.UserAuthSchema) returns (WorkspaceListResponse);
+    rpc getGuestWorkspacesByEmail(trello.auth.UserAuthSchema) returns (WorkspaceListResponse);
+    rpc getMemberWorkspacesByEmail(trello.auth.UserAuthSchema) returns (WorkspaceListResponse);
+    rpc getOwnerWorkspacesByEmail(trello.auth.UserAuthSchema) returns (WorkspaceListResponse);
+    rpc getPendingWorkspacesByEmail(trello.auth.UserAuthSchema) returns (WorkspaceListResponse);
+    rpc createWorkspace(trello.auth.UserAuthSchema, CreateWorkspaceRequest) returns (WorkspaceResponse);
+    rpc updateWorkspaceInfo(trello.auth.UserAuthSchema, UpdateWorkspaceRequest) returns (WorkspaceResponse);
+    rpc changeWorkspaceVisibility(trello.auth.UserAuthSchema, UpdateVisibilityRequest) returns (WorkspaceResponse);
+    rpc deleteWorkspaceById(trello.auth.UserAuthSchema, WorkspaceByIdRequest) returns (DeleteWorkspaceResponse);
+    rpc inviteMembers2Workspace(trello.auth.UserAuthSchema, InviteMember2WorkspaceRequest, WorkspaceByIdRequest) returns (WorkspaceResponse);
+}

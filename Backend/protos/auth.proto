@@ -1,0 +1,23 @@
+syntax = "proto3";
+package trello.auth;
+
+message UserAuthSchema{
+    int32 exp=1;
+    int32 iat=2;
+    string jti=3;
+    string iss=4;
+    string aud=5;
+    string sub=6;
+    string typ=7;
+    string azp=8;
+    string session_state=9;
+    string acr=10;
+    string scope=11;
+    string sid=12;
+    boolean email_verified=13;
+    string name=14;
+    string preferred_username=15;
+    string given_name=16;
+    string family_name=17;
+    string email=18;
+}

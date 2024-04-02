@@ -184,8 +184,25 @@ export class CardlistController {
     }
   }
 
-  @InjectRoute(CardlistRoutes.testRoute)
-  test() {
-    return { Hello: 'Demo' }
+  @InjectRoute(CardlistRoutes.cloneCardlists)
+  async cloneCardlistsByBoard(
+    @Body(new ZodValidationPipe(TrelloApi.CardlistApi.CloneCardlistsToNewBoardRequestSchema))
+    body: TrelloApi.CardlistApi.CloneCardlistsToNewBoardRequest,
+  ): Promise<TrelloApi.CardlistApi.CloneCardlistsToNewBoardResponse> {
+    const data = await this.cardlistService.cloneCardlistsToNewBoard(body.board_input_id, body.board_output_id)
+    return {
+      data: data,
+    }
+  }
+
+  @InjectRoute(CardlistRoutes.deleteCardlistsByBoardId)
+  async deleteCardlistsByBoardId(
+    @Body(new ZodValidationPipe(TrelloApi.CardlistApi.DeleteCardlistsByBoardIdRequestSchema))
+    body: TrelloApi.CardlistApi.DeleteCardlistsByBoardIdRequest,
+  ) {
+    const result = await this.cardlistService.deleteCardlistsByBoardId(body)
+    return {
+      result: result,
+    }
   }
 }
