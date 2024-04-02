@@ -7,15 +7,18 @@ import { useTheme } from '../Theme/themeContext'
 import { Card } from '@trello-v2/shared/src/schemas/CardList'
 import { Feature_Attachment } from '@trello-v2/shared/src/schemas/Feature'
 import React from 'react'
+import { CardApiRTQ } from '~/api'
 
 type AttachmentType = 'file' | 'link'
 
 interface CardAttachmentProps {
+  cardlistId: string
+  cardId: string
   currentCard: Card
   setCurrentCard: (newState: Card) => void
 }
 
-export function CardAttachment({ currentCard, setCurrentCard }: CardAttachmentProps) {
+export function CardAttachment({ cardlistId, cardId, currentCard, setCurrentCard }: CardAttachmentProps) {
   const { colors } = useTheme()
   const boxRef = useRef(null)
   const [anchorEl, setAnchorEl] = useState<null | HTMLDivElement>(null)
@@ -75,6 +78,8 @@ export function CardAttachment({ currentCard, setCurrentCard }: CardAttachmentPr
                   <CardAttachmentTile
                     key={index}
                     type='link'
+                    cardlistId={cardlistId}
+                    cardId={cardId}
                     attachment={attachment}
                     currentCard={currentCard}
                     setCurrentCard={setCurrentCard}
@@ -85,6 +90,8 @@ export function CardAttachment({ currentCard, setCurrentCard }: CardAttachmentPr
           {isOpenModal && (
             <CardAttachmentModal
               anchorEl={anchorEl}
+              cardlistId={cardlistId}
+              cardId={cardId}
               currentCard={currentCard}
               setCurrentCard={setCurrentCard}
               handleClose={handleCloseModal}
@@ -98,25 +105,29 @@ export function CardAttachment({ currentCard, setCurrentCard }: CardAttachmentPr
 
 interface CardAttachmentTileProps {
   type: AttachmentType
+  cardlistId: string
+  cardId: string
   attachment: Feature_Attachment
   currentCard: Card
   setCurrentCard: (newState: Card) => void
 }
 
-function CardAttachmentTile({ type, attachment, currentCard, setCurrentCard }: CardAttachmentTileProps) {
+function CardAttachmentTile({ type, cardlistId, cardId, attachment, setCurrentCard }: CardAttachmentTileProps) {
   const { colors } = useTheme()
   const boxRef = useRef(null)
   const [anchorEl, setAnchorEl] = useState<null | HTMLDivElement>(null)
   const [isOpenModal, setIsOpenModal] = useState<boolean[]>([false, false])
 
-  function handleRemove() {
-    const updatedCard: Card = {
-      ...currentCard,
-      features: currentCard.features.filter(
-        (feature) => feature.type === 'attachment' && feature._id === attachment._id
-      )
-    }
-    setCurrentCard(updatedCard)
+  //API
+  const [deleteCardFeatureAPI] = CardApiRTQ.CardApiSlice.useDeleteCardFeatureMutation()
+
+  async function handleRemove() {
+    const response = await deleteCardFeatureAPI({
+      cardlist_id: cardlistId,
+      card_id: cardId,
+      feature_id: attachment._id!
+    })
+    setCurrentCard(response.data.data)
   }
 
   return (

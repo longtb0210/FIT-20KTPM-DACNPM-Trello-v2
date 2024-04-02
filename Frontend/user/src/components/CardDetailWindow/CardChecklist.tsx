@@ -6,8 +6,11 @@ import { ChecklistItemModal, DeleteChecklistModal } from './modals/CardChecklist
 import { useTheme } from '../Theme/themeContext'
 import { Feature_Checklist } from '@trello-v2/shared/src/schemas/Feature'
 import { Card } from '@trello-v2/shared/src/schemas/CardList'
+import { CardApiRTQ } from '~/api'
 
 interface ChecklistAddTextAreaProps {
+  cardlistId: string
+  cardId: string
   isInputFocused: boolean
   setIsInputFocused: (newState: boolean) => void
   checklistId: string
@@ -16,6 +19,8 @@ interface ChecklistAddTextAreaProps {
 }
 
 function ChecklistAddTextArea({
+  cardlistId,
+  cardId,
   isInputFocused,
   setIsInputFocused,
   checklistId,
@@ -24,6 +29,9 @@ function ChecklistAddTextArea({
 }: ChecklistAddTextAreaProps) {
   const { colors } = useTheme()
   const [textAreaValue, setTextAreaValue] = useState('')
+
+  //API
+  const [updateCardFeatureAPI] = CardApiRTQ.CardApiSlice.useUpdateCardFeatureMutation()
 
   const handleTextAreaChange = (event: ChangeEvent<HTMLTextAreaElement>) => {
     setTextAreaValue(event.target.value)
@@ -46,6 +54,17 @@ function ChecklistAddTextArea({
       const currentChecklist = currentCard.features.find(
         (feature) => feature.type === 'checklist' && feature._id === checklistId
       ) as Feature_Checklist
+      // Call API
+      updateCardFeatureAPI({
+        cardlist_id: cardlistId,
+        card_id: cardId,
+        feature: {
+          _id: checklistId,
+          type: 'checklist',
+          name: currentChecklist.name,
+          items: [...currentChecklist.items, { name: trimmedValue, is_check: false }]
+        }
+      })
       // Update checklist table
       const updatedCard: Card = {
         ...currentCard,
@@ -133,12 +152,14 @@ function ChecklistAddTextArea({
 }
 
 interface ChecklistAddButtonProps {
+  cardlistId: string
+  cardId: string
   checklistId: string
   currentCard: Card
   setCurrentCard: (newState: Card) => void
 }
 
-function ChecklistAddButton({ checklistId, currentCard, setCurrentCard }: ChecklistAddButtonProps) {
+function ChecklistAddButton({ cardlistId, cardId, checklistId, currentCard, setCurrentCard }: ChecklistAddButtonProps) {
   const { colors } = useTheme()
   const [isInputFocused, setIsInputFocused] = useState(false)
 
@@ -167,6 +188,8 @@ function ChecklistAddButton({ checklistId, currentCard, setCurrentCard }: Checkl
       )}
       {isInputFocused && (
         <ChecklistAddTextArea
+          cardlistId={cardlistId}
+          cardId={cardId}
           isInputFocused={isInputFocused}
           setIsInputFocused={setIsInputFocused}
           checklistId={checklistId}
@@ -432,6 +455,8 @@ function ChecklistItemNameField({
 }
 
 interface ChecklistItemProps {
+  cardlistId: string
+  cardId: string
   checklistId: string
   checkitemId: number
   currentCheckitem: { name: string; is_check: boolean }
@@ -441,6 +466,8 @@ interface ChecklistItemProps {
 }
 
 function ChecklistItem({
+  cardlistId,
+  cardId,
   checklistId,
   checkitemId,
   currentCheckitem,
@@ -451,11 +478,30 @@ function ChecklistItem({
   const { colors } = useTheme()
   const [onFocus, setOnFocus] = useState(false)
 
+  // API
+  const [updateCardFeatureAPI] = CardApiRTQ.CardApiSlice.useUpdateCardFeatureMutation()
+
   function handleCheckbox() {
+    const currentChecklist = currentCard.features.find(
+      (feature) => feature.type === 'checklist' && feature._id === checklistId
+    ) as Feature_Checklist
+    // Call API
+    updateCardFeatureAPI({
+      cardlist_id: cardlistId,
+      card_id: cardId,
+      feature: {
+        _id: checklistId,
+        type: 'checklist',
+        name: currentChecklist.name,
+        items: currentChecklist.items.map((checkitem, index) =>
+          index === checkitemId ? { ...checkitem, is_check: !checkitem.is_check } : checkitem
+        )
+      }
+    })
     const updatedCard: Card = {
       ...currentCard,
       features: currentCard.features.map((feature) =>
-        feature.type === 'checklist'
+        feature.type === 'checklist' && feature._id === checklistId
           ? {
               ...feature,
               items: feature.items.map((checkitem, index) =>
@@ -517,13 +563,24 @@ function ChecklistItem({
   }
 
   function deleteChecklistItem() {
+    const currentChecklist = currentCard.features.find((feature) => feature._id === checklistId) as Feature_Checklist
+    updateCardFeatureAPI({
+      cardlist_id: cardlistId,
+      card_id: cardId,
+      feature: {
+        _id: checklistId,
+        type: 'checklist',
+        name: currentChecklist.name,
+        items: currentChecklist.items.filter((_checkitem) => _checkitem.name !== currentCheckitem.name)
+      }
+    })
     const updatedCard: Card = {
       ...currentCard,
       features: currentCard.features.map((feature) =>
-        feature.type === 'checklist'
+        feature.type === 'checklist' && feature._id === checklistId
           ? {
               ...feature,
-              items: feature.items.filter((_checkitem, index) => index === checkitemId)
+              items: feature.items.filter((_checkitem) => _checkitem.name !== currentCheckitem.name)
             }
           : feature
       )
@@ -625,15 +682,29 @@ export default function CardChecklist({
 }: CardChecklistProps) {
   const { colors } = useTheme()
   // START: Handle edit Checklist name
-  const [checklistNameState, setChecklistNameState] = useState<string>('Checklist name')
+  const [checklistNameState, setChecklistNameState] = useState<string>(currentChecklist.name)
   const [isInputFocused, setIsInputFocused] = useState<boolean>(false)
   const [progress, setProgress] = useState<number>(0)
+
+  // API
+  const [updateCardFeatureAPI] = CardApiRTQ.CardApiSlice.useUpdateCardFeatureMutation()
+  const [deleteCardFeatureAPI] = CardApiRTQ.CardApiSlice.useDeleteCardFeatureMutation()
 
   function updateChecklistName() {
     // Remove unnecessary white space
     const trimmedValue = checklistNameState.replace(/\s+/g, ' ').trim()
     // Check if new checklist name is empty
     if (trimmedValue !== '') {
+      updateCardFeatureAPI({
+        cardlist_id: cardlistId,
+        card_id: cardId,
+        feature: {
+          _id: currentChecklist._id!,
+          type: 'checklist',
+          name: trimmedValue,
+          items: [...currentChecklist.items]
+        }
+      })
       // Update checklist name
       const updatedCard: Card = {
         ...currentCard,
@@ -642,8 +713,8 @@ export default function CardChecklist({
           .map((checklist) =>
             checklist._id === currentChecklist._id
               ? {
-                  ...checklist
-                  // name: trimmedValue
+                  ...checklist,
+                  name: trimmedValue
                 }
               : checklist
           )
@@ -659,14 +730,17 @@ export default function CardChecklist({
   }
   // END: Handle edit Checklist name
 
-  function deleteChecklist() {
-    const updatedCard: Card = {
-      ...currentCard,
-      features: currentCard.features.filter(
-        (feature) => feature.type !== 'checklist' || feature._id !== currentChecklist._id
-      )
+  async function deleteChecklist() {
+    try {
+      const response = await deleteCardFeatureAPI({
+        cardlist_id: cardlistId,
+        card_id: cardId,
+        feature_id: currentChecklist._id!
+      })
+      setCurrentCard(response.data.data)
+    } catch (error) {
+      console.error('Error while adding checklist to card:', error)
     }
-    setCurrentCard(updatedCard)
   }
 
   return (
@@ -688,7 +762,7 @@ export default function CardChecklist({
         </div>
         {/* Delete button */}
         {!isInputFocused && (
-          <ChecklistDeleteButton currentChecklistName='Checklist name' handleDelete={deleteChecklist} />
+          <ChecklistDeleteButton currentChecklistName={currentChecklist.name} handleDelete={deleteChecklist} />
         )}
       </div>
       {/* END: Header */}
@@ -698,6 +772,8 @@ export default function CardChecklist({
         {currentChecklist.items.map((checkitem, index) => (
           <ChecklistItem
             key={index}
+            cardlistId={cardlistId}
+            cardId={cardId}
             checklistId={currentChecklist._id!}
             checkitemId={index}
             currentCheckitem={checkitem}
@@ -707,6 +783,8 @@ export default function CardChecklist({
           />
         ))}
         <ChecklistAddButton
+          cardlistId={cardlistId}
+          cardId={cardId}
           checklistId={currentChecklist._id!}
           currentCard={currentCard}
           setCurrentCard={setCurrentCard}

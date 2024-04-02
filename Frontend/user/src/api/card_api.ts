@@ -1,7 +1,7 @@
 import { createApi, fetchBaseQuery } from '@reduxjs/toolkit/query/react'
 import { TrelloApi } from '@trello-v2/shared'
 const token =
-  'eyJhbGciOiJSUzI1NiIsInR5cCIgOiAiSldUIiwia2lkIiA6ICJJeTRaRVRpQVp3OUwtN1hQQWJPN1RxclNjYW9EN1pNQVNTSUNRWEVsLTBzIn0.eyJleHAiOjE3MTE3MzcyMTIsImlhdCI6MTcxMTcwMTIxMiwianRpIjoiNmZjODQ2YTUtOTUwZS00NWYzLTkwMTktZjhkZWNkZDg4OWMyIiwiaXNzIjoiaHR0cHM6Ly8yMDEyNzA0Ny1rZXljbG9hay10cmVsbG8uYXp1cmV3ZWJzaXRlcy5uZXQvcmVhbG1zL3RyZWxsbyIsImF1ZCI6ImFjY291bnQiLCJzdWIiOiIyZThlNjY3NC1lNjI3LTQxZWMtYTU0MC1lYzQxNmRmMDFjNTMiLCJ0eXAiOiJCZWFyZXIiLCJhenAiOiJ0cmVsbG8iLCJzZXNzaW9uX3N0YXRlIjoiMGEwNjdlMDktYjM5YS00NmQ5LTkyZTAtYTI5MzFjODEwYzg2IiwiYWNyIjoiMSIsImFsbG93ZWQtb3JpZ2lucyI6WyJodHRwczovL3d3dy5rZXljbG9hay5vcmciXSwicmVhbG1fYWNjZXNzIjp7InJvbGVzIjpbIm9mZmxpbmVfYWNjZXNzIiwidW1hX2F1dGhvcml6YXRpb24iLCJkZWZhdWx0LXJvbGVzLXRyZWxsbyJdfSwicmVzb3VyY2VfYWNjZXNzIjp7ImFjY291bnQiOnsicm9sZXMiOlsibWFuYWdlLWFjY291bnQiLCJtYW5hZ2UtYWNjb3VudC1saW5rcyIsInZpZXctcHJvZmlsZSJdfX0sInNjb3BlIjoicHJvZmlsZSBlbWFpbCIsInNpZCI6IjBhMDY3ZTA5LWIzOWEtNDZkOS05MmUwLWEyOTMxYzgxMGM4NiIsImVtYWlsX3ZlcmlmaWVkIjp0cnVlLCJuYW1lIjoidnUgYW5oIiwicHJlZmVycmVkX3VzZXJuYW1lIjoidnV4IiwiZ2l2ZW5fbmFtZSI6InZ1IiwiZmFtaWx5X25hbWUiOiJhbmgiLCJlbWFpbCI6InZ1QGdtYWlsLmNvbSJ9.MJVhHbntRudubJMXM_E5RaHMMX5-ur3BZMlq5F_w1UO_abmay7af7hhhWdule5ZxI5FXs96K9X2vs4zDLto5XkJ0YZwpefMxM_9_OgMbM-OzcbEcrps7nqAIYgf-Cg20nLUz0Lksfn-HpP4JE2f_7qXF4qT7ckpfUo5tHcLMBy6apoWyXk-pEux-WYlhapLntTLXsvIxJM3PviWZGgQdiJ704YgSwFatak90SinXkqOuIUBi6qIUuJywMr51S_smX7-OOM4g2hPACvCwtWtupxLdnOh3mw9HBHG7AlzHiHSs39uxROOsxp8RFKshB-cb0rXTZWUMnspfACy9gCCIyQ'
+  'eyJhbGciOiJSUzI1NiIsInR5cCIgOiAiSldUIiwia2lkIiA6ICJSUHBQZ09sTjVINUxiVzQzeFFYcC1jQkVrcFg4SjZMTFJEVUFzN3J1R0JjIn0.eyJleHAiOjE3MTE5Nzk3ODYsImlhdCI6MTcxMTk3Nzk4NiwianRpIjoiMjBiOWQzODgtYTU1NC00ZDRkLTk2Y2UtMDNkZWU2YzE5M2MyIiwiaXNzIjoiaHR0cHM6Ly8yMDEyNzA0Ny1rZXljbG9hay10cmVsbG8uYXp1cmV3ZWJzaXRlcy5uZXQvcmVhbG1zL3RyZWxsbyIsImF1ZCI6ImFjY291bnQiLCJzdWIiOiI3ZWNlMjI0NC05YjhhLTQxNGYtOTEyZC05NTY4Y2I1NjEwMWUiLCJ0eXAiOiJCZWFyZXIiLCJhenAiOiJ0cmVsbG8iLCJzZXNzaW9uX3N0YXRlIjoiNTE1OWEyYTMtMTQ3Yy00N2ExLTk3ZmEtMDhlMjc3ZTEyMDhhIiwiYWNyIjoiMSIsImFsbG93ZWQtb3JpZ2lucyI6WyIvKiJdLCJyZWFsbV9hY2Nlc3MiOnsicm9sZXMiOlsib2ZmbGluZV9hY2Nlc3MiLCJ1bWFfYXV0aG9yaXphdGlvbiIsImRlZmF1bHQtcm9sZXMtdHJlbGxvIl19LCJyZXNvdXJjZV9hY2Nlc3MiOnsiYWNjb3VudCI6eyJyb2xlcyI6WyJtYW5hZ2UtYWNjb3VudCIsIm1hbmFnZS1hY2NvdW50LWxpbmtzIiwidmlldy1wcm9maWxlIl19fSwic2NvcGUiOiJlbWFpbCBwcm9maWxlIiwic2lkIjoiNTE1OWEyYTMtMTQ3Yy00N2ExLTk3ZmEtMDhlMjc3ZTEyMDhhIiwiZW1haWxfdmVyaWZpZWQiOnRydWUsIm5hbWUiOiJ2dSBuZ28iLCJwcmVmZXJyZWRfdXNlcm5hbWUiOiJ2dXgiLCJnaXZlbl9uYW1lIjoidnUiLCJmYW1pbHlfbmFtZSI6Im5nbyIsImVtYWlsIjoidnVAZ21haWwuY29tIn0.nSozgmGBg2kZ910w3tqPMAYCdz2Tzuhlq7sqrSQs7zigKIO051xwk2KO5qd_ZSrfqedF8VLWYE0OuzGsgbFZZXekxQS8nOS6XitqG4r55mlvpA15Q-vM96LByb6LHIn5or2ArAS28Xxkm8LCi2w6cTKC3oGClg7GS9kVLevaSbjETYeSQCJRKQw5xK-K7kG3EciRFq60d-JFb2OnafUrrjkrpigng-LM-XWyq9DLdE3ohOy7l4y-uQ9sWd0XxOtzXAiCZgsX5qHBenZHVkIZfUfskF7t4qZT90XuR6FKH6XfRy3TH2w5NOBO9DFylEvYh9Y8xUswH9NHYKWwUgwiBA'
 export const CardApiSlice = createApi({
   reducerPath: 'CardApi',
   baseQuery: fetchBaseQuery({
@@ -15,10 +15,7 @@ export const CardApiSlice = createApi({
       query: (data) => ({
         url: '/api/card/',
         method: 'POST',
-        body: {
-          ...data
-          // cardlist_id: 'demo_cardlist'
-        }
+        body: data
       })
     }),
     getCardDetail: build.query<TrelloApi.CardApi.GetCardDetailResponse, TrelloApi.CardApi.GetCardDetailRequest>({
@@ -35,9 +32,7 @@ export const CardApiSlice = createApi({
       query: (data) => ({
         url: '/api/card/detail',
         method: 'PUT',
-        body: {
-          ...data
-        }
+        body: data
       })
     }),
     addCardWatcher: build.mutation<
@@ -47,9 +42,7 @@ export const CardApiSlice = createApi({
       query: (data) => ({
         url: '/api/card/watcher',
         method: 'POST',
-        body: {
-          ...data
-        }
+        body: data
       })
     }),
     deleteCardWatcher: build.mutation<
@@ -68,9 +61,7 @@ export const CardApiSlice = createApi({
       query: (data) => ({
         url: '/api/card/feature',
         method: 'POST',
-        body: {
-          ...data
-        }
+        body: data
       })
     }),
     updateCardFeature: build.mutation<
@@ -80,9 +71,14 @@ export const CardApiSlice = createApi({
       query: (data) => ({
         url: '/api/card/feature',
         method: 'PUT',
-        body: {
-          ...data
-        }
+        body: data
+      })
+    }),
+    deleteCardFeature: build.mutation<TrelloApi.CardApi.DeleteFeatureResponse, TrelloApi.CardApi.DeleteFeatureRequest>({
+      query: (data) => ({
+        url: '/api/card/feature',
+        method: 'DELETE',
+        body: data
       })
     })
   })

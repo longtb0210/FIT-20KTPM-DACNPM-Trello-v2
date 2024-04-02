@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react'
 import { Box, Grid, Popover } from '@mui/material'
-import { MemberAvatar, bgColors } from '../CardMemberList'
+import { MemberAvatar, stringToColor } from '../CardMemberList'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { faXmark } from '@fortawesome/free-solid-svg-icons'
 import { useTheme } from '~/components/Theme/themeContext'
@@ -197,7 +197,7 @@ export function CardMemberModal({
                 <MemberAvatarAndName
                   key={index}
                   email={email}
-                  bgColor={bgColors[index]}
+                  bgColor={stringToColor(email)}
                   onClick={() => removeMemberFromCard(email)}
                 />
               ))}
@@ -215,7 +215,7 @@ export function CardMemberModal({
                 <MemberAvatarAndName
                   key={index}
                   email={email}
-                  bgColor={bgColors[index]}
+                  bgColor={stringToColor(email)}
                   onClick={() => addMemberToCard(email)}
                 />
               ))}

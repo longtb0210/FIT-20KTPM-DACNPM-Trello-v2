@@ -1,7 +1,7 @@
 import { faPlus } from '@fortawesome/free-solid-svg-icons'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { Box, Tooltip } from '@mui/material'
-import { useRef, useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import { CardLabelListModal, CreateCardLabelModal, EditCardLabelModal } from './modals/CardLabelModal'
 import { useTheme } from '../Theme/themeContext'
 import { Card } from '@trello-v2/shared/src/schemas/CardList'
@@ -143,6 +143,7 @@ export default function CardLabelList({
 
   // API
   const [addCardFeatureAPI] = CardApiRTQ.CardApiSlice.useAddCardFeatureMutation()
+  const [deleteCardFeatureAPI] = CardApiRTQ.CardApiSlice.useDeleteCardFeatureMutation()
 
   function openModal(modalIndex: number) {
     const updatedOpenModal = modalState.map((state, index) => (index === modalIndex ? true : state))
@@ -173,44 +174,44 @@ export default function CardLabelList({
     setBoardLabelState(updatedBoardLabelList)
     // Remove label from Card as well
     if (isLabelIncluded(selectedLabel)) {
-      const updatedCard = {
+      handleExcludeLabel(selectedLabel)
+    }
+  }
+
+  async function handleIncludeLabel(boardLabel: BoardLabel) {
+    try {
+      const response = await addCardFeatureAPI({
+        cardlist_id: cardlistId,
+        card_id: cardId,
+        feature: {
+          type: 'label',
+          label_id: boardLabel._id!
+        }
+      })
+      const updatedCard: Card = {
         ...currentCard,
-        labels: currentCard.features.filter(
-          (feature) => feature.type === 'label' && feature.label_id !== selectedLabel._id
-        )
+        features: [...currentCard.features, response.data.data]
       }
       setCurrentCard(updatedCard)
+    } catch (error) {
+      console.error('Error while adding label to card:', error)
     }
   }
 
-  function handleIncludeLabel(boardLabel: BoardLabel) {
-    const newCardLabel: Feature_CardLabel = {
-      type: 'label',
-      label_id: boardLabel._id!
+  async function handleExcludeLabel(boardLabel: BoardLabel) {
+    try {
+      const featureToDelete: Feature_CardLabel = currentCard.features.find(
+        (feature) => feature.type === 'label' && feature.label_id === boardLabel._id
+      ) as Feature_CardLabel
+      const response = await deleteCardFeatureAPI({
+        cardlist_id: cardlistId,
+        card_id: cardId,
+        feature_id: featureToDelete._id!
+      })
+      setCurrentCard(response.data.data)
+    } catch (error) {
+      console.error('Error while removing label from card:', error)
     }
-    const updatedCard: Card = {
-      ...currentCard,
-      features: [...currentCard.features, newCardLabel]
-    }
-    setCurrentCard(updatedCard)
-    addCardFeatureAPI({
-      cardlist_id: cardlistId,
-      card_id: cardId,
-      feature: {
-        type: 'label',
-        label_id: boardLabel._id!
-      }
-    })
-  }
-
-  function handleExcludeLabel(boardLabel: BoardLabel) {
-    const updatedCard: Card = {
-      ...currentCard,
-      features: currentCard.features.filter(
-        (feature) => feature.type === 'label' && feature.label_id !== boardLabel._id
-      )
-    }
-    setCurrentCard(updatedCard)
   }
 
   return (
@@ -226,31 +227,33 @@ export default function CardLabelList({
               .map((feature, index) => {
                 const label = feature as Feature_CardLabel
                 const boardLabel = boardLabelState.find((boardLabel) => boardLabel._id === label.label_id)
-                const colorTitle = labelColorsTitle[labelColors.indexOf(boardLabel!.color || labelColors[0])]
-                return (
-                  <Tooltip
-                    arrow
-                    key={index}
-                    title={`Color: ${colorTitle}, title: ${boardLabel!.name}`}
-                    placement='bottom'
-                    slotProps={{
-                      popper: {
-                        modifiers: [
-                          {
-                            name: 'offset',
-                            options: {
-                              offset: [0, -12]
+                if (boardLabel) {
+                  const colorTitle = labelColorsTitle[labelColors.indexOf(boardLabel!.color || labelColors[0])]
+                  return (
+                    <Tooltip
+                      arrow
+                      key={index}
+                      title={`Color: ${colorTitle}, title: ${boardLabel!.name}`}
+                      placement='bottom'
+                      slotProps={{
+                        popper: {
+                          modifiers: [
+                            {
+                              name: 'offset',
+                              options: {
+                                offset: [0, -12]
+                              }
                             }
-                          }
-                        ]
-                      }
-                    }}
-                  >
-                    <div style={{ display: 'inline-block' }}>
-                      <CardLabelItem title={boardLabel!.name} bgColor={boardLabel!.color} />
-                    </div>
-                  </Tooltip>
-                )
+                          ]
+                        }
+                      }}
+                    >
+                      <div style={{ display: 'inline-block' }}>
+                        <CardLabelItem title={boardLabel!.name} bgColor={boardLabel!.color} />
+                      </div>
+                    </Tooltip>
+                  )
+                }
               })}
             <Box
               sx={{

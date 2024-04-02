@@ -33,6 +33,7 @@ export function SidebarButtonLabels({
 
   // API
   const [addCardFeatureAPI] = CardApiRTQ.CardApiSlice.useAddCardFeatureMutation()
+  const [deleteCardFeatureAPI] = CardApiRTQ.CardApiSlice.useDeleteCardFeatureMutation()
 
   function openModal(modalIndex: number) {
     const updatedOpenModal = modalState.map((state, index) => (index === modalIndex ? true : state))
@@ -63,45 +64,63 @@ export function SidebarButtonLabels({
     setBoardLabelState(updatedBoardLabelList)
     // Remove label from Card as well
     if (isLabelIncluded(selectedLabel)) {
-      const updatedCard = {
+      handleExcludeLabel(selectedLabel)
+    }
+  }
+
+  async function handleIncludeLabel(boardLabel: BoardLabel) {
+    try {
+      const response = await addCardFeatureAPI({
+        cardlist_id: cardlistId,
+        card_id: cardId,
+        feature: {
+          type: 'label',
+          label_id: boardLabel._id!
+        }
+      })
+      const updatedCard: Card = {
         ...currentCard,
-        labels: currentCard.features.filter(
-          (feature) => feature.type === 'label' && feature.label_id !== selectedLabel._id
-        )
+        features: [...currentCard.features, response.data.data]
       }
       setCurrentCard(updatedCard)
+    } catch (error) {
+      console.error('Error while adding label to card:', error)
     }
   }
 
-  function handleIncludeLabel(boardLabel: BoardLabel) {
-    const newCardLabel: Feature_CardLabel = {
-      type: 'label',
-      label_id: boardLabel._id!
+  // useEffect(() => {
+  //   if (newCardLabel && newCardLabel.data) {
+  //     const updatedCard: Card = {
+  //       ...currentCard,
+  //       features: [...currentCard.features, newCardLabel.data]
+  //     }
+  //     setCurrentCard(updatedCard)
+  //   }
+  //   // eslint-disable-next-line react-hooks/exhaustive-deps
+  // }, [newCardLabel])
+
+  async function handleExcludeLabel(boardLabel: BoardLabel) {
+    try {
+      const featureToDelete: Feature_CardLabel = currentCard.features.find(
+        (feature) => feature.type === 'label' && feature.label_id === boardLabel._id
+      ) as Feature_CardLabel
+      const response = await deleteCardFeatureAPI({
+        cardlist_id: cardlistId,
+        card_id: cardId,
+        feature_id: featureToDelete._id!
+      })
+      setCurrentCard(response.data.data)
+    } catch (error) {
+      console.error('Error while removing label from card:', error)
     }
-    const updatedCard: Card = {
-      ...currentCard,
-      features: [...currentCard.features, newCardLabel]
-    }
-    setCurrentCard(updatedCard)
-    addCardFeatureAPI({
-      cardlist_id: cardlistId,
-      card_id: cardId,
-      feature: {
-        type: 'label',
-        label_id: boardLabel._id!
-      }
-    })
   }
 
-  function handleExcludeLabel(boardLabel: BoardLabel) {
-    const updatedCard: Card = {
-      ...currentCard,
-      features: currentCard.features.filter(
-        (feature) => feature.type === 'label' && feature.label_id !== boardLabel._id
-      )
-    }
-    setCurrentCard(updatedCard)
-  }
+  // useEffect(() => {
+  //   if (updatedCardAfterDeleteFeature && updatedCardAfterDeleteFeature.data) {
+  //     setCurrentCard(updatedCardAfterDeleteFeature.data)
+  //   }
+  //   // eslint-disable-next-line react-hooks/exhaustive-deps
+  // }, [updatedCardAfterDeleteFeature])
 
   return (
     <Box ref={boxRef}>

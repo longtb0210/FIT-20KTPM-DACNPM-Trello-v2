@@ -6,11 +6,19 @@ import { Card } from '@trello-v2/shared/src/schemas/CardList'
 
 interface SidebarButtonAttachmentsProps {
   type: ButtonType
+  cardlistId: string
+  cardId: string
   currentCard: Card
   setCurrentCard: (newState: Card) => void
 }
 
-export function SidebarButtonAttachments({ type, currentCard, setCurrentCard }: SidebarButtonAttachmentsProps) {
+export function SidebarButtonAttachments({
+  type,
+  cardlistId,
+  cardId,
+  currentCard,
+  setCurrentCard
+}: SidebarButtonAttachmentsProps) {
   const boxRef = useRef(null)
   const [anchorEl, setAnchorEl] = useState<null | HTMLDivElement>(null)
   const [isOpenModal, setIsOpenModal] = useState(false)
@@ -37,6 +45,8 @@ export function SidebarButtonAttachments({ type, currentCard, setCurrentCard }: 
       {isOpenModal && (
         <CardAttachmentModal
           anchorEl={anchorEl}
+          cardlistId={cardlistId}
+          cardId={cardId}
           currentCard={currentCard}
           setCurrentCard={setCurrentCard}
           handleClose={handleCloseModal}

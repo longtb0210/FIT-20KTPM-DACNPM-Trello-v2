@@ -5,7 +5,6 @@ import { useState } from 'react'
 // import moment from 'moment'
 import { useTheme } from '~/components/Theme/themeContext'
 import { Card } from '@trello-v2/shared/src/schemas/CardList'
-import { Feature_Checklist } from '@trello-v2/shared/src/schemas/Feature'
 import { Activity } from '@trello-v2/shared/src/schemas/Activity'
 import { CardApiRTQ } from '~/api'
 
@@ -36,35 +35,35 @@ export function CreateCardChecklistModal({
   // API
   const [addCardFeatureAPI] = CardApiRTQ.CardApiSlice.useAddCardFeatureMutation()
 
-  function createChecklist() {
-    const trimmedValue = textFieldValue.replace(/\s+/g, ' ').trim()
-    const newChecklist: Feature_Checklist = {
-      // name: trimmedValue,
-      type: 'checklist',
-      items: []
-    }
-    const newActivity: Activity = {
-      workspace_id: '0',
-      board_id: '0',
-      cardlist_id: '0',
-      card_id: '0',
-      content: `TrelloUser added ${trimmedValue} to this card`
-      // time: moment().format()
-    }
-    const updatedCard = {
-      ...currentCard,
-      features: [...currentCard.features, newChecklist],
-      activities: [...currentCard.activities, newActivity]
-    }
-    setCurrentCard(updatedCard)
-    addCardFeatureAPI({
-      cardlist_id: cardlistId,
-      card_id: cardId,
-      feature: {
-        type: 'checklist',
-        items: []
+  async function createChecklist() {
+    try {
+      const trimmedValue = textFieldValue.replace(/\s+/g, ' ').trim()
+      const response = await addCardFeatureAPI({
+        cardlist_id: cardlistId,
+        card_id: cardId,
+        feature: {
+          type: 'checklist',
+          name: trimmedValue,
+          items: []
+        }
+      })
+      const newActivity: Activity = {
+        workspace_id: '0',
+        board_id: '0',
+        cardlist_id: cardlistId,
+        card_id: cardId,
+        content: `TrelloUser added ${trimmedValue} to this card`
+        // time: moment().format()
       }
-    })
+      const updatedCard: Card = {
+        ...currentCard,
+        features: [...currentCard.features, response.data.data],
+        activities: [...currentCard.activities, newActivity]
+      }
+      setCurrentCard(updatedCard)
+    } catch (error) {
+      console.error('Error while adding checklist to card:', error)
+    }
   }
 
   return (

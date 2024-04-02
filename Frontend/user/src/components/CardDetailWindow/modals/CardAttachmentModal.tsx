@@ -4,8 +4,8 @@ import { Box, Grid, Popover, styled } from '@mui/material'
 import { useState } from 'react'
 import { useTheme } from '~/components/Theme/themeContext'
 import { Card } from '@trello-v2/shared/src/schemas/CardList'
-import { Feature_Attachment } from '@trello-v2/shared/src/schemas/Feature'
 import { Activity } from '@trello-v2/shared/src/schemas/Activity'
+import { CardApiRTQ } from '~/api'
 
 const VisuallyHiddenInput = styled('input')({
   clip: 'rect(0 0 0 0)',
@@ -21,15 +21,27 @@ const VisuallyHiddenInput = styled('input')({
 
 interface CardAttachmentModalProps {
   anchorEl: (EventTarget & HTMLDivElement) | null
+  cardlistId: string
+  cardId: string
   currentCard: Card
   setCurrentCard: (newState: Card) => void
   handleClose: () => void
 }
 
-export function CardAttachmentModal({ anchorEl, currentCard, setCurrentCard, handleClose }: CardAttachmentModalProps) {
+export function CardAttachmentModal({
+  anchorEl,
+  cardlistId,
+  cardId,
+  currentCard,
+  setCurrentCard,
+  handleClose
+}: CardAttachmentModalProps) {
   const { colors } = useTheme()
   const [attachmentLinkValue, setAttachmentLinkValue] = useState<string>('')
   const [attachmentTitleValue, setAttachmentTitleValue] = useState<string>('')
+
+  //API
+  const [addCardFeatureAPI] = CardApiRTQ.CardApiSlice.useAddCardFeatureMutation()
 
   function handleLinkValueChange(event: React.ChangeEvent<HTMLInputElement>) {
     setAttachmentLinkValue(event.target.value)
@@ -39,12 +51,16 @@ export function CardAttachmentModal({ anchorEl, currentCard, setCurrentCard, han
     setAttachmentTitleValue(event.target.value)
   }
 
-  function createAttachment() {
+  async function createAttachment() {
     if (attachmentLinkValue.trim() !== '') {
-      const newAttachment: Feature_Attachment = {
-        type: 'attachment',
-        link: attachmentLinkValue
-      }
+      const response = await addCardFeatureAPI({
+        cardlist_id: cardlistId,
+        card_id: cardId,
+        feature: {
+          type: 'attachment',
+          link: attachmentLinkValue.trim()
+        }
+      })
       const newActivity: Activity = {
         workspace_id: '0',
         board_id: '0',
@@ -54,7 +70,7 @@ export function CardAttachmentModal({ anchorEl, currentCard, setCurrentCard, han
       }
       const updatedCard: Card = {
         ...currentCard,
-        features: [...currentCard.features, newAttachment],
+        features: [...currentCard.features, response.data.data],
         activities: [...currentCard.activities, newActivity]
       }
       setCurrentCard(updatedCard)

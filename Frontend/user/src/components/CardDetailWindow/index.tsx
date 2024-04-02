@@ -34,8 +34,8 @@ const focusInputColor = '#0ff'
 // }
 
 export default function CardDetailWindow() {
-  const cardlistId: string = '660571266c1192d17c46315b'
-  const cardId: string = '6605713e6c1192d17c46315e'
+  const cardlistId: string = '660a27f18cb2ac1e95c119fb'
+  const cardId: string = '660a28058cb2ac1e95c119fe'
   const { colors } = useTheme()
 
   // Card data (MOCK UP)
@@ -74,7 +74,7 @@ export default function CardDetailWindow() {
         cardlist_id: cardlistId,
         card_id: cardId
       })
-      setCurrentCardState(cardData!.data)
+      setCurrentCardState(cardData?.data)
     } catch (err) {
       console.error('Error fetching card data:', err)
     }
@@ -93,7 +93,6 @@ export default function CardDetailWindow() {
       setCardNameFieldValue(currentCardState!.name)
       setInitialCardNameFieldValue(currentCardState!.name)
       setIsWatching(false)
-      console.log(JSON.stringify(currentCardState, null, 2))
     }
   }, [currentCardState])
 
@@ -108,8 +107,7 @@ export default function CardDetailWindow() {
       updateCardDetailAPI({
         cardlist_id: cardlistId,
         card_id: cardId,
-        name: trimmedValue,
-        cover: ''
+        name: trimmedValue
       })
       setInitialCardNameFieldValue(trimmedValue)
     }
@@ -231,10 +229,20 @@ export default function CardDetailWindow() {
                   </div>
                   {/* END: Hero */}
                   {/* START: Description */}
-                  <CardDescription currentCard={_currentCardState} setCurrentCard={_setCurrentCardState} />
+                  <CardDescription
+                    cardlistId={cardlistId}
+                    cardId={cardId}
+                    currentCard={currentCardState!}
+                    setCurrentCard={setCurrentCardState}
+                  />
                   {/* END: Description */}
                   {/* START: Attachment */}
-                  <CardAttachment currentCard={_currentCardState} setCurrentCard={_setCurrentCardState} />
+                  <CardAttachment
+                    cardlistId={cardlistId}
+                    cardId={cardId}
+                    currentCard={currentCardState!}
+                    setCurrentCard={setCurrentCardState}
+                  />
                   {/* END: Attachment */}
                   {/* START: Checklist */}
                   {currentCardState.features
@@ -253,7 +261,7 @@ export default function CardDetailWindow() {
                       )
                     })}
                   {/* END: Checklist */}
-                  <CardActivity currentCard={_currentCardState} setCurrentCard={_setCurrentCardState} />
+                  <CardActivity currentCard={currentCardState!} setCurrentCard={setCurrentCardState} />
                 </Grid>
                 <Grid item xs={3} sx={{ padding: '0 16px 8px 8px' }}>
                   <Stack sx={{ padding: '10px 0 0 0' }}>
@@ -281,8 +289,8 @@ export default function CardDetailWindow() {
                       type={ButtonType.Checklists}
                       cardlistId={cardlistId}
                       cardId={cardId}
-                      currentCard={_currentCardState}
-                      setCurrentCard={_setCurrentCardState}
+                      currentCard={currentCardState!}
+                      setCurrentCard={setCurrentCardState}
                     />
                     <SidebarButtonDates
                       type={ButtonType.Dates}
@@ -291,6 +299,8 @@ export default function CardDetailWindow() {
                     />
                     <SidebarButtonAttachments
                       type={ButtonType.Attachments}
+                      cardlistId={cardlistId}
+                      cardId={cardId}
                       currentCard={_currentCardState}
                       setCurrentCard={_setCurrentCardState}
                     />

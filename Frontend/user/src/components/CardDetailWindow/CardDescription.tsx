@@ -5,6 +5,7 @@ import { useRef, useState } from 'react'
 import { TextAreaControl } from './CardChecklist'
 import { useTheme } from '../Theme/themeContext'
 import { Card } from '@trello-v2/shared/src/schemas/CardList'
+import { CardApiRTQ } from '~/api'
 
 interface EditButtonProps {
   onClick: () => void
@@ -35,33 +36,41 @@ function EditButton({ onClick }: EditButtonProps) {
 }
 
 interface CardDescriptionProps {
+  cardlistId: string
+  cardId: string
   currentCard: Card
   setCurrentCard: (newState: Card) => void
 }
 
-export default function CardDescription({ currentCard, setCurrentCard }: CardDescriptionProps) {
+export default function CardDescription({ cardlistId, cardId, currentCard, setCurrentCard }: CardDescriptionProps) {
   const { colors } = useTheme()
   const [textAreaMinRows, setTextAreaMinRows] = useState<number>(2)
   const [isOpenTextArea, setIsOpenTextArea] = useState<boolean>(false)
-  const [initialValue, setInitialValue] = useState<string>(currentCard.description || '')
-  const [textAreaValue, setTextAreaValue] = useState<string>(currentCard.description || '')
+  const [initialValue, setInitialValue] = useState<string>(currentCard.description! || '')
+  const [textAreaValue, setTextAreaValue] = useState<string>(currentCard.description! || '')
   const textAreaRef = useRef<HTMLTextAreaElement>(null)
+
+  // API
+  const [updateCardDetailAPI] = CardApiRTQ.CardApiSlice.useUpdateCardDetailMutation()
 
   function handleTextAreaChange(event: React.ChangeEvent<HTMLTextAreaElement>) {
     setTextAreaValue(event.target.value)
   }
 
-  function handleSave() {
+  async function handleSave() {
     const trimmedValue = textAreaValue.replace(/\s+/g, ' ').trim()
+    console.log(trimmedValue)
     if (trimmedValue !== initialValue.trim()) {
-      const newCard: Card = {
-        ...currentCard,
-        description: textAreaValue
-      }
-      setCurrentCard(newCard)
+      const response = await updateCardDetailAPI({
+        cardlist_id: cardlistId,
+        card_id: cardId,
+        name: currentCard.name,
+        cover: currentCard.cover,
+        description: trimmedValue
+      })
+      setCurrentCard(response.data.data)
       setInitialValue(trimmedValue)
     }
-    handleClose()
   }
 
   function handleClose() {
@@ -100,7 +109,7 @@ export default function CardDescription({ currentCard, setCurrentCard }: CardDes
           resize: 'none',
           background: isOpenTextArea
             ? colors.background_modal_tertiary
-            : currentCard.description?.trim() !== ''
+            : textAreaValue.trim() !== ''
               ? colors.background_modal
               : colors.button
         }}
@@ -112,7 +121,15 @@ export default function CardDescription({ currentCard, setCurrentCard }: CardDes
         onBlur={handleClose}
         onFocus={handleOpen}
       />
-      {isOpenTextArea && <TextAreaControl handleSave={handleSave} handleClose={handleClose} />}
+      {isOpenTextArea && (
+        <TextAreaControl
+          handleSave={() => {
+            handleSave()
+            handleClose()
+          }}
+          handleClose={handleClose}
+        />
+      )}
     </div>
   )
 }

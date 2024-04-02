@@ -10,6 +10,23 @@ import React from 'react'
 // eslint-disable-next-line react-refresh/only-export-components
 export const bgColors: string[] = ['#8a2be2', '#1e90ff', '#66cdaa', '#ffa500', '#FFD700', '#DC143C']
 
+// eslint-disable-next-line react-refresh/only-export-components
+export function stringToColor(string: string) {
+  let hash = 0
+  let i
+  /* eslint-disable no-bitwise */
+  for (i = 0; i < string.length; i += 1) {
+    hash = string.charCodeAt(i) + ((hash << 5) - hash)
+  }
+  let color = '#'
+  for (i = 0; i < 3; i += 1) {
+    const value = (hash >> (i * 8)) & 0xff
+    color += `00${value.toString(16)}`.slice(-2)
+  }
+  /* eslint-enable no-bitwise */
+  return color
+}
+
 const getContrastColor = (hexColor: string) => {
   if (!hexColor) {
     return '#ffffff'
@@ -155,7 +172,7 @@ export default function CardMemberList({
                 }}
               >
                 <div style={{ display: 'inline-block' }}>
-                  <MemberAvatar memberName={email.slice(0, 2).toUpperCase()} bgColor={bgColors[index]} />
+                  <MemberAvatar memberName={email.slice(0, 2).toUpperCase()} bgColor={stringToColor(email)} />
                 </div>
               </Tooltip>
             ))}
