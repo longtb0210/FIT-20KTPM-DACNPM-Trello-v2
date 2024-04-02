@@ -28,7 +28,7 @@ const menuItems = [
 ];
 
 function SidebarTemplate() {
-  const [getALlWorkspace, { data: workspaceData }] = WorkspaceApiRTQ.WorkspaceApiSlice.useLazyGetAllWorkspaceQuery()
+  const [getAllWorkspace, { data: workspaceData }] = WorkspaceApiRTQ.WorkspaceApiSlice.useLazyGetAllWorkspaceQuery()
 
   const [activeItem, setActiveItem] = useState<string | null>(null);
   const [hoveredItem, setHoveredItem] = useState<string | null>(null);
@@ -64,7 +64,7 @@ function SidebarTemplate() {
   ));
 
   React.useEffect(() => {
-    getALlWorkspace().then((v) => console.log(v))
+    getAllWorkspace().then((v) => console.log(v))
   }, [])
 
   return (
