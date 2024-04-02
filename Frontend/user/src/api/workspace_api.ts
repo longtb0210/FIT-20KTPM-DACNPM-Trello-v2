@@ -2,7 +2,7 @@ import { createApi, fetchBaseQuery } from '@reduxjs/toolkit/query/react'
 import { TrelloApi } from '@trello-v2/shared'
 const WorkspaceApiSlice = createApi({
   reducerPath: 'WorkspaceApi',
-  baseQuery: fetchBaseQuery({ baseUrl: 'http://localhost:10000' }),
+  baseQuery: fetchBaseQuery({ baseUrl: 'http://localhost:3333' }),
   endpoints: (builder) => ({
     createWorkspace: builder.mutation<
       TrelloApi.WorkspaceApi.WorspaceResponse,

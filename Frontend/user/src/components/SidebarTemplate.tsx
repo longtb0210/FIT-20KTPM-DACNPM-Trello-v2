@@ -69,7 +69,7 @@ function SidebarTemplate() {
 
   return (
     <div 
-    className='detail-sidebar-container fixed pl-20 pt-2 max-h-95vh max-h-screen overflow-y-auto w-100px text-sm'>
+    className='detail-sidebar-container fixed pl-20 pt-2 max-h-95vh max-h-screen overflow-y-auto text-sm' style={{ width: '20vw' }}>
       <Menu  style={{backgroundColor: colors.background, color: colors.text}}>
         <MenuItem
           className='menu-item rounded-md font-bold'
@@ -101,9 +101,8 @@ function SidebarTemplate() {
               </Link>
             </span>
           }
-          defaultOpen={true}
           style={{
-            height: '32px',
+             height: '32px',
             backgroundColor: 
               hoveredItem === 'templates' ? colors.bg_button_hover :
               activeItem === 'templates' ? colors.bg_button_active_hover : colors.background
