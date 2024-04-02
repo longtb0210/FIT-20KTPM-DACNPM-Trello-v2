@@ -8,7 +8,8 @@
     "test": "echo \"Error: no test specified\" && exit 1",
     "gen-p": "protoc -I ./protos --js_out=import_style=commonjs:./protos/builds --grpc-web_out=import_style=typescript,mode=grpcweb:./protos/builds hello.proto",
     "gen": "cd protos && node gen.js",
-    "docker:backend": "node build-backend.js"
+    "docker:backend": "node build-backend.js",
+    "docker:compose": "docker compose -f docker-compose.backend.yml up --env-file ./config/.env up"
   },
   "author": "",
   "license": "ISC",

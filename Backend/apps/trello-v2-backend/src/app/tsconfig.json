@@ -1,9 +1,0 @@
-{
-  "extends": "../../tsconfig.app.json",
-  "compilerOptions": {
-    "strict": true,
-    "strictNullChecks": true,
-    "experimentalDecorators": true,
-    "emitDecoratorMetadata": true,
-  },
-}

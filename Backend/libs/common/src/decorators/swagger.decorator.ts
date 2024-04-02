@@ -14,7 +14,7 @@ export function SwaggerController(name: string) {
   return applyDecorators(ApiTags(name))
 }
 export function SwaggerApi({ responses = [], body, query, params }: ISwaggerParams) {
-  const consumeTypes = ['application/json', 'application/x-www-form-urlencoded']
+  const consumeTypes = ['application/json', 'application/x-www-form-urlencoded', 'multipart/form-data']
 
   const decorators = []
 

@@ -14,7 +14,7 @@ if (existsSync(swagger_ui_dist)) {
   if (!existsSync('./build/public/')) {
     mkdirSync('./build/public/swagger', { recursive: true })
   }
-  swagger_files.forEach((f) => copyFileSync(`./../node_modules/swagger-ui-dist/${f}`, `./build/public/${f}`))
+  swagger_files.forEach((f) => copyFileSync(`./../node_modules/swagger-ui-dist/${f}`, `./build/public/swagger/${f}`))
 }
 
 // const file = readFileSync('./build/index.js')

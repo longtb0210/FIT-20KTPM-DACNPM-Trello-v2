@@ -31,8 +31,9 @@ function GenerateSwaggerSchema(zodSchemas: { [key: string]: any }[]) {
 }
 
 export function initSwagger(app: INestApplication<any>, path: string, zodSchemas: { [key: string]: any }[]) {
-  const config = new DocumentBuilder().build()
+  const config = new DocumentBuilder().addBearerAuth().build()
   const document = SwaggerModule.createDocument(app, config)
+  app.enableCors()
   document.components.schemas = {
     ...document.components.schemas,
     ...GenerateSwaggerSchema(zodSchemas),

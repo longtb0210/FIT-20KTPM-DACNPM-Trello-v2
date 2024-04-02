@@ -4,8 +4,8 @@ import { Refine_MongoId } from "../utils/RefineMongoId";
 
 export const BoardLabelSchema = z.object({
   _id: z.string().refine(Refine_MongoId, { message: "Invalid id" }).optional(),
-  color: z.string(),
-  name: z.string(),
+  color: z.string().default(""),
+  name: z.string().default(""),
 });
 
 export const BoardSchema = z.object({
