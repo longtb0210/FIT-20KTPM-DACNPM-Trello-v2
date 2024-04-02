@@ -30,8 +30,8 @@ const menuItems = [
 function SidebarTemplate() {
   const [getAllWorkspace, { data: workspaceData }] = WorkspaceApiRTQ.WorkspaceApiSlice.useLazyGetAllWorkspaceQuery()
 
-  const [activeItem, setActiveItem] = useState<string | null>(null);
-  const [hoveredItem, setHoveredItem] = useState<string | null>(null);
+  const [activeItem, setActiveItem] = useState<string | null>(null)
+  const [hoveredItem, setHoveredItem] = useState<string | null>(null)
   const { darkMode, colors } = useTheme()
 
   const handleItemClick = (item: string) => {
