@@ -4,6 +4,7 @@ import { InjectController, InjectRoute } from '@app/common/decorators'
 import { SwaggerApi } from '@app/common/decorators/'
 import { IdParamValidationPipe, ZodValidationPipe } from '@app/common/pipes'
 import {
+  BadRequestException,
   Body,
   FileTypeValidator,
   HttpStatus,
@@ -77,7 +78,7 @@ export class BoardController {
       },
     ],
   })
-  async create(
+  async createBoard(
     @Body(new ZodValidationPipe(TrelloApi.BoardApi.CreateBoardRequestSchema))
     body: TrelloApi.BoardApi.CreateBoard,
   ): Promise<TrelloApi.BoardApi.CreateBoardResponse> {
@@ -263,6 +264,17 @@ export class BoardController {
       type: 'string',
       example: 'string',
     },
+    body: {
+      schema: {
+        type: 'object',
+        properties: {
+          background: {
+            type: 'string',
+            format: 'binary',
+          },
+        },
+      },
+    },
     responses: [
       {
         status: HttpStatus.OK,
@@ -276,7 +288,7 @@ export class BoardController {
     board_id: TrelloApi.BoardApi.BoardIdRequest,
     @UploadedFile(
       new ParseFilePipe({
-        validators: [new MaxFileSizeValidator({ maxSize: 10000000 }), new FileTypeValidator({ fileType: '.(png|jpeg|jpg)' })],
+        validators: [new MaxFileSizeValidator({ maxSize: 10 * 1024 * 1024 }), new FileTypeValidator({ fileType: '.(png|jpeg|jpg)' })],
       }),
     )
     background: Express.Multer.File,
@@ -338,6 +350,132 @@ export class BoardController {
 
     if (board.background_list.includes(body.background)) await this.boardService.removeFirebaseImage(body.background)
 
+    return {
+      data: update,
+    }
+  }
+
+  @InjectRoute(BoardRoutes.getLabels)
+  @SwaggerApi({
+    params: {
+      name: 'board_id',
+      type: 'string',
+      example: 'string',
+    },
+    responses: [
+      {
+        status: HttpStatus.OK,
+        schema: { $ref: getSchemaPath('GetLabelsResponseSchema') },
+      },
+    ],
+  })
+  async getLabels(
+    @Param('board_id', IdParamValidationPipe)
+    board_id: TrelloApi.BoardApi.BoardIdRequest,
+  ): Promise<TrelloApi.BoardApi.GetLabelsResponse> {
+    const board = await this.boardService.getBoardInfoByBoardId(board_id)
+    return {
+      data: board?.labels ?? null,
+    }
+  }
+
+  @InjectRoute(BoardRoutes.createLabel)
+  @SwaggerApi({
+    params: {
+      name: 'board_id',
+      type: 'string',
+      example: 'string',
+    },
+    body: { schema: { $ref: getSchemaPath('AddLabelRequestSchema') } },
+    responses: [
+      {
+        status: HttpStatus.OK,
+        schema: { $ref: getSchemaPath('GetBoardInfoByBoardIdResponseSchema') },
+      },
+    ],
+  })
+  async addLabel(
+    @Param('board_id', IdParamValidationPipe)
+    board_id: TrelloApi.BoardApi.BoardIdRequest,
+    @Body(new ZodValidationPipe(TrelloApi.BoardApi.AddLabelRequestSchema))
+    body: TrelloApi.BoardApi.CreateLabel,
+  ): Promise<TrelloApi.BoardApi.GetBoardInfoByBoardIdResponse> {
+    if (!body.color && !body.name) throw new BadRequestException('Color and name cannot be empty.')
+    const label = await this.boardService.createLabel(body)
+    const board = await this.boardService.getBoardInfoByBoardId(board_id)
+    const update = await this.boardService.updateBoard({ _id: board_id, labels: _.union(board.labels, [label]) })
+    return {
+      data: update,
+    }
+  }
+
+  @InjectRoute(BoardRoutes.deleteLabel)
+  @SwaggerApi({
+    params: {
+      name: 'board_id',
+      type: 'string',
+      example: 'string',
+    },
+    body: { schema: { $ref: getSchemaPath('RemoveLabelRequestSchema') } },
+    responses: [
+      {
+        status: HttpStatus.OK,
+        schema: { $ref: getSchemaPath('GetBoardInfoByBoardIdResponseSchema') },
+      },
+    ],
+  })
+  async removeLabel(
+    @Param('board_id', IdParamValidationPipe)
+    board_id: TrelloApi.BoardApi.BoardIdRequest,
+    @Body(new ZodValidationPipe(TrelloApi.BoardApi.RemoveLabelRequestSchema))
+    body: TrelloApi.BoardApi.RemoveLabel,
+  ): Promise<TrelloApi.BoardApi.GetBoardInfoByBoardIdResponse> {
+    const board = await this.boardService.getBoardInfoByBoardId(board_id)
+    const update = await this.boardService.updateBoard({
+      _id: board_id,
+      labels: board.labels.filter((item) => item._id.toString() !== body._id),
+    })
+    return {
+      data: update,
+    }
+  }
+
+  @InjectRoute(BoardRoutes.updateLabel)
+  @SwaggerApi({
+    params: {
+      name: 'board_id',
+      type: 'string',
+      example: 'string',
+    },
+    body: { schema: { $ref: getSchemaPath('UpdateLabelRequestSchema') } },
+    responses: [
+      {
+        status: HttpStatus.OK,
+        schema: { $ref: getSchemaPath('GetBoardInfoByBoardIdResponseSchema') },
+      },
+    ],
+  })
+  async updateLabel(
+    @Param('board_id', IdParamValidationPipe)
+    board_id: TrelloApi.BoardApi.BoardIdRequest,
+    @Body(new ZodValidationPipe(TrelloApi.BoardApi.UpdateLabelRequestSchema))
+    body: TrelloApi.BoardApi.UpdateLabel,
+  ): Promise<TrelloApi.BoardApi.GetBoardInfoByBoardIdResponse> {
+    const board = await this.boardService.getBoardInfoByBoardId(board_id)
+    const update = await this.boardService.updateBoard({
+      _id: board_id,
+      labels: board.labels.map((item) => {
+        if (item._id.toString() === body._id) {
+          return {
+            ...Object.assign(
+              item,
+              _.omitBy(body, (value) => _.isUndefined(value)),
+            ),
+          }
+        }
+        return item
+      }),
+    })
     return {
       data: update,
     }

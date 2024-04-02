@@ -9,5 +9,5 @@
 node_modules
 #packages/shared
 dist
-
+.env
 protos/builds

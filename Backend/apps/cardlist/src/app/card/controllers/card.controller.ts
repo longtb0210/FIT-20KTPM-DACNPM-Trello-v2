@@ -8,7 +8,7 @@ import { CardRoutes } from '../card.routes'
 import { CardService } from '../services/card.service'
 
 @InjectController({
-  name: 'card',
+  name: '/api/card',
 })
 export class CardController {
   constructor(private cardService: CardService) {}

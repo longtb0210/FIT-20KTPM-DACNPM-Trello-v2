@@ -18,6 +18,7 @@ export abstract class IBoardService {
   abstract uploadFirebaseImage(imageName: string, imageFile: Express.Multer.File): Promise<string | null>
   abstract removeFirebaseImage(imageUrl: string): Promise<boolean>
   abstract removeFirebaseFolder(board_id: TrelloApi.BoardApi.BoardIdRequest): Promise<boolean>
+  abstract createLabel(data: TrelloApi.BoardApi.CreateLabel): Promise<DbSchemas.BoardSchema.BoardLabel>
 }
 
 export class BoardService implements IBoardService {
@@ -25,6 +26,38 @@ export class BoardService implements IBoardService {
     @InjectModel(DbSchemas.COLLECTION_NAMES[1])
     private BoardMModel: Model<DbSchemas.BoardSchema.Board>,
   ) {}
+
+  async createBoard(data: TrelloApi.BoardApi.CreateBoard) {
+    const model = new this.BoardMModel(data)
+    return model.save()
+  }
+
+  async getAllBoard() {
+    return this.BoardMModel.find().exec()
+  }
+
+  async getBoardsByWorkspaceId(workspace_id: string) {
+    return await this.BoardMModel.find({ workspace_id: workspace_id }).exec()
+  }
+
+  async getBoardInfoByBoardId(board_id: string) {
+    return await this.BoardMModel.findById(board_id).exec()
+  }
+
+  async updateBoard(data: Partial<DbSchemas.BoardSchema.Board>) {
+    const filter = { _id: data._id }
+    const update: Partial<DbSchemas.BoardSchema.Board> = _.omitBy(data, (value, key) => _.isUndefined(value) || key === '_id')
+
+    return await this.BoardMModel.findOneAndUpdate(filter, update, {
+      new: true,
+    })
+  }
+
+  async deleteBoard(board_id: string) {
+    return await this.BoardMModel.findOneAndDelete({
+      _id: board_id,
+    }).exec()
+  }
 
   async uploadFirebaseImage(board_id: string, imageFile: Express.Multer.File) {
     const imageRef = ref(storage, `backgrounds/${board_id}/${v4()}.${imageFile.mimetype.split('/')[1]}`)
@@ -66,36 +99,9 @@ export class BoardService implements IBoardService {
     }
   }
 
-  async createBoard(data: TrelloApi.BoardApi.CreateBoard) {
-    const model = new this.BoardMModel(data)
-    return model.save()
-  }
-
-  async getAllBoard() {
-    return this.BoardMModel.find().exec()
-  }
-
-  async getBoardsByWorkspaceId(workspace_id: string) {
-    return await this.BoardMModel.find({ workspace_id: workspace_id }).exec()
-  }
-
-  async getBoardInfoByBoardId(board_id: string) {
-    return await this.BoardMModel.findById(board_id).exec()
-  }
-
-  async updateBoard(data: Partial<DbSchemas.BoardSchema.Board>) {
-    const filter = { _id: data._id }
-    const update: Partial<DbSchemas.BoardSchema.Board> = _.omitBy(data, (value, key) => _.isUndefined(value) || key === '_id')
-
-    return await this.BoardMModel.findOneAndUpdate(filter, update, {
-      new: true,
-    })
-  }
-
-  async deleteBoard(board_id: string) {
-    return await this.BoardMModel.findOneAndDelete({
-      _id: board_id,
-    }).exec()
+  async createLabel(data: TrelloApi.BoardApi.CreateLabel) {
+    const label = DbSchemas.BoardSchema.BoardLabelSchema.parse(data)
+    return label
   }
 }
 
@@ -198,5 +204,17 @@ export class BoardServiceMock implements IBoardService {
 
   removeFirebaseFolder() {
     return Promise.resolve(true)
+  }
+
+  createLabel(data: TrelloApi.BoardApi.CreateLabel) {
+    return new Promise<DbSchemas.BoardSchema.BoardLabel>((res) => {
+      const label = { _id: 'Mock-id', name: '', color: '' }
+      res(
+        Object.assign(
+          label,
+          _.omitBy(data, (value) => _.isUndefined(value)),
+        ),
+      )
+    })
   }
 }

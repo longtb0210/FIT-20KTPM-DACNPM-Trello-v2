@@ -1,3 +1,2 @@
-docker build -f Dockerfile.backend -t lamlance/backend:latest .
 docker build -f Dockerfile.envoy -t lamlance/trello-envoy:latest .
-docker compose -f docker-compose.backend.yml up
+docker compose --env-file ./configs/.env -f docker-compose.backend.yml up

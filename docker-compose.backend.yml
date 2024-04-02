@@ -20,15 +20,6 @@ services:
       ME_CONFIG_MONGODB_ADMINPASSWORD: MONGO_123
       ME_CONFIG_MONGODB_URL: mongodb://MONGO_USER:MONGO_123@mongo:27017/
 
-  keycloak:
-    image: quay.io/keycloak/keycloak
-    ports:
-      - 8090:8080
-    environment:
-      - KEYCLOAK_ADMIN=admin
-      - KEYCLOAK_ADMIN_PASSWORD=admin
-    command: ["start-dev"]
-
   envoy:
     image: lamlance/trello-envoy:latest
     ports:
@@ -36,44 +27,75 @@ services:
 
   backend-cardlist:
     image: lamlance/trello-backend:cardlist-latest
+    env_file:
+      - ./configs/.env
     environment:
       - GRPC_HOST=0.0.0.0
       - PORT=3000
       - SERVICE_NAME=cardlist
       - DB_CONN_STR=mongodb://MONGO_USER:MONGO_123@mongo:27017/trello?authSource=admin
+      - KEYCLOAK_AUTH_SERVER_URL=${keycloak_auth_server}
+      - KEYCLOAK_REALM=trello
+      - KEYCLOAK_CLIENT_ID=trello
+      - KEYCLOAK_CLIENT_SECRET=${keycloak_client_secret}
     ports:
       - 3010:3000
       - 3011:3001
 
   backend-board:
     image: lamlance/trello-backend:board-latest
+    env_file:
+      - ./configs/.env
     environment:
       - GRPC_HOST=0.0.0.0
       - PORT=3000
       - SERVICE_NAME=board
       - DB_CONN_STR=mongodb://MONGO_USER:MONGO_123@mongo:27017/trello?authSource=admin
+      - FIREBASE_API_KEY=AIzaSyA3NSjbYE0ZXTlY8XXbLyqlnTDi3z9mjXU
+      - FIREBASE_AUTH_DOMAIN=trello-99b40.firebaseapp.com
+      - FIREBASE_PROJECT_ID=trello-99b40
+      - FIREBASE_STORAGE_BUCKET=trello-99b40.appspot.com
+      - FIREBASE_MESSAGE_SENDER_ID=939798359186
+      - FIREBASE_APP_ID=1:939798359186:web:7dcbbfc2d5199bfbcf8a4b
+      - FIREBASE_MEASUREMENT_ID=G-XPG5D2J42X
+      - KEYCLOAK_AUTH_SERVER_URL=${keycloak_auth_server}
+      - KEYCLOAK_REALM=trello
+      - KEYCLOAK_CLIENT_ID=trello
+      - KEYCLOAK_CLIENT_SECRET=${keycloak_client_secret}
     ports:
       - 3020:3000
       - 3021:3001
 
   backend-workspace:
     image: lamlance/trello-backend:workspace-latest
+    env_file:
+      - ./configs/.env
     environment:
       - GRPC_HOST=0.0.0.0
       - PORT=3000
       - SERVICE_NAME=workspace
       - DB_CONN_STR=mongodb://MONGO_USER:MONGO_123@mongo:27017/trello?authSource=admin
+      - KEYCLOAK_AUTH_SERVER_URL=${keycloak_auth_server}
+      - KEYCLOAK_REALM=trello
+      - KEYCLOAK_CLIENT_ID=trello
+      - KEYCLOAK_CLIENT_SECRET=${keycloak_client_secret}
     ports:
       - 3030:3000
       - 3031:3001
 
   backend-user:
     image: lamlance/trello-backend:user-latest
+    env_file:
+      - ./configs/.env
     environment:
       - GRPC_HOST=0.0.0.0
       - PORT=3000
       - SERVICE_NAME=workspace
       - DB_CONN_STR=mongodb://MONGO_USER:MONGO_123@mongo:27017/trello?authSource=admin
+      - KEYCLOAK_AUTH_SERVER_URL=${keycloak_auth_server}
+      - KEYCLOAK_REALM=trello
+      - KEYCLOAK_CLIENT_ID=trello
+      - KEYCLOAK_CLIENT_SECRET=${keycloak_client_secret}
     ports:
       - 3040:3000
       - 3041:3001

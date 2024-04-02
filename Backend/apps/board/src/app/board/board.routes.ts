@@ -62,4 +62,24 @@ export default {
     path: '/:board_id/background_list/remove',
     method: RequestMethod.POST,
   } as IRouteParams,
+
+  getLabels: {
+    path: '/:board_id/label',
+    method: RequestMethod.GET,
+  } as IRouteParams,
+
+  createLabel: {
+    path: '/:board_id/label/add',
+    method: RequestMethod.POST,
+  } as IRouteParams,
+
+  deleteLabel: {
+    path: '/:board_id/label/remove',
+    method: RequestMethod.POST,
+  } as IRouteParams,
+
+  updateLabel: {
+    path: '/:board_id/label',
+    method: RequestMethod.PATCH,
+  } as IRouteParams,
 } as const

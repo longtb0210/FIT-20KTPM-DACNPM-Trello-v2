@@ -16,6 +16,8 @@ static_resources:
                     - name: local_service
                       domains: ["*"]
                       routes:
+                        - match: { prefix: "/realms/" }
+                          route: { cluster: "keycloak_service" }
                         - match: { prefix: "/api/mongo/" }
                           route: { cluster: mongo_express, prefix_rewrite: "/" }
                         - match: { prefix: "/api/workspace" }
@@ -31,7 +33,7 @@ static_resources:
                       cors:
                         allow_origin_string_match:
                           - prefix: "*"
-                        allow_methods: GET, POST, OPTIONS
+                        allow_methods: GET, POST, OPTIONS, PUT, DELETE, PATCH
                         allow_headers: keep-alive,user-agent,cache-control,content-type,content-transfer-encoding,custom-header-1,x-accept-content-transfer-encoding,x-accept-response-streaming,x-user-agent,x-grpc-web,grpc-timeout
                         max_age: "1728000"
                         expose_headers: custom-header-1,grpc-status,grpc-message
@@ -108,7 +110,7 @@ static_resources:
       type: LOGICAL_DNS
       lb_policy: ROUND_ROBIN
       load_assignment:
-        cluster_name: board_service
+        cluster_name: mongo_express
         endpoints:
           - lb_endpoints:
               - endpoint:
@@ -116,3 +118,16 @@ static_resources:
                     socket_address:
                       address: mongo-express
                       port_value: 8081
+    - name: keycloak_service
+      connect_timeout: 10s
+      type: LOGICAL_DNS
+      lb_policy: ROUND_ROBIN
+      load_assignment:
+        cluster_name: keycloak_service
+        endpoints:
+          - lb_endpoints:
+              - endpoint:
+                  address:
+                    socket_address:
+                      address: keycloak
+                      port_value: 8080

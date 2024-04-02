@@ -27,7 +27,7 @@ const EnvSchema = {
     }),
     KeycloakConnectModule.registerAsync({
       useExisting: KeycloakConfigService,
-      imports: [AuthModule]
+      imports: [AuthModule],
     }),
     ServeStaticModule.forRoot({
       rootPath: './public',

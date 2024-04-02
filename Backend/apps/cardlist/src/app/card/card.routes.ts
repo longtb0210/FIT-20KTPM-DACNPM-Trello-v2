@@ -3,57 +3,57 @@ import { RequestMethod } from '@nestjs/common'
 
 export const CardRoutes = {
   createCard: {
-    path: '/api/card',
+    path: '',
     method: RequestMethod.POST,
     jwtSecure: false,
   } as IRouteParams,
   getAllCardsOfCardlist: {
-    path: '/api/card',
+    path: '',
     method: RequestMethod.GET,
     jwtSecure: false,
   } as IRouteParams,
   getCardDetail: {
-    path: '/api/card/detail',
+    path: 'detail',
     method: RequestMethod.GET,
     jwtSecure: false,
   } as IRouteParams,
   updateCardDetail: {
-    path: '/api/card/detail',
+    path: 'detail',
     method: RequestMethod.PUT,
     jwtSecure: false,
   } as IRouteParams,
   addFeatureToCard: {
-    path: '/api/card/feature',
+    path: 'feature',
     method: RequestMethod.POST,
     jwtSecure: false,
   } as IRouteParams,
   updateFeatureToCard: {
-    path: '/api/card/feature',
+    path: 'feature',
     method: RequestMethod.PUT,
     jwtSecure: false,
   } as IRouteParams,
   addWatcherToCard: {
-    path: '/api/card/watcher',
+    path: 'watcher',
     method: RequestMethod.POST,
     jwtSecure: false,
   } as IRouteParams,
   deleteWatcherToCard: {
-    path: '/api/card/watcher',
+    path: 'watcher',
     method: RequestMethod.DELETE,
     jwtSecure: false,
   } as IRouteParams,
   archiveCard: {
-    path: '/api/card/archive',
+    path: 'archive',
     method: RequestMethod.POST,
     jwtSecure: false,
   } as IRouteParams,
   unarchiveCard: {
-    path: '/api/card/archive',
+    path: 'archive',
     method: RequestMethod.DELETE,
     jwtSecure: false,
   } as IRouteParams,
   moveCard: {
-    path: '/api/card/move/same',
+    path: 'move/same',
     method: RequestMethod.POST,
     jwtSecure: false,
   } as IRouteParams,
