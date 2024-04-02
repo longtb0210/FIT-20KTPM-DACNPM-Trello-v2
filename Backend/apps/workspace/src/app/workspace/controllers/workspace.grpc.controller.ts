@@ -12,7 +12,7 @@ import { WorkspaceService } from '../workspace.service'
 @InjectController({
   name: workspaceRoutes.index,
 })
-export class WorkspaceController {
+export class WorkspaceGrpcController {
   constructor(private workspaceService: WorkspaceService) {}
 
   @GrpcMethod('WorkspaceController', 'getAll')
