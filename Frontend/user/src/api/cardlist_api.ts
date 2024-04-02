@@ -20,9 +20,8 @@ export const CardListApiSlice = createApi({
       { id: string | undefined }
     >({
       query: ({ id }) => ({
-        url: '/api/cardlist',
-        method: 'GET',
-        params: { id }
+        url: `/api/cardlist/cardlist_by_board/${id}`,
+        method: 'GET'
       })
     }),
     createCardlist: build.mutation<
