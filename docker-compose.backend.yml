@@ -84,7 +84,7 @@ services:
       - 3031:3001
 
   backend-user:
-    image: lamlance/trello-backend:user-latest
+    image: lamlance/trello-backend:user-dev
     env_file:
       - ./configs/.env
     environment:

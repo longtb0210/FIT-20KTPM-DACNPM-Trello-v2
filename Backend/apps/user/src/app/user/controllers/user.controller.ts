@@ -7,6 +7,9 @@ import { TrelloApi } from '@trello-v2/shared'
 import { SwaggerApi } from '@app/common/decorators'
 import { getSchemaPath } from '@nestjs/swagger'
 import { UserGrpcService } from '../services/user.grpc.service'
+import { CacheService } from '@app/common/cache'
+import { Public } from 'nest-keycloak-connect'
+import { KcAdminService } from '../services/kc.service'
 
 @InjectController({
   name: 'user',
@@ -16,6 +19,8 @@ export class UserController {
   constructor(
     private userService: UserService,
     private userGrpcService: UserGrpcService,
+    private cacheService: CacheService.TrelloCacheDbService,
+    private kcAdminService: KcAdminService,
   ) {}
 
   @InjectRoute(UserRoutes.createUser)
@@ -107,7 +112,7 @@ export class UserController {
   async getUser(@Param('email') email: string): Promise<TrelloApi.UserApi.GetUserResponse> {
     const user = await this.userService.getUser(email)
     if (!user) throw new NotFoundException("Can't find user")
-
+    this.kcAdminService.getUserDataByEmail(email).then((data) => console.log(data))
     return {
       data: user,
     }
@@ -241,5 +246,16 @@ export class UserController {
   @InjectRoute({ path: '/api/grpc/test', method: RequestMethod.GET })
   test() {
     return this.userGrpcService.echoService.Echo({ name: 'User service' })
+  }
+
+  @Public()
+  @InjectRoute({ path: '/api/user/sqlite/test', method: RequestMethod.GET })
+  async sqlite() {
+    try {
+      const data = await this.cacheService.insertOrUpdate('mail@1', { hello: 'World' })
+      return { a: 'b', data: data }
+    } catch (error) {
+      throw error
+    }
   }
 }

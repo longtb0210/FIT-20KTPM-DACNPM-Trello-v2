@@ -5,6 +5,11 @@ import { configuration } from '@app/common'
 import { MongooseModule } from '@nestjs/mongoose'
 import { ServeStaticModule } from '@nestjs/serve-static'
 import { UserModule } from './app/user/user.module'
+import { AuthGuard, KeycloakConnectModule, ResourceGuard, RoleGuard } from 'nest-keycloak-connect'
+import { KeycloakConfigService } from '@app/common/auth/auth.service'
+import { AuthModule } from '@app/common/auth/auth.module'
+import { APP_GUARD } from '@nestjs/core'
+import { CacheModule } from '@app/common/cache'
 
 const EnvSchema = {
   PORT: Joi.number(),
@@ -21,10 +26,11 @@ const EnvSchema = {
       validationSchema: Joi.object().keys(EnvSchema),
       load: [configuration],
     }),
-    // KeycloakConnectModule.registerAsync({
-    //   useExisting: KeycloakConfigService,
-    //   imports: [AuthModule],
-    // }),
+    KeycloakConnectModule.registerAsync({
+      useExisting: KeycloakConfigService,
+      imports: [AuthModule],
+    }),
+    CacheModule.TrelloCacheDbModule.forRoot({}),
     ServeStaticModule.forRoot({
       rootPath: './public',
       serveRoot: '/api/user/swagger',
@@ -35,18 +41,18 @@ const EnvSchema = {
   ],
   controllers: [],
   providers: [
-    // {
-    //   provide: APP_GUARD,
-    //   useClass: AuthGuard,
-    // },
-    // {
-    //   provide: APP_GUARD,
-    //   useClass: ResourceGuard,
-    // },
-    // {
-    //   provide: APP_GUARD,
-    //   useClass: RoleGuard,
-    // },
+    {
+      provide: APP_GUARD,
+      useClass: AuthGuard,
+    },
+    {
+      provide: APP_GUARD,
+      useClass: ResourceGuard,
+    },
+    {
+      provide: APP_GUARD,
+      useClass: RoleGuard,
+    },
   ],
 })
 export class UserServiceModule {}
