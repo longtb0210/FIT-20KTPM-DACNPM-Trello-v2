@@ -1,15 +1,11 @@
 {
   "$schema": "https://json.schemastore.org/nest-cli",
   "collection": "@nestjs/schematics",
-  "sourceRoot": "apps/trello-v2-backend/src",
+  "sourceRoot": "apps/cardlist/src",
   "compilerOptions": {
     "deleteOutDir": true,
-    "assets": [
-      "../protos/*.proto"
-    ],
-    "watchAssets": true,
     "webpack": false,
-    "tsConfigPath": "apps/trello-v2-backend/tsconfig.app.json"
+    "tsConfigPath": "apps/cardlist/tsconfig.app.json"
   },
   "projects": {
     "common": {
