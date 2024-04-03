@@ -28,14 +28,14 @@ import { CardApiRTQ, CardlistApiRTQ } from '~/api'
 
 const focusInputColor = '#0ff'
 
-// interface CardDetailWindowProps {
-//   cardlistId: string
-//   cardId: string
-// }
+interface CardDetailWindowProps {
+  cardlistId: string
+  cardId: string
+  isOpenCDW: boolean
+  handleCloseCDW: () => void
+}
 
-export default function CardDetailWindow() {
-  const cardlistId: string = '660cc2ceb0660ac999e0de8d'
-  const cardId: string = '660cc2e5b0660ac999e0de90'
+export default function CardDetailWindow({ cardlistId, cardId, isOpenCDW, handleCloseCDW }: CardDetailWindowProps) {
   const { colors } = useTheme()
 
   // Card data (MOCK UP)
@@ -131,7 +131,7 @@ export default function CardDetailWindow() {
   }
 
   return (
-    <Backdrop sx={{ bgcolor: 'rgba(0, 0, 0, 0.64)', zIndex: (theme) => theme.zIndex.drawer + 1 }} open={true}>
+    <Backdrop sx={{ bgcolor: 'rgba(0, 0, 0, 0.64)', zIndex: (theme) => theme.zIndex.drawer + 1 }} open={isOpenCDW}>
       <Box
         sx={{
           width: '100%',
@@ -198,6 +198,7 @@ export default function CardDetailWindow() {
                   <Box
                     sx={{ width: 40, height: 40, '&:hover': { bgcolor: colors.button_hover } }}
                     className='flex cursor-pointer items-center justify-center rounded-full'
+                    onClick={handleCloseCDW}
                   >
                     <FontAwesomeIcon icon={faTimes} style={{ color: colors.text, width: 20, height: 20 }} />
                   </Box>
@@ -338,8 +339,26 @@ export default function CardDetailWindow() {
               {/* END: Body */}
             </>
           ) : (
-            <Box sx={{ width: '100%', marginTop: '20px' }} className='flex items-center justify-center'>
-              <CircularProgress />
+            <Box sx={{ width: '100%' }} className='flex items-center justify-center'>
+              {/* START: Header */}
+              <Box sx={{ width: '100%', height: 89, padding: '8px 0' }} className='flex flex-row'>
+                <Box sx={{ width: 46 }}>
+                  <Box sx={{ padding: '14px 0 0 20px' }}>
+                    <CircularProgress />
+                  </Box>
+                </Box>
+                <Box sx={{ width: 660, padding: '6px 0' }}></Box>
+                <Box sx={{ width: 52, padding: '7px 6px 0 0' }} className='flex items-start justify-end'>
+                  <Box
+                    sx={{ width: 40, height: 40, '&:hover': { bgcolor: colors.button_hover } }}
+                    className='flex cursor-pointer items-center justify-center rounded-full'
+                    onClick={handleCloseCDW}
+                  >
+                    <FontAwesomeIcon icon={faTimes} style={{ color: colors.text, width: 20, height: 20 }} />
+                  </Box>
+                </Box>
+              </Box>
+              {/* END: Header */}
             </Box>
           )}
         </Box>
