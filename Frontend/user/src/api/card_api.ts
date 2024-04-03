@@ -78,6 +78,8 @@ export const CardApiSlice = createApi({
         url: '/api/card/feature',
         method: 'DELETE',
         body: data
+      })
+    }),
     updateCard: build.mutation<TrelloApi.CardApi.UpdateCardDetailResponse, TrelloApi.CardApi.UpdateCardDetailRequest>({
       query: (data) => ({
         url: '/api/card/detail/',
