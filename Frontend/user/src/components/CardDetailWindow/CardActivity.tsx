@@ -1,12 +1,13 @@
 import { faListUl } from '@fortawesome/free-solid-svg-icons'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
-import { Avatar, Box, TextareaAutosize, Tooltip } from '@mui/material'
+import { Box, TextareaAutosize, Tooltip } from '@mui/material'
 import { ChangeEvent, useState } from 'react'
 import moment from 'moment'
 // import dayjs from 'dayjs'
 import { useTheme } from '../Theme/themeContext'
 import { Activity } from '@trello-v2/shared/src/schemas/Activity'
 import { Card } from '@trello-v2/shared/src/schemas/CardList'
+import { MemberAvatar, stringToColor } from './CardMemberList'
 
 function ShowDetailsButton() {
   const { colors } = useTheme()
@@ -176,22 +177,7 @@ export default function CardActivity({ currentCard, setCurrentCard }: CardActivi
       {/* START: Body */}
       <div style={{ width: '100%' }} className='flex items-start'>
         <Box sx={{ width: 44, marginTop: '2px' }}>
-          <Avatar
-            sx={{
-              bgcolor: '#8a2be2',
-              width: 32,
-              height: 32,
-              color: '#fff',
-              fontSize: 14,
-              fontWeight: 500,
-              '&:hover': {
-                filter: 'brightness(85%)'
-              }
-            }}
-            className='cursor-pointer'
-          >
-            <p>AV</p>
-          </Avatar>
+          <MemberAvatar memberName='TA' bgColor={stringToColor('tailwindcss@gmail.com')} />
         </Box>
         <Box style={{ width: '100%', resize: 'none' }} className='flex flex-col'>
           <TextareaAutosize
@@ -225,7 +211,7 @@ export default function CardActivity({ currentCard, setCurrentCard }: CardActivi
         sx={{ width: '100%', height: 'fit-content', margin: '10px 0 0 0', paddingLeft: '40px' }}
         className='flex flex-col items-start'
       >
-        {sortedActivities.map((activity, index) => (
+        {currentCard.activities.map((activity, index) => (
           <CardActivityTile key={index} activity={activity} />
         ))}
       </Box>

@@ -48,11 +48,13 @@ function StatusTag({ cardDateStatus }: StatusTagProps) {
 }
 
 interface CardDateProps {
+  cardlistId: string
+  cardId: string
   currentCard: Card
   setCurrentCard: (newState: Card) => void
 }
 
-export default function CardDate({ currentCard, setCurrentCard }: CardDateProps) {
+export default function CardDate({ cardlistId, cardId, currentCard, setCurrentCard }: CardDateProps) {
   const { colors } = useTheme()
   const boxRef = useRef(null)
   const [anchorEl, setAnchorEl] = useState<null | HTMLDivElement>(null)
@@ -175,6 +177,8 @@ export default function CardDate({ currentCard, setCurrentCard }: CardDateProps)
                 {isOpenModal && (
                   <SelectCardDatesModal
                     anchorEl={anchorEl}
+                    cardlistId={cardlistId}
+                    cardId={cardId}
                     currentCard={currentCard}
                     setCurrentCard={setCurrentCard}
                     handleClose={handleCloseModal}

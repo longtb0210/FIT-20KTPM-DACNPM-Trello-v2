@@ -6,11 +6,13 @@ import { Card } from '@trello-v2/shared/src/schemas/CardList'
 
 interface SidebarButtonDatesProps {
   type: ButtonType
+  cardlistId: string
+  cardId: string
   currentCard: Card
   setCurrentCard: (newState: Card) => void
 }
 
-export function SidebarButtonDates({ type, currentCard, setCurrentCard }: SidebarButtonDatesProps) {
+export function SidebarButtonDates({ type, cardlistId, cardId, currentCard, setCurrentCard }: SidebarButtonDatesProps) {
   const boxRef = useRef(null)
   const [anchorEl, setAnchorEl] = useState<null | HTMLDivElement>(null)
   const [isOpenModal, setIsOpenModal] = useState(false)
@@ -37,6 +39,8 @@ export function SidebarButtonDates({ type, currentCard, setCurrentCard }: Sideba
       {isOpenModal && (
         <SelectCardDatesModal
           anchorEl={anchorEl}
+          cardlistId={cardlistId}
+          cardId={cardId}
           currentCard={currentCard}
           setCurrentCard={setCurrentCard}
           handleClose={handleCloseModal}

@@ -34,8 +34,8 @@ const focusInputColor = '#0ff'
 // }
 
 export default function CardDetailWindow() {
-  const cardlistId: string = '660a27f18cb2ac1e95c119fb'
-  const cardId: string = '660a28058cb2ac1e95c119fe'
+  const cardlistId: string = '660cc2ceb0660ac999e0de8d'
+  const cardId: string = '660cc2e5b0660ac999e0de90'
   const { colors } = useTheme()
 
   // Card data (MOCK UP)
@@ -225,7 +225,12 @@ export default function CardDetailWindow() {
                       setBoardLabelState={setBoardLabelState}
                     />
                     <CardNotification isWatching={isWatching} setIsWatching={handleNotification} />
-                    <CardDate currentCard={_currentCardState} setCurrentCard={_setCurrentCardState} />
+                    <CardDate
+                      cardlistId={cardlistId}
+                      cardId={cardId}
+                      currentCard={currentCardState!}
+                      setCurrentCard={setCurrentCardState}
+                    />
                   </div>
                   {/* END: Hero */}
                   {/* START: Description */}
@@ -294,15 +299,17 @@ export default function CardDetailWindow() {
                     />
                     <SidebarButtonDates
                       type={ButtonType.Dates}
-                      currentCard={_currentCardState}
-                      setCurrentCard={_setCurrentCardState}
+                      cardlistId={cardlistId}
+                      cardId={cardId}
+                      currentCard={currentCardState!}
+                      setCurrentCard={setCurrentCardState}
                     />
                     <SidebarButtonAttachments
                       type={ButtonType.Attachments}
                       cardlistId={cardlistId}
                       cardId={cardId}
-                      currentCard={_currentCardState}
-                      setCurrentCard={_setCurrentCardState}
+                      currentCard={currentCardState!}
+                      setCurrentCard={setCurrentCardState}
                     />
                     <h2 style={{ color: colors.text }} className='mb-2 mt-6 text-xs font-bold'>
                       Actions

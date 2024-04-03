@@ -61,6 +61,8 @@ export default function CardDescription({ cardlistId, cardId, currentCard, setCu
     const trimmedValue = textAreaValue.replace(/\s+/g, ' ').trim()
     console.log(trimmedValue)
     if (trimmedValue !== initialValue.trim()) {
+      setTextAreaValue(trimmedValue)
+      setInitialValue(trimmedValue)
       const response = await updateCardDetailAPI({
         cardlist_id: cardlistId,
         card_id: cardId,
@@ -69,8 +71,9 @@ export default function CardDescription({ cardlistId, cardId, currentCard, setCu
         description: trimmedValue
       })
       setCurrentCard(response.data.data)
-      setInitialValue(trimmedValue)
     }
+    setTextAreaMinRows(2)
+    setIsOpenTextArea(false)
   }
 
   function handleClose() {
@@ -125,7 +128,6 @@ export default function CardDescription({ cardlistId, cardId, currentCard, setCu
         <TextAreaControl
           handleSave={() => {
             handleSave()
-            handleClose()
           }}
           handleClose={handleClose}
         />

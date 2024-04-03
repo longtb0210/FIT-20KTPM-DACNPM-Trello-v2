@@ -2,7 +2,7 @@ import { Box } from '@mui/material'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { faPaperclip, faUpRightFromSquare } from '@fortawesome/free-solid-svg-icons'
 import { useRef, useState } from 'react'
-import { CardAttachmentModal, RemoveAttachmentModal } from './modals/CardAttachmentModal'
+import { CardAttachmentModal, EditAttachmentModal, RemoveAttachmentModal } from './modals/CardAttachmentModal'
 import { useTheme } from '../Theme/themeContext'
 import { Card } from '@trello-v2/shared/src/schemas/CardList'
 import { Feature_Attachment } from '@trello-v2/shared/src/schemas/Feature'
@@ -112,11 +112,53 @@ interface CardAttachmentTileProps {
   setCurrentCard: (newState: Card) => void
 }
 
-function CardAttachmentTile({ type, cardlistId, cardId, attachment, setCurrentCard }: CardAttachmentTileProps) {
+function CardAttachmentTile({
+  type,
+  cardlistId,
+  cardId,
+  attachment,
+  currentCard,
+  setCurrentCard
+}: CardAttachmentTileProps) {
   const { colors } = useTheme()
   const boxRef = useRef(null)
   const [anchorEl, setAnchorEl] = useState<null | HTMLDivElement>(null)
   const [isOpenModal, setIsOpenModal] = useState<boolean[]>([false, false])
+  const [faviconUrl, setFaviconUrl] = useState<string | null>(null)
+
+  // async function fetchFaviconUrl(url: string) {
+  //   try {
+  //     let link = url
+  //     if (!link.startsWith('http://') && !link.startsWith('https://')) {
+  //       link = 'https://' + link
+  //     }
+  //     const response = await fetch(`https://s2.googleusercontent.com/s2/favicons?domain_url=${link}`)
+  //     if (response) {
+  //       console.log(response)
+  //       setFaviconUrl(response.data)
+  //     }
+  //   } catch (error) {
+  //     console.error('Error fetching favicon:', error)
+  //   }
+  // }
+  // useEffect(() => {
+  //   fetchFaviconUrl(attachment.link)
+  // }, [])
+
+  function getWebsiteName(url: string): string {
+    let link = url
+    if (!link.startsWith('http://') && !link.startsWith('https://')) {
+      link = 'https://' + link
+    }
+    const parsedUrl = new URL(link)
+    const parts = parsedUrl.hostname.split('.')
+    const hasSubdomain = parts.length > 2 // Check if there is a subdomain
+    if (hasSubdomain) {
+      return parts[parts.length - 2].charAt(0).toUpperCase() + parts[parts.length - 2].slice(1)
+    } else {
+      return parts[0].charAt(0).toUpperCase() + parts[0].slice(1)
+    }
+  }
 
   //API
   const [deleteCardFeatureAPI] = CardApiRTQ.CardApiSlice.useDeleteCardFeatureMutation()
@@ -144,7 +186,11 @@ function CardAttachmentTile({ type, cardlistId, cardId, attachment, setCurrentCa
         }}
         className='flex cursor-pointer flex-row items-center'
         onClick={() => {
-          window.open(attachment.link, '_blank')
+          let link = attachment.link
+          if (!link.startsWith('http://') && !link.startsWith('https://')) {
+            link = 'https://' + link
+          }
+          window.open(link, '_blank')
         }}
       >
         {/* Left box */}
@@ -155,13 +201,19 @@ function CardAttachmentTile({ type, cardlistId, cardId, attachment, setCurrentCa
           {type === 'file' ? (
             <h1 className='text-lg font-bold'>exe</h1>
           ) : (
-            <FontAwesomeIcon icon={faPaperclip} style={{ width: 36, marginRight: '6px' }} className='text-xl' />
+            <div>
+              {faviconUrl ? (
+                <img src={faviconUrl} alt='Favicon' style={{ width: 36, marginRight: '6px' }} />
+              ) : (
+                <FontAwesomeIcon icon={faPaperclip} style={{ width: 36, marginRight: '6px' }} className='text-xl' />
+              )}
+            </div>
           )}
         </Box>
         {/* Content */}
         <Box sx={{ flex: 1, height: 'fit-content', padding: '8px 20px' }} className='flex flex-col justify-start'>
           <Box className='flex flex-row items-center'>
-            <h2 className='text-sm font-bold'>{attachment.link}</h2>
+            <h2 className='text-sm font-bold'>{getWebsiteName(attachment.link)}</h2>
             <FontAwesomeIcon icon={faUpRightFromSquare} style={{ marginLeft: '12px' }} className='text-xs' />
           </Box>
           <Box sx={{ marginTop: '4px' }} className='flex flex-row items-center'>
@@ -186,6 +238,25 @@ function CardAttachmentTile({ type, cardlistId, cardId, attachment, setCurrentCa
             >
               Remove
             </p>
+            {/* Divider dot */}
+            <p
+              className='flex items-center justify-center text-2xl font-bold'
+              style={{ width: 16, position: 'relative' }}
+            >
+              <span style={{ position: 'absolute', left: 8, top: -8, transform: 'translate(-50%, -50%)' }}>.</span>
+            </p>
+            {/* Button edit */}
+            <p
+              ref={boxRef}
+              className='text-sm underline'
+              onClick={(event) => {
+                event.stopPropagation()
+                setAnchorEl(boxRef.current)
+                setIsOpenModal([false, true])
+              }}
+            >
+              Edit
+            </p>
           </Box>
         </Box>
       </Box>
@@ -193,6 +264,17 @@ function CardAttachmentTile({ type, cardlistId, cardId, attachment, setCurrentCa
         <RemoveAttachmentModal
           anchorEl={anchorEl}
           handleRemove={handleRemove}
+          handleClose={() => setIsOpenModal([false, false])}
+        />
+      )}
+      {isOpenModal[1] === true && (
+        <EditAttachmentModal
+          anchorEl={anchorEl}
+          cardlistId={cardlistId}
+          cardId={cardId}
+          currentCard={currentCard}
+          setCurrentCard={setCurrentCard}
+          attachment={attachment}
           handleClose={() => setIsOpenModal([false, false])}
         />
       )}

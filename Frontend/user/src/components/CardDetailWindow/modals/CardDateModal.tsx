@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import { Box, FormControl, Grid, MenuItem, Popover, Select, SelectChangeEvent } from '@mui/material'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { faXmark } from '@fortawesome/free-solid-svg-icons'
@@ -10,6 +10,7 @@ import { DateTimePicker, LocalizationProvider } from '@mui/x-date-pickers'
 import { useTheme } from '~/components/Theme/themeContext'
 import { Card } from '@trello-v2/shared/src/schemas/CardList'
 import { Feature_Date } from '@trello-v2/shared/src/schemas/Feature'
+import { CardApiRTQ } from '~/api'
 
 const reminderDateChoices: string[] = [
   'None',
@@ -25,6 +26,8 @@ const reminderDateChoices: string[] = [
 
 interface SelectCardDatesModalProps {
   anchorEl: (EventTarget & HTMLDivElement) | null
+  cardlistId: string
+  cardId: string
   currentCard: Card
   setCurrentCard: (newState: Card) => void
   handleClose: () => void
@@ -32,6 +35,8 @@ interface SelectCardDatesModalProps {
 
 export function SelectCardDatesModal({
   anchorEl,
+  cardlistId,
+  cardId,
   currentCard,
   setCurrentCard,
   handleClose
@@ -40,9 +45,26 @@ export function SelectCardDatesModal({
   const menuItemFontSize = 14
   const [startDateEnabled, setStartDateEnabled] = useState(true)
   const [dueDateEnabled, setDueDateEnabled] = useState(true)
-  const [startDateValue, setStartDateValue] = useState<Dayjs | null>(dayjs())
-  const [dueDateValue, setDueDateValue] = useState<Dayjs | null>(dayjs().add(1, 'day'))
+  const [startDateValue, setStartDateValue] = useState<Dayjs | null>(null)
+  const [dueDateValue, setDueDateValue] = useState<Dayjs | null>(null)
   const [reminderDateValue, setReminderDateValue] = useState('None')
+
+  //API
+  const [addCardFeatureAPI] = CardApiRTQ.CardApiSlice.useAddCardFeatureMutation()
+  const [updateCardFeatureAPI] = CardApiRTQ.CardApiSlice.useUpdateCardFeatureMutation()
+  const [deleteCardFeatureAPI] = CardApiRTQ.CardApiSlice.useDeleteCardFeatureMutation()
+
+  useEffect(() => {
+    const featureDate = currentCard.features.find((feature) => feature.type === 'date') as Feature_Date
+    if (featureDate) {
+      setStartDateValue(dayjs(featureDate.start_date))
+      setDueDateValue(dayjs(featureDate.due_date))
+    } else {
+      setStartDateValue(dayjs())
+      setDueDateValue(dayjs().add(1, 'day'))
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [])
 
   function handleSelectStartDate(startDate: Dayjs) {
     setStartDateValue(startDate)
@@ -62,13 +84,63 @@ export function SelectCardDatesModal({
     setReminderDateValue(event.target.value as string)
   }
 
-  function updateCardDates() {
+  async function updateCardDates() {
     const featureDateIndex = currentCard.features.findIndex((feature) => feature.type === 'date')
-    if (featureDateIndex !== -1) {
+    if (featureDateIndex === -1) {
+      const response = await addCardFeatureAPI({
+        cardlist_id: cardlistId,
+        card_id: cardId,
+        feature: {
+          type: 'date',
+          start_date: startDateValue!.toDate(),
+          due_date: dueDateValue!.toDate()
+        }
+      })
+      const updatedCard = {
+        ...currentCard,
+        features: [...currentCard.features, response.data.data]
+      }
+      setCurrentCard(updatedCard)
+    } else {
       const featureDate = currentCard.features[featureDateIndex] as Feature_Date
-      featureDate.start_date = startDateValue?.toDate()
-      featureDate.due_date = dueDateValue!.toDate()
-      setCurrentCard({ ...currentCard })
+      updateCardFeatureAPI({
+        cardlist_id: cardlistId,
+        card_id: cardId,
+        feature: {
+          _id: featureDate._id!,
+          type: 'date',
+          start_date: startDateValue!.toDate(),
+          due_date: dueDateValue!.toDate()
+        }
+      })
+      const updatedCard: Card = {
+        ...currentCard,
+        features: currentCard.features.map((feature) =>
+          feature.type === 'date' && feature._id === featureDate._id
+            ? {
+                ...feature,
+                start_date: startDateValue!.toDate(),
+                due_date: dueDateValue!.toDate()
+              }
+            : feature
+        )
+      }
+      setCurrentCard(updatedCard)
+    }
+  }
+
+  async function handleRemoveCardDate() {
+    const featureDateIndex = currentCard.features.findIndex((feature) => feature.type === 'date')
+    if (featureDateIndex === -1) {
+      return
+    } else {
+      const featureDate = currentCard.features[featureDateIndex] as Feature_Date
+      const response = await deleteCardFeatureAPI({
+        cardlist_id: cardlistId,
+        card_id: cardId,
+        feature_id: featureDate._id!
+      })
+      setCurrentCard(response.data.data)
     }
   }
 
@@ -242,7 +314,10 @@ export function SelectCardDatesModal({
             }
           }}
           className='flex cursor-pointer items-center justify-center rounded'
-          onClick={handleClose}
+          onClick={() => {
+            handleRemoveCardDate()
+            handleClose()
+          }}
         >
           <h2 className='text-sm font-semibold'>Remove</h2>
         </Box>

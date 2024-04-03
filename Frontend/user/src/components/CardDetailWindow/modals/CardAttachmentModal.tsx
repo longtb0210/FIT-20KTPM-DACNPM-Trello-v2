@@ -6,6 +6,7 @@ import { useTheme } from '~/components/Theme/themeContext'
 import { Card } from '@trello-v2/shared/src/schemas/CardList'
 import { Activity } from '@trello-v2/shared/src/schemas/Activity'
 import { CardApiRTQ } from '~/api'
+import { Feature_Attachment } from '@trello-v2/shared/src/schemas/Feature'
 
 const VisuallyHiddenInput = styled('input')({
   clip: 'rect(0 0 0 0)',
@@ -64,8 +65,8 @@ export function CardAttachmentModal({
       const newActivity: Activity = {
         workspace_id: '0',
         board_id: '0',
-        cardlist_id: '0',
-        card_id: '0',
+        cardlist_id: cardlistId,
+        card_id: cardId,
         content: `TrelloUser attached ${attachmentLinkValue} to this card`
       }
       const updatedCard: Card = {
@@ -230,6 +231,151 @@ export function CardAttachmentModal({
           >
             <p>Insert</p>
           </Box>
+        </Box>
+      </Box>
+    </Popover>
+  )
+}
+
+interface EditAttachmentModalProps {
+  anchorEl: (EventTarget & HTMLDivElement) | null
+  cardlistId: string
+  cardId: string
+  attachment: Feature_Attachment
+  currentCard: Card
+  setCurrentCard: (newState: Card) => void
+  handleClose: () => void
+}
+
+export function EditAttachmentModal({
+  anchorEl,
+  cardlistId,
+  cardId,
+  attachment,
+  currentCard,
+  setCurrentCard,
+  handleClose
+}: EditAttachmentModalProps) {
+  const { colors } = useTheme()
+  const [textFieldValue, setTextFieldValue] = useState(attachment.link)
+
+  function handleTextFieldChange(event: React.ChangeEvent<HTMLInputElement>) {
+    setTextFieldValue(event.target.value)
+  }
+
+  // API
+  const [updateCardFeatureAPI] = CardApiRTQ.CardApiSlice.useUpdateCardFeatureMutation()
+
+  async function updateAttachment() {
+    try {
+      const trimmedValue = textFieldValue.replace(/\s+/g, ' ').trim()
+      const response = await updateCardFeatureAPI({
+        cardlist_id: cardlistId,
+        card_id: cardId,
+        feature: {
+          type: 'attachment',
+          _id: attachment._id!,
+          link: trimmedValue
+        }
+      })
+      const updatedCard: Card = {
+        ...currentCard,
+        features: currentCard.features.map((feature) =>
+          feature.type === 'attachment' && feature._id === attachment._id ? response.data.data : feature
+        )
+      }
+      setCurrentCard(updatedCard)
+    } catch (error) {
+      console.error('Error while adding checklist to card:', error)
+    }
+  }
+
+  return (
+    <Popover
+      open={true}
+      anchorEl={anchorEl}
+      anchorOrigin={{
+        vertical: 'bottom',
+        horizontal: 'left'
+      }}
+      transformOrigin={{
+        vertical: 'top',
+        horizontal: 'left'
+      }}
+      onClose={handleClose}
+    >
+      <Box
+        sx={{
+          width: 304,
+          height: 'fit-content',
+          padding: '4px 8px',
+          color: colors.text,
+          backgroundColor: colors.background_modal_secondary
+        }}
+        className='flex flex-col'
+      >
+        {/* START: Modal heading */}
+        <Grid container sx={{ width: '100%', margin: '4px 0 8px 0' }}>
+          <Grid item xs={2}></Grid>
+          <Grid item xs={8} className='flex items-center justify-center'>
+            <h2 className='overflow-hidden overflow-ellipsis whitespace-nowrap text-sm font-semibold'>
+              Edit attachment
+            </h2>
+          </Grid>
+          <Grid item xs={2} className='flex items-center justify-end'>
+            <Box
+              sx={{ width: 32, height: 32, '&:hover': { bgcolor: colors.button_hover } }}
+              className='flex cursor-pointer items-center justify-center rounded-lg'
+              onMouseDown={handleClose}
+            >
+              <FontAwesomeIcon icon={faXmark} />
+            </Box>
+          </Grid>
+        </Grid>
+        {/* END: Modal heading */}
+        {/* Input checklist title */}
+        <p style={{ margin: '10px 0 4px 0', color: colors.text }} className='text-xs font-bold'>
+          Link
+        </p>
+        <input
+          autoFocus
+          style={{
+            width: '100%',
+            height: 36,
+            margin: '0 0 20px 0',
+            padding: '4px 6px',
+            color: colors.text,
+            background: colors.background_modal_tertiary,
+            border: `2px solid ${colors.button_hover}`
+          }}
+          className='flex items-center rounded-sm text-sm'
+          value={textFieldValue}
+          onChange={(e) => handleTextFieldChange(e)}
+        />
+        {/* Button */}
+        <Box
+          sx={{
+            bgcolor: colors.button_primary,
+            width: 'fit-content',
+            height: 32,
+            margin: '0 0 10px 0',
+            padding: '0 20px',
+            color: colors.background,
+            fontSize: 14,
+            fontWeight: 500,
+            '&:hover': {
+              filter: 'brightness(90%)'
+            }
+          }}
+          className='flex cursor-pointer items-center justify-center rounded'
+          onClick={() => {
+            if (textFieldValue.trim() !== '') {
+              updateAttachment()
+              handleClose()
+            }
+          }}
+        >
+          <p>Update</p>
         </Box>
       </Box>
     </Popover>
