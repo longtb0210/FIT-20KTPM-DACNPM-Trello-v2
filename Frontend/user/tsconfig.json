@@ -24,8 +24,8 @@
     "paths": {
       "~/*": ["src/*"]
     },
-    "types": ["cypress", "@4tw/cypress-drag-drop","node"]
+    "types": ["cypress", "@4tw/cypress-drag-drop", "node"]
   },
-  "include": ["src", "src/assets/declaration.d.ts"],
+  "include": ["src", "src/assets/declaration.d.ts", "vite-env.d.ts"],
   "references": [{ "path": "./tsconfig.node.json" }]
 }

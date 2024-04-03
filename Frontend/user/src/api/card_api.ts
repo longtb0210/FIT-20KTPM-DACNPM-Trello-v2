@@ -1,12 +1,12 @@
-import { createApi, fetchBaseQuery } from '@reduxjs/toolkit/query/react';
-import { TrelloApi } from '@trello-v2/shared';
+import { createApi, fetchBaseQuery } from '@reduxjs/toolkit/query/react'
+import { TrelloApi } from '@trello-v2/shared'
 
-import { token } from './getInfo';
+import { token } from './getInfo'
 
 export const CardApiSlice = createApi({
   reducerPath: 'CardApi',
   baseQuery: fetchBaseQuery({
-    baseUrl: 'http://localhost:10000',
+    baseUrl: import.meta.env.VITE_URL_API,
     headers: {
       Authorization: `Bearer ${token}`
     }

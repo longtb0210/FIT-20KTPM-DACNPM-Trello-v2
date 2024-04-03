@@ -43,6 +43,7 @@
     "axios": "^1.6.7",
     "caniuse-lite": "^1.0.30001605",
     "faker": "^5.5.3",
+    "keycloak-js": "^24.0.2",
     "localforage": "^1.10.0",
     "lodash": "^4.17.21",
     "match-sorter": "^6.3.3",

@@ -4,7 +4,7 @@ import { token } from './getInfo'
 export const CardListApiSlice = createApi({
   reducerPath: 'CardlistApi',
   baseQuery: fetchBaseQuery({
-    baseUrl: 'http://localhost:10000',
+    baseUrl: import.meta.env.VITE_URL_API,
     headers: {
       Authorization: `Bearer ${token}`
     }

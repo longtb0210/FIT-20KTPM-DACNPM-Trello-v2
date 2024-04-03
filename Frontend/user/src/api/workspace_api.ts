@@ -9,7 +9,7 @@ interface InviteMembers2WorkspaceRequestWithId extends TrelloApi.WorkspaceApi.In
 const WorkspaceApiSlice = createApi({
   reducerPath: 'WorkspaceApi',
   baseQuery: fetchBaseQuery({
-    baseUrl: 'http://localhost:10000',
+    baseUrl: import.meta.env.VITE_URL_API,
     headers: {
       Authorization: `Bearer ${token}`
     }
