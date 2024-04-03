@@ -6,7 +6,6 @@ import { UserService } from './services/user.service'
 import { ClientsModule, Transport } from '@nestjs/microservices'
 import { readdirSync } from 'fs'
 import { join } from 'path'
-import { UserGrpcService } from './services/user.grpc.service'
 
 const grpcPaths = readdirSync('./protos/test')
   .filter((n) => n.includes('.proto'))
@@ -30,6 +29,6 @@ console.log(grpcPaths)
     ]),
   ],
   controllers: [UserController],
-  providers: [UserService, UserGrpcService],
+  providers: [UserService],
 })
 export class UserModule {}
