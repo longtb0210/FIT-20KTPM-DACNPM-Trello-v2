@@ -16,8 +16,12 @@ async function bootstrap() {
 
   const grpcPaths = readdirSync('./protos/workspace')
     .filter((n) => n.includes('.proto'))
-    .concat(readdirSync('./protos/').filter((n) => n.includes('.proto')))
     .map((n) => join(process.cwd(), 'protos', 'workspace', n))
+    .concat(
+      readdirSync('./protos/')
+        .filter((n) => n.includes('.proto'))
+        .map((n) => join(process.cwd(), 'protos', '', n)),
+    )
 
   initProtos(app, `${GRPC_HOST}:${GRPC_PORT}`, grpcPaths, ['trello.workspace', 'trello.auth'])
 

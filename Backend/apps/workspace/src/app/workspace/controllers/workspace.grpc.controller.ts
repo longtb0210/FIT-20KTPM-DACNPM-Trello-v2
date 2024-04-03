@@ -1,17 +1,14 @@
 import { AuthenticatedUser, Public } from 'nest-keycloak-connect'
 
 import { UserInfoDto } from '@app/common/auth/user-info.dto'
-import { InjectController, ValidateGrpcInput } from '@app/common/decorators'
-import { InternalServerErrorException, NotFoundException } from '@nestjs/common'
+import { ValidateGrpcInput } from '@app/common/decorators'
+import { Controller, InternalServerErrorException, NotFoundException } from '@nestjs/common'
 import { GrpcMethod } from '@nestjs/microservices'
 import { TrelloApi } from '@trello-v2/shared'
 
-import workspaceRoutes from '../workspace.routes'
 import { WorkspaceService } from '../workspace.service'
 
-@InjectController({
-  name: workspaceRoutes.index,
-})
+@Controller()
 export class WorkspaceGrpcController {
   constructor(private workspaceService: WorkspaceService) {}
 

@@ -14,7 +14,7 @@ message UserAuthSchema{
     string acr=10;
     string scope=11;
     string sid=12;
-    boolean email_verified=13;
+    bool email_verified=13;
     string name=14;
     string preferred_username=15;
     string given_name=16;

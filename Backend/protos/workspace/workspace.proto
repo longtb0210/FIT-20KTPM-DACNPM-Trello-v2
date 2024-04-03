@@ -1,6 +1,8 @@
 syntax = "proto3";
 package trello.workspace;
 
+import "../auth.proto";
+
 message MemberSchema {
     string _id=1;
     string status=2;
@@ -17,5 +19,5 @@ message WorkspaceSchema {
     string logo=6;
     string type_id=7;
     string visibility=8;
-    repeated trello.member.MemberSchema members=9;
+    repeated MemberSchema members=9;
 }
