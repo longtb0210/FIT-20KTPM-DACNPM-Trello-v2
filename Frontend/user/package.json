@@ -40,7 +40,7 @@
     "@reduxjs/toolkit": "^2.0.1",
     "@trello-v2/shared": "*",
     "axios": "^1.6.7",
-    "caniuse-lite": "^1.0.30001603",
+    "caniuse-lite": "^1.0.30001605",
     "faker": "^5.5.3",
     "localforage": "^1.10.0",
     "lodash": "^4.17.21",
