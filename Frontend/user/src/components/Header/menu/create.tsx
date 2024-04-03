@@ -89,7 +89,8 @@ export default function Create() {
             >
               <Paper
                 sx={{
-                  backgroundColor: 'transparent'
+                  backgroundColor: 'transparent',
+                  boxShadow: 'rgba(100, 100, 111, 0.2) 0px 7px 29px 0px'
                 }}
               >
                 <ClickAwayListener onClickAway={handleClose}>
@@ -105,7 +106,6 @@ export default function Create() {
                       width: '304px',
                       padding: '12px 0',
                       borderRadius: '4px',
-                      maxHeight: 'calc(100vh - 180px)'
                     }}
                   >
                     {[

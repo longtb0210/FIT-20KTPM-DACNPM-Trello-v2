@@ -84,7 +84,7 @@ export default function Recent() {
                 transformOrigin: placement === 'bottom-start' ? 'left top' : 'left bottom'
               }}
             >
-              <Paper sx={{ backgroundColor: 'transparent' }}>
+              <Paper sx={{ backgroundColor: 'transparent', boxShadow: 'rgba(100, 100, 111, 0.2) 0px 7px 29px 0px' }}>
                 <ClickAwayListener onClickAway={handleClose}>
                   <MenuList
                     autoFocusItem={open}

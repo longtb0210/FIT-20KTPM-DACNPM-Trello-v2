@@ -1,10 +1,10 @@
 import { Box, FormControl, Grid, MenuItem, Popover, Select, SelectChangeEvent, TextareaAutosize } from '@mui/material'
-import { _Card } from '..'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { faList, faLocationDot, faXmark } from '@fortawesome/free-solid-svg-icons'
 import { useState } from 'react'
 import { faFlipboard } from '@fortawesome/free-brands-svg-icons'
 import { useTheme } from '~/components/Theme/themeContext'
+import { Card } from '@trello-v2/shared/src/schemas/CardList'
 
 interface CardElementTileProps {
   isChecked: boolean
@@ -32,8 +32,8 @@ function CardElementTile({ isChecked, handleCheckboxChange, elementName, element
 
 interface CopyCardModalProps {
   anchorEl: (EventTarget & HTMLDivElement) | null
-  currentCard: _Card
-  setCurrentCard: (newState: _Card) => void
+  currentCard: Card
+  setCurrentCard: (newState: Card) => void
   handleClose: () => void
 }
 
@@ -41,7 +41,7 @@ const boardChoices: string[] = ['Project Trello', 'Front-end', 'Back-end']
 const listChoices: string[] = ['To do', 'Doing', 'Done', 'Week 1', 'Week 2']
 const positionChoices: string[] = ['1', '2', '3', '4']
 
-export function CopyCardModal({ anchorEl, currentCard, setCurrentCard, handleClose }: CopyCardModalProps) {
+export function CopyCardModal({ anchorEl, currentCard, handleClose }: CopyCardModalProps) {
   const { colors } = useTheme()
   const menuItemFontSize = 14
   const [textFieldValue, setTextFieldValue] = useState('')
@@ -146,13 +146,13 @@ export function CopyCardModal({ anchorEl, currentCard, setCurrentCard, handleClo
             isChecked={isChecked[0]}
             handleCheckboxChange={() => handleCheckboxChange(0)}
             elementName='Checklists'
-            elementQuantity={currentCard.checklists.length}
+            elementQuantity={currentCard.features.filter((feature) => feature.type === 'checklist').length}
           />
           <CardElementTile
             isChecked={isChecked[1]}
             handleCheckboxChange={() => handleCheckboxChange(1)}
             elementName='Labels'
-            elementQuantity={currentCard.labels.length}
+            elementQuantity={currentCard.features.filter((feature) => feature.type === 'label').length}
           />
           <CardElementTile
             isChecked={isChecked[2]}
@@ -164,7 +164,7 @@ export function CopyCardModal({ anchorEl, currentCard, setCurrentCard, handleClo
             isChecked={isChecked[3]}
             handleCheckboxChange={() => handleCheckboxChange(3)}
             elementName='Attachments'
-            elementQuantity={currentCard.attachments.length}
+            elementQuantity={currentCard.features.filter((feature) => feature.type === 'attachment').length}
           />
         </Box>
         {/* Select card move destination */}

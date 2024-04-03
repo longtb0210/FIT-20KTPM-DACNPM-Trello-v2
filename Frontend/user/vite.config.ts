@@ -19,5 +19,8 @@ export default defineConfig({
   },
   optimizeDeps: {
     include: ['@mui/material/Tooltip'],
+  },
+  define: {
+    'process.env': {}
   }
 })

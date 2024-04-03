@@ -1,16 +1,24 @@
 import { useRef, useState } from 'react'
-import { _Card } from '..'
 import { ButtonType, SidebarButton, buttonTypeIconMap } from './CardSidebarButton'
 import { Box } from '@mui/material'
 import { CreateCardChecklistModal } from '../modals/CardChecklistModal'
+import { Card } from '@trello-v2/shared/src/schemas/CardList'
 
 interface SidebarButtonChecklistProps {
   type: ButtonType
-  currentCard: _Card
-  setCurrentCard: (newState: _Card) => void
+  cardlistId: string
+  cardId: string
+  currentCard: Card
+  setCurrentCard: (newState: Card) => void
 }
 
-export function SidebarButtonChecklist({ type, currentCard, setCurrentCard }: SidebarButtonChecklistProps) {
+export function SidebarButtonChecklist({
+  type,
+  cardlistId,
+  cardId,
+  currentCard,
+  setCurrentCard
+}: SidebarButtonChecklistProps) {
   const boxRef = useRef(null)
   const [anchorEl, setAnchorEl] = useState<null | HTMLDivElement>(null)
   const [isOpenModal, setIsOpenModal] = useState(false)
@@ -37,6 +45,8 @@ export function SidebarButtonChecklist({ type, currentCard, setCurrentCard }: Si
       {isOpenModal && (
         <CreateCardChecklistModal
           anchorEl={anchorEl}
+          cardlistId={cardlistId}
+          cardId={cardId}
           currentCard={currentCard}
           setCurrentCard={setCurrentCard}
           handleClose={handleCloseModal}

@@ -1,3 +1,37 @@
+import { User } from "@trello-v2/shared/src/schemas/User";
+
+// Generate mock data for a single activity
+const generateActivity = (index: number): any => {
+  return {
+    workspace_id: `workspace_${index}`,
+    content: `Activity ${index}`,
+    _id: `activity_${index}`,
+    board_id: `board_${index}`,
+    cardlist_id: `cardlist_${index}`,
+    card_id: `card_${index}`
+  };
+};
+
+// Generate mock data for a user
+const generateUser = (): User => {
+  const activitiesCount = 5; // You can change this to generate more or fewer activities
+  const activities = Array.from({ length: activitiesCount }, (_, index) => generateActivity(index + 1));
+
+  return {
+    email: 'example@example.com',
+    username: 'example_user',
+    bio: 'Lorem ipsum dolor sit amet, consectetur adipiscing elit.',
+    avatar: 'avatar_url',
+    activities,
+    workspace_ids: ['workspace_1', 'workspace_2'] // Example workspace IDs
+  };
+};
+
+// Example usage
+export const mockUser: User = generateUser();
+
+
+
 export const activityData = [
   {
     workspace_id: 'wp_01',

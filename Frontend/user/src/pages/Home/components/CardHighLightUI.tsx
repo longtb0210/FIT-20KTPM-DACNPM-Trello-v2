@@ -27,13 +27,13 @@ const CardHightLightContent = () => {
               className='canonical-stretch link-content-card-adjust link-content-card'
               style={{ textDecoration: 'none', backgroundColor: colors.backgroundSecond }}
             >
-              <div className='title-card-highlight' style={{color: colors.text }}>
+              <div className='title-card-highlight' style={{ color: colors.text }}>
                 Prototype
               </div>
               <div className='div-info-card-highlight'>
                 <span className='info-card-highlight'>
                   <div className='badge-card' data-test-class='badge-card-subscribed'>
-                    <span className='badge-card-item' style={{color: colors.text }}>
+                    <span className='badge-card-item' style={{ color: colors.text }}>
                       <IoEyeOutline size={25} />
                     </span>
                   </div>
@@ -56,19 +56,16 @@ const CardHightLightContent = () => {
                 </span>
                 <span className='info-card-highlight'>
                   <div className='badge-card'>
-                    <span className='badge-card-item' style={{color: colors.text }}>
+                    <span className='badge-card-item' style={{ color: colors.text }}>
                       <FaRegComment />
                     </span>
-                    <span
-                      className='content-badge-card'
-                      style={{color: colors.text }}
-                    >
+                    <span className='content-badge-card' style={{ color: colors.text }}>
                       3
                     </span>
                   </div>
                 </span>
               </div>
-              <div className='icon-member-joined' style={{color: colors.text}}>
+              <div className='icon-member-joined' style={{ color: colors.text }}>
                 <span
                   aria-label=''
                   role='img'
@@ -109,8 +106,11 @@ const CardHightLightContent = () => {
           </div>
         </div>
         <div>
-          <div className='canonical-comment rounded-b-lg' style={{ backgroundColor: colors.background, color: colors.text }}>
-            <div className='tab-comment' style={{ backgroundColor: colors.background, color: colors.text}}>
+          <div
+            className='canonical-comment rounded-b-lg'
+            style={{ backgroundColor: colors.background, color: colors.text }}
+          >
+            <div className='tab-comment' style={{ backgroundColor: colors.background, color: colors.text }}>
               <div className='div-member-comment'>
                 <span
                   aria-label=''
@@ -137,7 +137,7 @@ const CardHightLightContent = () => {
                   className='button-size detail-button-div canonical-overflow-button'
                   data-test-class='overflow-details-button'
                 >
-                  <span className='detail-icon' style={{color: colors.text }}>
+                  <span className='detail-icon' style={{ color: colors.text }}>
                     <IoIosMore size={25} />
                   </span>
                 </button>
@@ -159,7 +159,7 @@ const CardHightLightContent = () => {
                   <div className='reaction-pile-selector'>
                     <span className='reactions-add mod-with-border'>
                       <span title='Add reaction' className='icon-sm icon-add-reaction reactions-add-icon'>
-                        <div className='mb-2' style={{color: colors.text }}>
+                        <div className='mb-2' style={{ color: colors.text }}>
                           <AddReactionIcon fontSize='small' />
                         </div>
                       </span>
@@ -168,10 +168,14 @@ const CardHightLightContent = () => {
                 </div>
               </div>
               <div className='div-comment'>
-                  <Button className={`w-[100%] border-gray-400 text-gray-400 ${darkMode ? 'dark:bg-slate-800' : ''}`} variant='outlined' color='inherit'>
-                    <PiPaperPlaneTilt size={20} />
-                    <span className='normal-case'>Reply</span>
-                  </Button>
+                <Button
+                  className={`w-[100%] border-gray-400 text-gray-400 ${darkMode ? 'dark:bg-slate-800' : ''}`}
+                  variant='outlined'
+                  color='inherit'
+                >
+                  <PiPaperPlaneTilt size={20} />
+                  <span className='normal-case'>Reply</span>
+                </Button>
               </div>
             </div>
           </div>
