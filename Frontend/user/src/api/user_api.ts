@@ -1,31 +1,50 @@
 import { createApi, fetchBaseQuery } from '@reduxjs/toolkit/query/react'
 import { TrelloApi } from '@trello-v2/shared'
+
+import { token } from './getInfo'
+
 const UserApiSlice = createApi({
-  reducerPath: 'UserApi',
-  baseQuery: fetchBaseQuery({ baseUrl: import.meta.env.VITE_URL_API }),
+  reducerPath: 'UserdApi',
+  baseQuery: fetchBaseQuery({
+    baseUrl: import.meta.env.VITE_URL_API,
+    headers: {
+      Authorization: `Bearer ${token}`
+    }
+  }),
   endpoints: (builder) => ({
-    createUser: builder.mutation<TrelloApi.UserApi.CreateUserResponse, TrelloApi.UserApi.CreateUserRequest>({
-      query: (data) => {
-        const token = JSON.parse(localStorage.getItem('data') || '').token
-        const headers = {
-          Authorization: `Bearer ${token}`,
-          'Content-Type': 'application/json' // Header Content-Type
-        }
-        return {
-          url: '/api/user',
-          body: data,
-          headers: headers,
-          method: 'POST'
-        }
-      }
+    updateUser: builder.mutation<TrelloApi.UserApi.UpdateUserResponse, TrelloApi.UserApi.UpdateUserRequest>({
+      query: (data) => ({
+        url: `/api/user/${data.email}`,
+        body: data,
+        method: 'PUT'
+      })
     }),
-    getAllUser: builder.query<TrelloApi.UserApi.GetallUserResponse, void>({
-      query: () => {
-        return {
-          url: '/api/user',
-          method: 'GET'
+    getUserByEmail: builder.query<TrelloApi.UserApi.GetUserResponse, { email: string }>({
+      query: ({ email }) => ({
+        url: `/api/user/${email}`,
+        method: 'GET'
+      })
+    }),
+    getActivities: builder.query<TrelloApi.UserApi.GetallActivitiesResponse, { email: string }>({
+      query: ({ email }) => ({
+        url: `/api/user/${email}`,
+        method: 'GET'
+      })
+    }),
+    getWorkspaceById: builder.query<TrelloApi.UserApi.GetUserResponse, { email: string }>({
+      query: ({ email }) => ({
+        url: `/api/user/workspace/${email}`,
+        method: 'GET'
+      })
+    }),
+    getUserById: builder.query<TrelloApi.UserApi.GetUserResponse, string>({
+      query: (email_name) => ({
+        url: `/api/user/${email_name}`,
+        method: 'GET',
+        headers: {
+          Authorization: `Bearer ${token}`
         }
-      }
+      })
     })
   })
 })

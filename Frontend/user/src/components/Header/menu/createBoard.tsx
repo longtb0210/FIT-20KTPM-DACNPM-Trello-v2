@@ -86,7 +86,7 @@ export default function CreateBoard(props: AutocompleteContainerProps) {
   }
 
   return (
-    <Box sx={{ padding: '0 12px', overflow: 'scroll' }}>
+    <Box sx={{ padding: '0 12px', overflowY: 'scroll' }}>
       <Box
         onClick={props.onBack}
         sx={{

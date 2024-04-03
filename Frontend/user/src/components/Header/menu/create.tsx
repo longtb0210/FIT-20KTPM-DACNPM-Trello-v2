@@ -106,7 +106,6 @@ export default function Create() {
                       width: '304px',
                       padding: '12px 0',
                       borderRadius: '4px',
-                      maxHeight: 'calc(100vh - 180px)'
                     }}
                   >
                     {[

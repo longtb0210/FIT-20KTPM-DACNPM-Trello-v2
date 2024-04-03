@@ -1,0 +1,17 @@
+Card detail
+++ edit name
++- edit description
+
+Label:
+++ include Label (add label to card)
+++ exclude Label (remove label from card)
++- add board label
+
+Checklist:
+++ add checklist to card
+++ remove checklist from card
+++ edit checklist name
+++ add item to checklist
+++ remove item from checklist
+++ edit checklist item name
+

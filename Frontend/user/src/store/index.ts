@@ -1,11 +1,10 @@
 import { configureStore } from '@reduxjs/toolkit'
-import { exampleSlice, keycloakSlice } from './reducers'
+import { exampleSlice } from './reducers'
 import { BoardApiRTQ, CardApiRTQ, CardlistApiRTQ, WorkspaceApiRTQ, UserApiRTQ } from '~/api'
 
 export const store = configureStore({
   reducer: {
     exampleReducer: exampleSlice.reducer,
-    keycloak: keycloakSlice.reducer,
     [BoardApiRTQ.BoardApiSlice.reducerPath]: BoardApiRTQ.BoardApiSlice.reducer,
     [WorkspaceApiRTQ.WorkspaceApiSlice.reducerPath]: WorkspaceApiRTQ.WorkspaceApiSlice.reducer,
     [CardApiRTQ.CardApiSlice.reducerPath]: CardApiRTQ.CardApiSlice.reducer,

@@ -1,4 +1,4 @@
-import { createContext, useEffect, useState } from 'react'
+import { createContext, useState } from 'react'
 import Keycloak from 'keycloak-js'
 
 type AuthContext = {

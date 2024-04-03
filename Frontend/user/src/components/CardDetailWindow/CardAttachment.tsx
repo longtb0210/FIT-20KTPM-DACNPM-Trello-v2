@@ -1,23 +1,28 @@
 import { Box } from '@mui/material'
-import { _Card, _Feature_Attachment } from '.'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { faPaperclip, faUpRightFromSquare } from '@fortawesome/free-solid-svg-icons'
 import { useRef, useState } from 'react'
-import { CardAttachmentModal } from './modals/CardAttachmentModal'
+import { CardAttachmentModal, EditAttachmentModal, RemoveAttachmentModal } from './modals/CardAttachmentModal'
 import { useTheme } from '../Theme/themeContext'
+import { Card } from '@trello-v2/shared/src/schemas/CardList'
+import { Feature_Attachment } from '@trello-v2/shared/src/schemas/Feature'
+import React from 'react'
+import { CardApiRTQ } from '~/api'
 
 type AttachmentType = 'file' | 'link'
 
 interface CardAttachmentProps {
-  currentCard: _Card
-  setCurrentCard: (newState: _Card) => void
+  cardlistId: string
+  cardId: string
+  currentCard: Card
+  setCurrentCard: (newState: Card) => void
 }
 
-export function CardAttachment({ currentCard, setCurrentCard }: CardAttachmentProps) {
+export function CardAttachment({ cardlistId, cardId, currentCard, setCurrentCard }: CardAttachmentProps) {
   const { colors } = useTheme()
   const boxRef = useRef(null)
   const [anchorEl, setAnchorEl] = useState<null | HTMLDivElement>(null)
-  const [isOpenModal, setIsOpenModal] = useState(false)
+  const [isOpenModal, setIsOpenModal] = useState<boolean>(false)
 
   function handleOpenModal() {
     setIsOpenModal(true)
@@ -28,9 +33,9 @@ export function CardAttachment({ currentCard, setCurrentCard }: CardAttachmentPr
   }
 
   return (
-    <Box sx={{ width: '100%', height: 'fit-content', margin: '20px 0' }} className='flex flex-col'>
-      {currentCard.attachments.length !== 0 && (
-        <>
+    <React.Fragment>
+      {currentCard.features.filter((feature) => feature.type === 'attachment').length !== 0 && (
+        <Box sx={{ width: '100%', height: 'fit-content', margin: '30px 0 40px 0' }} className='flex flex-col'>
           <Box
             sx={{ width: '100%', height: 32, marginBottom: '16px', color: colors.text }}
             className='flex flex-row items-center justify-between'
@@ -65,75 +70,214 @@ export function CardAttachment({ currentCard, setCurrentCard }: CardAttachmentPr
             </Box>
           </Box>
           <Box sx={{ width: '100%', height: 'fit-content', paddingLeft: '42px' }} className='flex flex-col'>
-            {currentCard.attachments.map((attachment, index) => (
-              <CardAttachmentTile key={index} type='link' attachment={attachment} />
-            ))}
+            {currentCard.features
+              .filter((_feature) => _feature.type === 'attachment')
+              .map((feature, index) => {
+                const attachment = feature as Feature_Attachment
+                return (
+                  <CardAttachmentTile
+                    key={index}
+                    type='link'
+                    cardlistId={cardlistId}
+                    cardId={cardId}
+                    attachment={attachment}
+                    currentCard={currentCard}
+                    setCurrentCard={setCurrentCard}
+                  />
+                )
+              })}
           </Box>
           {isOpenModal && (
             <CardAttachmentModal
               anchorEl={anchorEl}
+              cardlistId={cardlistId}
+              cardId={cardId}
               currentCard={currentCard}
               setCurrentCard={setCurrentCard}
               handleClose={handleCloseModal}
             />
           )}
-        </>
+        </Box>
       )}
-    </Box>
+    </React.Fragment>
   )
 }
 
 interface CardAttachmentTileProps {
   type: AttachmentType
-  attachment: _Feature_Attachment
+  cardlistId: string
+  cardId: string
+  attachment: Feature_Attachment
+  currentCard: Card
+  setCurrentCard: (newState: Card) => void
 }
 
-function CardAttachmentTile({ type, attachment }: CardAttachmentTileProps) {
+function CardAttachmentTile({
+  type,
+  cardlistId,
+  cardId,
+  attachment,
+  currentCard,
+  setCurrentCard
+}: CardAttachmentTileProps) {
   const { colors } = useTheme()
+  const boxRef = useRef(null)
+  const [anchorEl, setAnchorEl] = useState<null | HTMLDivElement>(null)
+  const [isOpenModal, setIsOpenModal] = useState<boolean[]>([false, false])
+  const [faviconUrl, setFaviconUrl] = useState<string | null>(null)
+
+  // async function fetchFaviconUrl(url: string) {
+  //   try {
+  //     let link = url
+  //     if (!link.startsWith('http://') && !link.startsWith('https://')) {
+  //       link = 'https://' + link
+  //     }
+  //     const response = await fetch(`https://s2.googleusercontent.com/s2/favicons?domain_url=${link}`)
+  //     if (response) {
+  //       console.log(response)
+  //       setFaviconUrl(response.data)
+  //     }
+  //   } catch (error) {
+  //     console.error('Error fetching favicon:', error)
+  //   }
+  // }
+  // useEffect(() => {
+  //   fetchFaviconUrl(attachment.link)
+  // }, [])
+
+  function getWebsiteName(url: string): string {
+    let link = url
+    if (!link.startsWith('http://') && !link.startsWith('https://')) {
+      link = 'https://' + link
+    }
+    const parsedUrl = new URL(link)
+    const parts = parsedUrl.hostname.split('.')
+    const hasSubdomain = parts.length > 2 // Check if there is a subdomain
+    if (hasSubdomain) {
+      return parts[parts.length - 2].charAt(0).toUpperCase() + parts[parts.length - 2].slice(1)
+    } else {
+      return parts[0].charAt(0).toUpperCase() + parts[0].slice(1)
+    }
+  }
+
+  //API
+  const [deleteCardFeatureAPI] = CardApiRTQ.CardApiSlice.useDeleteCardFeatureMutation()
+
+  async function handleRemove() {
+    const response = await deleteCardFeatureAPI({
+      cardlist_id: cardlistId,
+      card_id: cardId,
+      feature_id: attachment._id!
+    })
+    setCurrentCard(response.data.data)
+  }
+
   return (
-    <Box
-      sx={{
-        width: '100%',
-        height: 'fit-content',
-        padding: '2px 0',
-        marginBottom: '6px',
-        bgcolor: colors.background_modal,
-        color: colors.text,
-        '&:hover': { bgcolor: colors.button }
-      }}
-      className='flex cursor-pointer flex-row items-center'
-      onClick={() => {
-        window.open(attachment.link, '_blank')
-      }}
-    >
-      {/* Left box */}
-      <Box sx={{ width: 112, height: 80, bgcolor: colors.button }} className='flex items-center justify-center rounded'>
-        {type === 'file' ? (
-          <h1 className='text-lg font-bold'>exe</h1>
-        ) : (
-          <FontAwesomeIcon icon={faPaperclip} style={{ width: 36, marginRight: '6px' }} className='text-xl' />
-        )}
-      </Box>
-      {/* Content */}
-      <Box sx={{ flex: 1, height: 'fit-content', padding: '8px 20px' }} className='flex flex-col justify-start'>
-        <Box className='flex flex-row items-center'>
-          <h2 className='text-sm font-bold'>{attachment.title}</h2>
-          <FontAwesomeIcon icon={faUpRightFromSquare} style={{ marginLeft: '12px' }} className='text-xs' />
+    <React.Fragment>
+      <Box
+        sx={{
+          width: '100%',
+          height: 'fit-content',
+          padding: '2px 0',
+          marginBottom: '6px',
+          bgcolor: colors.background_modal,
+          color: colors.text,
+          '&:hover': { bgcolor: colors.button }
+        }}
+        className='flex cursor-pointer flex-row items-center'
+        onClick={() => {
+          let link = attachment.link
+          if (!link.startsWith('http://') && !link.startsWith('https://')) {
+            link = 'https://' + link
+          }
+          window.open(link, '_blank')
+        }}
+      >
+        {/* Left box */}
+        <Box
+          sx={{ width: 112, height: 80, bgcolor: colors.button }}
+          className='flex items-center justify-center rounded'
+        >
+          {type === 'file' ? (
+            <h1 className='text-lg font-bold'>exe</h1>
+          ) : (
+            <div>
+              {faviconUrl ? (
+                <img src={faviconUrl} alt='Favicon' style={{ width: 36, marginRight: '6px' }} />
+              ) : (
+                <FontAwesomeIcon icon={faPaperclip} style={{ width: 36, marginRight: '6px' }} className='text-xl' />
+              )}
+            </div>
+          )}
         </Box>
-        <Box sx={{ marginTop: '4px' }} className='flex flex-row items-center'>
-          {/* Attachment creation time */}
-          <p className='text-sm'>Added 5 minutes ago</p>
-          {/* Divider dot */}
-          <p
-            className='flex items-center justify-center text-2xl font-bold'
-            style={{ width: 16, position: 'relative' }}
-          >
-            <span style={{ position: 'absolute', left: 8, top: -8, transform: 'translate(-50%, -50%)' }}>.</span>
-          </p>
-          {/* Button remove */}
-          <p className='text-sm underline'>Remove</p>
+        {/* Content */}
+        <Box sx={{ flex: 1, height: 'fit-content', padding: '8px 20px' }} className='flex flex-col justify-start'>
+          <Box className='flex flex-row items-center'>
+            <h2 className='text-sm font-bold'>{getWebsiteName(attachment.link)}</h2>
+            <FontAwesomeIcon icon={faUpRightFromSquare} style={{ marginLeft: '12px' }} className='text-xs' />
+          </Box>
+          <Box sx={{ marginTop: '4px' }} className='flex flex-row items-center'>
+            {/* Attachment creation time */}
+            <p className='text-sm'>Added 5 minutes ago</p>
+            {/* Divider dot */}
+            <p
+              className='flex items-center justify-center text-2xl font-bold'
+              style={{ width: 16, position: 'relative' }}
+            >
+              <span style={{ position: 'absolute', left: 8, top: -8, transform: 'translate(-50%, -50%)' }}>.</span>
+            </p>
+            {/* Button remove */}
+            <p
+              ref={boxRef}
+              className='text-sm underline'
+              onClick={(event) => {
+                event.stopPropagation()
+                setAnchorEl(boxRef.current)
+                setIsOpenModal([true, false])
+              }}
+            >
+              Remove
+            </p>
+            {/* Divider dot */}
+            <p
+              className='flex items-center justify-center text-2xl font-bold'
+              style={{ width: 16, position: 'relative' }}
+            >
+              <span style={{ position: 'absolute', left: 8, top: -8, transform: 'translate(-50%, -50%)' }}>.</span>
+            </p>
+            {/* Button edit */}
+            <p
+              ref={boxRef}
+              className='text-sm underline'
+              onClick={(event) => {
+                event.stopPropagation()
+                setAnchorEl(boxRef.current)
+                setIsOpenModal([false, true])
+              }}
+            >
+              Edit
+            </p>
+          </Box>
         </Box>
       </Box>
-    </Box>
+      {isOpenModal[0] === true && (
+        <RemoveAttachmentModal
+          anchorEl={anchorEl}
+          handleRemove={handleRemove}
+          handleClose={() => setIsOpenModal([false, false])}
+        />
+      )}
+      {isOpenModal[1] === true && (
+        <EditAttachmentModal
+          anchorEl={anchorEl}
+          cardlistId={cardlistId}
+          cardId={cardId}
+          currentCard={currentCard}
+          setCurrentCard={setCurrentCard}
+          attachment={attachment}
+          handleClose={() => setIsOpenModal([false, false])}
+        />
+      )}
+    </React.Fragment>
   )
 }

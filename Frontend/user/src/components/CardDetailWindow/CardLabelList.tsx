@@ -1,10 +1,14 @@
 import { faPlus } from '@fortawesome/free-solid-svg-icons'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { Box, Tooltip } from '@mui/material'
-import { _Card, _Feature_CardLabel } from '.'
-import { useRef, useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import { CardLabelListModal, CreateCardLabelModal, EditCardLabelModal } from './modals/CardLabelModal'
 import { useTheme } from '../Theme/themeContext'
+import { Card } from '@trello-v2/shared/src/schemas/CardList'
+import { Feature_CardLabel } from '@trello-v2/shared/src/schemas/Feature'
+import React from 'react'
+import { BoardLabel } from '@trello-v2/shared/src/schemas/Board'
+import { CardApiRTQ } from '~/api'
 
 // eslint-disable-next-line react-refresh/only-export-components
 export const labelColors: string[] = [
@@ -115,13 +119,17 @@ export function CardLabelItem({ title, bgColor }: CardLabelItemProps) {
 }
 
 interface CardLabelListProps {
-  currentCard: _Card
-  setCurrentCard: (newState: _Card) => void
-  boardLabelState: _Feature_CardLabel[]
-  setBoardLabelState: (newState: _Feature_CardLabel[]) => void
+  cardlistId: string
+  cardId: string
+  currentCard: Card
+  setCurrentCard: (newState: Card) => void
+  boardLabelState: BoardLabel[]
+  setBoardLabelState: (newState: BoardLabel[]) => void
 }
 
 export default function CardLabelList({
+  cardlistId,
+  cardId,
   currentCard,
   setCurrentCard,
   boardLabelState,
@@ -130,24 +138,34 @@ export default function CardLabelList({
   const { colors } = useTheme()
   const boxRef = useRef(null)
   const [anchorEl, setAnchorEl] = useState<null | HTMLDivElement>(null)
-  const [modalState, setModalState] = useState([false, false, false])
-  const [selectedLabel, setSelectedLabel] = useState(boardLabelState[0])
+  const [modalState, setModalState] = useState<boolean[]>([false, false, false])
+  const [selectedLabel, setSelectedLabel] = useState<BoardLabel>(boardLabelState[0])
+
+  // API
+  const [addCardFeatureAPI] = CardApiRTQ.CardApiSlice.useAddCardFeatureMutation()
+  const [deleteCardFeatureAPI] = CardApiRTQ.CardApiSlice.useDeleteCardFeatureMutation()
 
   function openModal(modalIndex: number) {
     const updatedOpenModal = modalState.map((state, index) => (index === modalIndex ? true : state))
     setModalState(updatedOpenModal)
   }
 
-  function addBoardLabel(_id: string, name: string) {
-    const newBoardLabel: _Feature_CardLabel = {
-      _id: _id,
+  function addBoardLabel(color: string, name: string) {
+    const newBoardLabel: BoardLabel = {
+      _id: (parseInt(boardLabelState.slice(-1)[0]._id || '0', 10) + 1).toString(),
+      color: color,
       name: name
     }
     setBoardLabelState([...boardLabelState, newBoardLabel])
   }
 
-  function isLabelIncluded(label: _Feature_CardLabel): boolean {
-    return currentCard.labels.some((_label) => _label._id === label._id && _label.name === label.name)
+  function isLabelIncluded(boardLabel: BoardLabel): boolean {
+    return currentCard.features.some((feature) => {
+      if (feature.type === 'label' && feature.label_id === boardLabel._id) {
+        return true
+      }
+      return false
+    })
   }
 
   function removeBoardLabel() {
@@ -156,107 +174,136 @@ export default function CardLabelList({
     setBoardLabelState(updatedBoardLabelList)
     // Remove label from Card as well
     if (isLabelIncluded(selectedLabel)) {
-      const updatedCard = {
+      handleExcludeLabel(selectedLabel)
+    }
+  }
+
+  async function handleIncludeLabel(boardLabel: BoardLabel) {
+    try {
+      const response = await addCardFeatureAPI({
+        cardlist_id: cardlistId,
+        card_id: cardId,
+        feature: {
+          type: 'label',
+          label_id: boardLabel._id!
+        }
+      })
+      const updatedCard: Card = {
         ...currentCard,
-        labels: currentCard.labels.filter((label) => label._id !== selectedLabel._id)
+        features: [...currentCard.features, response.data.data]
       }
       setCurrentCard(updatedCard)
+    } catch (error) {
+      console.error('Error while adding label to card:', error)
     }
   }
 
-  function handleIncludeLabel(label: _Feature_CardLabel) {
-    const updatedCard = {
-      ...currentCard,
-      labels: [...currentCard.labels, label]
+  async function handleExcludeLabel(boardLabel: BoardLabel) {
+    try {
+      const featureToDelete: Feature_CardLabel = currentCard.features.find(
+        (feature) => feature.type === 'label' && feature.label_id === boardLabel._id
+      ) as Feature_CardLabel
+      const response = await deleteCardFeatureAPI({
+        cardlist_id: cardlistId,
+        card_id: cardId,
+        feature_id: featureToDelete._id!
+      })
+      setCurrentCard(response.data.data)
+    } catch (error) {
+      console.error('Error while removing label from card:', error)
     }
-    setCurrentCard(updatedCard)
-  }
-
-  function handleExcludeLabel(label: _Feature_CardLabel) {
-    const updatedCard = {
-      ...currentCard,
-      labels: currentCard.labels.filter((_label) => _label._id !== label._id)
-    }
-    setCurrentCard(updatedCard)
   }
 
   return (
-    <Box ref={boxRef} sx={{ margin: '10px 20px 0 0' }}>
-      <h2 style={{ color: colors.text }} className='mb-2 text-xs font-bold'>
-        Labels
-      </h2>
-      <div className='flex flex-row flex-wrap'>
-        {currentCard.labels.map((label, index) => (
-          <Tooltip
-            arrow
-            key={index}
-            title={`Color: ${labelColorsTitle[parseInt(label._id, 10)]}, title: "${label.name}"`}
-            placement='bottom'
-            slotProps={{
-              popper: {
-                modifiers: [
-                  {
-                    name: 'offset',
-                    options: {
-                      offset: [0, -12]
-                    }
-                  }
-                ]
-              }
-            }}
-          >
-            <div style={{ display: 'inline-block' }}>
-              <CardLabelItem title={label.name} bgColor={labelColors[parseInt(label._id, 10)]} />
-            </div>
-          </Tooltip>
-        ))}
-        <Box
-          sx={{
-            bgcolor: colors.button,
-            width: 32,
-            height: 32,
-            color: colors.text,
-            fontSize: 14,
-            fontWeight: 500,
-            '&:hover': {
-              bgcolor: colors.button_hover
-            }
-          }}
-          className='flex cursor-pointer items-center justify-center rounded'
-          onClick={() => {
-            setAnchorEl(boxRef.current)
-            openModal(0)
-          }}
-        >
-          <FontAwesomeIcon icon={faPlus} />
+    <React.Fragment>
+      {currentCard.features.filter((feature) => feature.type === 'label').length !== 0 && (
+        <Box ref={boxRef} sx={{ margin: '10px 20px 0 0' }}>
+          <h2 style={{ color: colors.text }} className='mb-2 text-xs font-bold'>
+            Labels
+          </h2>
+          <div className='flex flex-row flex-wrap'>
+            {currentCard.features
+              .filter((_feature) => _feature.type === 'label')
+              .map((feature, index) => {
+                const label = feature as Feature_CardLabel
+                const boardLabel = boardLabelState.find((boardLabel) => boardLabel._id === label.label_id)
+                if (boardLabel) {
+                  const colorTitle = labelColorsTitle[labelColors.indexOf(boardLabel!.color || labelColors[0])]
+                  return (
+                    <Tooltip
+                      arrow
+                      key={index}
+                      title={`Color: ${colorTitle}, title: ${boardLabel!.name}`}
+                      placement='bottom'
+                      slotProps={{
+                        popper: {
+                          modifiers: [
+                            {
+                              name: 'offset',
+                              options: {
+                                offset: [0, -12]
+                              }
+                            }
+                          ]
+                        }
+                      }}
+                    >
+                      <div style={{ display: 'inline-block' }}>
+                        <CardLabelItem title={boardLabel!.name} bgColor={boardLabel!.color} />
+                      </div>
+                    </Tooltip>
+                  )
+                }
+              })}
+            <Box
+              sx={{
+                bgcolor: colors.button,
+                width: 32,
+                height: 32,
+                color: colors.text,
+                fontSize: 14,
+                fontWeight: 500,
+                '&:hover': {
+                  bgcolor: colors.button_hover
+                }
+              }}
+              className='flex cursor-pointer items-center justify-center rounded'
+              onClick={() => {
+                setAnchorEl(boxRef.current)
+                openModal(0)
+              }}
+            >
+              <FontAwesomeIcon icon={faPlus} />
+            </Box>
+            {modalState[0] && (
+              <CardLabelListModal
+                anchorEl={anchorEl}
+                setModalState={setModalState}
+                currentCard={currentCard}
+                boardLabels={boardLabelState}
+                setSelectedLabel={setSelectedLabel}
+                handleIncludeLabel={handleIncludeLabel}
+                handleExcludeLabel={handleExcludeLabel}
+              />
+            )}
+            {modalState[1] && (
+              <CreateCardLabelModal anchorEl={anchorEl} setModalState={setModalState} addBoardLabel={addBoardLabel} />
+            )}
+            {modalState[2] && (
+              <EditCardLabelModal
+                anchorEl={anchorEl}
+                setModalState={setModalState}
+                currentCard={currentCard}
+                setCurrentCard={setCurrentCard}
+                currentLabel={selectedLabel}
+                boardLabelState={boardLabelState}
+                setBoardLabelState={setBoardLabelState}
+                removeBoardLabel={removeBoardLabel}
+              />
+            )}
+          </div>
         </Box>
-        {modalState[0] && (
-          <CardLabelListModal
-            anchorEl={anchorEl}
-            setModalState={setModalState}
-            currentCard={currentCard}
-            boardLabels={boardLabelState}
-            setSelectedLabel={setSelectedLabel}
-            handleIncludeLabel={handleIncludeLabel}
-            handleExcludeLabel={handleExcludeLabel}
-          />
-        )}
-        {modalState[1] && (
-          <CreateCardLabelModal anchorEl={anchorEl} setModalState={setModalState} addBoardLabel={addBoardLabel} />
-        )}
-        {modalState[2] && (
-          <EditCardLabelModal
-            anchorEl={anchorEl}
-            setModalState={setModalState}
-            currentCard={currentCard}
-            setCurrentCard={setCurrentCard}
-            currentLabel={selectedLabel}
-            boardLabelState={boardLabelState}
-            setBoardLabelState={setBoardLabelState}
-            removeBoardLabel={removeBoardLabel}
-          />
-        )}
-      </div>
-    </Box>
+      )}
+    </React.Fragment>
   )
 }
