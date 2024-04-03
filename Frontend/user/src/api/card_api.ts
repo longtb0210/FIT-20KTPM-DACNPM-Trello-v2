@@ -1,6 +1,8 @@
-import { createApi, fetchBaseQuery } from '@reduxjs/toolkit/query/react'
-import { TrelloApi } from '@trello-v2/shared'
-import { token } from './getInfo'
+import { createApi, fetchBaseQuery } from '@reduxjs/toolkit/query/react';
+import { TrelloApi } from '@trello-v2/shared';
+
+import { token } from './getInfo';
+
 export const CardApiSlice = createApi({
   reducerPath: 'CardApi',
   baseQuery: fetchBaseQuery({
@@ -78,6 +80,8 @@ export const CardApiSlice = createApi({
         url: '/api/card/feature',
         method: 'DELETE',
         body: data
+      })
+    }),
     updateCard: build.mutation<TrelloApi.CardApi.UpdateCardDetailResponse, TrelloApi.CardApi.UpdateCardDetailRequest>({
       query: (data) => ({
         url: '/api/card/detail/',
