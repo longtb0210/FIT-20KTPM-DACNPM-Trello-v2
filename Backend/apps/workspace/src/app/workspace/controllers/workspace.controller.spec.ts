@@ -47,15 +47,6 @@ describe('WorkspaceController', () => {
     azp: '',
     session_state: '',
     acr: '',
-    'allowed-origins': [],
-    realm_access: {
-      roles: [],
-    },
-    resource_access: {
-      account: {
-        roles: [],
-      },
-    },
     scope: '',
     sid: '',
     email_verified: false,
