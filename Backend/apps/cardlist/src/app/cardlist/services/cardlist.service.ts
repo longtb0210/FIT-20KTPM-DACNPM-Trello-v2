@@ -16,9 +16,13 @@ export abstract class ICardlistService {
   abstract getAllCardlistArchivedByBoardId(board_id: string): Promise<DbSchemas.CardlistSchema.CardList[]>
 
   abstract getAllCardlistNonArchivedByBoardId(board_id: string): Promise<DbSchemas.CardlistSchema.CardList[]>
-  abstract sortCardlistByOldestDate(board_id: string): Promise<DbSchemas.CardlistSchema.CardList[]>
-  abstract sortCardlistByNewestDate(board_id: string): Promise<DbSchemas.CardlistSchema.CardList[]>
-  abstract sortCardlistByName(board_id: string): Promise<DbSchemas.CardlistSchema.CardList[]>
+  abstract sortCardlistByOldestDate(cardlist_id: string): Promise<DbSchemas.CardlistSchema.CardList[]>
+  abstract sortCardlistByNewestDate(cardlist_id: string): Promise<DbSchemas.CardlistSchema.CardList[]>
+  abstract sortCardlistByName(cardlist_id: string): Promise<DbSchemas.CardlistSchema.CardList[]>
+
+  abstract sortCardByOldestDate(board_id: string): Promise<DbSchemas.CardlistSchema.CardList>
+  abstract sortCardByNewestDate(board_id: string): Promise<DbSchemas.CardlistSchema.CardList>
+  abstract sortCardByName(board_id: string): Promise<DbSchemas.CardlistSchema.CardList>
 
   abstract archiveCardsInlist(cardlist_id: string): Promise<DbSchemas.CardlistSchema.CardList>
   abstract archiveCardlist(cardlist_id: string): Promise<DbSchemas.CardlistSchema.CardList>
@@ -26,6 +30,7 @@ export abstract class ICardlistService {
   abstract addWatcher(data: TrelloApi.CardlistApi.AddWatcherRequest): Promise<DbSchemas.CardlistSchema.CardList>
 
   abstract addCardToList(data: TrelloApi.CardlistApi.AddCardToListRequest): Promise<DbSchemas.CardlistSchema.CardList>
+  abstract cloneCardlistsToNewBoard(board_id_input: string, board_id_output: string): Promise<DbSchemas.CardlistSchema.CardList[]>
 
   abstract deleteCardlistsByBoardId(data: TrelloApi.CardlistApi.DeleteCardlistsByBoardIdRequest): Promise<{ status: string; msg: string }>
 }
@@ -186,6 +191,82 @@ export class CardlistService implements ICardlistService {
     return cardlists
   }
 
+  async sortCardByOldestDate(cardlist_id: string) {
+    const cardlist = await this.CardlistMModel.findById(cardlist_id).exec()
+    cardlist.cards.sort((a, b) => {
+      const dateA = a.created_at ? new Date(a.created_at).getTime() : null
+      const dateB = b.created_at ? new Date(b.created_at).getTime() : null
+
+      if (dateA === null && dateB === null) {
+        return 0
+      } else if (dateA === null) {
+        return -1
+      } else if (dateB === null) {
+        return 1
+      }
+
+      return dateA - dateB
+    })
+    for (let index = 0; index < cardlist.cards.length; index++) {
+      const item = cardlist.cards[index]
+      const card = await this.CardMModel.findById(item._id).exec()
+      card.index = index
+      item.index = index
+      await card.save()
+    }
+
+    await cardlist.save()
+    return cardlist
+  }
+
+  async sortCardByNewestDate(cardlist_id: string) {
+    const cardlist = await this.CardlistMModel.findById(cardlist_id).exec()
+    cardlist.cards.sort((a, b) => {
+      const dateA = a.created_at ? new Date(a.created_at).getTime() : null
+      const dateB = b.created_at ? new Date(b.created_at).getTime() : null
+
+      if (dateA === null && dateB === null) {
+        return 0
+      } else if (dateA === null) {
+        return -1
+      } else if (dateB === null) {
+        return 1
+      }
+
+      return dateB - dateA
+    })
+    for (let index = 0; index < cardlist.cards.length; index++) {
+      const item = cardlist.cards[index]
+      const card = await this.CardMModel.findById(item._id).exec()
+      card.index = index
+      item.index = index
+      await card.save()
+    }
+
+    await cardlist.save()
+    return cardlist
+  }
+
+  async sortCardByName(cardlist_id: string) {
+    const cardlist = await this.CardlistMModel.findById(cardlist_id).exec()
+    cardlist.cards.sort((a, b) => {
+      const nameA = a.name.toLowerCase()
+      const nameB = b.name.toLowerCase()
+
+      return nameA.localeCompare(nameB)
+    })
+
+    for (let index = 0; index < cardlist.cards.length; index++) {
+      const item = cardlist.cards[index]
+      const card = await this.CardMModel.findById(item._id).exec()
+      card.index = index
+      item.index = index
+      await card.save()
+    }
+
+    await cardlist.save()
+    return cardlist
+  }
   async archiveCardsInlist(cardlist_id: string) {
     const cardlist = await this.CardlistMModel.findById(cardlist_id)
     const currentDate = new Date()
@@ -244,12 +325,13 @@ export class CardlistService implements ICardlistService {
     const card = new this.CardMModel({
       name: data.name,
       index: data.index,
-      watcher_email: [],
+      watcher_email: data.watcher_email,
       archive_at: null,
       activities: [],
       features: [],
       cover: data.cover,
       description: data.description,
+      created_at: new Date(),
     })
     await card.save()
     cardlist.cards.push(card)
@@ -371,43 +453,149 @@ export class CardlistServiceMock implements ICardlistService {
 
   getAllCardlist() {
     return new Promise<DbSchemas.CardlistSchema.CardList[]>((res) => {
-      res([])
+      res([
+        {
+          _id: 'Mock-id',
+          name: 'Mock-name',
+          board_id: 'Mock-id',
+          watcher_email: [],
+          cards: [],
+          archive_at: null,
+          created_at: new Date(),
+        },
+      ])
     })
   }
 
-  getAllCardlistByBoardId() {
+  getAllCardlistByBoardId(board_id: string) {
     return new Promise<DbSchemas.CardlistSchema.CardList[]>((res) => {
-      res([])
+      res([
+        {
+          _id: 'Mock-id',
+          name: 'Mock-name',
+          board_id: board_id,
+          watcher_email: [],
+          cards: [],
+          archive_at: null,
+          created_at: new Date(),
+        },
+      ])
     })
   }
 
-  getAllCardlistArchivedByBoardId() {
+  getAllCardlistArchivedByBoardId(board_id: string) {
     return new Promise<DbSchemas.CardlistSchema.CardList[]>((res) => {
-      res([])
+      res([
+        {
+          _id: 'Mock-id',
+          name: 'Mock-name',
+          board_id: board_id,
+          watcher_email: [],
+          cards: [],
+          archive_at: null,
+          created_at: new Date(),
+        },
+      ])
     })
   }
 
-  getAllCardlistNonArchivedByBoardId() {
+  getAllCardlistNonArchivedByBoardId(board_id: string) {
     return new Promise<DbSchemas.CardlistSchema.CardList[]>((res) => {
-      res([])
+      res([
+        {
+          _id: 'Mock-id',
+          name: 'Mock-name',
+          board_id: board_id,
+          watcher_email: [],
+          cards: [],
+          archive_at: null,
+          created_at: new Date(),
+        },
+      ])
     })
   }
 
-  sortCardlistByOldestDate(): Promise<DbSchemas.CardlistSchema.CardList[]> {
+  sortCardlistByOldestDate(board_id: string): Promise<DbSchemas.CardlistSchema.CardList[]> {
     return new Promise<DbSchemas.CardlistSchema.CardList[]>((res) => {
-      res([])
+      res([
+        {
+          _id: 'Mock-id',
+          name: 'Mock-name',
+          board_id: board_id,
+          watcher_email: [],
+          cards: [],
+          archive_at: null,
+          created_at: new Date(),
+        },
+      ])
     })
   }
 
-  sortCardlistByNewestDate(): Promise<DbSchemas.CardlistSchema.CardList[]> {
+  sortCardlistByNewestDate(board_id: string): Promise<DbSchemas.CardlistSchema.CardList[]> {
     return new Promise<DbSchemas.CardlistSchema.CardList[]>((res) => {
-      res([])
+      res([
+        {
+          _id: 'Mock-id',
+          name: 'Mock-name',
+          board_id: board_id,
+          watcher_email: [],
+          cards: [],
+          archive_at: null,
+          created_at: new Date(),
+        },
+      ])
     })
   }
 
-  sortCardlistByName(): Promise<DbSchemas.CardlistSchema.CardList[]> {
+  sortCardlistByName(board_id: string): Promise<DbSchemas.CardlistSchema.CardList[]> {
     return new Promise<DbSchemas.CardlistSchema.CardList[]>((res) => {
-      res([])
+      res([
+        {
+          _id: 'Mock-id',
+          name: 'Mock-name',
+          board_id: board_id,
+          watcher_email: [],
+          cards: [],
+          archive_at: null,
+          created_at: new Date(),
+        },
+      ])
+    })
+  }
+
+  sortCardByOldestDate(cardlist_id: string): Promise<DbSchemas.CardlistSchema.CardList> {
+    return new Promise<DbSchemas.CardlistSchema.CardList>((res) => {
+      res({
+        _id: cardlist_id,
+        board_id: 'Mock-id',
+        watcher_email: [],
+        cards: [],
+        name: 'Mock-name',
+      })
+    })
+  }
+
+  sortCardByNewestDate(cardlist_id: string): Promise<DbSchemas.CardlistSchema.CardList> {
+    return new Promise<DbSchemas.CardlistSchema.CardList>((res) => {
+      res({
+        _id: cardlist_id,
+        board_id: 'Mock-id',
+        watcher_email: [],
+        cards: [],
+        name: 'Mock-name',
+      })
+    })
+  }
+
+  sortCardByName(cardlist_id: string): Promise<DbSchemas.CardlistSchema.CardList> {
+    return new Promise<DbSchemas.CardlistSchema.CardList>((res) => {
+      res({
+        _id: cardlist_id,
+        board_id: 'Mock-id',
+        watcher_email: [],
+        cards: [],
+        name: 'Mock-name',
+      })
     })
   }
   archiveCardsInlist(cardlist_id: string): Promise<DbSchemas.CardlistSchema.CardList> {
@@ -455,8 +643,24 @@ export class CardlistServiceMock implements ICardlistService {
         cards: [],
         watcher_email: [],
         archive_at: null,
-        created_at: null,
+        created_at: new Date(),
       })
+    })
+  }
+
+  cloneCardlistsToNewBoard(board_id_input: string, board_id_output: string): Promise<DbSchemas.CardlistSchema.CardList[]> {
+    return new Promise<DbSchemas.CardlistSchema.CardList[]>((res) => {
+      res([
+        {
+          _id: 'Mock-id',
+          name: 'Mock-name',
+          board_id: board_id_input ? board_id_input : board_id_output,
+          watcher_email: [],
+          cards: [],
+          archive_at: null,
+          created_at: new Date(),
+        },
+      ])
     })
   }
   async deleteCardlistsByBoardId(data: TrelloApi.CardlistApi.DeleteCardlistsByBoardIdRequest): Promise<{ status: string; msg: string }> {

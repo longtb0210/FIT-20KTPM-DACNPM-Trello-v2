@@ -75,10 +75,10 @@ export type MoveCardlistRequest = z.infer<typeof MoveCardlistRequestSchema>;
 
 export const AddCardToListRequestSchema = CardSchema.omit({
   _id: true,
-  watcher_email: true,
   archive_at: true,
   activities: true,
   features: true,
+  created_at: true,
 }).merge(
   z.object({
     index: z.number().default(0),
@@ -201,6 +201,27 @@ export const SortCardlistByNameResponseSchema = z.object({
 });
 export type SortCardlistByNameResponse = z.infer<
   typeof SortCardlistByNameResponseSchema
+>;
+
+export const SortCardByOldestDateResponseSchema = z.object({
+  data: CardlistSchema,
+});
+export type SortCardByOldestDateResponse = z.infer<
+  typeof SortCardByOldestDateResponseSchema
+>;
+
+export const SortCardByNewestDateResponseSchema = z.object({
+  data: CardlistSchema,
+});
+export type SortCardByNewestDateResponse = z.infer<
+  typeof SortCardByNewestDateResponseSchema
+>;
+
+export const SortCardByNameResponseSchema = z.object({
+  data: CardlistSchema,
+});
+export type SortCardByNameResponse = z.infer<
+  typeof SortCardByNameResponseSchema
 >;
 
 export const BoardIdRequestParamsSchema = z.object({

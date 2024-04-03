@@ -17,6 +17,7 @@ export const CardMSchema = new Schema<DbSchemas.CardlistSchema.Card>({
   archive_at: Date,
   activities: [ActivityMSchema],
   features: [FeatureMSchema],
+  created_at: Date,
 })
 
 export const CardlistMSchema = new Schema<DbSchemas.CardlistSchema.CardList>({

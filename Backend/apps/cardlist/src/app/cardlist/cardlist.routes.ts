@@ -165,6 +165,69 @@ export const CardlistRoutes = {
     },
     // jwtSecure: false,
   } as IRouteParams,
+  sortCardsByOldestDate: {
+    path: '/sort_oldest_cards/:cardlistId',
+    method: RequestMethod.GET,
+    swaggerInfo: {
+      params: {
+        name: 'cardlistId',
+        schema: {
+          type: 'string',
+        },
+      },
+      responses: [
+        {
+          status: 200,
+          schema: {
+            $ref: getSchemaPath('SortCardByOldestDateResponseSchema'),
+          },
+        },
+      ],
+    },
+    // jwtSecure: false,
+  } as IRouteParams,
+  sortCardsByNewestDate: {
+    path: '/sort_newest_card/:cardlistId',
+    method: RequestMethod.GET,
+    swaggerInfo: {
+      params: {
+        name: 'cardlistId',
+        schema: {
+          type: 'string',
+        },
+      },
+      responses: [
+        {
+          status: 200,
+          schema: {
+            $ref: getSchemaPath('SortCardByNewestDateResponseSchema'),
+          },
+        },
+      ],
+    },
+    // jwtSecure: false,
+  } as IRouteParams,
+  sortCardsByName: {
+    path: '/sort_name_cards/:cardlistId',
+    method: RequestMethod.GET,
+    swaggerInfo: {
+      params: {
+        name: 'cardlistId',
+        schema: {
+          type: 'string',
+        },
+      },
+      responses: [
+        {
+          status: 200,
+          schema: {
+            $ref: getSchemaPath('SortCardByNameResponseSchema'),
+          },
+        },
+      ],
+    },
+    // jwtSecure: false,
+  } as IRouteParams,
   updateCardlists: {
     path: '/update',
     method: RequestMethod.PUT,

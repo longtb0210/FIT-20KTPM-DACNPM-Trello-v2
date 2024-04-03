@@ -9,6 +9,7 @@ export const CardSchema = z.object({
   index: z.number().nullish(),
   watcher_email: z.string().array().default([]),
   archive_at: z.coerce.date().nullish(),
+  created_at: z.coerce.date().default(new Date()),
   activities: ActivitySchema.array().default([]),
   features: FeatureSchema.array().default([]),
   cover: z.string().nullish(),
