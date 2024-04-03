@@ -42,6 +42,7 @@ export const CreateBoardRequestSchema = BoardSchema.pick({
   workspace_id: true,
   name: true,
   visibility: true,
+  background: true,
 });
 export type CreateBoard = z.infer<typeof CreateBoardRequestSchema>;
 

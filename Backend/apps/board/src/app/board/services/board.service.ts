@@ -28,7 +28,8 @@ export class BoardService implements IBoardService {
   ) {}
 
   async createBoard(data: TrelloApi.BoardApi.CreateBoard) {
-    const model = new this.BoardMModel(data)
+    const board = DbSchemas.BoardSchema.BoardSchema.parse(data)
+    const model = new this.BoardMModel(board)
     return model.save()
   }
 
