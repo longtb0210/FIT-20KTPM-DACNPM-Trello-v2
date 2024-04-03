@@ -1,7 +1,9 @@
+import React, { useEffect, useState } from 'react'
 import { Card, CardContent, CardMedia, CardActions } from '@mui/material'
 import ContentCopyOutlinedIcon from '@mui/icons-material/ContentCopyOutlined'
 import VisibilityOutlinedIcon from '@mui/icons-material/VisibilityOutlined'
 import SearchIcon from '@mui/icons-material/Search'
+import { useTheme } from '../../../components/Theme/themeContext'
 
 import {
   featureData,
@@ -16,8 +18,30 @@ import {
 } from '../testData/templatesData'
 
 function CardTemplate() {
+  const { darkMode, colors } = useTheme()
+  const [hovered, setHovered] = useState(false);
+
+    const handleMouseEnter = () => {
+        setHovered(true);
+    };
+
+    const handleMouseLeave = () => {
+        setHovered(false);
+    };
+
+    const buttonStyle: React.CSSProperties = {
+        backgroundColor: colors.button_hover,
+        color: colors.text,
+        transition: 'background-color 0.2s ease-in-out, color 0.2s ease-in-out'
+    };
   return (
-    <div className='detail-card-container mx-4 w-full min-w-min max-w-screen-lg md:mx-auto'>
+    <div 
+      className='detail-card-container mx-4 w-full min-w-min max-w-screen-lg md:mx-auto'
+      style={{
+        backgroundColor: colors.background,
+        color: colors.text
+      }}
+    >
       <div className='features'>
         <div className='title-container mr-6 flex items-center justify-between'>
           <div className='title flex items-center'>
@@ -41,6 +65,10 @@ function CardTemplate() {
                 variant='elevation'
                 elevation={0}
                 className='detail-item mx-auto mt-8 block h-full w-full text-sm capitalize leading-6 text-gray-600 hover:cursor-pointer'
+                sx={{
+                  backgroundColor: colors.background,
+                  color: colors.text
+                }}
               >
                 <CardMedia
                   className='h-140 relative w-full transform transition duration-300 ease-in-out hover:shadow-xl'
@@ -72,6 +100,10 @@ function CardTemplate() {
               variant='elevation'
               elevation={0}
               className='item-newTemplate min-h-100 mx-auto w-full hover:cursor-pointer md:w-72'
+              sx={{
+                backgroundColor: colors.background,
+                color: colors.text
+              }}
             >
               <div className='cardContainer relative w-72'>
                 <CardMedia
@@ -82,18 +114,18 @@ function CardTemplate() {
                 />
               </div>
               <CardContent>
-                <label className='content-title flex items-center text-base font-bold text-gray-700'>
+                <label className='content-title flex items-center text-base font-bold'>
                   {card.title}
                 </label>
-                <p className='content text-sm leading-6 text-gray-600'>by {card.author}</p>
-                <p className='content text-sm leading-6 text-gray-600'>{card.description}</p>
+                <p className='content text-sm leading-6'>by {card.author}</p>
+                <p className='content text-sm leading-6'>{card.description}</p>
               </CardContent>
               <CardActions disableSpacing>
-                <button className='icon mr-5 inline-flex h-5 text-sm text-gray-600' aria-label='add to favorites'>
+                <button className='icon mr-5 inline-flex h-5 text-sm' aria-label='add to favorites'>
                   <ContentCopyOutlinedIcon fontSize='small' />
                   {card.likes}
                 </button>
-                <button className='icon mr-5 inline-flex h-5 text-sm text-gray-600' aria-label='share'>
+                <button className='icon mr-5 inline-flex h-5 text-sm' aria-label='share'>
                   <VisibilityOutlinedIcon fontSize='small' />
                   {card.views}
                 </button>
@@ -112,7 +144,12 @@ function CardTemplate() {
             height='24px'
           ></img>
           <label className='text-lg font-bold'>Business</label>
-          <button className='ml-auto mr-6 inline-flex cursor-pointer items-center justify-center rounded-md bg-gray-200 px-3 py-1 font-sans text-base font-medium text-gray-700 transition-colors duration-200 ease-in-out hover:bg-gray-300'>
+          <button 
+            className='ml-auto mr-6 inline-flex cursor-pointer items-center justify-center rounded-md px-3 py-1 font-sans text-base font-medium'
+            style={buttonStyle}
+            onMouseEnter={(e) => e.currentTarget.style.backgroundColor = colors.bg_button_active_hover}
+            onMouseLeave={(e) => e.currentTarget.style.backgroundColor = colors.button_hover}
+            >
             More templates for Business
           </button>
         </div>
@@ -123,6 +160,10 @@ function CardTemplate() {
               variant='elevation'
               elevation={0}
               className='item-newTemplate min-h-100 mx-auto w-full max-w-sm border-0 hover:cursor-pointer md:w-72'
+              sx={{
+                backgroundColor: colors.background,
+                color: colors.text
+              }}
             >
               <div className='cardContainer relative w-72'>
                 <CardMedia
@@ -133,18 +174,18 @@ function CardTemplate() {
                 />
               </div>
               <CardContent>
-                <label className='content-title flex items-center text-base font-bold text-gray-700'>
+                <label className='content-title flex items-center text-base font-bold'>
                   {business.title}
                 </label>
-                <p className='content text-sm leading-6 text-gray-600'>by {business.author}</p>
-                <p className='content text-sm leading-6 text-gray-600'>{business.description}</p>
+                <p className='content text-sm leading-6'>by {business.author}</p>
+                <p className='content text-sm leading-6'>{business.description}</p>
               </CardContent>
               <CardActions disableSpacing>
                 <button className='icon mr-5 mr-5 inline-flex h-5 text-sm text-gray-600' aria-label='add to favorites'>
                   <ContentCopyOutlinedIcon fontSize='small' />
                   {business.likes}
                 </button>
-                <button className='icon mr-5 inline-flex h-5 text-sm text-gray-600' aria-label='share'>
+                <button className='icon mr-5 inline-flex h-5 text-sm' aria-label='share'>
                   <VisibilityOutlinedIcon fontSize='small' />
                   {business.views}
                 </button>
@@ -163,7 +204,12 @@ function CardTemplate() {
             height='24px'
           ></img>
           <label className='text-lg font-bold'>Design</label>
-          <button className='ml-auto mr-6 inline-flex cursor-pointer items-center justify-center rounded-md bg-gray-200 px-3 py-1 font-sans text-base font-medium text-gray-700 transition-colors duration-200 ease-in-out hover:bg-gray-300'>
+          <button 
+            className='ml-auto mr-6 inline-flex cursor-pointer items-center justify-center rounded-md px-3 py-1 font-sans text-base font-medium'
+            style={buttonStyle}
+            onMouseEnter={(e) => e.currentTarget.style.backgroundColor = colors.bg_button_active_hover}
+            onMouseLeave={(e) => e.currentTarget.style.backgroundColor = colors.button_hover}
+          >
             More templates for Design
           </button>
         </div>
@@ -174,6 +220,10 @@ function CardTemplate() {
               variant='elevation'
               elevation={0}
               className='item-newTemplate min-h-100 mx-auto w-full max-w-sm hover:cursor-pointer md:w-72'
+              sx={{
+                backgroundColor: colors.background,
+                color: colors.text
+              }}
             >
               <div className='cardContainer relative w-72'>
                 <CardMedia
@@ -184,18 +234,18 @@ function CardTemplate() {
                 />
               </div>
               <CardContent>
-                <label className='content-title flex items-center text-base font-bold text-gray-700'>
+                <label className='content-title flex items-center text-base font-bold'>
                   {design.title}
                 </label>
-                <p className='content text-sm leading-6 text-gray-600'>by {design.author}</p>
-                <p className='content text-sm leading-6 text-gray-600'>{design.description}</p>
+                <p className='content text-sm leading-6'>by {design.author}</p>
+                <p className='content text-sm leading-6'>{design.description}</p>
               </CardContent>
               <CardActions disableSpacing>
-                <button className='icon mr-5 inline-flex h-5 text-sm text-gray-600' aria-label='add to favorites'>
+                <button className='icon mr-5 inline-flex h-5 text-sm' aria-label='add to favorites'>
                   <ContentCopyOutlinedIcon fontSize='small' />
                   {design.likes}
                 </button>
-                <button className='icon mr-5 inline-flex h-5 text-sm text-gray-600' aria-label='share'>
+                <button className='icon mr-5 inline-flex h-5 text-sm' aria-label='share'>
                   <VisibilityOutlinedIcon fontSize='small' />
                   {design.views}
                 </button>
@@ -214,7 +264,12 @@ function CardTemplate() {
             height='24px'
           ></img>
           <label className='text-lg font-bold'>Education</label>
-          <button className='ml-auto mr-6 inline-flex cursor-pointer items-center justify-center rounded-md bg-gray-200 px-3 py-1 font-sans text-base font-medium text-gray-700 transition-colors duration-200 ease-in-out hover:bg-gray-300'>
+          <button 
+            className='ml-auto mr-6 inline-flex cursor-pointer items-center justify-center rounded-md px-3 py-1 font-sans text-base font-medium'
+            style={buttonStyle}
+            onMouseEnter={(e) => e.currentTarget.style.backgroundColor = colors.bg_button_active_hover}
+            onMouseLeave={(e) => e.currentTarget.style.backgroundColor = colors.button_hover}
+          >
             More templates for Education
           </button>
         </div>
@@ -225,6 +280,10 @@ function CardTemplate() {
               variant='elevation'
               elevation={0}
               className='item-newTemplate min-h-100 mx-auto w-full max-w-sm hover:cursor-pointer md:w-72'
+              sx={{
+                backgroundColor: colors.background,
+                color: colors.text
+              }}
             >
               <div className='cardContainer relative w-72'>
                 <CardMedia
@@ -235,18 +294,18 @@ function CardTemplate() {
                 />
               </div>
               <CardContent>
-                <label className='content-title flex items-center text-base font-bold text-gray-700'>
+                <label className='content-title flex items-center text-base font-bold'>
                   {education.title}
                 </label>
-                <p className='content text-sm leading-6 text-gray-600'>by {education.author}</p>
-                <p className='content text-sm leading-6 text-gray-600'>{education.description}</p>
+                <p className='content text-sm leading-6'>by {education.author}</p>
+                <p className='content text-sm leading-6'>{education.description}</p>
               </CardContent>
               <CardActions disableSpacing>
-                <button className='icon mr-5 inline-flex h-5 text-sm text-gray-600' aria-label='add to favorites'>
+                <button className='icon mr-5 inline-flex h-5 text-sm' aria-label='add to favorites'>
                   <ContentCopyOutlinedIcon fontSize='small' />
                   {education.likes}
                 </button>
-                <button className='icon mr-5 inline-flex h-5 text-sm text-gray-600' aria-label='share'>
+                <button className='icon mr-5 inline-flex h-5 text-sm' aria-label='share'>
                   <VisibilityOutlinedIcon fontSize='small' />
                   {education.views}
                 </button>
@@ -265,7 +324,12 @@ function CardTemplate() {
             height='24px'
           ></img>
           <label className='text-lg font-bold'>Engineering</label>
-          <button className='ml-auto mr-6 inline-flex cursor-pointer items-center justify-center rounded-md bg-gray-200 px-3 py-1 font-sans text-base font-medium text-gray-700 transition-colors duration-200 ease-in-out hover:bg-gray-300'>
+          <button 
+            className='ml-auto mr-6 inline-flex cursor-pointer items-center justify-center rounded-md px-3 py-1 font-sans text-base font-medium'
+            style={buttonStyle}
+            onMouseEnter={(e) => e.currentTarget.style.backgroundColor = colors.bg_button_active_hover}
+            onMouseLeave={(e) => e.currentTarget.style.backgroundColor = colors.button_hover}
+          >
             More templates for Engineering
           </button>
         </div>
@@ -276,6 +340,10 @@ function CardTemplate() {
               variant='elevation'
               elevation={0}
               className='item-newTemplate min-h-100 mx-auto w-full max-w-sm hover:cursor-pointer md:w-72'
+              sx={{
+                backgroundColor: colors.background,
+                color: colors.text
+              }}
             >
               <div className='cardContainer relative w-72'>
                 <CardMedia
@@ -286,18 +354,18 @@ function CardTemplate() {
                 />
               </div>
               <CardContent>
-                <label className='content-title flex items-center text-base font-bold text-gray-700'>
+                <label className='content-title flex items-center text-base font-bold'>
                   {technique.title}
                 </label>
-                <p className='content text-sm leading-6 text-gray-600'>by {technique.author}</p>
-                <p className='content text-sm leading-6 text-gray-600'>{technique.description}</p>
+                <p className='content text-sm leading-6'>by {technique.author}</p>
+                <p className='content text-sm leading-6'>{technique.description}</p>
               </CardContent>
               <CardActions disableSpacing>
-                <button className='icon mr-5 inline-flex h-5 text-sm text-gray-600' aria-label='add to favorites'>
+                <button className='icon mr-5 inline-flex h-5 text-sm' aria-label='add to favorites'>
                   <ContentCopyOutlinedIcon fontSize='small' />
                   {technique.likes}
                 </button>
-                <button className='icon mr-5 inline-flex h-5 text-sm text-gray-600' aria-label='share'>
+                <button className='icon mr-5 inline-flex h-5 text-sm' aria-label='share'>
                   <VisibilityOutlinedIcon fontSize='small' />
                   {technique.views}
                 </button>
@@ -316,7 +384,12 @@ function CardTemplate() {
             height='24px'
           ></img>
           <label className='text-lg font-bold'>Marketing</label>
-          <button className='ml-auto mr-6 inline-flex cursor-pointer items-center justify-center rounded-md bg-gray-200 px-3 py-1 font-sans text-base font-medium text-gray-700 transition-colors duration-200 ease-in-out hover:bg-gray-300'>
+          <button 
+            className='ml-auto mr-6 inline-flex cursor-pointer items-center justify-center rounded-md px-3 py-1 font-sans text-base font-medium'
+            style={buttonStyle}
+            onMouseEnter={(e) => e.currentTarget.style.backgroundColor = colors.bg_button_active_hover}
+            onMouseLeave={(e) => e.currentTarget.style.backgroundColor = colors.button_hover}
+          >
             More templates for Marketing
           </button>
         </div>
@@ -327,6 +400,10 @@ function CardTemplate() {
               variant='elevation'
               elevation={0}
               className='item-newTemplate min-h-100 hover: mx-auto w-full max-w-sm cursor-pointer md:w-72'
+              sx={{
+                backgroundColor: colors.background,
+                color: colors.text
+              }}
             >
               <div className='cardContainer relative w-72'>
                 <CardMedia
@@ -337,18 +414,18 @@ function CardTemplate() {
                 />
               </div>
               <CardContent>
-                <label className='content-title flex items-center text-base font-bold text-gray-700'>
+                <label className='content-title flex items-center text-base font-bold'>
                   {marketing.title}
                 </label>
-                <p className='content text-sm leading-6 text-gray-600'>by {marketing.author}</p>
-                <p className='content text-sm leading-6 text-gray-600'>{marketing.description}</p>
+                <p className='content text-sm leading-6'>by {marketing.author}</p>
+                <p className='content text-sm leading-6'>{marketing.description}</p>
               </CardContent>
               <CardActions disableSpacing>
-                <button className='icon mr-5 inline-flex h-5 text-sm text-gray-600' aria-label='add to favorites'>
+                <button className='icon mr-5 inline-flex h-5 text-sm' aria-label='add to favorites'>
                   <ContentCopyOutlinedIcon fontSize='small' />
                   {marketing.favoriteCount}
                 </button>
-                <button className='icon mr-5 inline-flex h-5 text-sm text-gray-600' aria-label='share'>
+                <button className='icon mr-5 inline-flex h-5 text-sm' aria-label='share'>
                   <VisibilityOutlinedIcon fontSize='small' />
                   {marketing.visibilityCount}
                 </button>
@@ -367,7 +444,12 @@ function CardTemplate() {
             height='24px'
           ></img>
           <label className='text-lg font-bold'>Project management</label>
-          <button className='ml-auto mr-6 inline-flex cursor-pointer items-center justify-center rounded-md bg-gray-200 px-3 py-1 font-sans text-base font-medium text-gray-700 transition-colors duration-200 ease-in-out hover:bg-gray-300'>
+          <button 
+            className='ml-auto mr-6 inline-flex cursor-pointer items-center justify-center rounded-md px-3 py-1 font-sans text-base font-medium'
+            style={buttonStyle}
+            onMouseEnter={(e) => e.currentTarget.style.backgroundColor = colors.bg_button_active_hover}
+            onMouseLeave={(e) => e.currentTarget.style.backgroundColor = colors.button_hover}
+          >
             More templates for Project management
           </button>
         </div>
@@ -378,6 +460,10 @@ function CardTemplate() {
               variant='elevation'
               elevation={0}
               className='item-newTemplate min-h-100 mx-auto w-full max-w-sm hover:cursor-pointer md:w-72'
+              sx={{
+                backgroundColor: colors.background,
+                color: colors.text
+              }}
             >
               <div className='cardContainer relative w-72'>
                 <CardMedia
@@ -388,16 +474,16 @@ function CardTemplate() {
                 />
               </div>
               <CardContent>
-                <label className='content-title flex items-center text-base font-bold text-gray-700'>{pm.title}</label>
-                <p className='content text-sm leading-6 text-gray-600'>by {pm.author}</p>
-                <p className='content text-sm leading-6 text-gray-600'>{pm.description}</p>
+                <label className='content-title flex items-center text-base font-bold'>{pm.title}</label>
+                <p className='content text-sm leading-6'>by {pm.author}</p>
+                <p className='content text-sm leading-6'>{pm.description}</p>
               </CardContent>
               <CardActions disableSpacing>
-                <button className='icon mr-5 inline-flex h-5 text-sm text-gray-600' aria-label='add to favorites'>
+                <button className='icon mr-5 inline-flex h-5 text-sm' aria-label='add to favorites'>
                   <ContentCopyOutlinedIcon fontSize='small' />
                   {pm.favoriteCount}
                 </button>
-                <button className='icon mr-5 inline-flex h-5 text-sm text-gray-600' aria-label='share'>
+                <button className='icon mr-5 inline-flex h-5 text-sm' aria-label='share'>
                   <VisibilityOutlinedIcon fontSize='small' />
                   {pm.visibilityCount}
                 </button>
@@ -416,7 +502,12 @@ function CardTemplate() {
             height='24px'
           ></img>
           <label className='text-lg font-bold'>Remote work</label>
-          <button className='ml-auto mr-6 inline-flex cursor-pointer items-center justify-center rounded-md bg-gray-200 px-3 py-1 font-sans text-base font-medium text-gray-700 transition-colors duration-200 ease-in-out hover:bg-gray-300'>
+          <button 
+            className='ml-auto mr-6 inline-flex cursor-pointer items-center justify-center rounded-md px-3 py-1 font-sans text-base font-medium'
+            style={buttonStyle}
+            onMouseEnter={(e) => e.currentTarget.style.backgroundColor = colors.bg_button_active_hover}
+            onMouseLeave={(e) => e.currentTarget.style.backgroundColor = colors.button_hover}
+          >
             More templates for Remote work
           </button>
         </div>
@@ -427,6 +518,10 @@ function CardTemplate() {
               variant='elevation'
               elevation={0}
               className='item-newTemplate min-h-100 mx-auto w-full max-w-sm hover:cursor-pointer md:w-72'
+              sx={{
+                backgroundColor: colors.background,
+                color: colors.text
+              }}
             >
               <div className='cardContainer relative w-72'>
                 <CardMedia
@@ -437,16 +532,16 @@ function CardTemplate() {
                 />
               </div>
               <CardContent>
-                <label className='content-title flex items-center text-base font-bold text-gray-700'>{wr.title}</label>
-                <p className='content text-sm leading-6 text-gray-600'>by {wr.author}</p>
-                <p className='content text-sm leading-6 text-gray-600'>{wr.description}</p>
+                <label className='content-title flex items-center text-base font-bold'>{wr.title}</label>
+                <p className='content text-sm leading-6'>by {wr.author}</p>
+                <p className='content text-sm leading-6'>{wr.description}</p>
               </CardContent>
               <CardActions disableSpacing>
-                <button className='icon mr-5 inline-flex h-5 text-sm text-gray-600' aria-label='add to favorites'>
+                <button className='icon mr-5 inline-flex h-5 text-sm' aria-label='add to favorites'>
                   <ContentCopyOutlinedIcon fontSize='small' />
                   {wr.favoriteCount}
                 </button>
-                <button className='icon mr-5 inline-flex h-5 text-sm text-gray-600' aria-label='share'>
+                <button className='icon mr-5 inline-flex h-5 text-sm' aria-label='share'>
                   <VisibilityOutlinedIcon fontSize='small' />
                   {wr.visibilityCount}
                 </button>
