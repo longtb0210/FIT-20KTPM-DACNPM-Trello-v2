@@ -7,4 +7,7 @@ export const ActivityMSchema = new Schema<DbSchemas.ActivitySchema.Activity>({
   board_id: String,
   cardlist_id: String,
   card_id: String,
+  content: String,
+  create_time: Date,
+  creator_email: String,
 })

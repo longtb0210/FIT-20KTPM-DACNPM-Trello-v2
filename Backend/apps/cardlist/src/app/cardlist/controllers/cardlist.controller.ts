@@ -7,7 +7,7 @@ import { TrelloApi } from '@trello-v2/shared'
 
 import { CardlistRoutes } from '../cardlist.routes'
 import { CardlistService } from '../services/cardlist.service'
-import { AuthenticatedUser, Public } from 'nest-keycloak-connect'
+import { AuthenticatedUser } from 'nest-keycloak-connect'
 import { UserInfoDto } from '@app/common/auth/user-info.dto'
 
 @InjectController({
@@ -17,7 +17,6 @@ export class CardlistController {
   constructor(private cardlistService: CardlistService) {}
 
   @InjectRoute(CardlistRoutes.getAllCardlistApi)
-  @Public(false)
   async getAll(): Promise<TrelloApi.CardlistApi.GetallCardlistResponse> {
     const data = await this.cardlistService.getAllCardlist()
     return {
@@ -39,7 +38,6 @@ export class CardlistController {
   }
 
   @InjectRoute(CardlistRoutes.copyCardlistApi)
-  @Public(false)
   async copy(
     @Body(new ZodValidationPipe(TrelloApi.CardlistApi.CopyCardlistRequestSchema))
     body: TrelloApi.CardlistApi.CopyCardlistRequest,
@@ -53,7 +51,6 @@ export class CardlistController {
   }
 
   @InjectRoute(CardlistRoutes.getCardlistsByBoardId)
-  @Public(false)
   async getAllByBoardId(
     @Param('boardId', IdParamValidationPipe) boardId: string,
   ): Promise<TrelloApi.CardlistApi.GetallCardlistByBoardIdResponse> {
@@ -63,7 +60,6 @@ export class CardlistController {
     }
   }
   @InjectRoute(CardlistRoutes.getCardlistsArchivedByBoardId)
-  @Public(false)
   async getAllArchivedByBoardId(
     @Param('boardId', IdParamValidationPipe) boardId: string,
   ): Promise<TrelloApi.CardlistApi.GetallCardlistArchivedByBoardIdResponse> {
@@ -74,7 +70,6 @@ export class CardlistController {
   }
 
   @InjectRoute(CardlistRoutes.getCardlistsNonArchivedByBoardId)
-  @Public(false)
   async getAllNonArchivedByBoardId(
     @Param('boardId', IdParamValidationPipe) boardId: string,
   ): Promise<TrelloApi.CardlistApi.GetallCardlistNonArchivedByBoardIdResponse> {
@@ -85,7 +80,6 @@ export class CardlistController {
   }
 
   @InjectRoute(CardlistRoutes.sortCardlistsByOldestDate)
-  @Public(false)
   async sortByOldestDate(
     @Param('boardId', IdParamValidationPipe) boardId: string,
   ): Promise<TrelloApi.CardlistApi.SortCardlistByOldestDateResponse> {
@@ -96,7 +90,6 @@ export class CardlistController {
   }
 
   @InjectRoute(CardlistRoutes.sortCardlistsByNewestDate)
-  @Public(false)
   async sortByNewestDate(
     @Param('boardId', IdParamValidationPipe) boardId: string,
   ): Promise<TrelloApi.CardlistApi.SortCardlistByNewestDateResponse> {
@@ -107,7 +100,6 @@ export class CardlistController {
   }
 
   @InjectRoute(CardlistRoutes.sortCardlistsByName)
-  @Public(false)
   async sortByName(@Param('boardId', IdParamValidationPipe) boardId: string): Promise<TrelloApi.CardlistApi.SortCardlistByNameResponse> {
     const data = await this.cardlistService.sortCardlistByName(boardId)
     return {
@@ -115,8 +107,37 @@ export class CardlistController {
     }
   }
 
+  @InjectRoute(CardlistRoutes.sortCardsByOldestDate)
+  async sortCardsByOldestDate(
+    @Param('cardlistId', IdParamValidationPipe) cardlistId: string,
+  ): Promise<TrelloApi.CardlistApi.SortCardByOldestDateResponse> {
+    const data = await this.cardlistService.sortCardByOldestDate(cardlistId)
+    return {
+      data: data,
+    }
+  }
+
+  @InjectRoute(CardlistRoutes.sortCardsByNewestDate)
+  async sortCardsByNewestDate(
+    @Param('cardlistId', IdParamValidationPipe) cardlistId: string,
+  ): Promise<TrelloApi.CardlistApi.SortCardByNewestDateResponse> {
+    const data = await this.cardlistService.sortCardByNewestDate(cardlistId)
+    return {
+      data: data,
+    }
+  }
+
+  @InjectRoute(CardlistRoutes.sortCardsByName)
+  async sortCardsByName(
+    @Param('cardlistId', IdParamValidationPipe) cardlistId: string,
+  ): Promise<TrelloApi.CardlistApi.SortCardByNameResponse> {
+    const data = await this.cardlistService.sortCardByName(cardlistId)
+    return {
+      data: data,
+    }
+  }
+
   @InjectRoute(CardlistRoutes.updateCardlists)
-  @Public(false)
   async update(
     @Body(new ZodValidationPipe(TrelloApi.CardlistApi.UpdateCardlistRequestSchema))
     body: TrelloApi.CardlistApi.UpdateCardlistRequest,
@@ -128,7 +149,6 @@ export class CardlistController {
   }
 
   @InjectRoute(CardlistRoutes.moveCardlists)
-  @Public(false)
   async move(
     @Body(new ZodValidationPipe(TrelloApi.CardlistApi.MoveCardlistRequestSchema))
     body: TrelloApi.CardlistApi.MoveCardlistRequest,
@@ -140,7 +160,6 @@ export class CardlistController {
   }
 
   @InjectRoute(CardlistRoutes.archiveCardsInList)
-  @Public(false)
   async archiveCardsInList(
     @Param('cardlistId', IdParamValidationPipe) cardlistId: string,
   ): Promise<TrelloApi.CardlistApi.ArchiveAllCardsInListResponse> {
@@ -151,7 +170,6 @@ export class CardlistController {
   }
 
   @InjectRoute(CardlistRoutes.archiveCardList)
-  @Public(false)
   async archiveCardList(
     @Param('cardlistId', IdParamValidationPipe) cardlistId: string,
   ): Promise<TrelloApi.CardlistApi.ArchiveCardlistResponse> {
@@ -162,7 +180,6 @@ export class CardlistController {
   }
 
   @InjectRoute(CardlistRoutes.addWatcher)
-  @Public(false)
   async addWatcher(
     @Body(new ZodValidationPipe(TrelloApi.CardlistApi.AddWatcherRequestSchema))
     body: TrelloApi.CardlistApi.AddWatcherRequest,
@@ -173,19 +190,37 @@ export class CardlistController {
     }
   }
   @InjectRoute(CardlistRoutes.addCardTolist)
-  @Public(false)
   async addCardToList(
     @Body(new ZodValidationPipe(TrelloApi.CardlistApi.AddCardToListRequestSchema))
     body: TrelloApi.CardlistApi.AddCardToListRequest,
+    @AuthenticatedUser() user: UserInfoDto,
   ): Promise<TrelloApi.CardlistApi.AddCardToListResponse> {
+    body.watcher_email.push(user.email)
     const data = await this.cardlistService.addCardToList(body)
     return {
       data: data,
     }
   }
 
-  @InjectRoute(CardlistRoutes.testRoute)
-  test() {
-    return { Hello: 'Demo' }
+  @InjectRoute(CardlistRoutes.cloneCardlists)
+  async cloneCardlistsByBoard(
+    @Body(new ZodValidationPipe(TrelloApi.CardlistApi.CloneCardlistsToNewBoardRequestSchema))
+    body: TrelloApi.CardlistApi.CloneCardlistsToNewBoardRequest,
+  ): Promise<TrelloApi.CardlistApi.CloneCardlistsToNewBoardResponse> {
+    const data = await this.cardlistService.cloneCardlistsToNewBoard(body.board_input_id, body.board_output_id)
+    return {
+      data: data,
+    }
+  }
+
+  @InjectRoute(CardlistRoutes.deleteCardlistsByBoardId)
+  async deleteCardlistsByBoardId(
+    @Body(new ZodValidationPipe(TrelloApi.CardlistApi.DeleteCardlistsByBoardIdRequestSchema))
+    body: TrelloApi.CardlistApi.DeleteCardlistsByBoardIdRequest,
+  ) {
+    const result = await this.cardlistService.deleteCardlistsByBoardId(body)
+    return {
+      result: result,
+    }
   }
 }

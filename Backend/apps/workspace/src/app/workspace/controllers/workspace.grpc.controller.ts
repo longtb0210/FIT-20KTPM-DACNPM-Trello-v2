@@ -1,21 +1,18 @@
 import { AuthenticatedUser, Public } from 'nest-keycloak-connect'
 
 import { UserInfoDto } from '@app/common/auth/user-info.dto'
-import { InjectController, InjectRoute } from '@app/common/decorators'
-import { IdParamValidationPipe, ZodValidationPipe } from '@app/common/pipes'
-import { Body, InternalServerErrorException, NotFoundException, Param } from '@nestjs/common'
+import { ValidateGrpcInput } from '@app/common/decorators'
+import { Controller, InternalServerErrorException, NotFoundException } from '@nestjs/common'
+import { GrpcMethod } from '@nestjs/microservices'
 import { TrelloApi } from '@trello-v2/shared'
 
-import workspaceRoutes from '../workspace.routes'
 import { WorkspaceService } from '../workspace.service'
 
-@InjectController({
-  name: workspaceRoutes.index,
-})
-export class WorkspaceController {
+@Controller()
+export class WorkspaceGrpcController {
   constructor(private workspaceService: WorkspaceService) {}
 
-  @InjectRoute(workspaceRoutes.getAll)
+  @GrpcMethod('WorkspaceController', 'getAll')
   @Public(false)
   async getAll(): Promise<TrelloApi.WorkspaceApi.WorkspaceListResponse> {
     const data = await this.workspaceService.getAllWorkspaces()
@@ -25,7 +22,7 @@ export class WorkspaceController {
     return { data }
   }
 
-  @InjectRoute(workspaceRoutes.getAllWorkspacesByEmail)
+  @GrpcMethod('WorkspaceController', 'getAllWorkspacesByEmail')
   async getAllWorkspacesByEmail(@AuthenticatedUser() user: UserInfoDto): Promise<TrelloApi.WorkspaceApi.WorspaceListByEmailResponse> {
     const email = user.email
 
@@ -44,17 +41,16 @@ export class WorkspaceController {
     }
   }
 
-  @InjectRoute(workspaceRoutes.getWorkspaceById)
+  @GrpcMethod('WorkspaceController', 'getWorkspaceById')
   async getWorkspaceById(
-    @Param('id', IdParamValidationPipe)
-    id: string,
+    @ValidateGrpcInput(TrelloApi.WorkspaceApi.WorkspaceIdRequestSchema.safeParse) id: string,
   ): Promise<TrelloApi.WorkspaceApi.WorspaceResponse> {
     const workspace = await this.workspaceService.getWorkspaceById(id)
 
     return { data: workspace }
   }
 
-  @InjectRoute(workspaceRoutes.getAdminWorkspacesByEmail)
+  @GrpcMethod('WorkspaceController', 'getAdminWorkspacesByEmail')
   async getAdminWorkspacesByEmail(@AuthenticatedUser() user: UserInfoDto): Promise<TrelloApi.WorkspaceApi.WorkspaceListResponse> {
     const email = user.email
 
@@ -64,7 +60,7 @@ export class WorkspaceController {
     return { data: workspace }
   }
 
-  @InjectRoute(workspaceRoutes.getGuestWorkspacesByEmail)
+  @GrpcMethod('WorkspaceController', 'getGuestWorkspacesByEmail')
   async getGuestWorkspacesByEmail(@AuthenticatedUser() user: UserInfoDto): Promise<TrelloApi.WorkspaceApi.WorkspaceListResponse> {
     const email = user.email
 
@@ -74,7 +70,7 @@ export class WorkspaceController {
     return { data: workspace }
   }
 
-  @InjectRoute(workspaceRoutes.getMemberWorkspacesByEmail)
+  @GrpcMethod('WorkspaceController', 'getMemberWorkspacesByEmail')
   async getMemberWorkspacesByEmail(@AuthenticatedUser() user: UserInfoDto): Promise<TrelloApi.WorkspaceApi.WorkspaceListResponse> {
     const email = user.email
 
@@ -84,7 +80,7 @@ export class WorkspaceController {
     return { data: workspace }
   }
 
-  @InjectRoute(workspaceRoutes.getOwnerWorkspacesByEmail)
+  @GrpcMethod('WorkspaceController', 'getOwnerWorkspacesByEmail')
   async getOwnerWorkspacesByEmail(@AuthenticatedUser() user: UserInfoDto): Promise<TrelloApi.WorkspaceApi.WorkspaceListResponse> {
     const email = user.email
 
@@ -94,7 +90,7 @@ export class WorkspaceController {
     return { data: workspace }
   }
 
-  @InjectRoute(workspaceRoutes.getPendingWorkspacesByEmail)
+  @GrpcMethod('WorkspaceController', 'getPendingWorkspacesByEmail')
   async getPendingWorkspacesByEmail(@AuthenticatedUser() user: UserInfoDto): Promise<TrelloApi.WorkspaceApi.WorkspaceListResponse> {
     const email = user.email
 
@@ -104,10 +100,10 @@ export class WorkspaceController {
     return { data: workspace }
   }
 
-  @InjectRoute(workspaceRoutes.createWorkspace)
+  @GrpcMethod('WorkspaceController', 'createWorkspace')
   async createWorkspace(
     @AuthenticatedUser() user: UserInfoDto,
-    @Body(new ZodValidationPipe(TrelloApi.WorkspaceApi.CreateWorkspaceRequestSchema))
+    @ValidateGrpcInput(TrelloApi.WorkspaceApi.CreateWorkspaceRequestSchema.safeParse)
     body: TrelloApi.WorkspaceApi.CreateWorspaceRequest,
   ): Promise<TrelloApi.WorkspaceApi.WorspaceResponse> {
     const workspaceData = await this.workspaceService.createWorkspace(body, user.email)
@@ -119,10 +115,10 @@ export class WorkspaceController {
     }
   }
 
-  @InjectRoute(workspaceRoutes.updateWorkspaceInfo)
+  @GrpcMethod('WorkspaceController', 'updateWorkspaceInfo')
   async updateWorkspaceInfo(
     @AuthenticatedUser() user: UserInfoDto,
-    @Body(new ZodValidationPipe(TrelloApi.WorkspaceApi.UpdateWorkspaceInfoRequestSchema))
+    @ValidateGrpcInput(TrelloApi.WorkspaceApi.UpdateWorkspaceInfoRequestSchema.safeParse)
     body: TrelloApi.WorkspaceApi.UpdateWorkspaceInfoRequest,
   ): Promise<TrelloApi.WorkspaceApi.WorspaceResponse> {
     const workspaceUpdated = await this.workspaceService.updateWorkspaceInfo(body, user)
@@ -132,10 +128,10 @@ export class WorkspaceController {
     return { data: workspaceUpdated }
   }
 
-  @InjectRoute(workspaceRoutes.changeWorkspaceVisibility)
+  @GrpcMethod('WorkspaceController', 'changeWorkspaceVisibility')
   async changeWorkspaceVisibility(
     @AuthenticatedUser() user: UserInfoDto,
-    @Body(new ZodValidationPipe(TrelloApi.WorkspaceApi.ChangeWorkspaceVisibilityRequestSchema))
+    @ValidateGrpcInput(TrelloApi.WorkspaceApi.ChangeWorkspaceVisibilityRequestSchema.safeParse)
     body: TrelloApi.WorkspaceApi.ChangeWorkspaceVisibilityRequest,
   ): Promise<TrelloApi.WorkspaceApi.WorspaceResponse> {
     const workspaceUpdated = await this.workspaceService.changeWorkspaceVisibility(body, user)
@@ -145,11 +141,10 @@ export class WorkspaceController {
     return { data: workspaceUpdated }
   }
 
-  @InjectRoute(workspaceRoutes.deleteWorkspaceById)
+  @GrpcMethod('WorkspaceController', 'deleteWorkspaceById')
   async deleteWorkspaceById(
     @AuthenticatedUser() user: UserInfoDto,
-    @Param('id', IdParamValidationPipe)
-    id: string,
+    @ValidateGrpcInput(TrelloApi.WorkspaceApi.WorkspaceIdRequestSchema.safeParse) id: string,
   ) {
     const res = await this.workspaceService.deleteWorkspaceById(id, user)
 
@@ -158,13 +153,12 @@ export class WorkspaceController {
     }
   }
 
-  @InjectRoute(workspaceRoutes.inviteMembers2Workspace)
+  @GrpcMethod('WorkspaceController', 'inviteMembers2Workspace')
   async inviteMembers2Workspace(
     @AuthenticatedUser() user: UserInfoDto,
-    @Body(new ZodValidationPipe(TrelloApi.WorkspaceApi.InviteMembers2WorkspaceRequestSchema))
+    @ValidateGrpcInput(TrelloApi.WorkspaceApi.InviteMembers2WorkspaceRequestSchema.safeParse)
     body: TrelloApi.WorkspaceApi.InviteMembers2WorkspaceRequest,
-    @Param('id', IdParamValidationPipe)
-    id: string,
+    @ValidateGrpcInput(TrelloApi.WorkspaceApi.WorkspaceIdRequestSchema.safeParse) id: string,
   ): Promise<TrelloApi.WorkspaceApi.WorspaceResponse> {
     const res = await this.workspaceService.inviteMembers2Workspace(body, user, id)
 
