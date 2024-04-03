@@ -81,8 +81,12 @@ function BoardBar() {
   React.useEffect(() => {
     getBoardById(boardId).then((a) => console.log(a))
   }, [boardId, getBoardById])
+
   console.log(boardData?.data)
-  const [starred, setStarred] = useState<boolean>(boardData?.data?.is_star || false)
+  //khai bao useState isStar
+  const [starred, setStarred] = useState<boolean>(
+    boardData?.data?.is_star !== undefined ? boardData?.data?.is_star : false
+  )
 
   const [anchor, setAnchor] = React.useState<null | HTMLElement>(null)
   const [popupContent, setPopupContent] = useState(<div>Kine</div>)
@@ -94,7 +98,7 @@ function BoardBar() {
   const open = Boolean(anchor)
   const [openMore, setOpen] = React.useState(false)
   const id = open ? 'simple-popup' : undefined
-  const [ChangeVisibilityApi] = WorkspaceApiRTQ.WorkspaceApiSlice.useChangeVisibilityMutation()
+  const [ChangeVisibilityApi] = WorkspaceApiRTQ.WorkspaceApiSlice.useChangeWorkspaceVisibilityMutation()
   const [editBoardById] = BoardApiRTQ.BoardApiSlice.useEditBoardByIdMutation()
 
   const [visibility, setVisibility] = useState('private')
@@ -157,6 +161,7 @@ function BoardBar() {
 
   const handleClickToStar = () => {
     setStarred(!starred)
+    console.log(starred)
     editBoardById({
       _id: boardId,
       is_star: !boardData?.data?.is_star
@@ -185,7 +190,9 @@ function BoardBar() {
               ref={inputRef}
               className='mr-1 flex h-9 cursor-pointer content-center rounded-md border-none bg-[rgba(58,58,75,0.1)] px-1 py-1 text-[18px] font-bold leading-9 text-white hover:bg-[rgba(58,58,75,0.4)]'
               onKeyDown={handleChangeName}
-              style={{ width: `${Math.max(boardData?.data?.name.length, 1) * 10}px` }}
+              style={{
+                width: `${Math.max(boardData?.data?.name.length !== undefined ? boardData?.data?.name.length : 5, 1) * 10}px`
+              }}
             />
           </Box>
           <Tooltip title='Click to star or unstar this board'>

@@ -1,40 +1,62 @@
 import React, { ChangeEvent, useEffect, useRef, useState } from 'react'
-import { MdOutlineLock, MdPublic } from 'react-icons/md'
-import { LuPen } from 'react-icons/lu'
+
 import { useTheme } from '~/components/Theme/themeContext'
-import { AiOutlineUserAdd } from 'react-icons/ai'
+
 import InviteForm from './AddWorkspaceMembersForm'
-import { IoMdClose } from 'react-icons/io'
-import logo_temp from '../../assets/bg_help.png'
-import { RxAvatar } from 'react-icons/rx'
-import { SlPeople } from 'react-icons/sl'
+import { Workspace } from '@trello-v2/shared/src/schemas/Workspace'
 import LogoSection from './LogoSection'
 import WorkspaceInfo from './WorkspaceInfo'
 import EditForm from './EditForm'
+import { WorkspaceApiRTQ } from '~/api'
+import { UpdateWorkspaceInfoRequest } from '@trello-v2/shared/dist/src/api/WorkspaceApi'
 interface HeaderWpSetting {
   visibility: string | undefined
 }
 
 export const WorkspaceHeader: React.FC<HeaderWpSetting> = ({ visibility }) => {
   const { colors, darkMode } = useTheme()
+  const [workspaceInfo, setWorkspaceInfo] = useState<Workspace>()
+  const [visibilityState, setVisibilityState] = useState<string>('')
+  const [getWorkspaceInfo, { data: workspaceInfoRes }] =
+    WorkspaceApiRTQ.WorkspaceApiSlice.useLazyGetWorkspaceInfoQuery()
+  const [resetWorkspaceManually, setResetWorkspaceManually] = useState<boolean>(false)
   const [isEditing, setIsEditing] = useState<boolean>(false)
-
-
-  const [formData, setFormData] = useState({
-    name: '',
-    shortName: '',
-    website: '',
-    description: ''
+  const [updateWorkspaceInfo] = WorkspaceApiRTQ.WorkspaceApiSlice.useUpdateWorkspaceMutation()
+  const [formData, setFormData] = useState<UpdateWorkspaceInfoRequest>({
+    _id: 'string',
+    name: '123',
+    short_name: 'string',
+    description: 'string',
+    website: 'string',
+    logo: '',
+    members: []
   })
-  const isFormValid = formData.name.trim() !== '' && formData.shortName.trim() !== ''
+  useEffect(() => {
+    getWorkspaceInfo({ id: '6609a3b0e9b24bc694e69cf8' })
+  }, [resetWorkspaceManually])
+  useEffect(() => {
+    setWorkspaceInfo(workspaceInfoRes?.data)
+    console.log('My workspace123',workspaceInfoRes?.data)
+    setFormData({
+      _id: '6609a3b0e9b24bc694e69cf8',
+      name: workspaceInfoRes?.data.name,
+      short_name: workspaceInfoRes?.data.short_name,
+      description: workspaceInfoRes?.data.description,
+      website: workspaceInfoRes?.data.website,
+      logo: workspaceInfoRes?.data.logo,
+      members: workspaceInfoRes?.data.members
+    })
+  }, [workspaceInfoRes])
+  const isFormValid = formData.name?.trim() !== '' && formData.short_name?.trim() !== ''
   const handleEditClick = () => {
     setIsEditing(true)
   }
 
   const handleSaveClick = () => {
-    // Handle save functionality here
-    // You can save form data to the backend or perform other actions
-    setIsEditing(false)
+    updateWorkspaceInfo(formData).then(() => {
+      setResetWorkspaceManually(!resetWorkspaceManually)
+      setIsEditing(false)
+    })
   }
 
   const handleCancelClick = () => {
@@ -48,7 +70,11 @@ export const WorkspaceHeader: React.FC<HeaderWpSetting> = ({ visibility }) => {
         {!isEditing ? (
           <>
             <LogoSection />
-            <WorkspaceInfo visibility={visibility} handleEditClick={handleEditClick} />
+            <WorkspaceInfo
+              workspaceName={workspaceInfo?.name}
+              visibility={workspaceInfo?.visibility}
+              handleEditClick={handleEditClick}
+            />
           </>
         ) : (
           <EditForm
@@ -60,7 +86,7 @@ export const WorkspaceHeader: React.FC<HeaderWpSetting> = ({ visibility }) => {
           />
         )}
       </div>
-      <InviteForm />
+      <InviteForm workspace={workspaceInfo} />
     </header>
   )
 }

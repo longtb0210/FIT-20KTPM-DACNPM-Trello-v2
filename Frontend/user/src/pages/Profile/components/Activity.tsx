@@ -1,19 +1,30 @@
 // components/Activity.tsx
 import React, { useEffect, useState } from 'react'
-import { Activity, Workspace } from '../type'
-import { activityData, workspaceData } from '../testData'
+// import { activityData, workspaceData } from '../testData'
 import { MdOutlineLock } from 'react-icons/md'
-import { MdPublic } from "react-icons/md";
+import { MdPublic } from 'react-icons/md'
 import { RxActivityLog, RxAvatar } from 'react-icons/rx'
 import { SlPeople } from 'react-icons/sl'
 import { useTheme } from '~/components/Theme/themeContext'
-
-export const ActivityComponent: React.FC = () => {
+import { User } from '@trello-v2/shared/src/schemas/User'
+import { UserApiRTQ, WorkspaceApiRTQ } from '~/api'
+import { Activity } from '@trello-v2/shared/src/schemas/Activity'
+import { Workspace } from '@trello-v2/shared/src/schemas/Workspace'
+interface ActivityProps {
+  userInfo: User | undefined
+}
+export const ActivityComponent: React.FC<ActivityProps> = ({ userInfo }) => {
   const { colors, darkMode } = useTheme()
   const [activity, setActivity] = useState<Activity[]>()
   const [workspace, setWorkspace] = useState<Workspace[]>()
   const [activityCount, setActivityCount] = useState<number>(3)
+  const [workspaceAll, setWorkspaceAll] = useState<Workspace[]>()
+  const [getActivityAPI, { data: activityData }] = UserApiRTQ.UserApiSlice.useLazyGetActivitiesQuery()
+  const [getAllWorkspace, {data:workspaceData}] = WorkspaceApiRTQ.WorkspaceApiSlice.useLazyGetAllWorkspaceByEmailQuery()
   useEffect(() => {
+    getActivityAPI({
+      email: userInfo?.email || ''
+    })
     addWorkSpaceName()
   }, [activityCount])
 
@@ -22,18 +33,20 @@ export const ActivityComponent: React.FC = () => {
     else return data
   }
   function addWorkSpaceName() {
-    const newData = getActivity(activityData, activityCount)
-    const activityDataWithWorkspaceName = newData.map((activityItem) => {
-      const workspaceItem = workspaceData.find((workspace) => workspace._id === activityItem.workspace_id)
-      const workspaceName = workspaceItem ? workspaceItem.name : 'Unknown Workspace'
+    if (activityData && activityData.data) {
+      const newData = getActivity(activityData?.data, activityCount)
+      const activityDataWithWorkspaceName = newData.map((activityItem) => {
+        const workspaceItem = workspace?.find((workspace) => workspace._id === activityItem.workspace_id)
+        const workspaceName = workspaceItem ? workspaceItem.name : 'Unknown Workspace'
 
-      return {
-        ...activityItem,
-        workspace_name: workspaceName
-      }
-    })
-    setActivity(activityDataWithWorkspaceName)
-    setWorkspace(workspaceData)
+        return {
+          ...activityItem,
+          workspace_name: workspaceName
+        }
+      })
+      setActivity(activityDataWithWorkspaceName)
+      setWorkspace(workspaceData?.data.member)
+    }
   }
   return (
     <div className={`mx-52 mt-4 max-w-2xl p-8`}>
@@ -48,7 +61,7 @@ export const ActivityComponent: React.FC = () => {
 
         {workspace?.map((w, index) => (
           <>
-            <div key={index} className={`${index === 0 ? 'mb-1':'my-1'} mb-1 flex flex-row`}>
+            <div key={index} className={`${index === 0 ? 'mb-1' : 'my-1'} mb-1 flex flex-row`}>
               <div className={`w-[40px]`}></div>
               <div className={` flex w-full cursor-pointer flex-row items-center space-x-4  py-1 hover:bg-gray-200`}>
                 <p className={`ml-2  text-sm`}>{w.name}</p>
@@ -102,7 +115,7 @@ export const ActivityComponent: React.FC = () => {
             </div>
           </div>
         ))}
-        {activityCount && activityCount < activityData.length && (
+        {activityCount && activityData && activityData.data && activityCount < activityData.data.length && (
           <div className='my-5 ml-16'>
             <button
               className={`rounded ${darkMode ? 'bg-gray-800 hover:bg-gray-700' : 'bg-gray-200 hover:bg-gray-300'} `}

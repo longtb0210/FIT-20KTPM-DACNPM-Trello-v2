@@ -1,11 +1,11 @@
-import React from 'react'
+import React, { useEffect, useState } from 'react'
 import { useTheme } from '../Theme/themeContext'
+import { TrelloApi } from '@trello-v2/shared'
+import { UpdateWorkspaceInfoRequest, WorspaceResponse } from '@trello-v2/shared/dist/src/api/WorkspaceApi'
 
 interface EditFormProps {
-  formData: { name: string; shortName: string; website: string; description: string }
-  setFormData: React.Dispatch<
-    React.SetStateAction<{ name: string; shortName: string; website: string; description: string }>
-  >
+  formData: UpdateWorkspaceInfoRequest
+  setFormData: React.Dispatch<React.SetStateAction<UpdateWorkspaceInfoRequest>>
   isFormValid: boolean
   handleSaveClick: () => void
   handleCancelClick: () => void
@@ -19,7 +19,10 @@ const EditForm: React.FC<EditFormProps> = ({
   handleCancelClick
 }) => {
   const { darkMode, colors } = useTheme()
-  
+  const [formDataState, setFormDataState] = useState<UpdateWorkspaceInfoRequest>()
+  useEffect(() => {
+    setFormDataState(formData)
+  }, [formData])
   return (
     <div className='flex w-6/12 flex-col'>
       <div className='flex flex-col space-y-2'>
@@ -34,54 +37,54 @@ const EditForm: React.FC<EditFormProps> = ({
             }}
             type='text'
             id='name'
-            value={formData.name}
-            onChange={(e) => setFormData({ ...formData, name: e.target.value })}
+            value={formDataState?.name}
+            onChange={(e) => setFormData({ ...formDataState, name: e.target.value })}
             className={`rounded-sm border-[3px]  ${darkMode ? 'border-[#738496]' : 'border-[#9da6b5]'} p-1 px-2 focus:border-[3px] focus:border-blue-400 focus:outline-none`}
           />
         </div>
         <div className={`flex flex-col`}>
-                <label className='text-[12px] font-bold'>
-                  Short name<span className='text-red-500'>*</span>
-                </label>
-                <input
-                  style={{
-                    backgroundColor: colors.background,
-                    color: colors.text
-                  }}
-                  type='text'
-                  id='shortName'
-                  value={formData.shortName}
-                  onChange={(e) => setFormData({ ...formData, shortName: e.target.value })}
-                  className={`rounded-sm border-[3px]  ${darkMode ? 'border-[#738496]' : 'border-[#9da6b5]'} p-1 px-2 focus:border-[3px] focus:border-blue-400 focus:outline-none`}
-                />
-              </div>
-              <div className={`flex flex-col`}>
-                <label className='text-[12px] font-bold'>Website (Optional)</label>
-                <input
-                  style={{
-                    backgroundColor: colors.background,
-                    color: colors.text
-                  }}
-                  type='text'
-                  id='website'
-                  value={formData.website}
-                  onChange={(e) => setFormData({ ...formData, website: e.target.value })}
-                  className={`rounded-sm border-[3px]  ${darkMode ? 'border-[#738496]' : 'border-[#9da6b5]'} p-1 px-2 focus:border-[3px] focus:border-blue-400 focus:outline-none`}
-                />
-              </div>
-              <div className={`flex flex-col`}>
-                <label className='text-[12px] font-bold'>Description (Optional)</label>
-                <textarea
-                  style={{
-                    backgroundColor: colors.background,
-                    color: colors.text
-                  }}
-                  id='description'
-                  value={formData.description}
-                  onChange={(e) => setFormData({ ...formData, description: e.target.value })}
-                  className={`resize-y rounded-sm border-[3px]  ${darkMode ? 'border-[#738496]' : 'border-[#9da6b5]'} p-1 px-2 focus:border-[3px] focus:border-blue-400 focus:outline-none`}
-                />
-              </div>
+          <label className='text-[12px] font-bold'>
+            Short name<span className='text-red-500'>*</span>
+          </label>
+          <input
+            style={{
+              backgroundColor: colors.background,
+              color: colors.text
+            }}
+            type='text'
+            id='shortName'
+            value={formDataState?.short_name}
+            onChange={(e) => setFormData({ ...formDataState, short_name: e.target.value })}
+            className={`rounded-sm border-[3px]  ${darkMode ? 'border-[#738496]' : 'border-[#9da6b5]'} p-1 px-2 focus:border-[3px] focus:border-blue-400 focus:outline-none`}
+          />
+        </div>
+        <div className={`flex flex-col`}>
+          <label className='text-[12px] font-bold'>Website (Optional)</label>
+          <input
+            style={{
+              backgroundColor: colors.background,
+              color: colors.text
+            }}
+            type='text'
+            id='website'
+            value={formDataState?.website || ''}
+            onChange={(e) => setFormData({ ...formDataState, website: e.target.value })}
+            className={`rounded-sm border-[3px]  ${darkMode ? 'border-[#738496]' : 'border-[#9da6b5]'} p-1 px-2 focus:border-[3px] focus:border-blue-400 focus:outline-none`}
+          />
+        </div>
+        <div className={`flex flex-col`}>
+          <label className='text-[12px] font-bold'>Description (Optional)</label>
+          <textarea
+            style={{
+              backgroundColor: colors.background,
+              color: colors.text
+            }}
+            id='description'
+            value={formDataState?.description || ''}
+            onChange={(e) => setFormData({ ...formDataState, description: e.target.value })}
+            className={`resize-y rounded-sm border-[3px]  ${darkMode ? 'border-[#738496]' : 'border-[#9da6b5]'} p-1 px-2 focus:border-[3px] focus:border-blue-400 focus:outline-none`}
+          />
+        </div>
       </div>
 
       <div className='mt-2 flex'>

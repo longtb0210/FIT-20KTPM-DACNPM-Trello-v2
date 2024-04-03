@@ -1,13 +1,13 @@
 import { useRef, useState } from 'react'
-import { _Card } from '..'
 import { ButtonType, SidebarButton, buttonTypeIconMap } from './CardSidebarButton'
 import { Box } from '@mui/material'
 import { MoveCardModal } from '../modals/CardMoveModal'
+import { Card } from '@trello-v2/shared/src/schemas/CardList'
 
 interface SidebarButtonMoveProps {
   type: ButtonType
-  currentCard: _Card
-  setCurrentCard: (newState: _Card) => void
+  currentCard: Card
+  setCurrentCard: (newState: Card) => void
 }
 
 export function SidebarButtonMove({ type, currentCard, setCurrentCard }: SidebarButtonMoveProps) {

@@ -3,8 +3,9 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { Box, TextareaAutosize } from '@mui/material'
 import { useRef, useState } from 'react'
 import { TextAreaControl } from './CardChecklist'
-import { _Card } from '.'
 import { useTheme } from '../Theme/themeContext'
+import { Card } from '@trello-v2/shared/src/schemas/CardList'
+import { CardApiRTQ } from '~/api'
 
 interface EditButtonProps {
   onClick: () => void
@@ -35,40 +36,51 @@ function EditButton({ onClick }: EditButtonProps) {
 }
 
 interface CardDescriptionProps {
-  currentCard: _Card
-  setCurrentCard: (newState: _Card) => void
+  cardlistId: string
+  cardId: string
+  currentCard: Card
+  setCurrentCard: (newState: Card) => void
 }
 
-export default function CardDescription({ currentCard, setCurrentCard }: CardDescriptionProps) {
+export default function CardDescription({ cardlistId, cardId, currentCard, setCurrentCard }: CardDescriptionProps) {
   const { colors } = useTheme()
-  const [textAreaMinRows, setTextAreaMinRows] = useState<number>(6)
-  const [isOpenTextArea, setIsOpenTextArea] = useState(false)
-  const [initialValue, setInitialValue] = useState(currentCard.description)
-  const [textAreaValue, setTextAreaValue] = useState(currentCard.description)
+  const [textAreaMinRows, setTextAreaMinRows] = useState<number>(2)
+  const [isOpenTextArea, setIsOpenTextArea] = useState<boolean>(false)
+  const [initialValue, setInitialValue] = useState<string>(currentCard.description! || '')
+  const [textAreaValue, setTextAreaValue] = useState<string>(currentCard.description! || '')
   const textAreaRef = useRef<HTMLTextAreaElement>(null)
+
+  // API
+  const [updateCardDetailAPI] = CardApiRTQ.CardApiSlice.useUpdateCardDetailMutation()
 
   function handleTextAreaChange(event: React.ChangeEvent<HTMLTextAreaElement>) {
     setTextAreaValue(event.target.value)
   }
 
-  function handleSave() {
+  async function handleSave() {
     const trimmedValue = textAreaValue.replace(/\s+/g, ' ').trim()
+    console.log(trimmedValue)
     if (trimmedValue !== initialValue.trim()) {
-      const newCard: _Card = {
-        ...currentCard,
-        description: textAreaValue
-      }
-      setCurrentCard(newCard)
+      setTextAreaValue(trimmedValue)
       setInitialValue(trimmedValue)
+      const response = await updateCardDetailAPI({
+        cardlist_id: cardlistId,
+        card_id: cardId,
+        name: currentCard.name,
+        cover: currentCard.cover,
+        description: trimmedValue
+      })
+      setCurrentCard(response.data.data)
     }
-    handleClose()
+    setTextAreaMinRows(2)
+    setIsOpenTextArea(false)
   }
 
   function handleClose() {
     if (textAreaValue.trim() !== initialValue.trim()) {
       setTextAreaValue(initialValue)
     }
-    setTextAreaMinRows(1)
+    setTextAreaMinRows(2)
     setIsOpenTextArea(false)
   }
 
@@ -81,7 +93,7 @@ export default function CardDescription({ currentCard, setCurrentCard }: CardDes
   }
 
   return (
-    <div style={{ margin: '30px 0 0 40px', color: colors.text }} className='flex flex-col gap-1'>
+    <div style={{ margin: '24px 0 24px 40px', color: colors.text }} className='flex flex-col gap-1'>
       {/* START: Header */}
       <div className='flex flex-row items-center justify-between'>
         {/* Title */}
@@ -98,16 +110,28 @@ export default function CardDescription({ currentCard, setCurrentCard }: CardDes
         style={{
           width: '100%',
           resize: 'none',
-          background: isOpenTextArea ? colors.background_modal_tertiary : colors.background_modal
+          background: isOpenTextArea
+            ? colors.background_modal_tertiary
+            : textAreaValue.trim() !== ''
+              ? colors.background_modal
+              : colors.button
         }}
-        className='mt-1 px-3 py-2 text-sm'
+        className='mt-1 rounded-sm px-3 py-2 text-sm'
+        placeholder={isOpenTextArea ? 'Make your description even better.' : 'Add a more detailed description...'}
         minRows={textAreaMinRows}
         value={textAreaValue}
         onChange={handleTextAreaChange}
         onBlur={handleClose}
         onFocus={handleOpen}
       />
-      {isOpenTextArea && <TextAreaControl handleSave={handleSave} handleClose={handleClose} />}
+      {isOpenTextArea && (
+        <TextAreaControl
+          handleSave={() => {
+            handleSave()
+          }}
+          handleClose={handleClose}
+        />
+      )}
     </div>
   )
 }

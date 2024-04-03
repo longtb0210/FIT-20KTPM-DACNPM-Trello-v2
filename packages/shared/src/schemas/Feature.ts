@@ -13,17 +13,20 @@ export const FeatureLabelSchema = z.object({
 
 export const FeatureChecklistSchema = z.object({
   _id: z.string().optional(),
+  name: z.string().default(""),
   type: z.literal("checklist"),
   items: z
     .object({ name: z.string(), is_check: z.boolean().default(false) })
     .array(),
 });
+
 export const FeatureDateSchema = z.object({
   _id: z.string().optional(),
   type: z.literal("date"),
   start_date: z.coerce.date().optional(),
   due_date: z.coerce.date(),
 });
+
 export const FeatureAttachmentSchema = z.object({
   _id: z.string().optional(),
 

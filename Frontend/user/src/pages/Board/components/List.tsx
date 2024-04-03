@@ -11,13 +11,26 @@ import { IoImagesOutline } from 'react-icons/io5'
 import { useTheme } from '~/components/Theme/themeContext'
 // import { createCardAPI } from '~/api/Card'
 import { CardApiRTQ, CardlistApiRTQ } from '~/api'
-export default function ListComponent({ list, setOpenCardSetting }: ListComponentProps) {
+import { TrelloApi } from '@trello-v2/shared'
+import { board_id } from '~/api/getInfo'
+export default function ListComponent({
+  list,
+  index,
+  cardSelected,
+  maxHeight,
+  setOpenCardSetting,
+  setResetManually,
+  resetManually
+}: ListComponentProps) {
   const [createCard] = CardApiRTQ.CardApiSlice.useCreateCardMutation()
-  const [getAllCardlist] = CardlistApiRTQ.CardListApiSlice.useLazyGetAllCardlistQuery()
+  const [updateCardList] = CardlistApiRTQ.CardListApiSlice.useUpdateCardListMutation()
+  // const [getAllCardlist] = CardlistApiRTQ.CardListApiSlice.useLazyGetAllCardlistQuery()
+  const [getCardListByBoardId, { data: cardlistDataByBoardId }] =
+    CardlistApiRTQ.CardListApiSlice.useLazyGetCardlistByBoardIdQuery()
   const { colors, darkMode } = useTheme()
   const [listSettingOpen, setListSettingOpen] = useState<string>()
   const [addCardOpenAt, setAddCardOpenAt] = useState<string>('')
-
+  const [listName, setListName] = useState({ name: '', list_id: '' })
   const componentRef_AddCard = useRef<HTMLDivElement>(null)
   const componentRef_ListSetting = useRef<HTMLDivElement>(null)
   useEffect(() => {
@@ -28,6 +41,7 @@ export default function ListComponent({ list, setOpenCardSetting }: ListComponen
         setNewCardName('')
       }
     }
+
     const handleClickOutside_ListSetting = (event: MouseEvent) => {
       if (componentRef_ListSetting.current && !componentRef_ListSetting.current.contains(event.target as Node)) {
         // Clicked outside of Component A, hide it
@@ -41,6 +55,37 @@ export default function ListComponent({ list, setOpenCardSetting }: ListComponen
       document.removeEventListener('mousedown', handleClickOutside_ListSetting)
     }
   }, [])
+  const [inputValue, setInputValue] = useState<string>('')
+  const [isInputFocused, setIsInputFocused] = useState<boolean>(false)
+  const [editName, setEditName] = useState<boolean>(false)
+  useEffect(() => {
+    setInputValue(list.name)
+  }, [list])
+  const handleInputChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+    setInputValue(event.target.value)
+  }
+
+  const handleInputBlur = () => {
+    // If the input is blurred without any changes, revert to list name
+    if (!inputValue.trim() || inputValue === list.name) {
+      setInputValue(list.name)
+    }
+    updateCardList({
+      _id: list._id,
+      index: list.index || undefined,
+      name: inputValue,
+      archive_at: new Date()
+    }).then(() => {
+      getCardListByBoardId({ id: board_id })
+    })
+    setResetManually(!resetManually)
+    setEditName(false)
+    setIsInputFocused(false)
+  }
+
+  const handleInputFocus = () => {
+    setIsInputFocused(true)
+  }
   const [newCardName, setNewCardName] = useState<string>('')
   async function addCard() {
     const index = list.cards.length == 1 && list.cards[0].placeHolder ? 0 : list.cards.length
@@ -52,17 +97,8 @@ export default function ListComponent({ list, setOpenCardSetting }: ListComponen
     }).then(() => {
       setAddCardOpenAt('')
       setNewCardName('')
-      getAllCardlist()
+      getCardListByBoardId({ id: board_id })
     })
-    // const data = {
-    //   name: newCardName,
-    //   index: 1,
-    //   cover: '',
-    //   description: '',
-    //   cardlist_id: '12345'
-    // }
-    // const res = await createCardAPI(data)
-    // console.log(res)
   }
   const { attributes, listeners, setNodeRef, transform, isDragging } = useSortable({
     id: list._id,
@@ -72,27 +108,51 @@ export default function ListComponent({ list, setOpenCardSetting }: ListComponen
   const styleList = {
     transform: CSS.Transform.toString(transform),
     opacity: isDragging ? 0.5 : undefined,
+    height: '100%',
     backgroundColor: darkMode ? 'black' : '#f1f2f6',
-    color: colors.text
+    color: colors.text,
+    minHeight: `${maxHeight}px`
+    // maxHeight: `${maxHeight > 590 ? 590 : maxHeight}px`
   }
 
   return (
     <div
       ref={setNodeRef}
       style={styleList}
+      className={`relative mr-2 flex h-fit w-[300px] max-w-[300px] flex-col rounded-xl border pt-1 shadow-sm`}
       {...attributes}
       {...listeners}
-      className='mr-2 flex min-h-full w-[300px] max-w-[300px] flex-col rounded-xl border pt-1 shadow-sm '
     >
-      <div className=' relative mx-6 my-2 flex flex-row items-center justify-between'>
-        <h2 className={`font-bold  `}>{list.name}</h2>
+      <div className=' relative my-1 ml-4 mr-6 flex flex-row items-center justify-between'>
+        {!editName ? (
+          <h2
+            onClick={() => setEditName(true)}
+            className={`-ml-1 w-11/12 rounded-md border-[3px]  px-2 py-1 font-bold ${darkMode ? 'border-black' : 'border-[#f1f2f6]'}  `}
+          >
+            {list.name}
+          </h2>
+        ) : (
+          <input
+            style={{
+              backgroundColor: colors.background,
+              color: colors.text
+            }}
+            className={`-ml-1 w-11/12 rounded-lg border-[3px] px-2 py-1 font-bold ${darkMode ? 'border-black' : 'border-[#f1f2f6]'}  focus:border-[3px] focus:border-blue-400 focus:outline-none`}
+            autoFocus
+            value={inputValue}
+            onChange={handleInputChange}
+            onBlur={handleInputBlur}
+            onFocus={handleInputFocus}
+          />
+        )}
+
         <HiOutlineDotsHorizontal
           size={'20px'}
           className={` top-50 absolute right-0 rounded-lg   ${darkMode ? 'hover:bg-gray-600' : 'hover:bg-gray-300'}`}
           onClick={() => setListSettingOpen(list._id)}
         />
       </div>
-      <div className={` relative`} id={list._id}>
+      <div className={`relative max-h-[580px]  overscroll-contain`}>
         {listSettingOpen && listSettingOpen === list._id && (
           <div ref={componentRef_ListSetting}>
             <ListSetting closeListSetting={() => setListSettingOpen('')} />
@@ -103,10 +163,15 @@ export default function ListComponent({ list, setOpenCardSetting }: ListComponen
             items={list.cards.map((c) => c._id) as (UniqueIdentifier | { id: UniqueIdentifier })[]}
             strategy={verticalListSortingStrategy}
           >
-            <div className={`space-y-[10px]`}>
+            <div className={`space-y-[10px] `}>
               {list.cards &&
                 list.cards.map((card, index) => (
-                  <CardComponent key={index} card={card} setOpenCardSetting={setOpenCardSetting} />
+                  <CardComponent
+                    cardSelected={cardSelected}
+                    key={index}
+                    card={card}
+                    setOpenCardSetting={setOpenCardSetting}
+                  />
                 ))}
             </div>
           </SortableContext>
@@ -114,7 +179,7 @@ export default function ListComponent({ list, setOpenCardSetting }: ListComponen
         {addCardOpenAt &&
           addCardOpenAt === list._id &&
           (list.cards[0].placeHolder === false ? (
-            <div ref={componentRef_AddCard} className='mx-3 '>
+            <div ref={componentRef_AddCard} className='mx-3'>
               <div className={` mt-[10px] rounded-xl  ${darkMode ? `` : ' shadow-sm shadow-gray-300'} `}>
                 <div className={`flex flex-row items-center   justify-between`}>
                   <input
@@ -122,7 +187,7 @@ export default function ListComponent({ list, setOpenCardSetting }: ListComponen
                       backgroundColor: colors.background,
                       color: colors.text
                     }}
-                    className={` h-full w-full rounded-lg px-2 pt-2 pb-8 text-left focus:border-0 focus:outline-none focus:ring-0 `}
+                    className={` h-full w-full rounded-lg px-2 pb-8 pt-2 text-left focus:border-0 focus:outline-none focus:ring-0 `}
                     placeholder='Enter the title for this card...'
                     value={newCardName}
                     onChange={(e) => setNewCardName(e.target.value)}
@@ -169,7 +234,7 @@ export default function ListComponent({ list, setOpenCardSetting }: ListComponen
                       backgroundColor: colors.background,
                       color: colors.text
                     }}
-                    className={` h-full w-full rounded-lg px-2 pt-2 pb-8 text-left focus:border-0 focus:outline-none focus:ring-0 `}
+                    className={` h-full w-full rounded-lg px-2 pb-8 pt-2 text-left focus:border-0 focus:outline-none focus:ring-0 `}
                     placeholder='Enter the title for this card...'
                     value={newCardName}
                     onChange={(e) => setNewCardName(e.target.value)}
@@ -224,6 +289,11 @@ export default function ListComponent({ list, setOpenCardSetting }: ListComponen
           </button>
         </div>
       )}
+      {/* {index !== 0 && (
+        <div style={{ position: 'absolute', top: '100%', left: 0, width: '100%', height: '200px', zIndex: 50 }}>
+        
+        </div>
+      )} */}
     </div>
   )
 }

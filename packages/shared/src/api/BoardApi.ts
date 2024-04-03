@@ -1,6 +1,6 @@
 import { z } from "zod";
 
-import { BoardSchema } from "../schemas/Board";
+import { BoardLabelSchema, BoardSchema } from "../schemas/Board";
 import { emailRegex } from "../utils/regex";
 
 export const BoardIdRequestSchema = BoardSchema.pick({
@@ -10,6 +10,7 @@ export type BoardIdRequestGrpc = z.infer<typeof BoardIdRequestSchema>;
 
 export type BoardIdRequest = z.infer<typeof BoardSchema>["_id"];
 export type workSpaceIdRequest = z.infer<typeof BoardSchema>["workspace_id"];
+export type LabelIdRequest = z.infer<typeof BoardLabelSchema>["_id"];
 
 ///
 
@@ -159,3 +160,36 @@ export const RemoveBackgroundRequestSchema = BoardSchema.pick({
   background: true,
 }).required({ background: true });
 export type RemoveBackgroundRequest = z.infer<typeof RemoveBackgroundRequestSchema>;
+
+///
+
+export const GetLabelsResponseSchema = z.object({
+  data: BoardLabelSchema.array(),
+});
+export type GetLabelsResponse = z.infer<typeof GetLabelsResponseSchema>;
+
+///
+
+export const AddLabelRequestSchema = BoardLabelSchema.pick({
+  color: true,
+  name: true,
+}).partial();
+export type CreateLabel = z.infer<typeof AddLabelRequestSchema>;
+
+///
+
+export const RemoveLabelRequestSchema = BoardLabelSchema.pick({
+  _id: true,
+}).required({ _id: true });
+export type RemoveLabel = z.infer<typeof RemoveLabelRequestSchema>;
+
+///
+
+export const UpdateLabelRequestSchema = BoardLabelSchema.pick({
+  _id: true,
+  color: true,
+  name: true,
+})
+  .partial()
+  .required({ _id: true });
+export type UpdateLabel = z.infer<typeof UpdateLabelRequestSchema>;

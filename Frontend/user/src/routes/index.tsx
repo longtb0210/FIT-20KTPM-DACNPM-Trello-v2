@@ -40,7 +40,7 @@ export const router = createBrowserRouter([
       },
       {
         path: '/carddetail',
-        element: <CardDetailWindow />
+        element: <CardDetailWindow cardlistId={'demo_cardlist'} cardId={'0'} />
       },
       {
         path: '/cardlist',

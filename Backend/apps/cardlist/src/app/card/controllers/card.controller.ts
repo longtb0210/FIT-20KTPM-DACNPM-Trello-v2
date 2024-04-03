@@ -8,7 +8,7 @@ import { CardRoutes } from '../card.routes'
 import { CardService } from '../services/card.service'
 
 @InjectController({
-  name: 'card',
+  name: '/api/card',
 })
 export class CardController {
   constructor(private cardService: CardService) {}
@@ -302,6 +302,35 @@ export class CardController {
     if (!cards) throw new InternalServerErrorException("Can't move card")
     return {
       data: cards,
+    }
+  }
+
+  @InjectRoute(CardRoutes.moveCardNew)
+  @SwaggerApi({
+    body: {
+      schema: { $ref: getSchemaPath('MoveCardRequestSchema') },
+    },
+    responses: [{ status: 200, schema: { $ref: getSchemaPath('MoveCardResponseSchema') } }],
+  })
+  async moveCard(
+    @Body(new ZodValidationPipe(TrelloApi.CardApi.MoveCardRequestSchema)) data: TrelloApi.CardApi.MoveCardRequest,
+  ): Promise<TrelloApi.CardApi.MoveCardSamelistResponse> {
+    return {
+      data: await this.cardService.moveCard(data),
+    }
+  }
+
+  @InjectRoute(CardRoutes.deleteFeatureToCard)
+  @SwaggerApi({
+    body: { schema: { $ref: getSchemaPath('DeleteFeatureRequestSchema') } },
+    responses: [{ status: 200, schema: { $ref: getSchemaPath('MoveCardResponseSchema') } }],
+  })
+  async deleteFeature(
+    @Body(new ZodValidationPipe(TrelloApi.CardApi.DeleteFeatureRequestSchema)) body: TrelloApi.CardApi.DeleteFeatureRequest,
+  ): Promise<TrelloApi.CardApi.DeleteFeatureResponse> {
+    const card = await this.cardService.deleteFeature(body)
+    return {
+      data: card,
     }
   }
 }
