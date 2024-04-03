@@ -39,6 +39,7 @@ describe('BoardController', () => {
         workspace_id: 'any_workspace_id',
         name: 'any_name',
         visibility: 'private' as const,
+        background: 'any_background',
       }
       const data = await controller.createBoard(body)
       expect(TrelloApi.BoardApi.CreateBoardResponseSchema.safeParse(data).success).toBeTruthy()
