@@ -14,7 +14,6 @@ import Account from './menu/account'
 import { Link } from 'react-router-dom'
 
 import { useTheme } from './../Theme/themeContext'
-import { Button } from '@mui/base'
 
 const Header = () => {
   const { darkMode, colors } = useTheme()
@@ -33,7 +32,7 @@ const Header = () => {
         borderStyle: 'solid',
         padding: '8px',
         color: colors.text,
-        zIndex: '1000',
+        zIndex: '1201',
         transition: darkMode ? 'all 0.2s ease-in' : 'all 0.2s ease-in'
       }}
     >
@@ -79,9 +78,7 @@ const Header = () => {
         </Box>
 
         <Box sx={{ padding: '0 5px' }}>
-          <Link to={`/template`}>
-            <Templates />
-          </Link>
+          <Templates />
         </Box>
 
         <Create />

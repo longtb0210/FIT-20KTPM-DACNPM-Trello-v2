@@ -97,7 +97,7 @@ export default function Account() {
                 transformOrigin: placement === 'bottom-start' ? 'left top' : 'right top'
               }}
             >
-              <Paper sx={{ backgroundColor: 'transparent' }}>
+              <Paper sx={{ backgroundColor: 'transparent', boxShadow: 'rgba(100, 100, 111, 0.2) 0px 7px 29px 0px' }}>
                 <ClickAwayListener onClickAway={handleClose}>
                   <MenuList
                     autoFocusItem={open}

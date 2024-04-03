@@ -6,17 +6,21 @@ import './home.css'
 import SidebarTemplate from '~/components/SidebarTemplate'
 import { Box } from '@mui/material'
 import { useTheme } from '../../components/Theme/themeContext'
-import { useSelector } from 'react-redux'
-import { selectExample } from '~/store/reducers'
 import { useContext } from 'react'
 import { AuthContext } from '~/components/AuthProvider/AuthProvider'
 
 export default function HomePage() {
   const { darkMode, colors } = useTheme()
   const authContext = useContext(AuthContext)
+  // const a = JSON.parse(localStorage.getItem('data') || '')
+  // console.log(a)
 
-  // const test = useSelector(selectExample)
-  console.log(authContext?.keycloak.token)
+  // const expirationDate = new Date(a.tokenParsed.exp * 1000) // Chuyển đổi timestamp thành milliseconds
+  // const expirationDate1 = new Date(a.idTokenParsed.exp * 1000) // Chuyển đổi timestamp thành milliseconds
+  // console.log(expirationDate.toLocaleString())
+  // console.log(expirationDate1.toLocaleString())
+  // console.log(localStorage.getItem('accessToken'))
+  // console.log(localStorage.getItem('profile'))
 
   return (
     <>

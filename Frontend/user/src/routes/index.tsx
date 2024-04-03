@@ -10,17 +10,13 @@ import { WorkspaceSetting } from '~/pages/WorkspaceSetting'
 import { WorkspaceBoardsPage } from '~/pages/WorkspaceBoardsPage'
 import Layout from '~/layouts/Layout/layout'
 import PrivateRoute from './privateRoute'
-import { useContext, useState } from 'react'
+import { useContext } from 'react'
 import { AuthContext } from '~/components/AuthProvider/AuthProvider'
 
 export const Navigation = () => {
-  // localStorage.clear()
   const authContext = useContext(AuthContext)
-  const isLoggedIn = authContext?.isLoggedIn
-
-  // const isLoggedIn = JSON.parse(localStorage.getItem('isLogin') || 'false')
-
-  console.log(isLoggedIn)
+  // const isLoggedIn = authContext?.isLoggedIn
+  const isLoggedIn = true
 
   return (
     <Routes>

@@ -93,63 +93,65 @@ function SidebarTemplate() {
       <h1 className='mb-2 pl-5 pt-2 text-gray-700'>Workspaces</h1>
       <Sidebar className='workspaces mb-10'>
         <div>
-          {workspaceData?.data?.owner.map((w, index) => (
-            <div key={index}>
-              <Menu>
-                <SubMenu
-                  label={
-                    <span className='rounded-md font-bold hover:border-0 hover:bg-blue-500 hover:text-blue-500'>
-                      <div className='flex items-center'>
-                        <WorkspacesIcon fontSize='small' className='mr-2' />
-                        {w.name}
-                      </div>
-                    </span>
-                  }
-                  style={{ marginBottom: '4px', padding: '8px', height: '32px', width: '200px' }}
-                >
-                  <Link to={`/workspace/${w._id}`}>
+          {workspaceData?.data
+            .filter((item) => item.members.some((member) => member.role !== 'guest'))
+            .map((w, index) => (
+              <div key={index}>
+                <Menu>
+                  <SubMenu
+                    label={
+                      <span className='rounded-md font-bold hover:border-0 hover:bg-blue-500 hover:text-blue-500'>
+                        <div className='flex items-center'>
+                          <WorkspacesIcon fontSize='small' className='mr-2' />
+                          {w.name}
+                        </div>
+                      </span>
+                    }
+                    style={{ marginBottom: '4px', padding: '8px', height: '32px', width: '200px' }}
+                  >
+                    <Link to={`/workspace/${w._id}`}>
+                      <MenuItem style={{ height: '32px', width: '200px' }}>
+                        <div className='flex items-center'>
+                          <FontAwesomeIcon icon={faTrello} fontSize='small' className='mr-2' />
+                          Boards
+                        </div>
+                      </MenuItem>
+                    </Link>
                     <MenuItem style={{ height: '32px', width: '200px' }}>
                       <div className='flex items-center'>
-                        <FontAwesomeIcon icon={faTrello} fontSize='small' className='mr-2' />
-                        Boards
+                        <FontAwesomeIcon icon={faHeart} fontSize='small' className='mr-2' />
+                        Highlights
                       </div>
                     </MenuItem>
-                  </Link>
-                  <MenuItem style={{ height: '32px', width: '200px' }}>
-                    <div className='flex items-center'>
-                      <FontAwesomeIcon icon={faHeart} fontSize='small' className='mr-2' />
-                      Highlights
-                    </div>
-                  </MenuItem>
-                  <MenuItem style={{ height: '32px', width: '200px' }}>
-                    <div className='flex items-center'>
-                      <FontAwesomeIcon icon={faTableCells} fontSize='small' className='mr-2' />
-                      Views
-                    </div>
-                  </MenuItem>
-                  <MenuItem style={{ height: '32px', width: '200px' }}>
-                    <div className='flex w-full items-center justify-between'>
+                    <MenuItem style={{ height: '32px', width: '200px' }}>
                       <div className='flex items-center'>
-                        <FontAwesomeIcon icon={faUserGroup} fontSize='small' className='mr-2' />
-                        Members
+                        <FontAwesomeIcon icon={faTableCells} fontSize='small' className='mr-2' />
+                        Views
                       </div>
-                      <div>
-                        <Button>
-                          <AddOutlinedIcon fontSize='small' />
-                        </Button>
+                    </MenuItem>
+                    <MenuItem style={{ height: '32px', width: '200px' }}>
+                      <div className='flex w-full items-center justify-between'>
+                        <div className='flex items-center'>
+                          <FontAwesomeIcon icon={faUserGroup} fontSize='small' className='mr-2' />
+                          Members
+                        </div>
+                        <div>
+                          <Button>
+                            <AddOutlinedIcon fontSize='small' />
+                          </Button>
+                        </div>
                       </div>
-                    </div>
-                  </MenuItem>
-                  <MenuItem style={{ height: '32px', width: '200px' }}>
-                    <div className='flex items-center'>
-                      <FontAwesomeIcon icon={faGear} fontSize='small' className='mr-2' />
-                      Setting
-                    </div>
-                  </MenuItem>
-                </SubMenu>
-              </Menu>
-            </div>
-          ))}
+                    </MenuItem>
+                    <MenuItem style={{ height: '32px', width: '200px' }}>
+                      <div className='flex items-center'>
+                        <FontAwesomeIcon icon={faGear} fontSize='small' className='mr-2' />
+                        Setting
+                      </div>
+                    </MenuItem>
+                  </SubMenu>
+                </Menu>
+              </div>
+            ))}
         </div>
       </Sidebar>
     </div>
