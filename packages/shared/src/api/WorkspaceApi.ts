@@ -6,6 +6,16 @@ export const EmailIdSchema = z.object({
   email: z.string().nullish(),
 });
 
+export const WorkspaceDeleteResponeSchema = z.object({
+  data: z.object({
+    workspace_id: z.string().nullish(),
+  }),
+});
+
+export type WorkspaceDeleteRespone = z.infer<
+  typeof WorkspaceDeleteResponeSchema
+>;
+
 export type EmailIdType = z.infer<typeof EmailIdSchema>;
 
 export const WorkspaceIdRequestSchema = WorkspaceSchema.pick({
