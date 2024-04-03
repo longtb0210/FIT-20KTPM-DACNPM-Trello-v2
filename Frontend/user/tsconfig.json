@@ -24,7 +24,7 @@
     "paths": {
       "~/*": ["src/*"]
     },
-    "types": ["cypress", "@4tw/cypress-drag-drop"]
+    "types": ["cypress", "@4tw/cypress-drag-drop","node"]
   },
   "include": ["src", "src/assets/declaration.d.ts"],
   "references": [{ "path": "./tsconfig.node.json" }]

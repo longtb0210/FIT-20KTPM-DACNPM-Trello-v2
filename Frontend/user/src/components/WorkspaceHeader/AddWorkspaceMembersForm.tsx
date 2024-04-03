@@ -2,9 +2,15 @@ import React, { useState, useEffect, useRef } from 'react'
 import { AiOutlineUserAdd, AiOutlineClose } from 'react-icons/ai'
 import { useTheme } from '~/components/Theme/themeContext'
 import { FaRegCircleCheck } from 'react-icons/fa6'
-import { HiLink } from "react-icons/hi";
-const InviteForm: React.FC = () => {
+import { HiLink } from 'react-icons/hi'
+import { Workspace } from '@trello-v2/shared/src/schemas/Workspace'
+import { WorkspaceApiRTQ } from '~/api'
+interface InviteFormProps {
+  workspace: Workspace | undefined
+}
+const InviteForm: React.FC<InviteFormProps> = ({ workspace }) => {
   const { colors, darkMode } = useTheme()
+  const [inviteMember2Workspace] = WorkspaceApiRTQ.WorkspaceApiSlice.useInviteMember2WorkspaceMutation()
   const [isVisible, setIsVisible] = useState<boolean>(false)
   const [searchTerm, setSearchTerm] = useState<string>('')
   const [selectedEmail, setSelectedEmail] = useState<string[]>([])
@@ -71,6 +77,16 @@ const InviteForm: React.FC = () => {
     // Implement send invite functionality here
     // You can use selectedEmail to send the invite
     console.log('Sending invite to:', selectedEmail)
+    const members = selectedEmail.map((email) => ({
+      role: 'member',
+      email: email,
+      status: 'member' // or you can omit this property if it's optional
+    }))
+    if (workspace)
+      inviteMember2Workspace({
+        id: workspace._id,
+        members: members
+      })
     // Reset states or close the form after sending the invite
     setSelectedEmail([])
   }
@@ -102,7 +118,7 @@ const InviteForm: React.FC = () => {
               <h1 className={`text-xl`}>Invite to Workspace</h1>
               {copied && (
                 <div
-                  className={`ml-5 inline-flex items-center space-x-2 rounded-2xl py-[4px] px-2 ${darkMode ? 'bg-green-900 text-green-300' : 'bg-green-100 text-green-800'} `}
+                  className={`ml-5 inline-flex items-center space-x-2 rounded-2xl px-2 py-[4px] ${darkMode ? 'bg-green-900 text-green-300' : 'bg-green-100 text-green-800'} `}
                 >
                   <FaRegCircleCheck size={`20px`} />
                   <p className={` text-sm`}>Link copied to clipboard</p>
@@ -244,8 +260,8 @@ const InviteForm: React.FC = () => {
                     } `}
                     onClick={() => copyToClipboard(linkToCopy)}
                   >
-                   <div style={{ color: colors.text }} className={`inline-flex space-x-3 items-center font-semibold`}>
-                    <HiLink />
+                    <div style={{ color: colors.text }} className={`inline-flex items-center space-x-3 font-semibold`}>
+                      <HiLink />
                       <p>Copy link</p>
                     </div>
                   </button>
@@ -259,8 +275,8 @@ const InviteForm: React.FC = () => {
                       copyToClipboard('Link abcxyz')
                     }}
                   >
-                    <div style={{ color: colors.text }} className={`inline-flex space-x-3 items-center font-semibold`}>
-                    <HiLink />
+                    <div style={{ color: colors.text }} className={`inline-flex items-center space-x-3 font-semibold`}>
+                      <HiLink />
                       <p>Create Link</p>
                     </div>
                   </button>
