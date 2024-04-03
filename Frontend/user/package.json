@@ -40,6 +40,7 @@
     "@reduxjs/toolkit": "^2.0.1",
     "@trello-v2/shared": "*",
     "axios": "^1.6.7",
+    "caniuse-lite": "^1.0.30001605",
     "faker": "^5.5.3",
     "localforage": "^1.10.0",
     "lodash": "^4.17.21",
@@ -58,9 +59,9 @@
     "styled-components": "^6.1.8",
     "styles": "^0.2.1",
     "uuid": "^9.0.1",
+    "vite": "^5.1.1",
     "wait-on": "^7.2.0",
-    "yup": "^1.3.3",
-    "vite": "^5.1.1"
+    "yup": "^1.3.3"
   },
   "devDependencies": {
     "@4tw/cypress-drag-drop": "^2.2.5",
