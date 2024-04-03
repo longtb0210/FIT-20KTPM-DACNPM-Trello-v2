@@ -20,7 +20,7 @@ const WorkspaceApiSlice = createApi({
       TrelloApi.WorkspaceApi.CreateWorspaceRequest
     >({
       query: (data) => ({
-        url: '/api/worspace',
+        url: '/api/workspace',
         body: data,
         method: 'POST'
       })

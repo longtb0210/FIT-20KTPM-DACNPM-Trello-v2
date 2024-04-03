@@ -1,6 +1,6 @@
 import { configureStore } from '@reduxjs/toolkit'
 import { exampleSlice } from './reducers'
-import { BoardApiRTQ, CardApiRTQ, CardlistApiRTQ, UserApiRTQ, WorkspaceApiRTQ } from '~/api'
+import { BoardApiRTQ, CardApiRTQ, CardlistApiRTQ, WorkspaceApiRTQ, UserApiRTQ } from '~/api'
 
 export const store = configureStore({
   reducer: {
