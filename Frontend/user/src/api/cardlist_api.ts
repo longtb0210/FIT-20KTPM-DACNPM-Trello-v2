@@ -31,9 +31,7 @@ export const CardListApiSlice = createApi({
       query: (data) => ({
         method: 'POST',
         url: '/api/cardlist/create',
-        body: {
-          ...data
-        }
+        body: data
       })
     }),
     updateCardList: build.mutation<

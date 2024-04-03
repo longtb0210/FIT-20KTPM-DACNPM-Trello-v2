@@ -304,4 +304,33 @@ export class CardController {
       data: cards,
     }
   }
+
+  @InjectRoute(CardRoutes.moveCardNew)
+  @SwaggerApi({
+    body: {
+      schema: { $ref: getSchemaPath('MoveCardRequestSchema') },
+    },
+    responses: [{ status: 200, schema: { $ref: getSchemaPath('MoveCardResponseSchema') } }],
+  })
+  async moveCard(
+    @Body(new ZodValidationPipe(TrelloApi.CardApi.MoveCardRequestSchema)) data: TrelloApi.CardApi.MoveCardRequest,
+  ): Promise<TrelloApi.CardApi.MoveCardSamelistResponse> {
+    return {
+      data: await this.cardService.moveCard(data),
+    }
+  }
+
+  @InjectRoute(CardRoutes.deleteFeatureToCard)
+  @SwaggerApi({
+    body: { schema: { $ref: getSchemaPath('DeleteFeatureRequestSchema') } },
+    responses: [{ status: 200, schema: { $ref: getSchemaPath('MoveCardResponseSchema') } }],
+  })
+  async deleteFeature(
+    @Body(new ZodValidationPipe(TrelloApi.CardApi.DeleteFeatureRequestSchema)) body: TrelloApi.CardApi.DeleteFeatureRequest,
+  ): Promise<TrelloApi.CardApi.DeleteFeatureResponse> {
+    const card = await this.cardService.deleteFeature(body)
+    return {
+      data: card,
+    }
+  }
 }

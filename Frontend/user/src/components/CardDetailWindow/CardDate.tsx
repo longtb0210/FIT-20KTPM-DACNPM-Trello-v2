@@ -3,9 +3,11 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { Box, Tooltip } from '@mui/material'
 import { useEffect, useRef, useState } from 'react'
 import { SelectCardDatesModal } from './modals/CardDateModal'
-import { _Card } from '.'
 import dayjs, { Dayjs } from 'dayjs'
 import { useTheme } from '../Theme/themeContext'
+import { Card } from '@trello-v2/shared/src/schemas/CardList'
+import { Feature_Date } from '@trello-v2/shared/src/schemas/Feature'
+import React from 'react'
 
 type CardStatus = 'complete' | 'overdue' | ''
 
@@ -46,18 +48,20 @@ function StatusTag({ cardDateStatus }: StatusTagProps) {
 }
 
 interface CardDateProps {
-  currentCard: _Card
-  setCurrentCard: (newState: _Card) => void
+  cardlistId: string
+  cardId: string
+  currentCard: Card
+  setCurrentCard: (newState: Card) => void
 }
 
-export default function CardDate({ currentCard, setCurrentCard }: CardDateProps) {
+export default function CardDate({ cardlistId, cardId, currentCard, setCurrentCard }: CardDateProps) {
   const { colors } = useTheme()
   const boxRef = useRef(null)
   const [anchorEl, setAnchorEl] = useState<null | HTMLDivElement>(null)
-  const [isOpenModal, setIsOpenModal] = useState(false)
-  const [isComplete, setIsComplete] = useState(false)
+  const [isOpenModal, setIsOpenModal] = useState<boolean>(false)
+  const [isComplete, setIsComplete] = useState<boolean>(false)
   const [cardDateStatus, setCardDateStatus] = useState<CardStatus>('')
-  const [cardDateVisible, setCardDateVisible] = useState(true)
+  const [cardDateVisible, setCardDateVisible] = useState<boolean>(true)
 
   function handleOpenModal() {
     setIsOpenModal(true)
@@ -71,9 +75,18 @@ export default function CardDate({ currentCard, setCurrentCard }: CardDateProps)
     setIsComplete(!isComplete)
   }
 
+  function getFeatureDate(): Feature_Date | null {
+    const featureDateIndex = currentCard.features.findIndex((feature) => feature.type === 'date')
+    if (featureDateIndex !== -1) {
+      return currentCard.features[featureDateIndex] as Feature_Date
+    }
+    return null
+  }
+
   let datesText = ''
-  const startDate: Dayjs | null = currentCard.dates.start_date
-  const dueDate: Dayjs | null = currentCard.dates.due_date
+  const featureDate = getFeatureDate()
+  const startDate: Dayjs | null = dayjs(featureDate?.start_date)
+  const dueDate: Dayjs | null = dayjs(featureDate?.due_date)
 
   if (startDate || dueDate) {
     const startDateFormat = startDate ? `${startDate.format('MMM')} ${startDate.format('D')}` : ''
@@ -99,77 +112,83 @@ export default function CardDate({ currentCard, setCurrentCard }: CardDateProps)
   }, [dueDate, isComplete])
 
   return (
-    <Box>
-      {cardDateVisible && (
-        <Tooltip
-          title={getTooltipTitle(isOpenModal, cardDateStatus)}
-          placement='bottom-start'
-          slotProps={{
-            popper: {
-              modifiers: [
-                {
-                  name: 'offset',
-                  options: {
-                    offset: [18, -12]
-                  }
+    <React.Fragment>
+      {currentCard.features.filter((feature) => feature.type === 'date').length !== 0 && (
+        <Box>
+          {cardDateVisible && (
+            <Tooltip
+              title={getTooltipTitle(isOpenModal, cardDateStatus)}
+              placement='bottom-start'
+              slotProps={{
+                popper: {
+                  modifiers: [
+                    {
+                      name: 'offset',
+                      options: {
+                        offset: [18, -12]
+                      }
+                    }
+                  ]
                 }
-              ]
-            }
-          }}
-        >
-          <Box sx={{ margin: '10px 20px 0 0' }}>
-            <h2 style={{ color: colors.text }} className='mb-2 text-xs font-bold'>
-              {startDate && !dueDate ? 'Start date' : 'Dates'}
-            </h2>
-            <Box className='flex flex-row gap-2'>
-              {!(startDate && !dueDate) && (
-                <input
-                  type='checkbox'
-                  style={{ background: 'transparent' }}
-                  className='cursor-pointer'
-                  onClick={handleCheckboxClick}
-                />
-              )}
-              <Box
-                ref={boxRef}
-                sx={{
-                  boxsizing: 'content-box',
-                  width: 'fit-content',
-                  height: 32,
-                  bgcolor: colors.button,
-                  padding: '0px 12px 0 12px',
-                  color: colors.text,
-                  '&:hover': {
-                    bgcolor: colors.button_hover
-                  }
-                }}
-                className='flex cursor-pointer flex-row flex-wrap items-center gap-2 rounded'
-                onClick={() => {
-                  setAnchorEl(boxRef.current)
-                  handleOpenModal()
-                }}
-              >
-                <p className='text-sm font-semibold'>{datesText}</p>
-                <Box
-                  sx={{ width: 'fit-content', height: 24, color: colors.text }}
-                  className='flex items-center justify-center gap-2 text-sm'
-                >
-                  {cardDateStatus !== '' && <StatusTag cardDateStatus={cardDateStatus} />}
-                  <FontAwesomeIcon icon={faChevronDown} />
+              }}
+            >
+              <Box sx={{ margin: '10px 20px 0 0' }}>
+                <h2 style={{ color: colors.text }} className='mb-2 text-xs font-bold'>
+                  {startDate && !dueDate ? 'Start date' : 'Dates'}
+                </h2>
+                <Box className='flex flex-row gap-2'>
+                  {!(startDate && !dueDate) && (
+                    <input
+                      type='checkbox'
+                      style={{ background: 'transparent' }}
+                      className='cursor-pointer'
+                      onClick={handleCheckboxClick}
+                    />
+                  )}
+                  <Box
+                    ref={boxRef}
+                    sx={{
+                      boxsizing: 'content-box',
+                      width: 'fit-content',
+                      height: 32,
+                      bgcolor: colors.button,
+                      padding: '0px 12px 0 12px',
+                      color: colors.text,
+                      '&:hover': {
+                        bgcolor: colors.button_hover
+                      }
+                    }}
+                    className='flex cursor-pointer flex-row flex-wrap items-center gap-2 rounded'
+                    onClick={() => {
+                      setAnchorEl(boxRef.current)
+                      handleOpenModal()
+                    }}
+                  >
+                    <p className='text-sm font-semibold'>{datesText}</p>
+                    <Box
+                      sx={{ width: 'fit-content', height: 24, color: colors.text }}
+                      className='flex items-center justify-center gap-2 text-sm'
+                    >
+                      {cardDateStatus !== '' && <StatusTag cardDateStatus={cardDateStatus} />}
+                      <FontAwesomeIcon icon={faChevronDown} />
+                    </Box>
+                  </Box>
                 </Box>
+                {isOpenModal && (
+                  <SelectCardDatesModal
+                    anchorEl={anchorEl}
+                    cardlistId={cardlistId}
+                    cardId={cardId}
+                    currentCard={currentCard}
+                    setCurrentCard={setCurrentCard}
+                    handleClose={handleCloseModal}
+                  />
+                )}
               </Box>
-            </Box>
-            {isOpenModal && (
-              <SelectCardDatesModal
-                anchorEl={anchorEl}
-                currentCard={currentCard}
-                setCurrentCard={setCurrentCard}
-                handleClose={handleCloseModal}
-              />
-            )}
-          </Box>
-        </Tooltip>
+            </Tooltip>
+          )}
+        </Box>
       )}
-    </Box>
+    </React.Fragment>
   )
 }
