@@ -17,13 +17,19 @@ export default function WorkSpaces() {
     getALlWorkspace()
   }, [getALlWorkspace])
 
-  const listWorkspaceData = workspaceData?.data
-  const listWorkspaceNotGuestData = workspaceData?.data.filter((workspace) =>
-    workspace.members.some((member) => member.role !== 'guest')
-  )
-  const listWorkspaceGuestData = workspaceData?.data.filter((workspace) =>
-    workspace.members.some((member) => member.role === 'guest')
-  )
+  const listWorkspaceData = !workspaceData?.data
+    ? []
+    : [
+        ...workspaceData.data.admin,
+        ...workspaceData.data.guest,
+        ...workspaceData.data.member,
+        ...workspaceData.data.guest
+      ]
+  const listWorkspaceNotGuestData = !workspaceData?.data
+    ? []
+    : [...workspaceData.data.admin, ...workspaceData.data.guest, ...workspaceData.data.member]
+
+  const listWorkspaceGuestData = workspaceData?.data.guest || []
 
   const handleToggle = () => {
     setOpen((prevOpen) => !prevOpen)

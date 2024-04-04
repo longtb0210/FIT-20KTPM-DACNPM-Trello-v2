@@ -15,7 +15,7 @@ export default function HomePage() {
   const [getALlBoard, { data: boardData }] = BoardApiRTQ.BoardApiSlice.useLazyGetAllBoardQuery()
   React.useEffect(() => {
     getALlBoard().then((a) => console.log(a))
-  }, [getALlBoard])
+  }, [])
   console.log(boardData?.data)
 
   const [starred, setStarred] = useState(false)

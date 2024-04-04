@@ -3,20 +3,22 @@ import StarBorderIcon from '@mui/icons-material/StarBorder'
 import { useTheme } from '~/components/Theme/themeContext'
 import { WorkspaceApiRTQ } from '~/api'
 import React from 'react'
+import { DbSchemas } from '@trello-v2/shared'
 
 interface ProjectTileProps {
-  boardData: Record<string, any>
+  boardData: DbSchemas.BoardSchema.Board
 }
 
 const ProjectTile: React.FC<ProjectTileProps> = ({ boardData }) => {
   const { colors } = useTheme()
   const [isStar, setIsStar] = useState(false) // State để theo dõi hover của icon
   const [isHovered, setIsHovered] = useState(false) // State để theo dõi hover của ProjectTile
-  const [getWorkspaceById, { data: workspaceData }] = WorkspaceApiRTQ.WorkspaceApiSlice.useLazyGetWorkspaceByIdQuery()
+  const [getWorkspaceById, { data: workspaceData }] =
+    WorkspaceApiRTQ.WorkspaceApiSlice.useLazyGetAllWorkspaceByEmailQuery()
 
   React.useEffect(() => {
-    getWorkspaceById(boardData.workspace_id)
-  }, [boardData.workspace_id, getWorkspaceById])
+    getWorkspaceById({ email: boardData.workspace_id })
+  }, [boardData])
 
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   function handleIconClick(): void {
@@ -52,7 +54,7 @@ const ProjectTile: React.FC<ProjectTileProps> = ({ boardData }) => {
             className='mt-0 block overflow-hidden text-ellipsis whitespace-nowrap text-xs font-normal leading-3 text-gray-700'
             style={{ color: colors.text }}
           >
-            {workspaceData?.data[0].description}
+            {workspaceData?.data.owner[0]?.description || 'No desc found'}
           </span>
         </span>
       </a>

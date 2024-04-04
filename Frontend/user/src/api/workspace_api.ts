@@ -1,6 +1,6 @@
 import { createApi, fetchBaseQuery } from '@reduxjs/toolkit/query/react'
 import { TrelloApi } from '@trello-v2/shared'
-import { token } from './getInfo'
+import { RootState } from '~/store'
 
 interface InviteMembers2WorkspaceRequestWithId extends TrelloApi.WorkspaceApi.InviteMembers2WorkspaceRequest {
   id: string | undefined
@@ -10,8 +10,12 @@ const WorkspaceApiSlice = createApi({
   reducerPath: 'WorkspaceApi',
   baseQuery: fetchBaseQuery({
     baseUrl: import.meta.env.VITE_URL_API,
-    headers: {
-      Authorization: `Bearer ${token}`
+    prepareHeaders: (headers, { getState }) => {
+      const token = (getState() as RootState).KC_TOKEN?.acessToken
+      if (token) {
+        headers.set('authorization', `Bearer ${token}`)
+      }
+      return headers
     }
   }),
   endpoints: (builder) => ({
@@ -27,13 +31,13 @@ const WorkspaceApiSlice = createApi({
     }),
     getAllWorkspace: builder.query<TrelloApi.WorkspaceApi.WorspaceListByEmailResponse, void>({
       query: () => ({
-        url: '/api/workspace/all/lethuynga1662002@gmail.com',
+        url: '/api/workspace/all',
         method: 'GET'
       })
     }),
     getAllWorkspaceByEmail: builder.query<TrelloApi.WorkspaceApi.WorspaceListByEmailResponse, { email: string }>({
       query: ({ email }) => ({
-        url: `/api/workspace/all/${email}`,
+        url: `/api/workspace/all/`,
         method: 'GET'
       })
     }),
