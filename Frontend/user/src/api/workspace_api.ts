@@ -74,7 +74,10 @@ const WorkspaceApiSlice = createApi({
         }
       }
     }),
-    changeWorkspaceVisibility: builder.mutation<void, TrelloApi.WorkspaceApi.ChangeWorkspaceVisibilityRequest>({
+    changeWorkspaceVisibility: builder.mutation<
+      TrelloApi.WorkspaceApi.WorspaceResponse,
+      TrelloApi.WorkspaceApi.ChangeWorkspaceVisibilityRequest
+    >({
       query: (data) => ({
         url: `/api/workspace/visibility`,
         method: 'PUT',
