@@ -16,7 +16,7 @@ import { AuthContext } from '~/components/AuthProvider/AuthProvider'
 export const Navigation = () => {
   const authContext = useContext(AuthContext)
   // const isLoggedIn = authContext?.isLoggedIn
-  const isLoggedIn = true
+  const isLoggedIn = !!authContext?.isLoggedIn
 
   return (
     <Routes>
