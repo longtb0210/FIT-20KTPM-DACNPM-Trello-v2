@@ -1,5 +1,6 @@
 import { createApi, fetchBaseQuery } from '@reduxjs/toolkit/query/react'
 import { TrelloApi } from '@trello-v2/shared'
+
 import { token } from './getInfo'
 
 interface InviteMembers2WorkspaceRequestWithId extends TrelloApi.WorkspaceApi.InviteMembers2WorkspaceRequest {
@@ -16,8 +17,8 @@ const WorkspaceApiSlice = createApi({
   }),
   endpoints: (builder) => ({
     createWorkspace: builder.mutation<
-      TrelloApi.WorkspaceApi.WorspaceResponse,
-      TrelloApi.WorkspaceApi.CreateWorspaceRequest
+      TrelloApi.WorkspaceApi.WorkspaceResponse,
+      TrelloApi.WorkspaceApi.CreateWorkspaceRequest
     >({
       query: (data) => ({
         url: '/api/workspace',
@@ -25,26 +26,26 @@ const WorkspaceApiSlice = createApi({
         method: 'POST'
       })
     }),
-    getAllWorkspace: builder.query<TrelloApi.WorkspaceApi.WorspaceListByEmailResponse, void>({
+    getAllWorkspace: builder.query<TrelloApi.WorkspaceApi.WorkspaceListByEmailResponse, void>({
       query: () => ({
         url: '/api/workspace/all/lethuynga1662002@gmail.com',
         method: 'GET'
       })
     }),
-    getAllWorkspaceByEmail: builder.query<TrelloApi.WorkspaceApi.WorspaceListByEmailResponse, { email: string }>({
+    getAllWorkspaceByEmail: builder.query<TrelloApi.WorkspaceApi.WorkspaceListByEmailResponse, { email: string }>({
       query: ({ email }) => ({
         url: `/api/workspace/all/${email}`,
         method: 'GET'
       })
     }),
-    getOwnerWorkspacebyEmail: builder.query<TrelloApi.WorkspaceApi.WorspaceResponse, { email: string }>({
+    getOwnerWorkspacebyEmail: builder.query<TrelloApi.WorkspaceApi.WorkspaceResponse, { email: string }>({
       query: ({ email }) => ({
         url: `/api/workspace/role/owner/${email}`,
         method: 'GET'
       })
     }),
     updateWorkspace: builder.mutation<
-      TrelloApi.WorkspaceApi.WorspaceResponse,
+      TrelloApi.WorkspaceApi.WorkspaceResponse,
       TrelloApi.WorkspaceApi.UpdateWorkspaceInfoRequest
     >({
       query: (data) => ({
@@ -53,14 +54,14 @@ const WorkspaceApiSlice = createApi({
         body: data
       })
     }),
-    getWorkspaceInfo: builder.query<TrelloApi.WorkspaceApi.WorspaceResponse, { id: string }>({
+    getWorkspaceInfo: builder.query<TrelloApi.WorkspaceApi.WorkspaceResponse, { id: string }>({
       query: ({ id }) => ({
         url: `/api/workspace/${id}`,
         method: 'GET'
       })
     }),
     inviteMember2Workspace: builder.mutation<
-      TrelloApi.WorkspaceApi.WorspaceResponse,
+      TrelloApi.WorkspaceApi.WorkspaceResponse,
       InviteMembers2WorkspaceRequestWithId
     >({
       query: (data) => {
@@ -81,7 +82,7 @@ const WorkspaceApiSlice = createApi({
         body: { data }
       })
     }),
-    deleteWorkspace: builder.mutation<TrelloApi.WorkspaceApi.WorspaceResponse, { workspace_id: string }>({
+    deleteWorkspace: builder.mutation<TrelloApi.WorkspaceApi.WorkspaceResponse, { workspace_id: string }>({
       query: (data) => ({
         url: `/api/workspace/${data.workspace_id}`,
         method: 'DELETE'

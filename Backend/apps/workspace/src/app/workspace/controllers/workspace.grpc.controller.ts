@@ -23,7 +23,7 @@ export class WorkspaceGrpcController {
   }
 
   @GrpcMethod('WorkspaceController', 'getAllWorkspacesByEmail')
-  async getAllWorkspacesByEmail(@AuthenticatedUser() user: UserInfoDto): Promise<TrelloApi.WorkspaceApi.WorspaceListByEmailResponse> {
+  async getAllWorkspacesByEmail(@AuthenticatedUser() user: UserInfoDto): Promise<TrelloApi.WorkspaceApi.WorkspaceListByEmailResponse> {
     const email = user.email
 
     const owner = (await this.workspaceService.getOwnerWorkspacesByEmail(email)) ?? []
@@ -44,7 +44,7 @@ export class WorkspaceGrpcController {
   @GrpcMethod('WorkspaceController', 'getWorkspaceById')
   async getWorkspaceById(
     @ValidateGrpcInput(TrelloApi.WorkspaceApi.WorkspaceIdRequestSchema.safeParse) id: string,
-  ): Promise<TrelloApi.WorkspaceApi.WorspaceResponse> {
+  ): Promise<TrelloApi.WorkspaceApi.WorkspaceResponse> {
     const workspace = await this.workspaceService.getWorkspaceById(id)
 
     return { data: workspace }
@@ -104,8 +104,8 @@ export class WorkspaceGrpcController {
   async createWorkspace(
     @AuthenticatedUser() user: UserInfoDto,
     @ValidateGrpcInput(TrelloApi.WorkspaceApi.CreateWorkspaceRequestSchema.safeParse)
-    body: TrelloApi.WorkspaceApi.CreateWorspaceRequest,
-  ): Promise<TrelloApi.WorkspaceApi.WorspaceResponse> {
+    body: TrelloApi.WorkspaceApi.CreateWorkspaceRequest,
+  ): Promise<TrelloApi.WorkspaceApi.WorkspaceResponse> {
     const workspaceData = await this.workspaceService.createWorkspace(body, user.email)
 
     if (!workspaceData._id) throw new InternalServerErrorException("Can't create workspace")
@@ -120,7 +120,7 @@ export class WorkspaceGrpcController {
     @AuthenticatedUser() user: UserInfoDto,
     @ValidateGrpcInput(TrelloApi.WorkspaceApi.UpdateWorkspaceInfoRequestSchema.safeParse)
     body: TrelloApi.WorkspaceApi.UpdateWorkspaceInfoRequest,
-  ): Promise<TrelloApi.WorkspaceApi.WorspaceResponse> {
+  ): Promise<TrelloApi.WorkspaceApi.WorkspaceResponse> {
     const workspaceUpdated = await this.workspaceService.updateWorkspaceInfo(body, user)
 
     if (!workspaceUpdated) throw new InternalServerErrorException("Can't update workspace infomation")
@@ -133,7 +133,7 @@ export class WorkspaceGrpcController {
     @AuthenticatedUser() user: UserInfoDto,
     @ValidateGrpcInput(TrelloApi.WorkspaceApi.ChangeWorkspaceVisibilityRequestSchema.safeParse)
     body: TrelloApi.WorkspaceApi.ChangeWorkspaceVisibilityRequest,
-  ): Promise<TrelloApi.WorkspaceApi.WorspaceResponse> {
+  ): Promise<TrelloApi.WorkspaceApi.WorkspaceResponse> {
     const workspaceUpdated = await this.workspaceService.changeWorkspaceVisibility(body, user)
 
     if (!workspaceUpdated) throw new InternalServerErrorException("Can't update workspace's visibility")
@@ -159,7 +159,7 @@ export class WorkspaceGrpcController {
     @ValidateGrpcInput(TrelloApi.WorkspaceApi.InviteMembers2WorkspaceRequestSchema.safeParse)
     body: TrelloApi.WorkspaceApi.InviteMembers2WorkspaceRequest,
     @ValidateGrpcInput(TrelloApi.WorkspaceApi.WorkspaceIdRequestSchema.safeParse) id: string,
-  ): Promise<TrelloApi.WorkspaceApi.WorspaceResponse> {
+  ): Promise<TrelloApi.WorkspaceApi.WorkspaceResponse> {
     const res = await this.workspaceService.inviteMembers2Workspace(body, user, id)
 
     return {
