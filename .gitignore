@@ -11,3 +11,4 @@ node_modules
 dist
 .env
 protos/builds
+*.license.txt
