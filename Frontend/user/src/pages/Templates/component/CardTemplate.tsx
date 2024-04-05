@@ -19,27 +19,18 @@ import {
 
 function CardTemplate() {
   const { darkMode, colors } = useTheme()
-  const [hovered, setHovered] = useState(false);
 
-    const handleMouseEnter = () => {
-        setHovered(true);
-    };
-
-    const handleMouseLeave = () => {
-        setHovered(false);
-    };
-
-    const buttonStyle: React.CSSProperties = {
-        backgroundColor: colors.button_hover,
-        color: colors.text,
-        transition: 'background-color 0.2s ease-in-out, color 0.2s ease-in-out'
-    };
+  const buttonStyle: React.CSSProperties = {
+      backgroundColor: colors.button_hover,
+      color: colors.text,
+      transition: 'background-color 0.2s ease-in-out, color 0.2s ease-in-out'
+  };
   return (
     <div 
       className='detail-card-container mx-4 w-full min-w-min max-w-screen-lg md:mx-auto'
       style={{
         backgroundColor: colors.background,
-        color: colors.text
+        color: colors.text,
       }}
     >
       <div className='features'>

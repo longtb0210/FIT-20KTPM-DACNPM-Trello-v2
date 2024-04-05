@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react'
-
+import { User } from '@trello-v2/shared/src/schemas/User'
 import { Menu, MenuItem, SubMenu } from 'react-pro-sidebar'
 import { Box, Typography } from '@mui/material'
 import { faTrello } from '@fortawesome/free-brands-svg-icons'
@@ -27,9 +27,13 @@ const menuItems = [
   'Team management'
 ]
 
-function SidebarTemplate() {
-  const [getAllWorkspace, { data: workspaceData }] = WorkspaceApiRTQ.WorkspaceApiSlice.useLazyGetAllWorkspaceQuery()
+interface ProfileProps {
+  userInfo: User | undefined
+}
 
+const SidebarTemplate: React.FC<ProfileProps> = ({ userInfo }) => {
+  const [email, setEmail] = useState<string>(userInfo?.email || '')
+  const [getAllWorkspace, {data:workspaceData}] = WorkspaceApiRTQ.WorkspaceApiSlice.useLazyGetAllWorkspaceByEmailQuery()
   const [activeItem, setActiveItem] = useState<string | null>(null)
   const [hoveredItem, setHoveredItem] = useState<string | null>(null)
   const { darkMode, colors } = useTheme()
@@ -67,15 +71,14 @@ function SidebarTemplate() {
   ))
 
   React.useEffect(() => {
-    getAllWorkspace().then((v) => console.log(v))
-  }, [])
+    getAllWorkspace({ email }).then((v:any) => console.log(v))
+  }, [email])
 
   console.log(workspaceData)
 
   return (
     <div
-      className='detail-sidebar-container max-h-95vh fixed max-h-screen overflow-y-auto pl-20 pt-2 text-sm'
-      style={{ width: '20vw' }}
+      className='detail-sidebar-container max-h-95vh fixed max-h-screen overflow-y-auto pt-2 text-sm'
     >
       <Menu style={{ backgroundColor: colors.background, color: colors.text }}>
         <MenuItem

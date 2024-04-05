@@ -27,7 +27,7 @@ const WorkspaceApiSlice = createApi({
     }),
     getAllWorkspace: builder.query<TrelloApi.WorkspaceApi.WorspaceListByEmailResponse, void>({
       query: () => ({
-        url: '/api/workspace/all/lethuynga1662002@gmail.com',
+        url: '/api/workspace/all/long@gmail.com',
         method: 'GET'
       })
     }),
