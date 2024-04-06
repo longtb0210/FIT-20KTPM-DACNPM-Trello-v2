@@ -2,14 +2,44 @@ import { useTheme } from '~/components/Theme/themeContext'
 import { IoMdClose } from 'react-icons/io'
 import { useState } from 'react'
 import { IoIosArrowBack } from 'react-icons/io'
+import { Box, FormControl, Grid, MenuItem, Popover, Select, SelectChangeEvent } from '@mui/material'
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
+import { faList, faLocationDot, faXmark } from '@fortawesome/free-solid-svg-icons'
+
+import { faFlipboard } from '@fortawesome/free-brands-svg-icons'
+
+import { Card } from '@trello-v2/shared/src/schemas/CardList'
+import { SidebarButtonMove } from '~/components/CardDetailWindow/sidebar/CardMoveSidebar'
+import { ButtonType } from '~/components/CardDetailWindow/sidebar/CardSidebarButton'
+import { testCard } from '~/components/CardDetailWindow/test_data'
 interface ListSettingProps {
   closeListSetting: () => void
 }
-
+const boardChoices: string[] = ['Project Trello', 'Front-end', 'Back-end']
+const listChoices: string[] = ['To do', 'Doing', 'Done', 'Week 1', 'Week 2']
+const positionChoices: string[] = ['1', '2', '3', '4']
 export default function ListSetting({ closeListSetting }: ListSettingProps) {
   const { colors, darkMode } = useTheme()
   const [openMoveList, setOpenMoveList] = useState<boolean>(false)
   const [openCopyList, setOpenCopyList] = useState<boolean>(false)
+  const menuItemFontSize = 14
+  const [selectedBoard, setSelectedBoard] = useState('Project Trello')
+  const [selectedList, setSelectedList] = useState('Doing')
+  const [selectedPosition, setSelectedPosition] = useState('3')
+  const [_currentCardState,_setCurrentCardState] = useState<Card>(testCard)
+  function handleSelectBoard(event: SelectChangeEvent) {
+    event.preventDefault()
+    setSelectedBoard(event.target.value as string)
+  }
+
+  function handleSelectList(event: SelectChangeEvent) {
+    setSelectedList(event.target.value as string)
+  }
+
+  function handleSelectPosition(event: SelectChangeEvent) {
+    event.stopPropagation()
+    setSelectedPosition(event.target.value as string)
+  }
   const handleBack = () => {
     setOpenMoveList(false)
     setOpenCopyList(false)
@@ -78,8 +108,8 @@ export default function ListSetting({ closeListSetting }: ListSettingProps) {
           </div>
         )}
         {openMoveList && (
-          <div className={`w-full px-2`}>
-            <div>
+          <div className={`relative w-full px-2`}>
+            {/* <div>
               <div className={`mb-3  mt-1 space-y-1`}>
                 <div
                   className={`flex cursor-pointer flex-col  justify-center rounded px-2 py-1 ${
@@ -111,7 +141,95 @@ export default function ListSetting({ closeListSetting }: ListSettingProps) {
               }}
             >
               Move
-            </button>
+            </button> */}
+
+            {/* <Box sx={{ width: 'fit-content', height: 20, marginBottom: '4px' }} className='flex flex-row items-center'>
+              <FontAwesomeIcon icon={faFlipboard} style={{ fontSize: 12 }} />
+              <p style={{ marginLeft: '6px', color: colors.text }} className='text-xs font-semibold'>
+                Board
+              </p>
+            </Box>
+            <FormControl fullWidth className='flex flex-col'>
+              <Box sx={{ width: '100%', height: 'fit-content' }}>
+                <Select
+                  sx={{
+                    width: '100%',
+                    height: 36,
+                    margin: '0 0 8px 0',
+                    fontSize: 14,
+                    background: colors.background_modal,
+                    color: colors.text
+                  }}
+                  value={selectedBoard}
+                  onChange={handleSelectBoard}
+                  MenuProps={{
+                    PaperProps: {
+                      style: {
+                        maxHeight: 144,
+                        marginTop: 8,
+                        background: colors.background_modal,
+                        color: colors.text
+                      }
+                    }
+                  }}
+                >
+                  {boardChoices.map((choice, index) => (
+                    <MenuItem key={index} value={choice} sx={{ fontSize: menuItemFontSize }}>
+                      {choice}
+                    </MenuItem>
+                  ))}
+                </Select>
+              </Box>
+            </FormControl>
+
+            <Grid item xs={5}>
+              <Box
+                sx={{ width: 'fit-content', height: 20, marginBottom: '4px' }}
+                className='flex flex-row items-center'
+              >
+                <FontAwesomeIcon icon={faLocationDot} style={{ fontSize: 12 }} />
+                <p style={{ marginLeft: '6px', color: colors.text }} className='text-xs font-semibold'>
+                  Position
+                </p>
+              </Box>
+              <FormControl fullWidth className='flex flex-col'>
+                <Select
+                  sx={{
+                    width: '100%',
+                    height: 36,
+                    margin: '0 0 8px 0',
+                    fontSize: 14,
+                    background: colors.background_modal,
+                    color: colors.text
+                  }}
+                  value={selectedPosition}
+                  onChange={handleSelectPosition}
+                  MenuProps={{
+                    PaperProps: {
+                      style: {
+                        maxHeight: 144,
+                        marginTop: 8,
+                        background: colors.background_modal,
+                        color: colors.text
+                      }
+                    }
+                  }}
+                >
+                  {positionChoices.map((choice, index) => (
+                    <MenuItem key={index} value={choice} sx={{ fontSize: menuItemFontSize }}>
+                      {choice}
+                    </MenuItem>
+                  ))}
+                </Select>
+              </FormControl>
+
+      
+            </Grid> */}
+            <SidebarButtonMove
+              type={ButtonType.Move}
+              currentCard={_currentCardState}
+              setCurrentCard={_setCurrentCardState}
+            />
           </div>
         )}
         {!openCopyList && !openMoveList && (

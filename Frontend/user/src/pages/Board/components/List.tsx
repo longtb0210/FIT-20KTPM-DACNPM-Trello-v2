@@ -93,7 +93,8 @@ export default function ListComponent({
     createCard({
       name: newCardName,
       cardlist_id: list._id,
-      index: index
+      index: index,
+      created_at: new Date()
     }).then(() => {
       setAddCardOpenAt('')
       setNewCardName('')
