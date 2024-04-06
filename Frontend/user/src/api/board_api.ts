@@ -31,6 +31,12 @@ const BoardApiSlice = createApi({
         method: 'GET'
       })
     }),
+    getBoardByWorkspaceId: builder.query<TrelloApi.BoardApi.getBoardsByWorkspaceIdResponse, { workspaceId: string | undefined }>({
+      query: ({workspaceId}) => ({
+        url: `/api/board/workspace/${workspaceId}`,
+        method: 'GET'
+      })
+    }),
     editBoardById: builder.mutation<TrelloApi.BoardApi.UpdateBoardResponse, TrelloApi.BoardApi.UpdateBoardRequest>({
       query: (data) => ({
         url: '/api/board',

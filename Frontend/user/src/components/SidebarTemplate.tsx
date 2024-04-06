@@ -205,7 +205,7 @@ const SidebarTemplate: React.FC<ProfileProps> = ({ userInfo }) => {
                 onMouseEnter={() => handleMouseEnter('workspace')}
                 onMouseLeave={() => handleMouseLeave()}
               >
-                <Link to={`/workspaceboard`}>
+                <Link to={`/workspace/${w._id}`}>
                   <MenuItem
                     style={{
                       height: '32px',
