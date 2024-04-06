@@ -21,7 +21,7 @@ export const AccountManagement: React.FC<AccountManagementProps> = ({ page }) =>
   }, [userInfoRes])
   useEffect(() => {
     getUserInfo({
-      email: '1@gmail.com'
+      email: 'tuitenteo1212@gmail.com'
     })
   }, [resetManually])
   useEffect(() => {

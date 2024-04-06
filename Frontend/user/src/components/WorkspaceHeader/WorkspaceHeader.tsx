@@ -9,6 +9,7 @@ import WorkspaceInfo from './WorkspaceInfo'
 import EditForm from './EditForm'
 import { WorkspaceApiRTQ } from '~/api'
 import { UpdateWorkspaceInfoRequest } from '@trello-v2/shared/dist/src/api/WorkspaceApi'
+import { workspace_id } from '~/api/getInfo'
 interface HeaderWpSetting {
   visibility: string | undefined
 }
@@ -16,7 +17,7 @@ interface HeaderWpSetting {
 export const WorkspaceHeader: React.FC<HeaderWpSetting> = ({ visibility }) => {
   const { colors, darkMode } = useTheme()
   const [workspaceInfo, setWorkspaceInfo] = useState<Workspace>()
-  const [visibilityState, setVisibilityState] = useState<string>('')
+  const [visibilityState, setVisibilityState] = useState<string | undefined>('')
   const [getWorkspaceInfo, { data: workspaceInfoRes }] =
     WorkspaceApiRTQ.WorkspaceApiSlice.useLazyGetWorkspaceInfoQuery()
   const [resetWorkspaceManually, setResetWorkspaceManually] = useState<boolean>(false)
@@ -32,13 +33,16 @@ export const WorkspaceHeader: React.FC<HeaderWpSetting> = ({ visibility }) => {
     members: []
   })
   useEffect(() => {
-    getWorkspaceInfo({ id: '6609a3b0e9b24bc694e69cf8' })
+    getWorkspaceInfo({ id: workspace_id })
   }, [resetWorkspaceManually])
   useEffect(() => {
+    setVisibilityState(visibility)
+  }, [visibility])
+  useEffect(() => {
     setWorkspaceInfo(workspaceInfoRes?.data)
-    console.log('My workspace123',workspaceInfoRes?.data)
+    console.log('My workspace123', workspaceInfoRes?.data)
     setFormData({
-      _id: '6609a3b0e9b24bc694e69cf8',
+      _id: workspace_id,
       name: workspaceInfoRes?.data.name,
       short_name: workspaceInfoRes?.data.short_name,
       description: workspaceInfoRes?.data.description,
@@ -72,7 +76,7 @@ export const WorkspaceHeader: React.FC<HeaderWpSetting> = ({ visibility }) => {
             <LogoSection />
             <WorkspaceInfo
               workspaceName={workspaceInfo?.name}
-              visibility={workspaceInfo?.visibility}
+              visibility={visibilityState}
               handleEditClick={handleEditClick}
             />
           </>
