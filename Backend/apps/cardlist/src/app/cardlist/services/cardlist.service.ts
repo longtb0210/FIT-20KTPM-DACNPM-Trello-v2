@@ -61,6 +61,7 @@ export class CardlistService implements ICardlistService {
 
   async copyCardlist(data: TrelloApi.CardlistApi.CopyCardlistRequest): Promise<DbSchemas.CardlistSchema.CardList> {
     const existingCardList = await this.CardlistMModel.findById(data._id)
+    const lengthCardlist = (await this.CardlistMModel.find({ board_id: existingCardList.board_id }).exec()).length
     if (!existingCardList) {
       return { status: 'Not Found', msg: "Can't find any cardlist" } as any
     }
@@ -68,12 +69,28 @@ export class CardlistService implements ICardlistService {
     if (!watcher_list.includes(data.created_by)) {
       watcher_list.push(data.created_by)
     }
+    const newCards = []
+    for (const card of existingCardList.cards) {
+      const newCard = new this.CardMModel({
+        name: card.name,
+        index: card.index,
+        watcher_email: card.watcher_email,
+        archive_at: null,
+        activities: card.activities,
+        features: card.features,
+        cover: card.cover,
+        description: card.description,
+        created_at: new Date(),
+      })
+      await newCard.save()
+      newCards.push(newCard)
+    }
     const newCardList = new this.CardlistMModel({
       name: existingCardList.name,
       board_id: existingCardList.board_id,
-      cards: existingCardList.cards,
+      cards: newCards,
       watcher_email: watcher_list,
-      index: existingCardList.index,
+      index: lengthCardlist,
       archive_at: null,
       created_at: new Date(),
     })
@@ -110,6 +127,34 @@ export class CardlistService implements ICardlistService {
       cardlist.index = data.index
     }
     return cardlist.save()
+  }
+
+  async moveCardlistInBoard(data: TrelloApi.CardlistApi.MoveCardlistInBoardRequest): Promise<DbSchemas.CardlistSchema.CardList> {
+    const updated_cardlist = await this.CardlistMModel.findById(data._id)
+    const cardlists = await this.CardlistMModel.find({ board_id: updated_cardlist.board_id }).exec()
+    if (!updated_cardlist) {
+      return { status: 'Not Found', msg: "Can't find any updated_cardlist" } as any
+    }
+    if (updated_cardlist.index < data.index) {
+      for (let i = 0; i < cardlists.length; i++) {
+        if (cardlists[i].index <= data.index) {
+          cardlists[i].index -= 1
+          await cardlists[i].save()
+        }
+      }
+    } else if (updated_cardlist.index > data.index) {
+      for (let i = 0; i < cardlists.length; i++) {
+        if (cardlists[i].index >= data.index) {
+          cardlists[i].index += 1
+          await cardlists[i].save()
+        }
+      }
+    }
+
+    if (data.index) {
+      updated_cardlist.index = data.index
+    }
+    return updated_cardlist.save()
   }
 
   async moveAllCards(data: TrelloApi.CardlistApi.MoveAllCardsRequest): Promise<DbSchemas.CardlistSchema.CardList> {

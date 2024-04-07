@@ -72,6 +72,21 @@ export const MoveCardlistRequestSchema = CardlistSchema.omit({
   })
 );
 export type MoveCardlistRequest = z.infer<typeof MoveCardlistRequestSchema>;
+export const MoveCardlistInBoardRequestSchema = CardlistSchema.omit({
+  board_id: true,
+  name: true,
+  cards: true,
+  watcher_email: true,
+  created_at: true,
+  archive_at: true,
+}).merge(
+  z.object({
+    index: z.number(),
+  })
+);
+export type MoveCardlistInBoardRequest = z.infer<
+  typeof MoveCardlistInBoardRequestSchema
+>;
 
 export const MoveAllCardsRequestSchema = z.object({
   cardlist_input_id: z
@@ -163,6 +178,12 @@ export const MoveCardlistResponseSchema = z.object({
   data: CardlistSchema,
 });
 export type MoveCardlistResponse = z.infer<typeof MoveCardlistResponseSchema>;
+export const MoveCardlistInBoardResponseSchema = z.object({
+  data: CardlistSchema,
+});
+export type MoveCardlistInBoardResponse = z.infer<
+  typeof MoveCardlistInBoardResponseSchema
+>;
 export const MoveAllCardsResponseSchema = z.object({
   data: CardlistSchema,
 });

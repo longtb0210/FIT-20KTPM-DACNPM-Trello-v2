@@ -256,6 +256,20 @@ export const CardlistRoutes = {
     },
     // jwtSecure: false,
   } as IRouteParams,
+  moveCardlistInBoard: {
+    path: '/move_cardlists_in_board',
+    method: RequestMethod.PUT,
+    swaggerInfo: {
+      body: { schema: { $ref: getSchemaPath('MoveCardlistInBoardRequestSchema') } },
+      responses: [
+        {
+          status: 200,
+          schema: { $ref: getSchemaPath('MoveCardlistInBoardResponseSchema') },
+        },
+      ],
+    },
+    // jwtSecure: false,
+  } as IRouteParams,
   moveAllCards: {
     path: '/move_all_cards',
     method: RequestMethod.PUT,
