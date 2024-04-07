@@ -19,7 +19,12 @@
     "Frontend/user",
     "packages/shared"
   ],
-  "dependencies": {},
+  "dependencies": {
+    "@nestjs/graphql": "^12.1.1",
+    "apollo-server-express": "^3.13.0",
+    "graphql": "^16.8.1",
+    "graphql-tools": "^9.0.1"
+  },
   "devDependencies": {
     "@rollup/plugin-commonjs": "^25.0.7",
     "rimraf": "^5.0.5"
