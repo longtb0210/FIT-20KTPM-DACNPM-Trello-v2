@@ -31,9 +31,13 @@ export const ActivityComponent: React.FC<ActivityProps> = ({ userInfo }) => {
     getAllWorkspace()
   }, [])
   useEffect(() => {
-    setWorkspace(
-      workspaceData?.data.owner.concat(workspaceData?.data.admin, workspaceData?.data.member, workspaceData?.data.guest)
+    const data = workspaceData?.data.owner.concat(
+      workspaceData?.data.admin,
+      workspaceData?.data.member,
+      workspaceData?.data.guest
     )
+    const uniqueWorkspaces = [...new Set(data)]
+    setWorkspace(uniqueWorkspaces)
   }, [workspaceData])
   function getActivity(data: Activity[], count: number) {
     if (count < data.length) return data.slice(0, count)

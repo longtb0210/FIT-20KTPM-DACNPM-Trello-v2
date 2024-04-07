@@ -45,6 +45,28 @@ export const CardListApiSlice = createApi({
           ...data
         }
       })
-    })
+    }),
+    moveCardList: build.mutation<TrelloApi.CardlistApi.MoveCardlistResponse, TrelloApi.CardlistApi.MoveCardlistRequest>(
+      {
+        query: (data) => ({
+          method: 'PUT',
+          url: '/api/cardlist/move',
+          body: {
+            ...data
+          }
+        })
+      }
+    ),
+    copyCardList: build.mutation<TrelloApi.CardlistApi.CopyCardlistResponse, TrelloApi.CardlistApi.CopyCardlistRequest>(
+      {
+        query: (data) => ({
+          method: 'POST',
+          url: '/api/cardlist/copy',
+          body: {
+            ...data
+          }
+        })
+      }
+    )
   })
 })

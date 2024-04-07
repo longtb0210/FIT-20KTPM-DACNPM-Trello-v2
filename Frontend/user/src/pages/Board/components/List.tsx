@@ -1,6 +1,6 @@
 import { UniqueIdentifier } from '@dnd-kit/core'
 import { CardComponent, ListSetting } from '.'
-import { ListComponentProps } from '../type'
+import { Card, List, ListComponentProps } from '../type'
 import { SortableContext, useSortable, verticalListSortingStrategy } from '@dnd-kit/sortable'
 import { CSS } from '@dnd-kit/utilities'
 import { useEffect, useRef, useState } from 'react'
@@ -22,6 +22,7 @@ export default function ListComponent({
   setResetManually,
   resetManually
 }: ListComponentProps) {
+  const [cardsData, setCardsData] = useState<Card[]>([])
   const [createCard] = CardApiRTQ.CardApiSlice.useCreateCardMutation()
   const [updateCardList] = CardlistApiRTQ.CardListApiSlice.useUpdateCardListMutation()
   // const [getAllCardlist] = CardlistApiRTQ.CardListApiSlice.useLazyGetAllCardlistQuery()
@@ -33,6 +34,9 @@ export default function ListComponent({
   const [listName, setListName] = useState({ name: '', list_id: '' })
   const componentRef_AddCard = useRef<HTMLDivElement>(null)
   const componentRef_ListSetting = useRef<HTMLDivElement>(null)
+  useEffect(() => {
+    setCardsData(list.cards.sort((a, b) => (a.index ?? Infinity) - (b.index ?? Infinity)))
+  }, [list])
   useEffect(() => {
     const handleClickOutside_AddCard = (event: MouseEvent) => {
       if (componentRef_AddCard.current && !componentRef_AddCard.current.contains(event.target as Node)) {
@@ -156,7 +160,7 @@ export default function ListComponent({
       <div className={`relative max-h-[580px]  overscroll-contain`}>
         {listSettingOpen && listSettingOpen === list._id && (
           <div ref={componentRef_ListSetting}>
-            <ListSetting closeListSetting={() => setListSettingOpen('')} />
+            <ListSetting closeListSetting={() => setListSettingOpen('')} list={list} />
           </div>
         )}
         <div className={`my-1`}>

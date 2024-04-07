@@ -105,16 +105,12 @@ export const CardApiSlice = createApi({
         }
       })
     }),
-    moveCardDifList: build.mutation<
-      TrelloApi.CardApi.MoveCardSamelistResponse,
-      TrelloApi.CardApi.MoveCardSamelistRequest
-    >({
+    moveCard: build.mutation<TrelloApi.CardApi.MoveCardResponse, TrelloApi.CardApi.MoveCardRequest>({
       query: (data) => ({
         url: '/api/card/move',
-        method: 'PUT',
+        method: 'POST',
         body: {
           ...data
-          // cardlist_id: 'demo_cardlist'
         }
       })
     })
