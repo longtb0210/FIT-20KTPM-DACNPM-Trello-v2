@@ -32,6 +32,7 @@ import { CardApiRTQ, CardlistApiRTQ } from '../../api'
 import { TrelloApi } from '@trello-v2/shared'
 import { board_id } from '~/api/getInfo'
 import CardDetailWindow from '~/components/CardDetailWindow'
+import { useParams } from 'react-router-dom'
 const MOCK_CARD_DATA: TrelloApi.CardlistApi.GetallCardlistResponse = {
   data: [
     {
@@ -78,9 +79,12 @@ export function Board() {
   const [activeDragItemData, setActiveDragItemData] = useState<any>()
   const [openCardSetting, setOpenCardSetting] = useState<string>('')
   const [resetManually, setResetManually] = useState<boolean>(false)
-
   const [selectedCard, setSelectedCard] = useState<Card>()
-
+  const params = useParams()
+  const boardId = params.workspaceId
+  useEffect(() => {
+    console.log('boardspaceId: ', boardId)
+  })
   const [action, setAction] = useState<boolean>(false)
   useEffect(() => {
     console.log('My list: ', listsData)
@@ -121,7 +125,7 @@ export function Board() {
   )
   async function getAllList() {
     // getAllCardlist()
-    getCardListByBoardId({ id: board_id })
+    getCardListByBoardId({ id: boardId !== '123' ? boardId : board_id })
   }
   useEffect(() => {
     console.log('update list')
@@ -341,13 +345,16 @@ export function Board() {
 
         const oldIndex = listsData?.findIndex((data) => data._id === active.id)
         const newIndex = listsData?.findIndex((data) => data._id === over.id)
-        const newListsData = arrayMove(listsData, oldIndex, newIndex)
-        setListsData(newListsData)
         moveListAPI({
           board_id: board_id,
           index: newIndex,
           _id: active.id as string
         })
+        // console.log('old: ', oldIndex)
+        // console.log('new: ', newIndex)
+        const newListsData = arrayMove(listsData, oldIndex, newIndex)
+        setListsData(newListsData)
+
         setAction(!action)
       }
     }

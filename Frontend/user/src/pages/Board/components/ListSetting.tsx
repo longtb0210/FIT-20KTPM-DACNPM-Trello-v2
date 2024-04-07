@@ -26,6 +26,8 @@ export default function ListSetting({ closeListSetting, list }: ListSettingProps
   const [value, setValue] = useState<string>(list.name)
   const [isEmpty, setIsEmpty] = useState<boolean>(false)
   const [copyCardList] = CardlistApiRTQ.CardListApiSlice.useCopyCardListMutation()
+  const [archiveAllCard] = CardlistApiRTQ.CardListApiSlice.useArchiveAllCardInCardListMutation()
+  const [archiveCardList] = CardlistApiRTQ.CardListApiSlice.useArchiveCardListMutation()
   const [getAllCardlistByBoardId] = CardlistApiRTQ.CardListApiSlice.useLazyGetCardlistByBoardIdQuery()
   const handleChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     const newValue = event.target.value
@@ -57,6 +59,17 @@ export default function ListSetting({ closeListSetting, list }: ListSettingProps
     setOpenMoveList(false)
     setOpenCopyList(false)
     setOpenMoveAllCard(false)
+    setOpenArchiveAllCard(false)
+  }
+  const handleArchiveAllCardInCardList = () => {
+    archiveAllCard({
+      cardListId: list._id
+    }).then(() => getAllCardlistByBoardId({ id: list.board_id }))
+  }
+  const handleArchiveList = () => {
+    archiveCardList({
+      cardListId: list._id
+    }).then(() => getAllCardlistByBoardId({ id: list.board_id }))
   }
   return (
     <div
@@ -209,8 +222,10 @@ export default function ListSetting({ closeListSetting, list }: ListSettingProps
               the board, click “Menu” {'>'} “Archived Items.”
             </p>
             <button
-              // onClick={() => handleDeleteWorkspace()}
-
+              onClick={() => {
+                handleArchiveAllCardInCardList()
+                handleBack()
+              }}
               className={`mt-5 flex w-full items-center justify-center rounded px-5 py-[4px]
                 ${darkMode ? 'bg-[#f87168] text-gray-700 hover:bg-red-300' : 'bg-red-600 text-white hover:bg-red-700'}
           `}
@@ -263,7 +278,9 @@ export default function ListSetting({ closeListSetting, list }: ListSettingProps
               <hr className={`h-[1px] w-11/12 border-0 ${darkMode ? 'bg-gray-500' : 'bg-gray-300'}`}></hr>
             </div>
             <div className={``}>
-              <button className={`m-0 w-full p-2 text-left hover:bg-gray-200`}>Archive this list</button>
+              <button className={`m-0 w-full p-2 text-left hover:bg-gray-200`} onClick={() => handleArchiveList()}>
+                Archive this list
+              </button>
             </div>
           </>
         )}

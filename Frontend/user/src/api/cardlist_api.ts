@@ -67,6 +67,21 @@ export const CardListApiSlice = createApi({
           }
         })
       }
-    )
+    ),
+    archiveAllCardInCardList: build.mutation<
+      TrelloApi.CardlistApi.ArchiveAllCardsInListResponse,
+      { cardListId: string }
+    >({
+      query: ({ cardListId }) => ({
+        method: 'PATCH',
+        url: `/api/cardlist/archive_cards_in_list/${cardListId}`
+      })
+    }),
+    archiveCardList: build.mutation<TrelloApi.CardlistApi.ArchiveAllCardsInListResponse, { cardListId: string }>({
+      query: ({ cardListId }) => ({
+        method: 'PATCH',
+        url: `/api/cardlist/archive_card_list/${cardListId}`
+      })
+    })
   })
 })
