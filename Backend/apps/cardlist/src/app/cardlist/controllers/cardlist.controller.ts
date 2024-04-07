@@ -158,6 +158,16 @@ export class CardlistController {
       data: data,
     }
   }
+  @InjectRoute(CardlistRoutes.moveAllCards)
+  async moveAllCards(
+    @Body(new ZodValidationPipe(TrelloApi.CardlistApi.MoveAllCardsRequestSchema))
+    body: TrelloApi.CardlistApi.MoveAllCardsRequest,
+  ): Promise<TrelloApi.CardlistApi.MoveAllCardsResponse> {
+    const data = await this.cardlistService.moveAllCards(body)
+    return {
+      data: data,
+    }
+  }
 
   @InjectRoute(CardlistRoutes.archiveCardsInList)
   async archiveCardsInList(
