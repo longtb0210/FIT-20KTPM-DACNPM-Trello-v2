@@ -10,6 +10,9 @@ import { CardModule } from './app/card/card.module'
 import { APP_GUARD } from '@nestjs/core'
 import { AuthGuard, KeycloakConnectModule, ResourceGuard, RoleGuard } from 'nest-keycloak-connect'
 import { ServeStaticModule } from '@nestjs/serve-static'
+import { GraphQLModule } from '@nestjs/graphql'
+import { ApolloDriver, ApolloDriverConfig } from '@nestjs/apollo'
+import { join } from 'path'
 const EnvSchema = {
   PORT: Joi.number(),
   DB_CONN_STR: Joi.string().required(),
@@ -17,6 +20,10 @@ const EnvSchema = {
 
 @Module({
   imports: [
+    GraphQLModule.forRoot<ApolloDriverConfig>({
+      driver: ApolloDriver,
+      autoSchemaFile: join(process.cwd(), 'src/schema.gql'),
+    }),
     ConfigModule.forRoot({
       validationSchema: Joi.object().keys(EnvSchema),
       load: [configuration],

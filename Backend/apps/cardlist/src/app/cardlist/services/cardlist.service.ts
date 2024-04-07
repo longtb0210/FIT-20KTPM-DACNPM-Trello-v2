@@ -1,6 +1,7 @@
 import { Model } from 'mongoose'
 import { InjectModel } from '@nestjs/mongoose'
 import { DbSchemas, TrelloApi } from '@trello-v2/shared'
+import { Cardlist } from '../entity/cardlist.entity'
 
 export abstract class ICardlistService {
   abstract createCardlist(data: TrelloApi.CardlistApi.CreateCardlistRequest): Promise<DbSchemas.CardlistSchema.CardList>
@@ -39,6 +40,7 @@ export class CardlistService implements ICardlistService {
   constructor(
     @InjectModel(DbSchemas.COLLECTION_NAMES[0])
     private CardlistMModel: Model<DbSchemas.CardlistSchema.CardList>,
+    private CardlistMModelGraphQL: Model<Cardlist>,
     @InjectModel(DbSchemas.COLLECTION_NAMES[1])
     private BoardMModel: Model<DbSchemas.BoardSchema.Board>,
     @InjectModel(DbSchemas.COLLECTION_NAMES[5])
@@ -113,6 +115,9 @@ export class CardlistService implements ICardlistService {
 
   async getAllCardlist() {
     return this.CardlistMModel.find().exec()
+  }
+  async getAllCardlistGraphQL(): Promise<Cardlist[]> {
+    return this.CardlistMModelGraphQL.find()
   }
 
   async getAllCardlistByBoardId(board_id: string) {
