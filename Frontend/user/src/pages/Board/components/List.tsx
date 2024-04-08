@@ -115,12 +115,18 @@ export default function ListComponent({
     })
   }
   async function handleAddCardOnTop() {
-    createCardOnTop({
+    const index =
+      list.cards.length == 1 && list.cards[0].placeHolder
+        ? 0
+        : typeof list.cards[0].index === 'number'
+          ? list.cards[0].index - 1
+          : 0
+    createCard({
       name: newCardName,
       cardlist_id: list._id,
-      index: typeof list.cards[0].index === 'number' ? list.cards[0].index - 1 : 0,
+      index: index,
       description: '',
-      watcher_email: [],
+      created_at: new Date(),
       cover: ''
     }).then(() => {
       setAddCardOnTop('')
