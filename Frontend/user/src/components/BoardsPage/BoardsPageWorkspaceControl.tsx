@@ -5,8 +5,13 @@ import GridViewIcon from '@mui/icons-material/GridView'
 import Person2OutlinedIcon from '@mui/icons-material/Person2Outlined'
 import SettingsOutlinedIcon from '@mui/icons-material/SettingsOutlined'
 import { useTheme } from '../Theme/themeContext'
+import { Workspace } from '@trello-v2/shared/src/schemas/Workspace'
 
-export default function BoardsPageWorkspaceControl() {
+interface BoardsPageWorkspaceControlProps {
+  currentWorkspace: Workspace
+}
+
+export default function BoardsPageWorkspaceControl({ currentWorkspace }: BoardsPageWorkspaceControlProps) {
   const { colors } = useTheme()
   return (
     <Box className='flex flex-row items-center'>
@@ -19,13 +24,12 @@ export default function BoardsPageWorkspaceControl() {
           color: colors.text,
           textTransform: 'none',
           padding: '0 12px',
-          marginRight: '12px',
-          boxShadow: '0px 2px 2px rgba(0, 0, 0, 0.4)'
+          marginRight: '12px'
         }}
         className='flex cursor-pointer items-center justify-center rounded-md'
       >
-        <FontAwesomeIcon icon={faTrello} style={{ fontSize: 16, marginRight: '8px' }} />
-        <p style={{ fontSize: 14 }} className='font-semibold'>
+        <FontAwesomeIcon icon={faTrello} style={{ fontSize: 14, marginRight: '10px' }} />
+        <p style={{ fontSize: 14, marginBottom: '2px' }} className='font-semibold'>
           Boards
         </p>
       </Box>
@@ -38,13 +42,12 @@ export default function BoardsPageWorkspaceControl() {
           color: colors.text,
           textTransform: 'none',
           padding: '0 12px',
-          marginRight: '12px',
-          boxShadow: '0px 2px 2px rgba(0, 0, 0, 0.4)'
+          marginRight: '12px'
         }}
         className='flex cursor-pointer items-center justify-center rounded-md'
       >
-        <GridViewIcon style={{ fontSize: 18, marginRight: '8px' }} />
-        <p style={{ fontSize: 14 }} className='font-semibold'>
+        <GridViewIcon style={{ fontSize: 16, marginRight: '8px' }} />
+        <p style={{ fontSize: 14, marginBottom: '2px' }} className='font-semibold'>
           Views
         </p>
       </Box>
@@ -57,14 +60,13 @@ export default function BoardsPageWorkspaceControl() {
           color: colors.text,
           textTransform: 'none',
           padding: '0 12px',
-          marginRight: '12px',
-          boxShadow: '0px 2px 2px rgba(0, 0, 0, 0.4)'
+          marginRight: '12px'
         }}
         className='flex cursor-pointer items-center justify-center rounded-md'
       >
-        <Person2OutlinedIcon style={{ fontSize: 18, marginRight: '8px' }} />
-        <p style={{ fontSize: 14 }} className='font-semibold'>
-          Members
+        <Person2OutlinedIcon style={{ fontSize: 16, marginRight: '8px' }} />
+        <p style={{ fontSize: 14, marginBottom: '2px' }} className='font-semibold'>
+          Members ({currentWorkspace.members.length})
         </p>
       </Box>
       <Box
@@ -75,13 +77,12 @@ export default function BoardsPageWorkspaceControl() {
           '&:hover': { backgroundColor: colors.button_hover },
           color: colors.text,
           textTransform: 'none',
-          padding: '0 12px 0 8px',
-          boxShadow: '0px 2px 2px rgba(0, 0, 0, 0.4)'
+          padding: '0 12px 0 8px'
         }}
         className='flex cursor-pointer items-center justify-center rounded-md'
       >
-        <SettingsOutlinedIcon style={{ fontSize: 18, marginRight: '8px' }} />
-        <p style={{ fontSize: 14 }} className='font-semibold'>
+        <SettingsOutlinedIcon style={{ fontSize: 16, marginRight: '8px' }} />
+        <p style={{ fontSize: 14, marginBottom: '2px' }} className='font-semibold'>
           Settings
         </p>
       </Box>
