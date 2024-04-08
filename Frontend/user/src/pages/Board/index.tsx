@@ -159,8 +159,8 @@ export function Board() {
 
       const modifier = isBelowOverItem ? 1 : 0
 
-      const newCardIndex = overCardIndex >= 0 ? overCardIndex + modifier : overList.cards.length + 1
-
+      const newCardIndex = overCardIndex + modifier
+      console.log('overCardIndex: ', overCardIndex, modifier)
       const nextList = cloneDeep(prevList)
       const nextActiveList = nextList?.find((list) => list._id === activeList._id)
       const nextOverList = nextList?.find((list) => list._id === overList._id)
@@ -175,19 +175,21 @@ export function Board() {
         nextOverList.cards = nextOverList.cards.filter((card) => card._id !== activeDragingCardId)
         const rebuild_activeDraggingCardData = {
           ...activeDraggingCardData,
-          list_id: nextOverList._id
+          list_id: nextOverList._id,
+          index: newCardIndex
         } as Card
         // Ensure activeDraggingCardData is not undefined before using it
         if (isCard(activeDraggingCardData)) {
           nextOverList.cards.splice(newCardIndex, 0, rebuild_activeDraggingCardData)
           nextOverList.cards = nextOverList.cards.filter((card) => card.placeHolder === false)
+
           if (nextActiveList && nextOverList && oldListWhenDragging && isHandleDragEnd === true) {
             const activeCardIdArray = oldListWhenDragging.cards.map((card) => card._id)
             const overCardIdArray = nextOverList.cards.map((card) => card._id)
             console.log('move card data', {
               source_list: {
                 cardlist_id: activeList._id,
-                target_card_id: overCardId as string,
+                target_card_id: activeDragingCardId as string,
                 cards_id_index: activeCardIdArray
               },
               destination_new_list: {

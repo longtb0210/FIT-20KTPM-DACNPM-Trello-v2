@@ -8,12 +8,13 @@ import { user_id } from '~/api/getInfo'
 
 interface ListSettingProps {
   closeListSetting: () => void
+  setAddCardOnTop: (data: string) => void
   list: List
 }
 const boardChoices: string[] = ['Project Trello', 'Front-end', 'Back-end']
 const listChoices: string[] = ['To do', 'Doing', 'Done', 'Week 1', 'Week 2']
 const positionChoices: string[] = ['1', '2', '3', '4']
-export default function ListSetting({ closeListSetting, list }: ListSettingProps) {
+export default function ListSetting({ closeListSetting, setAddCardOnTop, list }: ListSettingProps) {
   const { colors, darkMode } = useTheme()
   const [openMoveList, setOpenMoveList] = useState<boolean>(false)
   const [openCopyList, setOpenCopyList] = useState<boolean>(false)
@@ -237,7 +238,15 @@ export default function ListSetting({ closeListSetting, list }: ListSettingProps
         {!openCopyList && !openMoveList && !openMoveAllCard && !openArchiveAllCard && (
           <>
             <div>
-              <button className={`m-0 w-full p-2 text-left hover:bg-gray-200`}>Add card</button>
+              <button
+                className={`m-0 w-full p-2 text-left hover:bg-gray-200`}
+                onClick={() => {
+                  setAddCardOnTop(list._id)
+                  closeListSetting()
+                }}
+              >
+                Add card
+              </button>
               <button className={`m-0 w-full p-2 text-left hover:bg-gray-200`} onClick={() => setOpenCopyList(true)}>
                 Copy list
               </button>
