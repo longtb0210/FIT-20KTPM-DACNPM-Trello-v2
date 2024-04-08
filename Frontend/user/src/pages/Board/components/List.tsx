@@ -119,7 +119,21 @@ export default function ListComponent({
     minHeight: `${maxHeight}px`
     // maxHeight: `${maxHeight > 590 ? 590 : maxHeight}px`
   }
-
+  const renderCards = (list: List) => {
+    return (
+      <div className={`space-y-[10px] `}>
+        {list.cards &&
+          list.cards.map((card, index) => (
+            <CardComponent
+              cardSelected={cardSelected}
+              key={index}
+              card={card}
+              setOpenCardSetting={setOpenCardSetting}
+            />
+          ))}
+      </div>
+    )
+  }
   return (
     <div
       ref={setNodeRef}
@@ -168,17 +182,7 @@ export default function ListComponent({
             items={list.cards.map((c) => c._id) as (UniqueIdentifier | { id: UniqueIdentifier })[]}
             strategy={verticalListSortingStrategy}
           >
-            <div className={`space-y-[10px] `}>
-              {list.cards &&
-                list.cards.map((card, index) => (
-                  <CardComponent
-                    cardSelected={cardSelected}
-                    key={index}
-                    card={card}
-                    setOpenCardSetting={setOpenCardSetting}
-                  />
-                ))}
-            </div>
+            {renderCards(list)}
           </SortableContext>
         </div>
         {addCardOpenAt &&

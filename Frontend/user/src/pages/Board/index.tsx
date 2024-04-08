@@ -31,7 +31,7 @@ import { getAllListAPI } from '../../api/List'
 import { CardApiRTQ, CardlistApiRTQ } from '../../api'
 import { TrelloApi } from '@trello-v2/shared'
 import { board_id } from '~/api/getInfo'
-import CardDetailWindow from '~/components/CardDetailWindow'
+// import CardDetailWindow from '~/components/CardDetailWindow'
 import { useParams } from 'react-router-dom'
 const MOCK_CARD_DATA: TrelloApi.CardlistApi.GetallCardlistResponse = {
   data: [
@@ -65,6 +65,7 @@ const ACTIVE_DRAG_ITEM_TYPE = {
 // const LazyCardComponent = lazy(() => import('./components/Card'))
 // const LazyListComponent = lazy(() => import('./components/List'))
 const LazyListsComponent = lazy(() => import('./components/Lists'))
+const LazyCardDetailsComponent = lazy(() => import('~/components/CardDetailWindow'))
 export function Board() {
   // const [getAllCardlist, { data: cardlistData }] = CardlistApiRTQ.CardListApiSlice.useLazyGetAllCardlistQuery()
   const [getCardListByBoardId, { data: cardlistDataByBoardId }] =
@@ -375,15 +376,6 @@ export function Board() {
     })
   }
 
-  // useEffect(() => {
-  //   console.log(openCardSetting)
-  //   if (openCardSetting) {
-  //     document.body.style.overflow = 'hidden'
-  //   } else {
-  //     document.body.style.overflow = 'auto'
-  //   }
-  // }, [openCardSetting])
-
   return (
     <BoardLayout openCardSetting={openCardSetting}>
       <div className={`relative flex flex-row justify-start`}>
@@ -430,14 +422,16 @@ export function Board() {
         </DndContext>
         {selectedCard && (
           <div className={`relative mt-[32px]`}>
-            <CardDetailWindow
-              cardId={selectedCard._id}
-              cardlistId={selectedCard.list_id}
-              isOpenCDW={true}
-              handleCloseCDW={() => {
-                setSelectedCard(undefined)
-              }}
-            />
+            <Suspense fallback={<div>Loading...</div>}>
+              <LazyCardDetailsComponent
+                cardId={selectedCard._id}
+                cardlistId={selectedCard.list_id}
+                isOpenCDW={true}
+                handleCloseCDW={() => {
+                  setSelectedCard(undefined)
+                }}
+              />
+            </Suspense>
           </div>
         )}
       </div>
