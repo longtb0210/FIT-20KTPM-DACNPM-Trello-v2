@@ -33,7 +33,7 @@ export const Navigation = () => {
           <Route path='/cardlist' element={<Board />} />
           <Route path='/workspace/:workspaceId/members' element={<PageMembers />} />
           <Route path='/workspaceSetting' element={<WorkspaceSetting />} />
-          <Route path='/workspaceboard' element={<WorkspaceBoardsPage />} />
+          <Route path='/workspaceboard/:workspaceId' element={<WorkspaceBoardsPage />} />
         </Route>
       </Route>
       <Route path='*' element={<ErrorPage />} />

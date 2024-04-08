@@ -6,6 +6,7 @@ import Person2OutlinedIcon from '@mui/icons-material/Person2Outlined'
 import SettingsOutlinedIcon from '@mui/icons-material/SettingsOutlined'
 import { useTheme } from '../Theme/themeContext'
 import { Workspace } from '@trello-v2/shared/src/schemas/Workspace'
+import { useNavigate } from 'react-router-dom'
 
 interface BoardsPageWorkspaceControlProps {
   currentWorkspace: Workspace
@@ -13,6 +14,7 @@ interface BoardsPageWorkspaceControlProps {
 
 export default function BoardsPageWorkspaceControl({ currentWorkspace }: BoardsPageWorkspaceControlProps) {
   const { colors } = useTheme()
+  const navigate = useNavigate()
   return (
     <Box className='flex flex-row items-center'>
       <Box
@@ -27,6 +29,9 @@ export default function BoardsPageWorkspaceControl({ currentWorkspace }: BoardsP
           marginRight: '12px'
         }}
         className='flex cursor-pointer items-center justify-center rounded-md'
+        onClick={() => {
+          navigate(`/workspaceboard/${currentWorkspace._id}`)
+        }}
       >
         <FontAwesomeIcon icon={faTrello} style={{ fontSize: 14, marginRight: '10px' }} />
         <p style={{ fontSize: 14, marginBottom: '2px' }} className='font-semibold'>
