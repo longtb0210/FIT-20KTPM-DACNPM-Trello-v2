@@ -53,8 +53,8 @@ const WorkspaceApiSlice = createApi({
         body: data
       })
     }),
-    getWorkspaceInfo: builder.query<TrelloApi.WorkspaceApi.WorspaceResponse, { id: string }>({
-      query: ({ id }) => ({
+    getWorkspaceInfo: builder.query<TrelloApi.WorkspaceApi.WorspaceResponse, string>({
+      query: (id) => ({
         url: `/api/workspace/${id}`,
         method: 'GET'
       })
