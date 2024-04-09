@@ -11,8 +11,8 @@ spec:
         paths:
           - backend:
               service:
-                name: mongo-sh
+                name: redis-cluster
                 port:
-                  number: 27017
+                  number: 6379
             path: /
             pathType: Prefix
