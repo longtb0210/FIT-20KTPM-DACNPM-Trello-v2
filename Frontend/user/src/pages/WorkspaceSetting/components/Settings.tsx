@@ -7,9 +7,12 @@ import { WorkspaceHeader } from '../../../components/WorkspaceHeader/WorkspaceHe
 import { WorkspaceApiRTQ } from '~/api'
 import { Workspace } from '@trello-v2/shared/src/schemas/Workspace'
 import { workspace_id } from '~/api/getInfo'
+import { useParams } from 'react-router-dom'
 export const Settings: React.FC = () => {
   // const image = '/src/assets/Profile/profile_img.svg'
   const { colors, darkMode } = useTheme()
+  const params = useParams()
+  const workspaceId = params.workspaceId
   // const [visibility, setVisibility] = useState<string>('private')
   const [workspaceInfo, setWorkspaceInfo] = useState<Workspace>()
   const [getWorkspaceInfo, { data: workspaceInfoRes }] =
@@ -21,7 +24,7 @@ export const Settings: React.FC = () => {
   const [deleteWorkspaceName, setDeleteWorkspaceName] = useState<string>('')
   const [resetUseStateManual, setResetUseStateManual] = useState<boolean>(false)
   useEffect(() => {
-    getWorkspaceInfo({ id: workspace_id })
+    getWorkspaceInfo({ id: workspaceId && workspaceId !== '123' ? (workspaceId as string) : workspace_id })
   }, [resetUseStateManual])
 
   useEffect(() => {
@@ -31,13 +34,13 @@ export const Settings: React.FC = () => {
   const handleVisibilityChange = (newVisibility: string) => {
     changeVisibility({
       visibility: newVisibility,
-      _id: workspace_id
+      _id: workspaceId && workspaceId !== '123' ? (workspaceId as string) : workspace_id
     }).then(() => setResetUseStateManual(!resetUseStateManual))
     setShowForm(false)
   }
   const handleDeleteWorkspace = () => {
     deleteWorkspace({
-      workspace_id: workspace_id
+      workspace_id: workspaceId && workspaceId !== '123' ? (workspaceId as string) : workspace_id
     }).then(() => setResetUseStateManual(!resetUseStateManual))
   }
   return (
