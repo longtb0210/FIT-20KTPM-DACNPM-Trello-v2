@@ -41,7 +41,7 @@ export class UserController {
     body: TrelloApi.UserApi.CreateUserRequest,
   ): Promise<TrelloApi.UserApi.CreateUserResponse> {
     const user = await this.userService.createUser(body)
-    if (!user || !user._id) throw new InternalServerErrorException("Can't create user")
+    if (!user) throw new InternalServerErrorException("Can't create user")
     return {
       data: user,
     }
@@ -189,7 +189,7 @@ export class UserController {
     body: TrelloApi.UserApi.CreateActivityRequest,
   ): Promise<TrelloApi.UserApi.CreateActivityResponse> {
     const activity = await this.userService.createActivity(email, body)
-    if (!activity || !activity._id) throw new InternalServerErrorException("Can't create activity")
+    if (!activity) throw new InternalServerErrorException("Can't create activity")
     return {
       data: activity,
     }
@@ -262,22 +262,6 @@ export class UserController {
 
     return {
       data: user,
-    }
-  }
-
-  @InjectRoute({ path: '/api/grpc/test', method: RequestMethod.GET })
-  test() {
-    return this.userGrpcService.echoService.Echo({ name: 'User service' })
-  }
-
-  @Public()
-  @InjectRoute({ path: '/api/user/sqlite/test', method: RequestMethod.GET })
-  async sqlite() {
-    try {
-      const data = await this.cacheService.insertOrUpdate('mail@1', { hello: 'World' })
-      return { a: 'b', data: data }
-    } catch (error) {
-      throw error
     }
   }
 }

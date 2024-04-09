@@ -30,7 +30,7 @@ const AppBar = styled(MuiAppBar, {
       easing: theme.transitions.easing.easeOut,
       duration: theme.transitions.duration.enteringScreen
     })
-  })
+  }),
 }))
 
 const Main = styled('main', { shouldForwardProp: (prop) => prop !== 'open' })<{

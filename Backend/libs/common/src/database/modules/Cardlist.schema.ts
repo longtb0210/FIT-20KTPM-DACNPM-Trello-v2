@@ -18,6 +18,7 @@ export const CardMSchema = new Schema<DbSchemas.CardlistSchema.Card>({
   member_email: [String],
   activities: [ActivityMSchema],
   features: [FeatureMSchema],
+  created_at: Date,
 })
 
 export const CardlistMSchema = new Schema<DbSchemas.CardlistSchema.CardList>({

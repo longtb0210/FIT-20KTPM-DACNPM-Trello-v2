@@ -165,6 +165,69 @@ export const CardlistRoutes = {
     },
     // jwtSecure: false,
   } as IRouteParams,
+  sortCardsByOldestDate: {
+    path: '/sort_oldest_cards/:cardlistId',
+    method: RequestMethod.GET,
+    swaggerInfo: {
+      params: {
+        name: 'cardlistId',
+        schema: {
+          type: 'string',
+        },
+      },
+      responses: [
+        {
+          status: 200,
+          schema: {
+            $ref: getSchemaPath('SortCardByOldestDateResponseSchema'),
+          },
+        },
+      ],
+    },
+    // jwtSecure: false,
+  } as IRouteParams,
+  sortCardsByNewestDate: {
+    path: '/sort_newest_card/:cardlistId',
+    method: RequestMethod.GET,
+    swaggerInfo: {
+      params: {
+        name: 'cardlistId',
+        schema: {
+          type: 'string',
+        },
+      },
+      responses: [
+        {
+          status: 200,
+          schema: {
+            $ref: getSchemaPath('SortCardByNewestDateResponseSchema'),
+          },
+        },
+      ],
+    },
+    // jwtSecure: false,
+  } as IRouteParams,
+  sortCardsByName: {
+    path: '/sort_name_cards/:cardlistId',
+    method: RequestMethod.GET,
+    swaggerInfo: {
+      params: {
+        name: 'cardlistId',
+        schema: {
+          type: 'string',
+        },
+      },
+      responses: [
+        {
+          status: 200,
+          schema: {
+            $ref: getSchemaPath('SortCardByNameResponseSchema'),
+          },
+        },
+      ],
+    },
+    // jwtSecure: false,
+  } as IRouteParams,
   updateCardlists: {
     path: '/update',
     method: RequestMethod.PUT,
@@ -188,6 +251,34 @@ export const CardlistRoutes = {
         {
           status: 200,
           schema: { $ref: getSchemaPath('MoveCardlistResponseSchema') },
+        },
+      ],
+    },
+    // jwtSecure: false,
+  } as IRouteParams,
+  moveCardlistInBoard: {
+    path: '/move_cardlists_in_board',
+    method: RequestMethod.PUT,
+    swaggerInfo: {
+      body: { schema: { $ref: getSchemaPath('MoveCardlistInBoardRequestSchema') } },
+      responses: [
+        {
+          status: 200,
+          schema: { $ref: getSchemaPath('MoveCardlistInBoardResponseSchema') },
+        },
+      ],
+    },
+    // jwtSecure: false,
+  } as IRouteParams,
+  moveAllCards: {
+    path: '/move_all_cards',
+    method: RequestMethod.PUT,
+    swaggerInfo: {
+      body: { schema: { $ref: getSchemaPath('MoveAllCardsRequestSchema') } },
+      responses: [
+        {
+          status: 200,
+          schema: { $ref: getSchemaPath('MoveAllCardsResponseSchema') },
         },
       ],
     },

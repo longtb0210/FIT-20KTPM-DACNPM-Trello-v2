@@ -13,7 +13,6 @@ interface AutocompleteContainerProps {
   onBack: () => void
 }
 
-// const workspace = ['Team', 'Trello']
 const visibility = ['Workspace', 'Public', 'Private']
 
 const bg_image = [
@@ -56,20 +55,19 @@ export default function CreateBoard(props: AutocompleteContainerProps) {
   const [createBoard] = BoardApiRTQ.BoardApiSlice.useCreateBoardMutation()
   const [getAllBoard] = BoardApiRTQ.BoardApiSlice.useLazyGetAllBoardQuery()
   const [getALlWorkspace, { data: workspaceData }] = WorkspaceApiRTQ.WorkspaceApiSlice.useLazyGetAllWorkspaceQuery()
-  const [valueWorkspace, setValueWorkspace] = React.useState<string>('')
+  const [valueWorkspace, setValueWorkspace] = React.useState<string>(workspaceData?.data[0].name || '')
   const [valueVisibility, setValueVisibility] = React.useState<string>(visibility[0])
   const [inputValueWorkspace, setInputValueWorkspace] = React.useState('')
   const [inputValueVisibility, setInputValueVisibility] = React.useState('')
+  const [idWorkspace, setIdWorkspace] = React.useState(workspaceData?.data[0]._id || '')
   const [boardTitle, setBoardTitle] = React.useState('')
   const [activeBg, setActiveBg] = React.useState({ check: true, index: 0, type: 'color', data: bg_color[0].color })
   const anchorRef = React.useRef<HTMLButtonElement>(null)
   const { darkMode, colors } = useTheme()
-  // const navigator = useNavigate()
 
   React.useEffect(() => {
-    getALlWorkspace().then((v) => console.log(v))
-  }, [])
-  console.log(workspaceData?.data?.owner)
+    getALlWorkspace()
+  }, [getALlWorkspace])
 
   const handleTitleBoard = (event: React.ChangeEvent<HTMLInputElement>) => {
     setBoardTitle(event.target.value)
@@ -81,14 +79,14 @@ export default function CreateBoard(props: AutocompleteContainerProps) {
 
   const onSubmit = () => {
     createBoard({
-      name: boardTitle || '',
-      workspace_id: valueWorkspace || '',
+      name: boardTitle,
+      workspace_id: idWorkspace,
       visibility: valueVisibility?.toLocaleLowerCase() as 'private' | 'public' | 'workspace'
     }).then(() => getAllBoard())
   }
 
   return (
-    <Box sx={{ padding: '0 12px', overflow: 'scroll' }}>
+    <Box sx={{ padding: '0 12px', overflowY: 'scroll' }}>
       <Box
         onClick={props.onBack}
         sx={{
@@ -287,18 +285,26 @@ export default function CreateBoard(props: AutocompleteContainerProps) {
 
           <Autocomplete
             size='small'
-            value={workspaceData?.data?.owner[0].name}
+            value={valueWorkspace}
             disableClearable
             onChange={(_event: React.SyntheticEvent, newValue: string) => {
               setValueWorkspace(newValue)
+              const newIndex = workspaceData?.data.findIndex((workspace) => workspace.name === newValue) || 0
+              if (newIndex !== -1 && workspaceData?.data[newIndex]?._id) {
+                console.log('Selected index:', newIndex)
+                setIdWorkspace(workspaceData?.data[newIndex]?._id)
+              }
             }}
             inputValue={inputValueWorkspace}
             onInputChange={(_event: React.SyntheticEvent, newInputValue: string) => {
               setInputValueWorkspace(newInputValue)
             }}
             id='controllable-states-demo'
-            options={workspaceData?.data?.owner.map((workspace) => workspace.name) ?? []}
-            // getOptionLabel={(option: WorkspaceData) => option.name}
+            options={
+              workspaceData?.data
+                .filter((workspace) => workspace.members.some((member) => member.role !== 'guest'))
+                .map((workspace) => workspace.name) ?? []
+            }
             sx={{
               width: '100%',
               '& .MuiAutocomplete-option': {
@@ -353,7 +359,7 @@ export default function CreateBoard(props: AutocompleteContainerProps) {
 
         <Button
           onClick={onSubmit}
-          disabled={boardTitle.length === 0 ? true : false}
+          disabled={boardTitle.length === 0 || idWorkspace.length === 0 ? true : false}
           ref={anchorRef}
           id='composition-button'
           aria-haspopup='true'
@@ -362,7 +368,7 @@ export default function CreateBoard(props: AutocompleteContainerProps) {
             fontSize: '13px',
             textTransform: 'none',
             color: darkMode ? '#1d2125' : '#fff',
-            backgroundColor: boardTitle.length === 0 ? 'rgba(86,157,255,0.1)' : '#579dff',
+            backgroundColor: boardTitle.length === 0 || idWorkspace.length === 0 ? 'rgba(86,157,255,0.1)' : '#579dff',
             '&:hover': {
               backgroundColor: '#85b8ff'
             },

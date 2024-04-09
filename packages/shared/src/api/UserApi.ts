@@ -1,8 +1,8 @@
 import { z } from "zod";
 
-import { UserSchema } from "../schemas/User";
 import { ActivitySchema } from "../schemas/Activity";
 import { KeycloakUserBasicInfoSchema } from "../schemas/Keycloak";
+import { UserSchema } from "../schemas/User";
 
 // create user
 export const CreateUserRequestSchema = UserSchema.omit({

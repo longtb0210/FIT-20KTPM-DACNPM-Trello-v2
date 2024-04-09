@@ -26,6 +26,7 @@ export class CardService {
       activities: [],
       features: [],
       member_email: [],
+      created_at: new Date(),
     })
     await cardlist.save()
 

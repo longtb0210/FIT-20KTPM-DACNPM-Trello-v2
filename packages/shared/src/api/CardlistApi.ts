@@ -72,13 +72,38 @@ export const MoveCardlistRequestSchema = CardlistSchema.omit({
   })
 );
 export type MoveCardlistRequest = z.infer<typeof MoveCardlistRequestSchema>;
+export const MoveCardlistInBoardRequestSchema = CardlistSchema.omit({
+  board_id: true,
+  name: true,
+  cards: true,
+  watcher_email: true,
+  created_at: true,
+  archive_at: true,
+}).merge(
+  z.object({
+    index: z.number(),
+  })
+);
+export type MoveCardlistInBoardRequest = z.infer<
+  typeof MoveCardlistInBoardRequestSchema
+>;
+
+export const MoveAllCardsRequestSchema = z.object({
+  cardlist_input_id: z
+    .string()
+    .refine(Refine_MongoId, { message: "Invalid id" }),
+  cardlist_output_id: z
+    .string()
+    .refine(Refine_MongoId, { message: "Invalid id" }),
+});
+export type MoveAllCardsRequest = z.infer<typeof MoveAllCardsRequestSchema>;
 
 export const AddCardToListRequestSchema = CardSchema.omit({
   _id: true,
-  watcher_email: true,
   archive_at: true,
   activities: true,
   features: true,
+  created_at: true,
 }).merge(
   z.object({
     index: z.number().default(0),
@@ -153,6 +178,16 @@ export const MoveCardlistResponseSchema = z.object({
   data: CardlistSchema,
 });
 export type MoveCardlistResponse = z.infer<typeof MoveCardlistResponseSchema>;
+export const MoveCardlistInBoardResponseSchema = z.object({
+  data: CardlistSchema,
+});
+export type MoveCardlistInBoardResponse = z.infer<
+  typeof MoveCardlistInBoardResponseSchema
+>;
+export const MoveAllCardsResponseSchema = z.object({
+  data: CardlistSchema,
+});
+export type MoveAllCardsResponse = z.infer<typeof MoveAllCardsResponseSchema>;
 
 export const GetallCardlistResponseSchema = z.object({
   data: CardlistSchema.array(),
@@ -201,6 +236,27 @@ export const SortCardlistByNameResponseSchema = z.object({
 });
 export type SortCardlistByNameResponse = z.infer<
   typeof SortCardlistByNameResponseSchema
+>;
+
+export const SortCardByOldestDateResponseSchema = z.object({
+  data: CardlistSchema,
+});
+export type SortCardByOldestDateResponse = z.infer<
+  typeof SortCardByOldestDateResponseSchema
+>;
+
+export const SortCardByNewestDateResponseSchema = z.object({
+  data: CardlistSchema,
+});
+export type SortCardByNewestDateResponse = z.infer<
+  typeof SortCardByNewestDateResponseSchema
+>;
+
+export const SortCardByNameResponseSchema = z.object({
+  data: CardlistSchema,
+});
+export type SortCardByNameResponse = z.infer<
+  typeof SortCardByNameResponseSchema
 >;
 
 export const BoardIdRequestParamsSchema = z.object({

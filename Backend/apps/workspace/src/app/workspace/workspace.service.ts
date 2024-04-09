@@ -14,7 +14,7 @@ export abstract class IWorkspaceService {
   abstract getGuestWorkspacesByEmail(email: string): Promise<DbSchemas.WorkspaceSchema.Workspace[] | null>
   abstract getPendingWorkspacesByEmail(email: string): Promise<DbSchemas.WorkspaceSchema.Workspace[] | null>
   abstract createWorkspace(
-    body: TrelloApi.WorkspaceApi.CreateWorspaceRequest,
+    body: TrelloApi.WorkspaceApi.CreateWorkspaceRequest,
     email_owner: string,
   ): Promise<DbSchemas.WorkspaceSchema.Workspace>
   abstract updateWorkspaceInfo(
@@ -155,17 +155,20 @@ export class WorkspaceService implements IWorkspaceService {
   }
 
   async createWorkspace(
-    body: TrelloApi.WorkspaceApi.CreateWorspaceRequest,
+    body: TrelloApi.WorkspaceApi.CreateWorkspaceRequest,
     email_owner: string,
   ): Promise<DbSchemas.WorkspaceSchema.Workspace> {
     const owner = new this.memberModel({
       email: email_owner,
       role: DbSchemas.WorkspaceSchema.ROLE_WORKSPACE.admin,
       status: DbSchemas.WorkspaceSchema.STATUS_WORKSPACE.owner,
-      visibility: DbSchemas.WorkspaceSchema.VISIBILITY_WORKSPACE.private,
     })
 
-    const newWorkspace = new this.workspaceModel({ ...body, members: [owner] })
+    const newWorkspace = new this.workspaceModel({
+      ...body,
+      visibility: DbSchemas.WorkspaceSchema.VISIBILITY_WORKSPACE.private,
+      members: [owner],
+    })
 
     return await newWorkspace.save()
   }
