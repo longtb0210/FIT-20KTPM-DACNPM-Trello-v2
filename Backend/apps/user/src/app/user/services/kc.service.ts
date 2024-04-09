@@ -52,8 +52,12 @@ export class KcAdminService {
 
   async getUserDataByEmail(email: string) {
     const link = `${this.kcEnv.KEYCLOAK_AUTH_SERVER_URL}/admin/realms/${this.kcEnv.KEYCLOAK_REALM}/users/?email=${email}&exact=true`
-    // console.log(this.kcEnv, KcAdminService._token, KcAdminService._refreshToken)
+    // console.log(KcAdminService._token)
     const res = await fetch(encodeURI(link), { method: 'GET', headers: { authorization: `Bearer ${KcAdminService._token}` } })
-    return await res.json()
+    const json = await res.json()
+    if (Array.isArray(json)) {
+      return json[0]
+    }
+    return json
   }
 }

@@ -3,7 +3,7 @@ import { UserService } from '../services/user.service'
 import { UserRoutes } from '../user.routes'
 import { Body, InternalServerErrorException, NotFoundException, Param, RequestMethod } from '@nestjs/common'
 import { ZodValidationPipe } from '@app/common/pipes'
-import { TrelloApi } from '@trello-v2/shared'
+import { DbSchemas, TrelloApi } from '@trello-v2/shared'
 import { SwaggerApi } from '@app/common/decorators'
 import { getSchemaPath } from '@nestjs/swagger'
 import { UserGrpcService } from '../services/user.grpc.service'
@@ -112,9 +112,31 @@ export class UserController {
   async getUser(@Param('email') email: string): Promise<TrelloApi.UserApi.GetUserResponse> {
     const user = await this.userService.getUser(email)
     if (!user) throw new NotFoundException("Can't find user")
-    this.kcAdminService.getUserDataByEmail(email).then((data) => console.log(data))
-    return {
-      data: user,
+    const cache = await this.cacheService.getDataByKeyId(email)
+    if (!cache) {
+      const kc_json = await this.kcAdminService.getUserDataByEmail(email)
+      console.log(kc_json)
+      const kc = DbSchemas.Keycloak.KeycloakUserBasicInfoSchema.safeParse(kc_json)
+      if (kc.success) {
+        this.cacheService.insertOrUpdate(email, kc.data)
+      }
+      return {
+        data: user,
+        kc_data: kc.success ? { ...kc.data, is_cache: false } : undefined,
+      }
+    }
+
+    try {
+      const kc_json = DbSchemas.Keycloak.KeycloakUserBasicInfoSchema.parse(JSON.parse(cache.json_data))
+      return {
+        data: user,
+        kc_data: { ...kc_json, is_cache: true },
+      }
+    } catch (error) {
+      console.warn(error)
+      return {
+        data: user,
+      }
     }
   }
 

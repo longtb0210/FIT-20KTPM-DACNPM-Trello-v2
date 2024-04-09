@@ -2,6 +2,7 @@ import { z } from "zod";
 
 import { UserSchema } from "../schemas/User";
 import { ActivitySchema } from "../schemas/Activity";
+import { KeycloakUserBasicInfoSchema } from "../schemas/Keycloak";
 
 // create user
 export const CreateUserRequestSchema = UserSchema.omit({
@@ -25,6 +26,12 @@ export type GetallUserResponse = z.infer<typeof GetallUserResponseSchema>;
 // get user
 export const GetUserResponseSchema = z.object({
   data: UserSchema,
+  kc_data: z
+    .object({
+      is_cache: z.boolean(),
+    })
+    .merge(KeycloakUserBasicInfoSchema)
+    .optional(),
 });
 export type GetUserResponse = z.infer<typeof GetUserResponseSchema>;
 
@@ -60,22 +67,30 @@ export type CreateActivityRequest = z.infer<typeof CreateActivityRequestSchema>;
 export const CreateActivityResponseSchema = z.object({
   data: ActivitySchema,
 });
-export type CreateActivityResponse = z.infer<typeof CreateActivityResponseSchema>;
+export type CreateActivityResponse = z.infer<
+  typeof CreateActivityResponseSchema
+>;
 
 // get all activities
 export const GetallActivitiesResponseSchema = z.object({
   data: ActivitySchema.array().nullable(),
 });
-export type GetallActivitiesResponse = z.infer<typeof GetallActivitiesResponseSchema>;
+export type GetallActivitiesResponse = z.infer<
+  typeof GetallActivitiesResponseSchema
+>;
 
 // delete activity
 export const DeleteActivityResponseSchema = z.object({
   data: ActivitySchema,
 });
-export type DeleteActivityResponse = z.infer<typeof DeleteActivityResponseSchema>;
+export type DeleteActivityResponse = z.infer<
+  typeof DeleteActivityResponseSchema
+>;
 
 // delete activities
 export const DeleteActivitiesResponseSchema = z.object({
   data: UserSchema,
 });
-export type DeleteActivitiesResponse = z.infer<typeof DeleteActivitiesResponseSchema>;
+export type DeleteActivitiesResponse = z.infer<
+  typeof DeleteActivitiesResponseSchema
+>;
