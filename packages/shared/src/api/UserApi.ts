@@ -1,6 +1,7 @@
 import { z } from "zod";
 
 import { ActivitySchema } from "../schemas/Activity";
+import { KeycloakUserBasicInfoSchema } from "../schemas/Keycloak";
 import { UserSchema } from "../schemas/User";
 
 // create user
@@ -25,6 +26,12 @@ export type GetallUserResponse = z.infer<typeof GetallUserResponseSchema>;
 // get user
 export const GetUserResponseSchema = z.object({
   data: UserSchema,
+  kc_data: z
+    .object({
+      is_cache: z.boolean(),
+    })
+    .merge(KeycloakUserBasicInfoSchema)
+    .optional(),
 });
 export type GetUserResponse = z.infer<typeof GetUserResponseSchema>;
 

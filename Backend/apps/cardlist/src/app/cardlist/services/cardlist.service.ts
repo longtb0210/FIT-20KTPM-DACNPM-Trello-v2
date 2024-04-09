@@ -47,12 +47,12 @@ export class CardlistService implements ICardlistService {
   ) {}
 
   async createCardlist(data: TrelloApi.CardlistApi.CreateCardlistRequest): Promise<DbSchemas.CardlistSchema.CardList> {
-    const board = await this.BoardMModel.findById(data.board_id)
-    if (!board) {
-      // throw new NotFoundError('Board not found')
-      return { status: 'Not Found', msg: `Can't find any board with id: ${data.board_id}` } as any
-    }
-    data.archive_at = null
+    // const board = await this.BoardMModel.findById(data.board_id)
+    // if (!board) {
+    //   // throw new NotFoundError('Board not found')
+    //   return { status: 'Not Found', msg: `Can't find any board with id: ${data.board_id}` } as any
+    // }
+    // data.archive_at = null
     data.created_at = new Date()
     const model = new this.CardlistMModel(data)
 

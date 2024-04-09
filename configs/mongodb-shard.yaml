@@ -1,0 +1,26 @@
+apiVersion: kubedb.com/v1alpha2
+kind: MongoDB
+metadata:
+  name: mongo-sh
+  namespace: demo
+spec:
+  version: 6.0.5
+  shardTopology:
+    configServer:
+      replicas: 2
+      storage:
+        resources:
+          requests:
+            storage: 256Mi
+        storageClassName: hostpath
+    mongos:
+      replicas: 1
+    shard:
+      replicas: 2
+      shards: 2
+      storage:
+        resources:
+          requests:
+            storage: 128Mi
+        storageClassName: hostpath
+  terminationPolicy: WipeOut
