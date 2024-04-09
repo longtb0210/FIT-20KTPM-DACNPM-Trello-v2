@@ -10,30 +10,63 @@ import {
   Select,
   SelectChangeEvent
 } from '@mui/material'
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import { useTheme } from '~/components/Theme/themeContext'
-import { BoardSubset } from '..'
 import WorkspaceBoardsPageRow from '~/components/WorkspaceBoardsPage/WorkspaceBoardsPageRow'
+import { useParams } from 'react-router-dom'
+import { BoardApiRTQ } from '~/api'
+import { Board } from '@trello-v2/shared/src/schemas/Board'
 
 const sortMethods = ['Most recently active', 'Least recently active', 'Alphabetically A-Z', 'Alphabetically Z-A']
 
-const boards: BoardSubset[] = [
-  { _id: '0', name: 'Project Trello', is_star: false },
-  { _id: '1', name: 'New Board', is_star: false },
-  { _id: '2', name: 'demo board 1', is_star: false },
-  { _id: '3', name: 'test', is_star: false },
-  { _id: '4', name: 'Front-end', is_star: false },
-  { _id: '5', name: 'Back-end', is_star: false }
-]
-
 export function WorkspaceBoardsPage() {
+  const { workspaceId } = useParams()
   const { colors } = useTheme()
   const [selectedSort, setSelectedSort] = useState('Most recently active')
-  const [boardsState, setBoardsState] = useState(boards)
+  const [boardsState, setBoardsState] = useState<Board[]>([])
+  const [filteredBoardsState, setFilteredBoardsState] = useState<Board[]>([])
+  const [searchQuery, setSearchQuery] = useState('')
+
+  //API
+  const [getBoardsByWorkspaceIdAPI] = BoardApiRTQ.BoardApiSlice.useLazyGetBoardsByWorkspaceIDQuery()
+
+  function fetchBoardsByWorkspaceId() {
+    getBoardsByWorkspaceIdAPI({
+      workspace_id: workspaceId!
+    })
+      .unwrap()
+      .then((response) => {
+        setBoardsState(response.data)
+        setFilteredBoardsState(response.data)
+      })
+      .catch((error) => {
+        console.log('ERROR: fetch boards of workspace', error)
+      })
+  }
+
+  useEffect(() => {
+    fetchBoardsByWorkspaceId()
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [])
 
   function handleSelectSort(event: SelectChangeEvent) {
     setSelectedSort(event.target.value as string)
   }
+
+  function handleSearch(event: React.ChangeEvent<HTMLInputElement>) {
+    setSearchQuery(event.target.value)
+  }
+
+  useEffect(() => {
+    const filteredList = boardsState.filter((board) => board.name.toLowerCase().includes(searchQuery.toLowerCase()))
+    const sortedList = [...filteredList]
+    if (selectedSort === 'Alphabetically A-Z') {
+      sortedList.sort((a, b) => a.name.localeCompare(b.name))
+    } else if (selectedSort === 'Alphabetically Z-A') {
+      sortedList.sort((a, b) => b.name.localeCompare(a.name))
+    }
+    setFilteredBoardsState(sortedList)
+  }, [boardsState, searchQuery, selectedSort])
 
   return (
     <Box sx={{ width: '100%', height: 'calc(100vh - 50px)', bgcolor: colors.background }} className='flex flex-row'>
@@ -214,6 +247,8 @@ export function WorkspaceBoardsPage() {
                     }}
                     type={'text'}
                     placeholder='Search boards'
+                    value={searchQuery}
+                    onChange={handleSearch}
                     startAdornment={
                       <InputAdornment position='start'>
                         <IconButton>
@@ -227,7 +262,11 @@ export function WorkspaceBoardsPage() {
             </Box>
             {/* Board list */}
             <Box sx={{ width: '100%', margin: '16px 0' }}>
-              <WorkspaceBoardsPageRow boards={boardsState} setBoards={setBoardsState} enableAddBoard={true} />
+              <WorkspaceBoardsPageRow
+                workspaceBoards={filteredBoardsState!}
+                setWorkspaceBoards={setBoardsState}
+                enableAddBoard={true}
+              />
             </Box>
             {/* Button view closed board */}
             <Box sx={{ width: '100%', height: 32, margin: '50px 0' }} className='flex items-center justify-start'>

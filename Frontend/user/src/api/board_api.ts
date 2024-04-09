@@ -1,6 +1,5 @@
 import { createApi, fetchBaseQuery } from '@reduxjs/toolkit/query/react'
 import { TrelloApi } from '@trello-v2/shared'
-
 import { token } from './getInfo'
 
 const BoardApiSlice = createApi({
@@ -36,6 +35,12 @@ const BoardApiSlice = createApi({
         url: '/api/board',
         body: data,
         method: 'PATCH'
+      })
+    }),
+    getBoardsByWorkspaceID: builder.query<TrelloApi.BoardApi.getBoardsByWorkspaceIdResponse, { workspace_id: string }>({
+      query: ({ workspace_id }) => ({
+        url: `/api/board/workspace/${workspace_id}`,
+        method: 'GET'
       })
     }),
     addBackgroundBoard: builder.mutation<TrelloApi.BoardApi.UpdateBoardResponse, {id: string, background: File}>({
