@@ -1,14 +1,13 @@
 import { InjectController, InjectRoute } from '@app/common/decorators'
 import { UserService } from '../services/user.service'
 import { UserRoutes } from '../user.routes'
-import { Body, InternalServerErrorException, NotFoundException, Param, RequestMethod } from '@nestjs/common'
+import { Body, InternalServerErrorException, NotFoundException, Param } from '@nestjs/common'
 import { ZodValidationPipe } from '@app/common/pipes'
 import { DbSchemas, TrelloApi } from '@trello-v2/shared'
 import { SwaggerApi } from '@app/common/decorators'
 import { getSchemaPath } from '@nestjs/swagger'
 import { UserGrpcService } from '../services/user.grpc.service'
 import { CacheService } from '@app/common/cache'
-import { Public } from 'nest-keycloak-connect'
 import { KcAdminService } from '../services/kc.service'
 
 @InjectController({
