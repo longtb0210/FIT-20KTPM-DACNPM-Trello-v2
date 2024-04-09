@@ -24,6 +24,18 @@ export const CardListApiSlice = createApi({
         method: 'GET'
       })
     }),
+    addCardOnTop: build.mutation<
+      TrelloApi.CardlistApi.AddCardToListResponse,
+      TrelloApi.CardlistApi.AddCardToListRequest
+    >({
+      query: (data) => ({
+        url: `/api/cardlist/add_card`,
+        method: 'POST',
+        body: {
+          ...data
+        }
+      })
+    }),
     createCardlist: build.mutation<
       TrelloApi.CardlistApi.CreateCardlistResponse,
       TrelloApi.CardlistApi.CreateCardlistRequest
