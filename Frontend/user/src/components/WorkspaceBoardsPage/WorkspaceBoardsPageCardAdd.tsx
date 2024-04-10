@@ -2,7 +2,7 @@ import { Box } from '@mui/material'
 import React from 'react'
 import { useState } from 'react'
 import { useTheme } from '../Theme/themeContext'
-import CreateBoardModal from './CreateBoardModal'
+import CreateBoardModal from '../BoardsPage/CreateBoardModal'
 
 export function WorkspaceBoardsPageCardAdd() {
   const { colors } = useTheme()
