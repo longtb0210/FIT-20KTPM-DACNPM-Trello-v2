@@ -5,6 +5,8 @@ import { useState } from 'react'
 import { faFlipboard } from '@fortawesome/free-brands-svg-icons'
 import { useTheme } from '~/components/Theme/themeContext'
 import { Card } from '@trello-v2/shared/src/schemas/CardList'
+import { BoardApiRTQ, WorkspaceApiRTQ } from '~/api'
+import { Workspace } from '@trello-v2/shared/src/schemas/Workspace'
 
 interface CardElementTileProps {
   isChecked: boolean
@@ -49,6 +51,25 @@ export function CopyCardModal({ anchorEl, currentCard, handleClose }: CopyCardMo
   const [selectedBoard, setSelectedBoard] = useState('Project Trello')
   const [selectedList, setSelectedList] = useState('Doing')
   const [selectedPosition, setSelectedPosition] = useState('3')
+  const [allWorkspaces, setAllWorkspaces] = useState<Workspace[]>([])
+
+  //API
+  const [getAllWorkspacesAPI] = WorkspaceApiRTQ.WorkspaceApiSlice.useLazyGetAllWorkspaceQuery()
+  const [getBoardByWorkspaceIdAPI] = BoardApiRTQ.BoardApiSlice.useLazyGetBoardByIdQuery()
+
+  function fetchAllWorkspaces() {
+    getAllWorkspacesAPI()
+      .unwrap()
+      .then((response) => {
+        setAllWorkspaces([...response.data.owner, ...response.data.admin])
+      })
+  }
+
+  function fetchAllBoards() {
+    getBoardByWorkspaceIdAPI({
+      
+    })
+  }
 
   function handleTextFieldChange(event: React.ChangeEvent<HTMLTextAreaElement>) {
     setTextFieldValue(event.target.value)

@@ -730,17 +730,19 @@ export default function CardChecklist({
   }
   // END: Handle edit Checklist name
 
-  async function deleteChecklist() {
-    try {
-      const response = await deleteCardFeatureAPI({
-        cardlist_id: cardlistId,
-        card_id: cardId,
-        feature_id: currentChecklist._id!
+  function deleteChecklist() {
+    deleteCardFeatureAPI({
+      cardlist_id: cardlistId,
+      card_id: cardId,
+      feature_id: currentChecklist._id!
+    })
+      .unwrap()
+      .then((response) => {
+        setCurrentCard(response.data)
       })
-      setCurrentCard(response.data.data)
-    } catch (error) {
-      console.error('Error while adding checklist to card:', error)
-    }
+      .catch((error) => {
+        console.log('ERROR: delete checklist from card - ', error)
+      })
   }
 
   return (

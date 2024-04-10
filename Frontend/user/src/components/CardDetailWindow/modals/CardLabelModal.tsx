@@ -6,6 +6,7 @@ import { ChangeEvent, useState } from 'react'
 import { useTheme } from '~/components/Theme/themeContext'
 import { Card } from '@trello-v2/shared/src/schemas/CardList'
 import { BoardLabel } from '@trello-v2/shared/src/schemas/Board'
+import { BoardApiRTQ } from '~/api'
 
 interface CardLabelListTileProps {
   currentLabel: BoardLabel
@@ -449,6 +450,7 @@ export function CreateCardLabelModal({ anchorEl, setModalState, addBoardLabel }:
 
 interface EditCardLabelModalProps {
   anchorEl: (EventTarget & HTMLDivElement) | null
+  boardId: string
   setModalState: (newState: boolean[]) => void
   currentCard: Card
   setCurrentCard: (newState: Card) => void
@@ -460,6 +462,7 @@ interface EditCardLabelModalProps {
 
 export function EditCardLabelModal({
   anchorEl,
+  boardId,
   setModalState,
   currentCard,
   setCurrentCard,
@@ -472,11 +475,19 @@ export function EditCardLabelModal({
   const [labelNameFieldValue, setLabelNameFieldValue] = useState<string>(currentLabel.name)
   const [selectedColor, setSelectedColor] = useState<string>(currentLabel.color)
 
+  const [editBoardLabelAPI] = BoardApiRTQ.BoardApiSlice.useEditBoardLabelMutation()
+
   function handleLabelNameFieldChange(event: ChangeEvent<HTMLInputElement>) {
     setLabelNameFieldValue(event.currentTarget.value)
   }
 
   function handleEditBoardLabel() {
+    editBoardLabelAPI({
+      boardId: boardId,
+      _id: currentLabel._id!,
+      color: selectedColor,
+      name: labelNameFieldValue
+    })
     // Update Board label list
     const updatedBoardLabel: BoardLabel[] = boardLabelState.map((label) => {
       return label._id === currentLabel._id ? { ...label, color: selectedColor, name: labelNameFieldValue } : label

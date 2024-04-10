@@ -8,9 +8,6 @@ import { Card } from '@trello-v2/shared/src/schemas/CardList'
 import React from 'react'
 
 // eslint-disable-next-line react-refresh/only-export-components
-export const bgColors: string[] = ['#8a2be2', '#1e90ff', '#66cdaa', '#ffa500', '#FFD700', '#DC143C']
-
-// eslint-disable-next-line react-refresh/only-export-components
 export function stringToColor(string: string) {
   let hash = 0
   let i
