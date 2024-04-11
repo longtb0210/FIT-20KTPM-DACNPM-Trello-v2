@@ -1,6 +1,6 @@
 import { createApi, fetchBaseQuery } from '@reduxjs/toolkit/query/react'
 import { TrelloApi } from '@trello-v2/shared'
-import { token } from './getInfo'
+import { RootState } from '~/store'
 
 interface InviteMembers2WorkspaceRequestWithId extends TrelloApi.WorkspaceApi.InviteMembers2WorkspaceRequest {
   id: string | undefined
@@ -10,8 +10,13 @@ const WorkspaceApiSlice = createApi({
   reducerPath: 'WorkspaceApi',
   baseQuery: fetchBaseQuery({
     baseUrl: import.meta.env.VITE_URL_API,
-    headers: {
-      Authorization: `Bearer ${token}`
+    prepareHeaders: (headers, { getState }) => {
+      const token = (getState() as RootState).KC_TOKEN?.acessToken
+
+      if (token) {
+        headers.set('authorization', `Bearer ${token}`)
+      }
+      return headers
     }
   }),
   endpoints: (builder) => ({
@@ -89,6 +94,12 @@ const WorkspaceApiSlice = createApi({
       query: (data) => ({
         url: `/api/workspace/${data.workspace_id}`,
         method: 'DELETE'
+      })
+    }),
+    getWorkspaceByID: builder.mutation<TrelloApi.WorkspaceApi.WorspaceResponse, { workspace_id: string }>({
+      query: ({ workspace_id }) => ({
+        url: `/api/workspace/${workspace_id}`,
+        method: 'GET'
       })
     })
   })

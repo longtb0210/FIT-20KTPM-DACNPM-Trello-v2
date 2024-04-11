@@ -3,6 +3,7 @@ import StarBorderIcon from '@mui/icons-material/StarBorder'
 import { useTheme } from '~/components/Theme/themeContext'
 import { WorkspaceApiRTQ } from '~/api'
 import React from 'react'
+import { DbSchemas } from '@trello-v2/shared'
 
 interface ProjectTileProps {
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
