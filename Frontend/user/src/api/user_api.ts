@@ -40,10 +40,7 @@ const UserApiSlice = createApi({
     getUserById: builder.query<TrelloApi.UserApi.GetUserResponse, string>({
       query: (email_name) => ({
         url: `/api/user/${email_name}`,
-        method: 'GET',
-        headers: {
-          Authorization: `Bearer ${token}`
-        }
+        method: 'GET'
       })
     })
   })
