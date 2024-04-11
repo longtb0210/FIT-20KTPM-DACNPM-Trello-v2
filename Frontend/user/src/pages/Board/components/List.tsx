@@ -1,6 +1,6 @@
 import { UniqueIdentifier } from '@dnd-kit/core'
 import { CardComponent, ListSetting } from '.'
-import { ListComponentProps } from '../type'
+import { Card, List, ListComponentProps } from '../type'
 import { SortableContext, useSortable, verticalListSortingStrategy } from '@dnd-kit/sortable'
 import { CSS } from '@dnd-kit/utilities'
 import { useEffect, useRef, useState } from 'react'
@@ -22,7 +22,9 @@ export default function ListComponent({
   setResetManually,
   resetManually
 }: ListComponentProps) {
+  const [cardsData, setCardsData] = useState<Card[]>([])
   const [createCard] = CardApiRTQ.CardApiSlice.useCreateCardMutation()
+  const [createCardOnTop] = CardlistApiRTQ.CardListApiSlice.useAddCardOnTopMutation()
   const [updateCardList] = CardlistApiRTQ.CardListApiSlice.useUpdateCardListMutation()
   // const [getAllCardlist] = CardlistApiRTQ.CardListApiSlice.useLazyGetAllCardlistQuery()
   const [getCardListByBoardId, { data: cardlistDataByBoardId }] =
@@ -30,9 +32,12 @@ export default function ListComponent({
   const { colors, darkMode } = useTheme()
   const [listSettingOpen, setListSettingOpen] = useState<string>()
   const [addCardOpenAt, setAddCardOpenAt] = useState<string>('')
-  const [listName, setListName] = useState({ name: '', list_id: '' })
+  const [addCardOnTop, setAddCardOnTop] = useState<string>('')
   const componentRef_AddCard = useRef<HTMLDivElement>(null)
   const componentRef_ListSetting = useRef<HTMLDivElement>(null)
+  useEffect(() => {
+    setCardsData(list.cards.sort((a, b) => (a.index ?? Infinity) - (b.index ?? Infinity)))
+  }, [list])
   useEffect(() => {
     const handleClickOutside_AddCard = (event: MouseEvent) => {
       if (componentRef_AddCard.current && !componentRef_AddCard.current.contains(event.target as Node)) {
@@ -41,7 +46,13 @@ export default function ListComponent({
         setNewCardName('')
       }
     }
-
+    const handleClickOutside_AddCardOnTop = (event: MouseEvent) => {
+      if (componentRef_AddCard.current && !componentRef_AddCard.current.contains(event.target as Node)) {
+        // Clicked outside of Component A, hide it
+        setAddCardOnTop('')
+        setNewCardName('')
+      }
+    }
     const handleClickOutside_ListSetting = (event: MouseEvent) => {
       if (componentRef_ListSetting.current && !componentRef_ListSetting.current.contains(event.target as Node)) {
         // Clicked outside of Component A, hide it
@@ -49,9 +60,11 @@ export default function ListComponent({
       }
     }
     document.addEventListener('mousedown', handleClickOutside_AddCard)
+    document.addEventListener('mousedown', handleClickOutside_AddCardOnTop)
     document.addEventListener('mousedown', handleClickOutside_ListSetting)
     return () => {
       document.removeEventListener('mousedown', handleClickOutside_AddCard)
+      document.removeEventListener('mousedown', handleClickOutside_AddCardOnTop)
       document.removeEventListener('mousedown', handleClickOutside_ListSetting)
     }
   }, [])
@@ -87,15 +100,36 @@ export default function ListComponent({
     setIsInputFocused(true)
   }
   const [newCardName, setNewCardName] = useState<string>('')
-  async function addCard() {
+  async function handleAddCard() {
     const index = list.cards.length == 1 && list.cards[0].placeHolder ? 0 : list.cards.length
     console.log(list.cards.length)
     createCard({
       name: newCardName,
       cardlist_id: list._id,
-      index: index
+      index: index,
+      created_at: new Date()
     }).then(() => {
       setAddCardOpenAt('')
+      setNewCardName('')
+      getCardListByBoardId({ id: board_id })
+    })
+  }
+  async function handleAddCardOnTop() {
+    const index =
+      list.cards.length == 1 && list.cards[0].placeHolder
+        ? 0
+        : typeof list.cards[0].index === 'number'
+          ? list.cards[0].index - 1
+          : 0
+    createCard({
+      name: newCardName,
+      cardlist_id: list._id,
+      index: index,
+      description: '',
+      created_at: new Date(),
+      cover: ''
+    }).then(() => {
+      setAddCardOnTop('')
       setNewCardName('')
       getCardListByBoardId({ id: board_id })
     })
@@ -114,7 +148,21 @@ export default function ListComponent({
     minHeight: `${maxHeight}px`
     // maxHeight: `${maxHeight > 590 ? 590 : maxHeight}px`
   }
-
+  const renderCards = (list: List) => {
+    return (
+      <div className={`space-y-[10px] `}>
+        {list.cards &&
+          list.cards.map((card, index) => (
+            <CardComponent
+              cardSelected={cardSelected}
+              key={index}
+              card={card}
+              setOpenCardSetting={setOpenCardSetting}
+            />
+          ))}
+      </div>
+    )
+  }
   return (
     <div
       ref={setNodeRef}
@@ -155,25 +203,114 @@ export default function ListComponent({
       <div className={`relative max-h-[580px]  overscroll-contain`}>
         {listSettingOpen && listSettingOpen === list._id && (
           <div ref={componentRef_ListSetting}>
-            <ListSetting closeListSetting={() => setListSettingOpen('')} />
+            <ListSetting
+              closeListSetting={() => setListSettingOpen('')}
+              setAddCardOnTop={setAddCardOnTop}
+              list={list}
+            />
           </div>
         )}
+        {addCardOnTop &&
+          addCardOnTop === list._id &&
+          (list.cards[0].placeHolder === false ? (
+            <div ref={componentRef_AddCard} className='mx-3'>
+              <div className={` mt-[10px] rounded-xl  ${darkMode ? `` : ' shadow-sm shadow-gray-300'} `}>
+                <div className={`flex flex-row items-center   justify-between`}>
+                  <input
+                    style={{
+                      backgroundColor: colors.background,
+                      color: colors.text
+                    }}
+                    className={` h-full w-full rounded-lg px-2 pb-8 pt-2 text-left focus:border-0 focus:outline-none focus:ring-0 `}
+                    placeholder='Enter the title for this card...'
+                    value={newCardName}
+                    onChange={(e) => setNewCardName(e.target.value)}
+                    autoFocus
+                  ></input>
+                </div>
+              </div>
+              <div className={`mb-1 mt-[10px] flex flex-row space-x-2`}>
+                <button
+                  style={{
+                    backgroundColor: !isHovered ? colors.add_card : colors.add_card_hover,
+                    color: darkMode ? 'black' : 'white'
+                  }}
+                  className=' rounded   bg-blue-600 px-3 py-2 hover:bg-blue-700'
+                  onClick={() => {
+                    if (list._id) setAddCardOnTop(list._id)
+                    handleAddCardOnTop()
+                  }}
+                  onMouseEnter={() => setIsHovered(true)}
+                  onMouseLeave={() => setIsHovered(false)}
+                >
+                  <p className={`text-left ${darkMode ? '' : 'font-semibold'}`}> Add card</p>
+                </button>
+                <button
+                  className={` rounded-lg px-3 py-2 ${darkMode ? 'hover:bg-gray-600' : 'hover:bg-gray-300'}`}
+                  onClick={() => {
+                    setAddCardOnTop('')
+                    setNewCardName('')
+                  }}
+                >
+                  <p className={`text-left font-semibold`}>
+                    {' '}
+                    <IoMdClose className={``} size={'20px'} />{' '}
+                  </p>
+                </button>
+              </div>
+            </div>
+          ) : (
+            <div ref={componentRef_AddCard} className=' mx-3 -mt-3 '>
+              <div className={` space-y-2 rounded-xl  ${darkMode ? `` : ' shadow-sm shadow-gray-300'} `}>
+                <div className={`flex flex-row items-center   justify-between`}>
+                  <input
+                    style={{
+                      backgroundColor: colors.background,
+                      color: colors.text
+                    }}
+                    className={` h-full w-full rounded-lg px-2 pb-8 pt-2 text-left focus:border-0 focus:outline-none focus:ring-0 `}
+                    placeholder='Enter the title for this card...'
+                    value={newCardName}
+                    onChange={(e) => setNewCardName(e.target.value)}
+                    autoFocus
+                  ></input>
+                </div>
+              </div>
+              <div className={`mb-1 mt-[10px] flex flex-row space-x-2`}>
+                <button
+                  style={{
+                    backgroundColor: !isHovered ? colors.add_card : colors.add_card_hover,
+                    color: darkMode ? 'black' : 'white'
+                  }}
+                  className=' rounded   bg-blue-600 px-3 py-2 hover:bg-blue-700'
+                  onClick={() => {
+                    if (list._id) setAddCardOnTop(list._id)
+                    handleAddCardOnTop()
+                  }}
+                >
+                  <p className={`text-left ${darkMode ? '' : 'font-semibold'}`}> Add card</p>
+                </button>
+                <button
+                  className={` rounded-lg px-3 py-2 ${darkMode ? 'hover:bg-gray-600' : 'hover:bg-gray-300'}`}
+                  onClick={() => {
+                    setAddCardOnTop('')
+                    setNewCardName('')
+                  }}
+                >
+                  <p className={`text-left font-semibold `}>
+                    {' '}
+                    <IoMdClose className={``} size={'20px'} />{' '}
+                  </p>
+                </button>
+              </div>
+            </div>
+          ))}
         <div className={`my-1`}>
           <SortableContext
             items={list.cards.map((c) => c._id) as (UniqueIdentifier | { id: UniqueIdentifier })[]}
             strategy={verticalListSortingStrategy}
           >
-            <div className={`space-y-[10px] `}>
-              {list.cards &&
-                list.cards.map((card, index) => (
-                  <CardComponent
-                    cardSelected={cardSelected}
-                    key={index}
-                    card={card}
-                    setOpenCardSetting={setOpenCardSetting}
-                  />
-                ))}
-            </div>
+            {renderCards(list)}
           </SortableContext>
         </div>
         {addCardOpenAt &&
@@ -204,7 +341,7 @@ export default function ListComponent({
                   className=' rounded   bg-blue-600 px-3 py-2 hover:bg-blue-700'
                   onClick={() => {
                     if (list._id) setAddCardOpenAt(list._id)
-                    addCard()
+                    handleAddCard()
                   }}
                   onMouseEnter={() => setIsHovered(true)}
                   onMouseLeave={() => setIsHovered(false)}
@@ -251,7 +388,7 @@ export default function ListComponent({
                   className=' rounded   bg-blue-600 px-3 py-2 hover:bg-blue-700'
                   onClick={() => {
                     if (list._id) setAddCardOpenAt(list._id)
-                    addCard()
+                    handleAddCard()
                   }}
                 >
                   <p className={`text-left ${darkMode ? '' : 'font-semibold'}`}> Add card</p>

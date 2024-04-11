@@ -24,6 +24,18 @@ export const CardListApiSlice = createApi({
         method: 'GET'
       })
     }),
+    addCardOnTop: build.mutation<
+      TrelloApi.CardlistApi.AddCardToListResponse,
+      TrelloApi.CardlistApi.AddCardToListRequest
+    >({
+      query: (data) => ({
+        url: `/api/cardlist/add_card`,
+        method: 'POST',
+        body: {
+          ...data
+        }
+      })
+    }),
     createCardlist: build.mutation<
       TrelloApi.CardlistApi.CreateCardlistResponse,
       TrelloApi.CardlistApi.CreateCardlistRequest
@@ -44,6 +56,43 @@ export const CardListApiSlice = createApi({
         body: {
           ...data
         }
+      })
+    }),
+    moveCardList: build.mutation<TrelloApi.CardlistApi.MoveCardlistResponse, TrelloApi.CardlistApi.MoveCardlistRequest>(
+      {
+        query: (data) => ({
+          method: 'PUT',
+          url: '/api/cardlist/move',
+          body: {
+            ...data
+          }
+        })
+      }
+    ),
+    copyCardList: build.mutation<TrelloApi.CardlistApi.CopyCardlistResponse, TrelloApi.CardlistApi.CopyCardlistRequest>(
+      {
+        query: (data) => ({
+          method: 'POST',
+          url: '/api/cardlist/copy',
+          body: {
+            ...data
+          }
+        })
+      }
+    ),
+    archiveAllCardInCardList: build.mutation<
+      TrelloApi.CardlistApi.ArchiveAllCardsInListResponse,
+      { cardListId: string }
+    >({
+      query: ({ cardListId }) => ({
+        method: 'PATCH',
+        url: `/api/cardlist/archive_cards_in_list/${cardListId}`
+      })
+    }),
+    archiveCardList: build.mutation<TrelloApi.CardlistApi.ArchiveAllCardsInListResponse, { cardListId: string }>({
+      query: ({ cardListId }) => ({
+        method: 'PATCH',
+        url: `/api/cardlist/archive_card_list/${cardListId}`
       })
     })
   })

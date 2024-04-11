@@ -20,14 +20,25 @@ export const ActivityComponent: React.FC<ActivityProps> = ({ userInfo }) => {
   const [activityCount, setActivityCount] = useState<number>(3)
   const [workspaceAll, setWorkspaceAll] = useState<Workspace[]>()
   const [getActivityAPI, { data: activityData }] = UserApiRTQ.UserApiSlice.useLazyGetActivitiesQuery()
-  const [getAllWorkspace, {data:workspaceData}] = WorkspaceApiRTQ.WorkspaceApiSlice.useLazyGetAllWorkspaceByEmailQuery()
+  const [getAllWorkspace, { data: workspaceData }] = WorkspaceApiRTQ.WorkspaceApiSlice.useLazyGetAllUserWorkspaceQuery()
   useEffect(() => {
     getActivityAPI({
       email: userInfo?.email || ''
     })
     addWorkSpaceName()
   }, [activityCount])
-
+  useEffect(() => {
+    getAllWorkspace()
+  }, [])
+  useEffect(() => {
+    const data = workspaceData?.data.owner.concat(
+      workspaceData?.data.admin,
+      workspaceData?.data.member,
+      workspaceData?.data.guest
+    )
+    const uniqueWorkspaces = [...new Set(data)]
+    setWorkspace(uniqueWorkspaces)
+  }, [workspaceData])
   function getActivity(data: Activity[], count: number) {
     if (count < data.length) return data.slice(0, count)
     else return data
@@ -45,7 +56,6 @@ export const ActivityComponent: React.FC<ActivityProps> = ({ userInfo }) => {
         }
       })
       setActivity(activityDataWithWorkspaceName)
-      setWorkspace(workspaceData?.data.member)
     }
   }
   return (

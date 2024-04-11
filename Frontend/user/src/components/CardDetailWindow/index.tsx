@@ -131,7 +131,10 @@ export default function CardDetailWindow({ cardlistId, cardId, isOpenCDW, handle
   }
 
   return (
-    <Backdrop sx={{ bgcolor: 'rgba(0, 0, 0, 0.64)', zIndex: (theme) => theme.zIndex.drawer + 1 }} open={isOpenCDW}>
+    <Backdrop
+      sx={{ bgcolor: 'rgba(0, 0, 0, 0.64)', zIndex: (theme) => theme.zIndex.drawer + 1, marginTop: '55px' }}
+      open={isOpenCDW}
+    >
       <Box
         sx={{
           width: '100%',
