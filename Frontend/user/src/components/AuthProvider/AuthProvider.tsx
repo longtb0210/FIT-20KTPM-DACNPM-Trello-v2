@@ -25,6 +25,8 @@ export function AuthProvider({ children }: { children?: React.ReactNode }) {
     })
     keycloak.current.onAuthSuccess = () => {
       dispatch(TokenSlice.actions.setToken(keycloak.current?.token || ''))
+
+      // localStorage.setItem('isLogin', JSON.stringify(true))
     }
     keycloak.current
       .init({
@@ -47,6 +49,7 @@ export function AuthProvider({ children }: { children?: React.ReactNode }) {
 
   const logout = () => {
     if (keycloak.current) {
+      localStorage.clear()
       keycloak.current.logout({ redirectUri: 'http://localhost:3000/login' })
     }
   }

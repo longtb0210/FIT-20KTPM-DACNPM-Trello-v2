@@ -6,19 +6,20 @@ import React from 'react'
 import { DbSchemas } from '@trello-v2/shared'
 
 interface ProjectTileProps {
-  boardData: DbSchemas.BoardSchema.Board
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  boardData: Record<string, any>
 }
 
 const ProjectTile: React.FC<ProjectTileProps> = ({ boardData }) => {
   const { colors } = useTheme()
   const [isStar, setIsStar] = useState(false) // State để theo dõi hover của icon
   const [isHovered, setIsHovered] = useState(false) // State để theo dõi hover của ProjectTile
-  const [getWorkspaceById, { data: workspaceData }] =
-    WorkspaceApiRTQ.WorkspaceApiSlice.useLazyGetAllWorkspaceByEmailQuery()
+  const [getWorkspaceById, { data: workspaceData }] = WorkspaceApiRTQ.WorkspaceApiSlice.useLazyGetWorkspaceInfoQuery()
 
   React.useEffect(() => {
-    getWorkspaceById({ email: boardData.workspace_id })
-  }, [boardData])
+    console.log({ id: boardData.workspace_id })
+    getWorkspaceById(boardData.workspace_id)
+  }, [boardData.workspace_id, getWorkspaceById])
 
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   function handleIconClick(): void {
@@ -54,7 +55,7 @@ const ProjectTile: React.FC<ProjectTileProps> = ({ boardData }) => {
             className='mt-0 block overflow-hidden text-ellipsis whitespace-nowrap text-xs font-normal leading-3 text-gray-700'
             style={{ color: colors.text }}
           >
-            {workspaceData?.data.owner[0]?.description || 'No desc found'}
+            {workspaceData?.data.description}
           </span>
         </span>
       </a>

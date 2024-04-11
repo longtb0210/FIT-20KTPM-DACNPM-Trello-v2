@@ -55,11 +55,11 @@ export default function CreateBoard(props: AutocompleteContainerProps) {
   const [createBoard] = BoardApiRTQ.BoardApiSlice.useCreateBoardMutation()
   const [getAllBoard] = BoardApiRTQ.BoardApiSlice.useLazyGetAllBoardQuery()
   const [getALlWorkspace, { data: workspaceData }] = WorkspaceApiRTQ.WorkspaceApiSlice.useLazyGetAllWorkspaceQuery()
-  const [valueWorkspace, setValueWorkspace] = React.useState<string>(workspaceData?.data[0].name || '')
+  const [valueWorkspace, setValueWorkspace] = React.useState<string>(workspaceData?.data.owner[0].name || '')
   const [valueVisibility, setValueVisibility] = React.useState<string>(visibility[0])
   const [inputValueWorkspace, setInputValueWorkspace] = React.useState('')
   const [inputValueVisibility, setInputValueVisibility] = React.useState('')
-  const [idWorkspace, setIdWorkspace] = React.useState(workspaceData?.data[0]._id || '')
+  const [idWorkspace, setIdWorkspace] = React.useState(workspaceData?.data.owner[0]._id || '')
   const [boardTitle, setBoardTitle] = React.useState('')
   const [activeBg, setActiveBg] = React.useState({ check: true, index: 0, type: 'color', data: bg_color[0].color })
   const anchorRef = React.useRef<HTMLButtonElement>(null)
@@ -81,7 +81,8 @@ export default function CreateBoard(props: AutocompleteContainerProps) {
     createBoard({
       name: boardTitle,
       workspace_id: idWorkspace,
-      visibility: valueVisibility?.toLocaleLowerCase() as 'private' | 'public' | 'workspace'
+      visibility: valueVisibility?.toLocaleLowerCase() as 'private' | 'public' | 'workspace',
+      background: activeBg.data
     }).then(() => getAllBoard())
   }
 
@@ -102,7 +103,7 @@ export default function CreateBoard(props: AutocompleteContainerProps) {
             padding: '8px',
             cursor: 'pointer',
             '&:hover': {
-              backgroundColor: 'rgba(255,255,255,0.1)',
+              backgroundColor: colors.colorHover,
               borderRadius: '4px'
             }
           }}
@@ -118,7 +119,7 @@ export default function CreateBoard(props: AutocompleteContainerProps) {
             padding: '8px',
             cursor: 'pointer',
             '&:hover': {
-              backgroundColor: 'rgba(255,255,255,0.1)',
+              backgroundColor: colors.colorHover,
               borderRadius: '4px'
             }
           }}
@@ -289,10 +290,9 @@ export default function CreateBoard(props: AutocompleteContainerProps) {
             disableClearable
             onChange={(_event: React.SyntheticEvent, newValue: string) => {
               setValueWorkspace(newValue)
-              const newIndex = workspaceData?.data.findIndex((workspace) => workspace.name === newValue) || 0
-              if (newIndex !== -1 && workspaceData?.data[newIndex]?._id) {
-                console.log('Selected index:', newIndex)
-                setIdWorkspace(workspaceData?.data[newIndex]?._id)
+              const newIndex = workspaceData?.data.owner.findIndex((workspace) => workspace.name === newValue) || 0
+              if (newIndex !== -1 && workspaceData?.data.owner[newIndex]?._id) {
+                setIdWorkspace(workspaceData?.data.owner[newIndex]?._id)
               }
             }}
             inputValue={inputValueWorkspace}
@@ -301,7 +301,7 @@ export default function CreateBoard(props: AutocompleteContainerProps) {
             }}
             id='controllable-states-demo'
             options={
-              workspaceData?.data
+              workspaceData?.data.owner
                 .filter((workspace) => workspace.members.some((member) => member.role !== 'guest'))
                 .map((workspace) => workspace.name) ?? []
             }

@@ -12,6 +12,7 @@ const WorkspaceApiSlice = createApi({
     baseUrl: import.meta.env.VITE_URL_API,
     prepareHeaders: (headers, { getState }) => {
       const token = (getState() as RootState).KC_TOKEN?.acessToken
+
       if (token) {
         headers.set('authorization', `Bearer ${token}`)
       }
@@ -57,8 +58,8 @@ const WorkspaceApiSlice = createApi({
         body: data
       })
     }),
-    getWorkspaceInfo: builder.query<TrelloApi.WorkspaceApi.WorspaceResponse, { id: string }>({
-      query: ({ id }) => ({
+    getWorkspaceInfo: builder.query<TrelloApi.WorkspaceApi.WorspaceResponse, string>({
+      query: (id) => ({
         url: `/api/workspace/${id}`,
         method: 'GET'
       })
@@ -89,6 +90,12 @@ const WorkspaceApiSlice = createApi({
       query: (data) => ({
         url: `/api/workspace/${data.workspace_id}`,
         method: 'DELETE'
+      })
+    }),
+    getWorkspaceByID: builder.mutation<TrelloApi.WorkspaceApi.WorspaceResponse, { workspace_id: string }>({
+      query: ({ workspace_id }) => ({
+        url: `/api/workspace/${workspace_id}`,
+        method: 'GET'
       })
     })
   })

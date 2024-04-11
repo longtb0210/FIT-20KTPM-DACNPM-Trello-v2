@@ -2,10 +2,11 @@ import * as React from 'react'
 import { Box, Button, ClickAwayListener, Grow, Paper, Popper, MenuList, Stack, Typography } from '@mui/material'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { faChevronDown } from '@fortawesome/free-solid-svg-icons'
-
 import { Link } from 'react-router-dom'
 import { useTheme } from '../../Theme/themeContext'
 import { WorkspaceApiRTQ } from '~/api'
+import { stringToColor } from '~/utils/StringToColor'
+import noneStar from '~/assets/noneStar.svg'
 
 export default function WorkSpaces() {
   const [open, setOpen] = React.useState(false)
@@ -23,11 +24,11 @@ export default function WorkSpaces() {
         ...workspaceData.data.admin,
         ...workspaceData.data.guest,
         ...workspaceData.data.member,
-        ...workspaceData.data.guest
+        ...workspaceData.data.owner
       ]
   const listWorkspaceNotGuestData = !workspaceData?.data
     ? []
-    : [...workspaceData.data.admin, ...workspaceData.data.guest, ...workspaceData.data.member]
+    : [...workspaceData.data.admin, ...workspaceData.data.owner, ...workspaceData.data.member]
 
   const listWorkspaceGuestData = workspaceData?.data.guest || []
 
@@ -118,14 +119,14 @@ export default function WorkSpaces() {
                       transition: 'all 0.1s ease-in',
                       padding: '12px',
                       backgroundColor: colors.background_menu_header,
-                      minWidth: '304px',
+                      width: '304px',
                       borderRadius: '4px'
                     }}
                   >
-                    {listWorkspaceData && listWorkspaceData.length !== 0 && (
-                      <>
-                        {listWorkspaceNotGuestData && listWorkspaceNotGuestData.length !== 0 && (
-                          <Box>
+                    {listWorkspaceData && listWorkspaceData.length !== 0 ? (
+                      [
+                        listWorkspaceNotGuestData && listWorkspaceNotGuestData.length !== 0 && (
+                          <Box key='yourWorkspaces'>
                             <Typography
                               variant='body1'
                               sx={{ fontSize: '12px', fontWeight: 700, color: colors.text, marginBottom: '8px' }}
@@ -134,7 +135,7 @@ export default function WorkSpaces() {
                             </Typography>
 
                             {listWorkspaceNotGuestData.map((workspace, index) => (
-                              <Link to={`/workspace/${workspace._id}`} key={index}>
+                              <Link to={`/workspaceboard/${workspace._id}`} key={index}>
                                 <Box
                                   sx={{
                                     display: 'flex',
@@ -155,7 +156,8 @@ export default function WorkSpaces() {
                                       fontWeight: 700,
                                       padding: '8px 14px',
                                       borderRadius: '6px',
-                                      backgroundImage: `linear-gradient(to bottom, ${generateRandomColor()}, ${generateRandomColor()})`
+                                      backgroundColor: stringToColor(workspace.name),
+                                      color: colors.foreColor
                                     }}
                                   >
                                     {workspace.name.charAt(0).toUpperCase()}
@@ -171,10 +173,10 @@ export default function WorkSpaces() {
                               </Link>
                             ))}
                           </Box>
-                        )}
+                        ),
 
-                        {listWorkspaceGuestData && listWorkspaceGuestData.length !== 0 && (
-                          <Box sx={{ marginTop: '20px' }}>
+                        listWorkspaceGuestData && listWorkspaceGuestData.length !== 0 && (
+                          <Box sx={{ marginTop: '20px' }} key='guestWorkspaces'>
                             <Typography
                               variant='body1'
                               sx={{ fontSize: '12px', fontWeight: 700, color: colors.text, marginBottom: '8px' }}
@@ -183,7 +185,7 @@ export default function WorkSpaces() {
                             </Typography>
 
                             {listWorkspaceGuestData.map((workspace, index) => (
-                              <Link to={`/workspace/${workspace._id}`} key={index}>
+                              <Link to={`/workspaceboard/${workspace._id}`} key={index}>
                                 <Box
                                   sx={{
                                     display: 'flex',
@@ -204,7 +206,8 @@ export default function WorkSpaces() {
                                       fontWeight: 700,
                                       padding: '8px 14px',
                                       borderRadius: '6px',
-                                      backgroundImage: `linear-gradient(to bottom, ${generateRandomColor()}, ${generateRandomColor()})`
+                                      backgroundColor: stringToColor(workspace.name),
+                                      color: colors.foreColor
                                     }}
                                   >
                                     {workspace.name.charAt(0).toUpperCase()}
@@ -220,8 +223,19 @@ export default function WorkSpaces() {
                               </Link>
                             ))}
                           </Box>
-                        )}
-                      </>
+                        )
+                      ]
+                    ) : (
+                      <Box>
+                        <img src={noneStar} alt='' style={{ backgroundSize: 'cover', width: '100%' }} />
+
+                        <Typography
+                          variant='body1'
+                          sx={{ fontSize: '14px', color: colors.text, textAlign: 'center', margin: '12px 0 8px 0' }}
+                        >
+                          No workspace
+                        </Typography>
+                      </Box>
                     )}
                   </MenuList>
                 </ClickAwayListener>

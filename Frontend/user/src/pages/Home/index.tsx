@@ -134,7 +134,7 @@ export default function HomePage() {
             <div className='iSLLvvYdGSEgKr'>
               <h6 className='mb-4 ml-3 text-[13px] font-semibold'>Links</h6>
               <div className='relative flex h-12 items-center rounded'>
-                <button className='absolute m-0 flex h-6 h-[50px] w-[100%] cursor-pointer items-center rounded rounded-md border-0 p-0  font-thin shadow-none hover:bg-[#DCDFE4]'>
+                <button className='absolute m-0 flex h-[50px] w-[100%] cursor-pointer items-center rounded-md border-0 p-0  font-thin shadow-none hover:bg-[#DCDFE4]'>
                   <span className='ml-2 mr-4 rounded-md bg-[#F1F2F4] px-3 py-2'>
                     <FaPlus className='' />
                   </span>
