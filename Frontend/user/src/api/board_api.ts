@@ -1,6 +1,5 @@
 import { createApi, fetchBaseQuery } from '@reduxjs/toolkit/query/react'
 import { TrelloApi } from '@trello-v2/shared'
-import { token } from './getInfo'
 import { RootState } from '~/store'
 
 const BoardApiSlice = createApi({
@@ -49,7 +48,7 @@ const BoardApiSlice = createApi({
         method: 'GET'
       })
     }),
-    addBackgroundBoard: builder.mutation<TrelloApi.BoardApi.UpdateBoardResponse, {id: string, background: File}>({
+    addBackgroundBoard: builder.mutation<TrelloApi.BoardApi.UpdateBoardResponse, { id: string; background: File }>({
       query: (data) => ({
         url: `/api/board/${data.id}/background_list/add`,
         body: data,
@@ -63,20 +62,26 @@ const BoardApiSlice = createApi({
         method: 'POST'
       })
     }),
-    removeWatcherMember: builder.mutation<TrelloApi.BoardApi.RemoveMemberResponse, TrelloApi.BoardApi.RemoveMemberRequest>({
+    removeWatcherMember: builder.mutation<
+      TrelloApi.BoardApi.RemoveMemberResponse,
+      TrelloApi.BoardApi.RemoveMemberRequest
+    >({
       query: (data) => ({
         url: `/api/board/watchers/remove`,
         body: data,
         method: 'POST'
       })
     }),
-    removeMemberInBoardByEmail: builder.mutation<TrelloApi.BoardApi.RemoveMemberResponse, TrelloApi.BoardApi.RemoveMemberRequest>({
+    removeMemberInBoardByEmail: builder.mutation<
+      TrelloApi.BoardApi.RemoveMemberResponse,
+      TrelloApi.BoardApi.RemoveMemberRequest
+    >({
       query: (data) => ({
         url: `/api/board/members/remove`,
         body: data,
         method: 'POST'
       })
-    }),
+    })
   })
 })
 

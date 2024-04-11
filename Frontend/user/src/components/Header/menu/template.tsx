@@ -133,7 +133,7 @@ export default function Templates() {
                       style={{
                         fontSize: '12px',
                         fontWeight: 500,
-                        color: '#44546f',
+                        color: colors.text,
                         marginBottom: '8px'
                       }}
                     >

@@ -1,5 +1,5 @@
 import * as React from 'react'
-import { Box, Button, Autocomplete, TextField } from '@mui/material'
+import { Box, Button, Autocomplete, TextField, SelectChangeEvent, makeStyles } from '@mui/material'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { faCheck, faChevronLeft, faClose } from '@fortawesome/free-solid-svg-icons'
 import bgHeader from '~/assets/bg_header_create_board.svg'
@@ -7,6 +7,8 @@ import { useTheme } from './../../Theme/themeContext'
 // import { useNavigate } from 'react-router-dom'
 // import axios from 'axios'
 import { BoardApiRTQ, WorkspaceApiRTQ } from '~/api'
+import { useEffect, useRef, useState } from 'react'
+import { Workspace } from '@trello-v2/shared/src/schemas/Workspace'
 
 interface AutocompleteContainerProps {
   onClose: () => void
@@ -55,17 +57,17 @@ export default function CreateBoard(props: AutocompleteContainerProps) {
   const [createBoard] = BoardApiRTQ.BoardApiSlice.useCreateBoardMutation()
   const [getAllBoard] = BoardApiRTQ.BoardApiSlice.useLazyGetAllBoardQuery()
   const [getALlWorkspace, { data: workspaceData }] = WorkspaceApiRTQ.WorkspaceApiSlice.useLazyGetAllWorkspaceQuery()
-  const [valueWorkspace, setValueWorkspace] = React.useState<string>(workspaceData?.data.owner[0].name || '')
-  const [valueVisibility, setValueVisibility] = React.useState<string>(visibility[0])
-  const [inputValueWorkspace, setInputValueWorkspace] = React.useState('')
-  const [inputValueVisibility, setInputValueVisibility] = React.useState('')
-  const [idWorkspace, setIdWorkspace] = React.useState(workspaceData?.data.owner[0]._id || '')
-  const [boardTitle, setBoardTitle] = React.useState('')
-  const [activeBg, setActiveBg] = React.useState({ check: true, index: 0, type: 'color', data: bg_color[0].color })
-  const anchorRef = React.useRef<HTMLButtonElement>(null)
+  const [valueWorkspace, setValueWorkspace] = useState<string>(workspaceData?.data.owner[0].name || '')
+  const [valueVisibility, setValueVisibility] = useState<string>(visibility[0])
+  const [inputValueWorkspace, setInputValueWorkspace] = useState('')
+  const [inputValueVisibility, setInputValueVisibility] = useState('')
+  const [idWorkspace, setIdWorkspace] = useState(workspaceData?.data.owner[0]._id || '')
+  const [boardTitle, setBoardTitle] = useState('')
+  const [activeBg, setActiveBg] = useState({ check: true, index: 0, type: 'color', data: bg_color[0].color })
+  const anchorRef = useRef<HTMLButtonElement>(null)
   const { darkMode, colors } = useTheme()
 
-  React.useEffect(() => {
+  useEffect(() => {
     getALlWorkspace()
   }, [getALlWorkspace])
 
@@ -307,10 +309,6 @@ export default function CreateBoard(props: AutocompleteContainerProps) {
             }
             sx={{
               width: '100%',
-              '& .MuiAutocomplete-option': {
-                backgroundColor: 'red !important'
-              },
-
               '& .MuiInputBase-input': {
                 fontSize: '12px',
                 color: colors.text
@@ -318,6 +316,7 @@ export default function CreateBoard(props: AutocompleteContainerProps) {
               '& .MuiSvgIcon-root': {
                 color: colors.text
               },
+
               border: '1px solid #384148',
               borderRadius: '4px'
             }}

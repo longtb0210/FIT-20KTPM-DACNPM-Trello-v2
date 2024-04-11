@@ -1,14 +1,18 @@
 import { createApi, fetchBaseQuery } from '@reduxjs/toolkit/query/react'
 import { TrelloApi } from '@trello-v2/shared'
-
-import { token } from './getInfo'
+import { RootState } from '~/store'
 
 export const CardApiSlice = createApi({
   reducerPath: 'CardApi',
   baseQuery: fetchBaseQuery({
     baseUrl: import.meta.env.VITE_URL_API,
-    headers: {
-      Authorization: `Bearer ${token}`
+    prepareHeaders: (headers, { getState }) => {
+      const token = (getState() as RootState).KC_TOKEN?.acessToken
+
+      if (token) {
+        headers.set('authorization', `Bearer ${token}`)
+      }
+      return headers
     }
   }),
   endpoints: (build) => ({
@@ -105,16 +109,12 @@ export const CardApiSlice = createApi({
         }
       })
     }),
-    moveCardDifList: build.mutation<
-      TrelloApi.CardApi.MoveCardSamelistResponse,
-      TrelloApi.CardApi.MoveCardSamelistRequest
-    >({
+    moveCard: build.mutation<TrelloApi.CardApi.MoveCardResponse, TrelloApi.CardApi.MoveCardRequest>({
       query: (data) => ({
         url: '/api/card/move',
-        method: 'PUT',
+        method: 'POST',
         body: {
           ...data
-          // cardlist_id: 'demo_cardlist'
         }
       })
     })

@@ -36,9 +36,9 @@ const WorkspaceApiSlice = createApi({
         method: 'GET'
       })
     }),
-    getAllWorkspaceByEmail: builder.query<TrelloApi.WorkspaceApi.WorspaceListByEmailResponse, { email: string }>({
-      query: ({ email }) => ({
-        url: `/api/workspace/all/`,
+    getAllUserWorkspace: builder.query<TrelloApi.WorkspaceApi.WorspaceListByEmailResponse, void>({
+      query: () => ({
+        url: `/api/workspace/all`,
         method: 'GET'
       })
     }),
@@ -71,19 +71,23 @@ const WorkspaceApiSlice = createApi({
       query: (data) => {
         // Omit the id field from the data object
         const { id, ...requestData } = data
-
+        console.log(id)
+        console.log(requestData)
         return {
           url: `/api/workspace/invite/${id}`,
           method: 'POST',
-          body: { data: requestData }
+          body: { ...requestData }
         }
       }
     }),
-    changeWorkspaceVisibility: builder.mutation<void, TrelloApi.WorkspaceApi.ChangeWorkspaceVisibilityRequest>({
+    changeWorkspaceVisibility: builder.mutation<
+      TrelloApi.WorkspaceApi.WorspaceResponse,
+      TrelloApi.WorkspaceApi.ChangeWorkspaceVisibilityRequest
+    >({
       query: (data) => ({
         url: `/api/workspace/visibility`,
         method: 'PUT',
-        body: { data }
+        body: { ...data }
       })
     }),
     deleteWorkspace: builder.mutation<TrelloApi.WorkspaceApi.WorspaceResponse, { workspace_id: string }>({
