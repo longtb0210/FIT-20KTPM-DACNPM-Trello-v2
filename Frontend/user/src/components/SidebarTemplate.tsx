@@ -4,7 +4,7 @@ import { Menu, MenuItem, SubMenu } from 'react-pro-sidebar'
 import { Box, Typography } from '@mui/material'
 import { faTrello } from '@fortawesome/free-brands-svg-icons'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
-import { Link } from 'react-router-dom'
+import { Link, useLocation } from 'react-router-dom'
 import { WorkspaceApiRTQ } from '~/api'
 import { faChessBoard, faGear, faTableCells, faUserGroup, faHome } from '@fortawesome/free-solid-svg-icons'
 import { faHeart } from '@fortawesome/free-regular-svg-icons'
@@ -37,10 +37,8 @@ const SidebarTemplate: React.FC<ProfileProps> = ({ userInfo }) => {
   const [activeItem, setActiveItem] = useState<string | null>(null)
   const [hoveredItem, setHoveredItem] = useState<string | null>(null)
   const { darkMode, colors } = useTheme()
-
-  const handleItemClick = (item: string) => {
-    setActiveItem(item)
-  }
+  const location = useLocation()
+  console.log(location)
 
   const handleMouseEnter = (itemKey: string) => {
     setHoveredItem(itemKey)
@@ -58,11 +56,10 @@ const SidebarTemplate: React.FC<ProfileProps> = ({ userInfo }) => {
         backgroundColor:
           hoveredItem === item
             ? colors.bg_button_hover
-            : activeItem === item
+            : activeItem === `/template/item`
               ? colors.bg_button_active_hover
               : colors.background
       }}
-      onClick={() => handleItemClick(item)}
       onMouseEnter={() => handleMouseEnter(item)}
       onMouseLeave={() => handleMouseLeave()}
     >
@@ -71,8 +68,18 @@ const SidebarTemplate: React.FC<ProfileProps> = ({ userInfo }) => {
   ))
 
   React.useEffect(() => {
+    const targetPaths = [
+      `/boards`,
+      `/template`,
+      `/template/item`,
+      `/`
+    ];
+
+    if (targetPaths.includes(location.pathname)) {
+      setActiveItem(location.pathname);
+    }
     getAllWorkspace().then((v:any) => console.log(v))
-  }, [])
+  }, [location.pathname])
 
   console.log(workspaceData)
 
@@ -88,15 +95,14 @@ const SidebarTemplate: React.FC<ProfileProps> = ({ userInfo }) => {
             backgroundColor:
               hoveredItem === 'boards'
                 ? colors.bg_button_hover
-                : activeItem === 'boards'
+                : activeItem === `/boards`
                   ? colors.bg_button_active_hover
                   : colors.background
           }}
-          onClick={() => handleItemClick('boards')}
           onMouseEnter={() => handleMouseEnter('boards')}
           onMouseLeave={() => handleMouseLeave()}
         >
-          <Link to={'/board/1'}>
+          <Link to={'/boards'}>
             <div className='flex items-center'>
               <FontAwesomeIcon icon={faTrello} fontSize='small' className='mr-2' />
               Boards
@@ -119,11 +125,10 @@ const SidebarTemplate: React.FC<ProfileProps> = ({ userInfo }) => {
             backgroundColor:
               hoveredItem === 'templates'
                 ? colors.bg_button_hover
-                : activeItem === 'templates'
+                : activeItem === `/template`
                   ? colors.bg_button_active_hover
                   : colors.background
           }}
-          onClick={() => handleItemClick('templates')}
           onMouseEnter={() => handleMouseEnter('templates')}
           onMouseLeave={() => handleMouseLeave()}
         >
@@ -136,11 +141,10 @@ const SidebarTemplate: React.FC<ProfileProps> = ({ userInfo }) => {
             backgroundColor:
               hoveredItem === 'home'
                 ? colors.bg_button_hover
-                : activeItem === 'home'
+                : activeItem === `/`
                   ? colors.bg_button_active_hover
                   : colors.background
           }}
-          onClick={() => handleItemClick('home')}
           onMouseEnter={() => handleMouseEnter('home')}
           onMouseLeave={() => handleMouseLeave()}
         >
@@ -204,7 +208,6 @@ const SidebarTemplate: React.FC<ProfileProps> = ({ userInfo }) => {
                   height: '50px',
                   backgroundColor: colors.background
                 }}
-                onClick={() => handleItemClick('workspace')}
                 onMouseEnter={() => handleMouseEnter('workspace')}
                 onMouseLeave={() => handleMouseLeave()}
               >
@@ -220,7 +223,6 @@ const SidebarTemplate: React.FC<ProfileProps> = ({ userInfo }) => {
                             ? colors.bg_button_active_hover
                             : colors.background
                     }}
-                    onClick={() => handleItemClick('board')}
                     onMouseEnter={() => handleMouseEnter('board')}
                     onMouseLeave={() => handleMouseLeave()}
                   >
@@ -242,7 +244,6 @@ const SidebarTemplate: React.FC<ProfileProps> = ({ userInfo }) => {
                             ? colors.bg_button_active_hover
                             : colors.background
                     }}
-                    onClick={() => handleItemClick('highlights')}
                     onMouseEnter={() => handleMouseEnter('highlights')}
                     onMouseLeave={() => handleMouseLeave()}
                   >
@@ -264,7 +265,6 @@ const SidebarTemplate: React.FC<ProfileProps> = ({ userInfo }) => {
                             ? colors.bg_button_active_hover
                             : colors.background
                     }}
-                    onClick={() => handleItemClick('views')}
                     onMouseEnter={() => handleMouseEnter('views')}
                     onMouseLeave={() => handleMouseLeave()}
                   >
@@ -286,7 +286,6 @@ const SidebarTemplate: React.FC<ProfileProps> = ({ userInfo }) => {
                             ? colors.bg_button_active_hover
                             : colors.background
                     }}
-                    onClick={() => handleItemClick('members')}
                     onMouseEnter={() => handleMouseEnter('members')}
                     onMouseLeave={() => handleMouseLeave()}
                   >
@@ -296,7 +295,7 @@ const SidebarTemplate: React.FC<ProfileProps> = ({ userInfo }) => {
                     </div>
                   </MenuItem>
                 </Link>
-                <Link to={`/workspaceSetting`}>
+                <Link to={`/workspace/${w._id}/workspaceSetting`}>
                   <MenuItem
                     style={{
                       height: '32px',
@@ -308,7 +307,6 @@ const SidebarTemplate: React.FC<ProfileProps> = ({ userInfo }) => {
                             ? colors.bg_button_active_hover
                             : colors.background
                     }}
-                    onClick={() => handleItemClick('setting')}
                     onMouseEnter={() => handleMouseEnter('setting')}
                     onMouseLeave={() => handleMouseLeave()}
                   >
@@ -361,11 +359,10 @@ const SidebarTemplate: React.FC<ProfileProps> = ({ userInfo }) => {
                   height: '50px',
                   backgroundColor: colors.background
                 }}
-                onClick={() => handleItemClick('workspace')}
                 onMouseEnter={() => handleMouseEnter('workspace')}
                 onMouseLeave={() => handleMouseLeave()}
               >
-                <Link to={`/workspaceboard`}>
+                <Link to={`/workspaceboard/${w._id}`}>
                   <MenuItem
                     style={{
                       height: '32px',
@@ -377,7 +374,6 @@ const SidebarTemplate: React.FC<ProfileProps> = ({ userInfo }) => {
                             ? colors.bg_button_active_hover
                             : colors.background
                     }}
-                    onClick={() => handleItemClick('board')}
                     onMouseEnter={() => handleMouseEnter('board')}
                     onMouseLeave={() => handleMouseLeave()}
                   >
@@ -399,7 +395,6 @@ const SidebarTemplate: React.FC<ProfileProps> = ({ userInfo }) => {
                             ? colors.bg_button_active_hover
                             : colors.background
                     }}
-                    onClick={() => handleItemClick('highlights')}
                     onMouseEnter={() => handleMouseEnter('highlights')}
                     onMouseLeave={() => handleMouseLeave()}
                   >
@@ -421,7 +416,6 @@ const SidebarTemplate: React.FC<ProfileProps> = ({ userInfo }) => {
                             ? colors.bg_button_active_hover
                             : colors.background
                     }}
-                    onClick={() => handleItemClick('views')}
                     onMouseEnter={() => handleMouseEnter('views')}
                     onMouseLeave={() => handleMouseLeave()}
                   >
@@ -443,7 +437,6 @@ const SidebarTemplate: React.FC<ProfileProps> = ({ userInfo }) => {
                             ? colors.bg_button_active_hover
                             : colors.background
                     }}
-                    onClick={() => handleItemClick('members')}
                     onMouseEnter={() => handleMouseEnter('members')}
                     onMouseLeave={() => handleMouseLeave()}
                   >
@@ -453,7 +446,7 @@ const SidebarTemplate: React.FC<ProfileProps> = ({ userInfo }) => {
                     </div>
                   </MenuItem>
                 </Link>
-                <Link to={`/workspaceSetting`}>
+                <Link to={`/workspace/${w._id}/workspaceSetting`}>
                   <MenuItem
                     style={{
                       height: '32px',
@@ -465,7 +458,6 @@ const SidebarTemplate: React.FC<ProfileProps> = ({ userInfo }) => {
                             ? colors.bg_button_active_hover
                             : colors.background
                     }}
-                    onClick={() => handleItemClick('setting')}
                     onMouseEnter={() => handleMouseEnter('setting')}
                     onMouseLeave={() => handleMouseLeave()}
                   >
@@ -521,11 +513,10 @@ const SidebarTemplate: React.FC<ProfileProps> = ({ userInfo }) => {
                   height: '50px',
                   backgroundColor: colors.background
                 }}
-                onClick={() => handleItemClick('workspace')}
                 onMouseEnter={() => handleMouseEnter('workspace')}
                 onMouseLeave={() => handleMouseLeave()}
               >
-                <Link to={`/workspaceboard`}>
+                <Link to={`/workspaceboard/${w._id}`}>
                   <MenuItem
                     style={{
                       height: '32px',
@@ -537,7 +528,6 @@ const SidebarTemplate: React.FC<ProfileProps> = ({ userInfo }) => {
                             ? colors.bg_button_active_hover
                             : colors.background
                     }}
-                    onClick={() => handleItemClick('board')}
                     onMouseEnter={() => handleMouseEnter('board')}
                     onMouseLeave={() => handleMouseLeave()}
                   >
@@ -559,7 +549,6 @@ const SidebarTemplate: React.FC<ProfileProps> = ({ userInfo }) => {
                             ? colors.bg_button_active_hover
                             : colors.background
                     }}
-                    onClick={() => handleItemClick('highlights')}
                     onMouseEnter={() => handleMouseEnter('highlights')}
                     onMouseLeave={() => handleMouseLeave()}
                   >
@@ -581,7 +570,6 @@ const SidebarTemplate: React.FC<ProfileProps> = ({ userInfo }) => {
                             ? colors.bg_button_active_hover
                             : colors.background
                     }}
-                    onClick={() => handleItemClick('views')}
                     onMouseEnter={() => handleMouseEnter('views')}
                     onMouseLeave={() => handleMouseLeave()}
                   >
@@ -603,7 +591,6 @@ const SidebarTemplate: React.FC<ProfileProps> = ({ userInfo }) => {
                             ? colors.bg_button_active_hover
                             : colors.background
                     }}
-                    onClick={() => handleItemClick('members')}
                     onMouseEnter={() => handleMouseEnter('members')}
                     onMouseLeave={() => handleMouseLeave()}
                   >
@@ -613,7 +600,7 @@ const SidebarTemplate: React.FC<ProfileProps> = ({ userInfo }) => {
                     </div>
                   </MenuItem>
                 </Link>
-                <Link to={`/workspaceSetting`}>
+                <Link to={`/workspace/${w._id}/workspaceSetting`}>
                   <MenuItem
                     style={{
                       height: '32px',
@@ -625,7 +612,6 @@ const SidebarTemplate: React.FC<ProfileProps> = ({ userInfo }) => {
                             ? colors.bg_button_active_hover
                             : colors.background
                     }}
-                    onClick={() => handleItemClick('setting')}
                     onMouseEnter={() => handleMouseEnter('setting')}
                     onMouseLeave={() => handleMouseLeave()}
                   >

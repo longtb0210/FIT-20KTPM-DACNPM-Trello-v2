@@ -38,10 +38,6 @@ const SidebarCateWorkSpace: React.FC<Props> = ({ open, handleDrawerClose }) => {
   const [activeItem, setActiveItem] = useState<string | null>(null)
   const [hoveredItem, setHoveredItem] = useState<string | null>(null)
 
-  const handleItemClick = (item: string) => {
-    setActiveItem(item)
-  }
-
   const handleMouseEnter = (itemKey: string) => {
     setHoveredItem(itemKey)
   }
