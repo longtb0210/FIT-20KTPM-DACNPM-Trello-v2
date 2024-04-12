@@ -96,6 +96,8 @@ services:
       - KEYCLOAK_REALM=trello
       - KEYCLOAK_CLIENT_ID=trello
       - KEYCLOAK_CLIENT_SECRET=${keycloak_client_secret}
+      - KEYCLOAK_ADMIN_USER_NAME=${kc_admin_username}
+      - KEYCLOAK_ADMIN_PASSWORD=${kc_admin_password}
     ports:
       - 3040:3000
       - 3041:3001

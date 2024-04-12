@@ -6,6 +6,8 @@ import { TrelloApi } from '@trello-v2/shared'
 
 import { CardRoutes } from '../card.routes'
 import { CardService } from '../services/card.service'
+import { UserInfoDto } from '@app/common/auth/user-info.dto'
+import { AuthenticatedUser } from 'nest-keycloak-connect'
 
 @InjectController({
   name: '/api/card',
@@ -331,6 +333,31 @@ export class CardController {
     const card = await this.cardService.deleteFeature(body)
     return {
       data: card,
+    }
+  }
+
+  @InjectRoute(CardRoutes.addMemberToCard)
+  async addMemberToCard(
+    @AuthenticatedUser() user: UserInfoDto,
+    @Body(new ZodValidationPipe(TrelloApi.CardApi.AddCardMemberRequestSchema)) body: TrelloApi.CardApi.AddCardMemberRequest,
+  ): Promise<TrelloApi.CardApi.AddCardMemberResponse> {
+    const data = await this.cardService.addMemberToCard(user.email, body)
+    if (!data || !data._id) throw new NotFoundException('Card not found')
+    return {
+      _id: data._id,
+      ...data,
+    }
+  }
+  @InjectRoute(CardRoutes.deleteMemberToCard)
+  async deleteMemberToCard(
+    @AuthenticatedUser() user: UserInfoDto,
+    @Body(new ZodValidationPipe(TrelloApi.CardApi.DeleteCardMemberRequestSchema)) body: TrelloApi.CardApi.DeleteCardMemberRequest,
+  ): Promise<TrelloApi.CardApi.AddCardMemberResponse> {
+    const data = await this.cardService.deleteMemberToCard(body)
+    if (!data || !data._id) throw new NotFoundException('Card not found')
+    return {
+      _id: data._id,
+      ...data,
     }
   }
 }

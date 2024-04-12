@@ -25,6 +25,7 @@ export class CardService {
       watcher_email: [],
       activities: [],
       features: [],
+      member_email: [],
       created_at: new Date(),
     })
     await cardlist.save()
@@ -51,6 +52,7 @@ export class CardService {
         $set: {
           ...(data.name ? { 'cards.$.name': data.name } : {}),
           ...(data.cover ? { 'cards.$.cover': data.cover } : {}),
+          ...(data.description ? { 'cards.$.cover': data.description } : {}),
         },
       },
       { new: true },
@@ -260,5 +262,45 @@ export class CardService {
       },
     )
     return res.toJSON().cards.find((c) => data.card_id === c._id.toString())
+  }
+
+  async addMemberToCard(creator_email: string, data: TrelloApi.CardApi.AddCardMemberRequest) {
+    const res = await this.CardlistMModel.findOneAndUpdate(
+      {
+        _id: data.cardlist_id,
+        cards: { $elemMatch: { _id: data.card_id } },
+      },
+      {
+        $push: { 'cards.$.member_email': data.member_email },
+      },
+      { new: true, fields: { 'cards.features': 0 } },
+    )
+    const cardIdx = res.cards.findIndex((e) => e._id?.toString() === data.card_id)
+    if (cardIdx < 0) return null
+    res.cards[cardIdx].activities.push({
+      content: `<b>${creator_email}</b> has add <b>${data.member_email}</b> to ${res.cards[cardIdx].name} card`,
+      create_time: new Date(),
+      creator_email: creator_email,
+      workspace_id: 'id',
+    })
+    res.save()
+    return res.toJSON().cards[cardIdx]
+  }
+
+  async deleteMemberToCard(data: TrelloApi.CardApi.DeleteCardMemberRequest) {
+    const res = await this.CardlistMModel.findOneAndUpdate(
+      {
+        _id: data.cardlist_id,
+        cards: { $elemMatch: { _id: data.card_id } },
+      },
+      {
+        $pullAll: {
+          'cards.$.member_email': [data.member_email],
+        },
+      },
+      { new: true, fields: { 'cards.features': 0 } },
+    )
+    const card = res?.toJSON().cards.find((e) => e._id?.toString() === data.card_id)
+    return card ? card : null
   }
 }

@@ -1,7 +1,8 @@
 import React, { useEffect, useState } from 'react'
+
+import { UpdateWorkspaceInfoRequest } from '@trello-v2/shared/dist/src/api/WorkspaceApi'
+
 import { useTheme } from '../Theme/themeContext'
-import { TrelloApi } from '@trello-v2/shared'
-import { UpdateWorkspaceInfoRequest, WorspaceResponse } from '@trello-v2/shared/dist/src/api/WorkspaceApi'
 
 interface EditFormProps {
   formData: UpdateWorkspaceInfoRequest
