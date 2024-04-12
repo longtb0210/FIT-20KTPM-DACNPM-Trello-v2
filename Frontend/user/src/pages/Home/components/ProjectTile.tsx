@@ -3,8 +3,10 @@ import StarBorderIcon from '@mui/icons-material/StarBorder'
 import { useTheme } from '~/components/Theme/themeContext'
 import { WorkspaceApiRTQ } from '~/api'
 import React from 'react'
+import { DbSchemas } from '@trello-v2/shared'
 
 interface ProjectTileProps {
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   boardData: Record<string, any>
 }
 
@@ -12,9 +14,10 @@ const ProjectTile: React.FC<ProjectTileProps> = ({ boardData }) => {
   const { colors } = useTheme()
   const [isStar, setIsStar] = useState(false) // State để theo dõi hover của icon
   const [isHovered, setIsHovered] = useState(false) // State để theo dõi hover của ProjectTile
-  const [getWorkspaceById, { data: workspaceData }] = WorkspaceApiRTQ.WorkspaceApiSlice.useLazyGetWorkspaceByIdQuery()
+  const [getWorkspaceById, { data: workspaceData }] = WorkspaceApiRTQ.WorkspaceApiSlice.useLazyGetWorkspaceInfoQuery()
 
   React.useEffect(() => {
+    console.log({ id: boardData.workspace_id })
     getWorkspaceById(boardData.workspace_id)
   }, [boardData.workspace_id, getWorkspaceById])
 
@@ -52,7 +55,7 @@ const ProjectTile: React.FC<ProjectTileProps> = ({ boardData }) => {
             className='mt-0 block overflow-hidden text-ellipsis whitespace-nowrap text-xs font-normal leading-3 text-gray-700'
             style={{ color: colors.text }}
           >
-            {workspaceData?.data[0].description}
+            {workspaceData?.data.description}
           </span>
         </span>
       </a>

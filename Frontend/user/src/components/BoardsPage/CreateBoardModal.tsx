@@ -1,13 +1,15 @@
 import { faCheck, faClose } from '@fortawesome/free-solid-svg-icons'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
-import { Autocomplete, Box, Popover, TextField } from '@mui/material'
+import { Box, FormControl, MenuItem, Popover, Select, SelectChangeEvent } from '@mui/material'
 import { ChangeEvent, useEffect, useRef, useState } from 'react'
 import bgHeader from '~/assets/bg_header_create_board.svg'
 import React from 'react'
 import { useTheme } from '../Theme/themeContext'
+import { BoardApiRTQ, WorkspaceApiRTQ } from '~/api'
+import { Workspace } from '@trello-v2/shared/src/schemas/Workspace'
 
-const workspaceOptions = ["Âu Hồng Minh's workspace", 'My Workspace']
 const visibilityOptions = ['Private', 'Workspace', 'Public']
+type VisibilityType = 'private' | 'public' | 'workspace'
 
 interface CreateBoardModalProps {
   anchorEl: HTMLDivElement | null
@@ -17,26 +19,60 @@ interface CreateBoardModalProps {
 
 export default function CreateBoardModal({ anchorEl, isOpen, handleCloseDialog }: CreateBoardModalProps) {
   const { colors } = useTheme()
+  const anchorRef = React.useRef<HTMLButtonElement>(null)
   const inputRef = useRef<HTMLInputElement>(null)
+  const [textFieldValue, setTextFieldValue] = useState('')
+  const [isRequired, setIsRequired] = useState(true)
+  const [allWorkspaces, setAllWorkspaces] = useState<Workspace[]>([])
+  const [selectedWorkspace, setSelectedWorkspace] = useState('')
+  const [selectedVisibility, setSelectedVisibility] = useState<VisibilityType>('private')
+
+  //API
+  const [getAllWorkspacesAPI] = WorkspaceApiRTQ.WorkspaceApiSlice.useLazyGetAllWorkspaceQuery()
+  const [createBoardAPI] = BoardApiRTQ.BoardApiSlice.useCreateBoardMutation()
+
+  function fetchAllWorkspaces() {
+    getAllWorkspacesAPI()
+      .unwrap()
+      .then((response) => {
+        setAllWorkspaces([...response.data.owner, ...response.data.member])
+      })
+      .catch((error) => {
+        console.log('ERROR: get all workspaces', error)
+      })
+  }
 
   useEffect(() => {
     inputRef.current?.focus()
+    fetchAllWorkspaces()
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [])
 
-  const [textFieldValue, setTextFieldValue] = useState('')
-  const [isRequired, setIsRequired] = useState(true)
-  const anchorRef = React.useRef<HTMLButtonElement>(null)
-
   function handleSubmit() {
-    if (textFieldValue.trim() === '') return
-    handleCloseDialog()
-    setTextFieldValue('')
+    if (textFieldValue.trim() !== '') {
+      createBoardAPI({
+        name: textFieldValue.trim(),
+        workspace_id: selectedWorkspace,
+        visibility: selectedVisibility
+      })
+      handleCloseDialog()
+      setTextFieldValue('')
+      window.location.reload()
+    }
   }
 
   function handleChangeTitle(event: ChangeEvent<HTMLInputElement>) {
     const { value } = event.target
     value.trim() === '' ? setIsRequired(true) : setIsRequired(false)
     setTextFieldValue(value)
+  }
+
+  function handleSelectWorkspace(event: SelectChangeEvent) {
+    setSelectedWorkspace(event.target.value as string)
+  }
+
+  function handleSelectVisibility(event: SelectChangeEvent) {
+    setSelectedVisibility(event.target.value as string)
   }
 
   return (
@@ -311,60 +347,70 @@ export default function CreateBoardModal({ anchorEl, isOpen, handleCloseDialog }
           {/* Select workspace */}
           <Box sx={{ marginBottom: '8px' }}>
             <p style={{ fontSize: '12px', fontWeight: 700, color: colors.secondary, marginBottom: '4px' }}>Workspace</p>
-            <Autocomplete
-              size='small'
-              disableClearable
-              id='controllable-states-demo'
-              options={workspaceOptions}
-              sx={{
-                width: '100%',
-                '& .MuiInputBase-input': {
-                  fontSize: '12px',
-                  color: colors.text,
-                  backgroundColor: colors.background_modal_tertiary
-                },
-                '& .MuiSvgIcon-root': {
-                  color: colors.text,
-                  backgroundColor: colors.background_modal_tertiary
-                },
-                '& .MuiOutlinedInput-root': {
-                  background: colors.background_modal_tertiary
-                },
-                border: `1px solid ${colors.text}`,
-                borderRadius: '4px'
-              }}
-              renderInput={(params) => <TextField {...params} />}
-            />
+            <FormControl fullWidth>
+              <Select
+                sx={{
+                  height: 36,
+                  margin: '0 0 8px 0',
+                  fontSize: 14,
+                  background: colors.background_modal,
+                  color: colors.text
+                }}
+                value={selectedWorkspace}
+                onChange={handleSelectWorkspace}
+                MenuProps={{
+                  PaperProps: {
+                    style: {
+                      maxHeight: 144,
+                      marginTop: 8,
+                      background: colors.background_modal,
+                      color: colors.text
+                    }
+                  }
+                }}
+              >
+                {allWorkspaces.map((workspace, index) => (
+                  <MenuItem key={index} value={workspace._id} sx={{ fontSize: 14 }}>
+                    {workspace.name}
+                  </MenuItem>
+                ))}
+              </Select>
+            </FormControl>
           </Box>
           {/* Select visibility */}
           <Box sx={{ marginBottom: '18px' }}>
             <p style={{ fontSize: '12px', fontWeight: 700, color: colors.secondary, marginBottom: '4px' }}>
               Visibility
             </p>
-            <Autocomplete
-              size='small'
-              disableClearable
-              id='controllable-states-demo'
-              options={visibilityOptions}
-              sx={{
-                width: '100%',
-                '& .MuiInputBase-input': {
-                  fontSize: '12px',
-                  color: colors.text,
-                  backgroundColor: colors.background_modal_tertiary
-                },
-                '& .MuiSvgIcon-root': {
-                  color: colors.text,
-                  backgroundColor: colors.background_modal_tertiary
-                },
-                '& .MuiOutlinedInput-root': {
-                  background: colors.background_modal_tertiary
-                },
-                border: `1px solid ${colors.text}`,
-                borderRadius: '4px'
-              }}
-              renderInput={(params) => <TextField {...params} />}
-            />
+            <FormControl fullWidth>
+              <Select
+                sx={{
+                  height: 36,
+                  margin: '0 0 8px 0',
+                  fontSize: 14,
+                  background: colors.background_modal,
+                  color: colors.text
+                }}
+                value={selectedVisibility}
+                onChange={handleSelectVisibility}
+                MenuProps={{
+                  PaperProps: {
+                    style: {
+                      maxHeight: 144,
+                      marginTop: 8,
+                      background: colors.background_modal,
+                      color: colors.text
+                    }
+                  }
+                }}
+              >
+                {visibilityOptions.map((visibility, index) => (
+                  <MenuItem key={index} value={visibility.toLowerCase()} sx={{ fontSize: 14 }}>
+                    {visibility}
+                  </MenuItem>
+                ))}
+              </Select>
+            </FormControl>
           </Box>
           {/* Button submit */}
           <Box

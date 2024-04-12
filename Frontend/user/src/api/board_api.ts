@@ -1,14 +1,18 @@
 import { createApi, fetchBaseQuery } from '@reduxjs/toolkit/query/react'
 import { TrelloApi } from '@trello-v2/shared'
-
-import { token } from './getInfo'
+import { RootState } from '~/store'
 
 const BoardApiSlice = createApi({
   reducerPath: 'BoardApi',
   baseQuery: fetchBaseQuery({
     baseUrl: import.meta.env.VITE_URL_API,
-    headers: {
-      Authorization: `Bearer ${token}`
+    prepareHeaders: (headers, { getState }) => {
+      const token = (getState() as RootState).KC_TOKEN?.acessToken
+
+      if (token) {
+        headers.set('authorization', `Bearer ${token}`)
+      }
+      return headers
     }
   }),
   endpoints: (builder) => ({
@@ -26,8 +30,8 @@ const BoardApiSlice = createApi({
       })
     }),
     getBoardById: builder.query<TrelloApi.BoardApi.GetBoardInfoByBoardIdResponse, TrelloApi.BoardApi.BoardIdRequest>({
-      query: (data) => ({
-        url: `/api/board/${data}`,
+      query: (id) => ({
+        url: `/api/board/${id}`,
         method: 'GET'
       })
     }),
@@ -42,6 +46,46 @@ const BoardApiSlice = createApi({
         url: '/api/board',
         body: data,
         method: 'PATCH'
+      })
+    }),
+    getBoardsByWorkspaceID: builder.query<TrelloApi.BoardApi.getBoardsByWorkspaceIdResponse, { workspace_id: string }>({
+      query: ({ workspace_id }) => ({
+        url: `/api/board/workspace/${workspace_id}`,
+        method: 'GET'
+      })
+    }),
+    addBackgroundBoard: builder.mutation<TrelloApi.BoardApi.UpdateBoardResponse, { id: string; background: File }>({
+      query: (data) => ({
+        url: `/api/board/${data.id}/background_list/add`,
+        body: data,
+        method: 'POST'
+      })
+    }),
+    addWatcherMember: builder.mutation<TrelloApi.BoardApi.AddMemberResponse, TrelloApi.BoardApi.AddWatcherRequest>({
+      query: (data) => ({
+        url: `/api/board/watchers/add`,
+        body: data,
+        method: 'POST'
+      })
+    }),
+    removeWatcherMember: builder.mutation<
+      TrelloApi.BoardApi.RemoveMemberResponse,
+      TrelloApi.BoardApi.RemoveMemberRequest
+    >({
+      query: (data) => ({
+        url: `/api/board/watchers/remove`,
+        body: data,
+        method: 'POST'
+      })
+    }),
+    removeMemberInBoardByEmail: builder.mutation<
+      TrelloApi.BoardApi.RemoveMemberResponse,
+      TrelloApi.BoardApi.RemoveMemberRequest
+    >({
+      query: (data) => ({
+        url: `/api/board/members/remove`,
+        body: data,
+        method: 'POST'
       })
     })
   })

@@ -105,7 +105,7 @@ export default function Create() {
                       backgroundColor: colors.background_menu_header,
                       width: '304px',
                       padding: '12px 0',
-                      borderRadius: '4px',
+                      borderRadius: '4px'
                     }}
                   >
                     {[
@@ -143,7 +143,9 @@ export default function Create() {
                       !openItem.show && (
                         <Box
                           key='start-template'
-                          onClick={() => setOpenItem({ show: true, type: 'Templates' })}
+                          onClick={() => {
+                            setOpen(false)
+                          }}
                           sx={{
                             padding: '6px 12px',
                             cursor: 'pointer',

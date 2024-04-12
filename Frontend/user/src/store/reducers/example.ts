@@ -1,27 +1,24 @@
-import { createSlice } from '@reduxjs/toolkit'
+import { PayloadAction, createSlice } from '@reduxjs/toolkit'
 
 import { RootState } from '../'
 
 export interface ExampleState {
-  title: string
+  acessToken: string
 }
 
 const initialState: ExampleState = {
-  title: ''
+  acessToken: ''
 }
-
-export const exampleSlice = createSlice({
-  name: 'example',
+export const TokenSlice = createSlice({
+  name: 'KC_TOKEN',
   initialState,
   reducers: {
-    setExample: (state, action) => {
-      state.title = action.payload
+    setToken: (state, action: PayloadAction<string>) => {
+      state.acessToken = action.payload
     }
   }
 })
 
-export const { setExample } = exampleSlice.actions
+export const selectExample = (state: RootState) => state.KC_TOKEN
 
-export const selectExample = (state: RootState) => state.exampleReducer
-
-export default exampleSlice.reducer
+export default TokenSlice
