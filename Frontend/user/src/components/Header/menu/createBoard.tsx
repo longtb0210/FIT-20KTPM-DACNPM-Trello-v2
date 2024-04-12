@@ -8,7 +8,6 @@ import { useTheme } from './../../Theme/themeContext'
 // import axios from 'axios'
 import { BoardApiRTQ, WorkspaceApiRTQ } from '~/api'
 import { useEffect, useRef, useState } from 'react'
-import { Workspace } from '@trello-v2/shared/src/schemas/Workspace'
 import { useNavigate } from 'react-router-dom'
 
 interface AutocompleteContainerProps {

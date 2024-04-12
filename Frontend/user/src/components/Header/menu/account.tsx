@@ -3,12 +3,22 @@ import { Box, ClickAwayListener, Grow, Paper, Popper, MenuList, Stack, Typograph
 import { Link } from 'react-router-dom'
 import { useTheme } from './../../Theme/themeContext'
 import { AuthContext } from '~/components/AuthProvider/AuthProvider'
+import { UserApiRTQ } from '~/api'
+import { stringToColor } from '~/utils/StringToColor'
 
 export default function Account() {
   const [open, setOpen] = React.useState(false)
   const anchorRef = React.useRef<HTMLButtonElement>(null)
   const { darkMode, toggleDarkMode, colors } = useTheme()
   const authContext = React.useContext(AuthContext)
+  // const [getUser, { data: dataUser }] = UserApiRTQ.UserApiSlice.useGetUserMutation()
+
+  // React.useEffect(() => {
+  //   getUser()
+  // }, [])
+
+  // console.log(dataUser)
+  const profile = JSON.parse(localStorage.getItem('profile') || `{ email: '', name: '' }`)
 
   const handleToggle = () => {
     setOpen((prevOpen) => !prevOpen)
@@ -45,6 +55,24 @@ export default function Account() {
     if (authContext) {
       authContext.logout()
     }
+  }
+
+  const getFirstTwoCharsOfLastWord = (inputString: string) => {
+    const words = inputString.split(' ')
+
+    if (words.length >= 2) {
+      const secondToLastWord = words[words.length - 2]
+      const lastWord = words[words.length - 1]
+
+      let firstLetters = `${secondToLastWord.charAt(0)}${lastWord.charAt(0)}`
+
+      if (!firstLetters.match(/[A-Z]/)) {
+        firstLetters = firstLetters.toUpperCase()
+      }
+
+      return firstLetters
+    }
+    return null
   }
 
   return (
@@ -132,18 +160,18 @@ export default function Account() {
                             fontWeight: 700,
                             padding: '8px 10px',
                             borderRadius: '50%',
-                            backgroundImage: 'linear-gradient(to bottom, #E774BB, #943D73)'
+                            backgroundColor: stringToColor(profile.name)
                           }}
                         >
-                          HT
+                          {getFirstTwoCharsOfLastWord(profile.name)}
                         </Typography>
 
                         <Box sx={{ display: 'flex', flexDirection: 'column' }}>
                           <Typography variant='body1' sx={{ fontSize: '14px', color: colors.text, marginLeft: '12px' }}>
-                            Hữu Chính Trần
+                            {profile.name}
                           </Typography>
                           <Typography variant='body1' sx={{ fontSize: '12px', color: colors.text, marginLeft: '12px' }}>
-                            abc@gmail.com
+                            {profile.email}
                           </Typography>
                         </Box>
                       </Box>
