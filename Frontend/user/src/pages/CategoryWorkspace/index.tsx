@@ -82,7 +82,7 @@ export function CategoryWorkspace() {
               sx={{ mr: 2, ...(open && { display: 'none' }) }}
             >
               <div className='relative'>
-                <div className='group rounded-full border border-gray-300'>
+                <div style={{borderRadius: '50%', border: '2px solid #888', width: '36px', height: '36px', display: 'flex', justifyContent: 'center', alignItems: 'center'}}>
                   <ChevronRightIcon className='h-6 w-6' />
                 </div>
               </div>
