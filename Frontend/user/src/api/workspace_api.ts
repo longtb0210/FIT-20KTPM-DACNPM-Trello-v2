@@ -1,7 +1,7 @@
-import { RootState } from '~/store';
+import { RootState } from '~/store'
 
-import { createApi, fetchBaseQuery } from '@reduxjs/toolkit/query/react';
-import { TrelloApi } from '@trello-v2/shared';
+import { createApi, fetchBaseQuery } from '@reduxjs/toolkit/query/react'
+import { TrelloApi } from '@trello-v2/shared'
 
 interface InviteMembers2WorkspaceRequestWithId extends TrelloApi.WorkspaceApi.InviteMembers2WorkspaceRequest {
   id: string | undefined
@@ -37,15 +37,9 @@ const WorkspaceApiSlice = createApi({
         method: 'GET'
       })
     }),
-<<<<<<< HEAD
-    getAllWorkspaceByEmail: builder.query<TrelloApi.WorkspaceApi.WorkspaceListByEmailResponse, { email: string }>({
-      query: ({ email }) => ({
-        url: `/api/workspace/all/${email}`,
-=======
     getAllUserWorkspace: builder.query<TrelloApi.WorkspaceApi.WorspaceListByEmailResponse, void>({
       query: () => ({
         url: `/api/workspace/all`,
->>>>>>> 9d0cbd03f693f70bf4b3ed02911efcff9d26aeb2
         method: 'GET'
       })
     }),
@@ -65,13 +59,8 @@ const WorkspaceApiSlice = createApi({
         body: data
       })
     }),
-<<<<<<< HEAD
-    getWorkspaceInfo: builder.query<TrelloApi.WorkspaceApi.WorkspaceResponse, { id: string }>({
-      query: ({ id }) => ({
-=======
     getWorkspaceInfo: builder.query<TrelloApi.WorkspaceApi.WorspaceResponse, string>({
       query: (id) => ({
->>>>>>> 9d0cbd03f693f70bf4b3ed02911efcff9d26aeb2
         url: `/api/workspace/${id}`,
         method: 'GET'
       })
