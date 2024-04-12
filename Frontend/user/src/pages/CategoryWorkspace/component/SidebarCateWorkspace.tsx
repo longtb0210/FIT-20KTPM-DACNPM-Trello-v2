@@ -9,7 +9,7 @@ import {faTrello } from '@fortawesome/free-brands-svg-icons'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { Sidebar, Menu, MenuItem } from 'react-pro-sidebar'
 import { useTheme as useCustomTheme } from '~/components/Theme/themeContext'
-import { Link, useParams } from 'react-router-dom'
+import { Link, useParams, useLocation } from 'react-router-dom'
 import { WorkspaceApiRTQ } from '~/api'
 import { BoardApiRTQ } from '~/api'
 import FileUploadIcon from '@mui/icons-material/FileUpload'
@@ -51,14 +51,27 @@ const SidebarCateWorkSpace: React.FC<Props> = ({ open, handleDrawerClose }) => {
   }
 
   const params = useParams()
+  const location = useLocation()
+  console.log(location)
   const workspaceId = params.workspaceId
 
   useEffect(() => {
+    const targetPaths = [
+      `/workspaceboard/${workspaceId}`,
+      `/workspace/${workspaceId}/members`,
+      `/workspace/${workspaceId}/workspaceSetting`,
+      `/cardlist`
+    ];
+
+    if (targetPaths.includes(location.pathname)) {
+      setActiveItem(location.pathname);
+    }
+
     if (workspaceId) {
-      getWorkspace({ id: workspaceId }).then((v: any) => console.log(v))
+      getWorkspace(workspaceId ).then((v: any) => console.log(v))
       getAllBoard({workspaceId: workspaceId}).then((v: any) => console.log(v))
     }
-  }, [])
+  }, [location.pathname, workspaceId])
 
   console.log('workspaceData: ' + workspaceData)
   console.log('boardData: ' + boardData?.data)
@@ -119,7 +132,7 @@ const SidebarCateWorkSpace: React.FC<Props> = ({ open, handleDrawerClose }) => {
         <Divider />
         <Sidebar className='text-sm'>
           <Menu>
-            <Link to={'/workspaceboard'}>
+            <Link to={`/workspaceboard/${workspaceId}`}>
               <MenuItem
                 className='menu-item rounded-md'
                 style={{ 
@@ -127,11 +140,10 @@ const SidebarCateWorkSpace: React.FC<Props> = ({ open, handleDrawerClose }) => {
                   backgroundColor:
                   hoveredItem === 'boards'
                     ? colors.bg_button_hover
-                    : activeItem === 'boards'
-                      ? colors.bg_button_active_hover
-                      : colors.background 
+                    : activeItem === `/workspaceboard/${workspaceId}` 
+                      ? colors.bg_button_active_hover 
+                      : colors.background  
                 }}
-                onClick={() => handleItemClick('boards')}
                 onMouseEnter={() => handleMouseEnter('boards')}
                 onMouseLeave={() => handleMouseLeave()}
               >
@@ -148,11 +160,10 @@ const SidebarCateWorkSpace: React.FC<Props> = ({ open, handleDrawerClose }) => {
                   backgroundColor:
                   hoveredItem === 'members'
                     ? colors.bg_button_hover
-                    : activeItem === 'members'
+                    : activeItem === `/workspace/${workspaceId}/members`
                       ? colors.bg_button_active_hover
                       : colors.background 
                 }}
-                onClick={() => handleItemClick('members')}
                 onMouseEnter={() => handleMouseEnter('members')}
                 onMouseLeave={() => handleMouseLeave()}
               >
@@ -164,18 +175,17 @@ const SidebarCateWorkSpace: React.FC<Props> = ({ open, handleDrawerClose }) => {
                 </div>
               </MenuItem>
             </Link>
-            <Link to={'/workspaceSetting'}>
+            <Link to={`/workspace/${workspaceId}/workspaceSetting`}>
               <MenuItem
                 style={{ 
                   height: '40px', 
                   backgroundColor:
                   hoveredItem === 'settings'
                     ? colors.bg_button_hover
-                    : activeItem === 'settings'
+                    : activeItem === `/workspace/${workspaceId}/workspaceSetting`
                       ? colors.bg_button_active_hover
                       : colors.background 
                 }}
-                onClick={() => handleItemClick('settings')}
                 onMouseEnter={() => handleMouseEnter('settings')}
                 onMouseLeave={() => handleMouseLeave()}
               >
@@ -202,11 +212,10 @@ const SidebarCateWorkSpace: React.FC<Props> = ({ open, handleDrawerClose }) => {
                   backgroundColor:
                   hoveredItem === 'table'
                     ? colors.bg_button_hover
-                    : activeItem === 'table'
+                    : activeItem === `/table`
                       ? colors.bg_button_active_hover
                       : colors.background 
                 }}
-                onClick={() => handleItemClick('table')}
                 onMouseEnter={() => handleMouseEnter('table')}
                 onMouseLeave={() => handleMouseLeave()}
               >
@@ -223,11 +232,10 @@ const SidebarCateWorkSpace: React.FC<Props> = ({ open, handleDrawerClose }) => {
                   backgroundColor:
                   hoveredItem === 'calendar'
                     ? colors.bg_button_hover
-                    : activeItem === 'calendar'
+                    : activeItem === `/calendar`
                       ? colors.bg_button_active_hover
                       : colors.background 
                 }}
-                onClick={() => handleItemClick('calendar')}
                 onMouseEnter={() => handleMouseEnter('calendar')}
                 onMouseLeave={() => handleMouseLeave()}
               >
@@ -250,27 +258,28 @@ const SidebarCateWorkSpace: React.FC<Props> = ({ open, handleDrawerClose }) => {
           <div>
             <Menu>
               {boardData?.data?.map((board) => (
-                <MenuItem
-                  key={board._id}
-                  className='menu-item'
-                  style={{ 
-                    height: '40px', 
-                    backgroundColor:
-                    hoveredItem === board._id
-                      ? colors.bg_button_hover
-                      : activeItem === board._id
-                        ? colors.bg_button_active_hover
-                        : colors.background 
-                  }}
-                  onClick={() => handleItemClick(board._id || '')}
-                  onMouseEnter={() => handleMouseEnter(board._id || '')}
-                  onMouseLeave={() => handleMouseLeave()}
-                >
-                  <div className='flex items-center'>
-                    <FontAwesomeIcon icon={faTableColumns} fontSize='small' className='mr-2' />
-                    {board.name}
-                  </div>
-                </MenuItem>
+                <Link to={'/'}>
+                  <MenuItem
+                    key={board._id}
+                    className='menu-item'
+                    style={{ 
+                      height: '40px', 
+                      backgroundColor:
+                      hoveredItem === board._id
+                        ? colors.bg_button_hover
+                        : activeItem === `/cardlist`
+                          ? colors.bg_button_active_hover
+                          : colors.background 
+                    }}
+                    onMouseEnter={() => handleMouseEnter(board._id || '')}
+                    onMouseLeave={() => handleMouseLeave()}
+                  >
+                    <div className='flex items-center'>
+                      <FontAwesomeIcon icon={faTableColumns} fontSize='small' className='mr-2' />
+                      {board.name}
+                    </div>
+                  </MenuItem>
+                </Link>
               ))}
             </Menu>
           </div>

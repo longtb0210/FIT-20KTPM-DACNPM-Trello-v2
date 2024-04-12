@@ -34,7 +34,7 @@ export const Navigation = () => {
             <Route path='/activity/:id' element={<AccountManagement page={`activity`} />} />
             <Route path='/cardlist' element={<Board />} />
             <Route path='/workspace/:workspaceId/members' element={<PageMembers />} />
-            <Route path='/workspaceSetting' element={<WorkspaceSetting />} />
+            <Route path='/workspace/:workspaceId/workspaceSetting' element={<WorkspaceSetting />} />
             <Route path='/workspaceboard/:workspaceId' element={<WorkspaceBoardsPage />} />
           </Route>
         </Route>
