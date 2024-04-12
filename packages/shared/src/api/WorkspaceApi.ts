@@ -2,6 +2,15 @@ import { z } from "zod";
 
 import { MemberSchema, WorkspaceSchema } from "../schemas/Workspace";
 
+export const WorkspaceDeleteResponseSchema = z.object({
+  data: z.object({
+    workspace_id: z.string().nullish(),
+  }),
+});
+export type WorkspaceDeleteResponse = z.infer<
+  typeof WorkspaceDeleteResponseSchema
+>;
+
 export const EmailIdSchema = z.object({
   email: z.string().nullish(),
 });
@@ -21,7 +30,6 @@ export type EmailIdType = z.infer<typeof EmailIdSchema>;
 export const WorkspaceIdRequestSchema = WorkspaceSchema.pick({
   _id: true,
 });
-
 export type WorkspaceIdRequest = z.infer<typeof WorkspaceIdRequestSchema>;
 
 //res list workspaces
@@ -31,13 +39,13 @@ export const WorkspaceListResponseSchema = z.object({
 export type WorkspaceListResponse = z.infer<typeof WorkspaceListResponseSchema>;
 
 //res workspace
-export const WorspaceResponseSchema = z.object({
+export const WorkspaceResponseSchema = z.object({
   data: WorkspaceSchema,
 });
-export type WorspaceResponse = z.infer<typeof WorspaceResponseSchema>;
+export type WorkspaceResponse = z.infer<typeof WorkspaceResponseSchema>;
 
 //res workspace by email
-export const WorspaceListByEmailResponseSchema = z.object({
+export const WorkspaceListByEmailResponseSchema = z.object({
   data: z.object({
     owner: WorkspaceSchema.array(),
     admin: WorkspaceSchema.array(),
@@ -45,8 +53,8 @@ export const WorspaceListByEmailResponseSchema = z.object({
     guest: WorkspaceSchema.array(),
   }),
 });
-export type WorspaceListByEmailResponse = z.infer<
-  typeof WorspaceListByEmailResponseSchema
+export type WorkspaceListByEmailResponse = z.infer<
+  typeof WorkspaceListByEmailResponseSchema
 >;
 
 //req create workspace
@@ -55,7 +63,7 @@ export const CreateWorkspaceRequestSchema = WorkspaceSchema.pick({
   description: true,
   members_email: true,
 });
-export type CreateWorspaceRequest = z.infer<
+export type CreateWorkspaceRequest = z.infer<
   typeof CreateWorkspaceRequestSchema
 >;
 
