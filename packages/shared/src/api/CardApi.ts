@@ -246,3 +246,19 @@ export const DeleteFeatureResponseSchema = z.object({
 });
 export type DeleteFeatureRequest = z.infer<typeof DeleteFeatureRequestSchema>;
 export type DeleteFeatureResponse = z.infer<typeof DeleteFeatureResponseSchema>;
+
+export const AddCardMemberRequestSchema = z.object({
+  cardlist_id: z.string(),
+  card_id: z.string(),
+  member_email: z.string(),
+});
+export const AddCardMemberResponseSchema = CardSchema.omit({
+  features: true,
+}).required({ _id: true });
+export type AddCardMemberRequest = z.infer<typeof AddCardMemberRequestSchema>;
+export type AddCardMemberResponse = z.infer<typeof AddCardMemberResponseSchema>;
+
+export const DeleteCardMemberRequestSchema = AddCardMemberRequestSchema;
+export const DeleteCardMemberResponseSchema = AddCardFeatureResponseSchema;
+export type DeleteCardMemberRequest = AddCardMemberRequest;
+export type DeleteCardMemberResponse = AddCardMemberResponse;

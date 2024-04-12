@@ -1,12 +1,13 @@
 import * as React from 'react'
-import { Box, Button, Autocomplete, TextField } from '@mui/material'
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
-import { faClose } from '@fortawesome/free-solid-svg-icons'
-import workspace from '~/assets/workspace_img.svg'
-import { useTheme } from './../../Theme/themeContext'
-import axios from 'axios'
 import { useNavigate } from 'react-router-dom'
 import { WorkspaceApiRTQ } from '~/api'
+import workspace from '~/assets/workspace_img.svg'
+
+import { faClose } from '@fortawesome/free-solid-svg-icons'
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
+import { Autocomplete, Box, Button, TextField } from '@mui/material'
+
+import { useTheme } from '../../Theme/themeContext'
 
 interface AutocompleteContainerProps {
   onClose: () => void
