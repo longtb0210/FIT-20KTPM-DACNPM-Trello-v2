@@ -23,16 +23,7 @@ services:
   envoy:
     image: lamlance/trello-envoy:latest
     ports:
-      - "10000"
-
-  # nginx:
-  #   image: lamlance/trello-backed:nginx-latest
-  #   ports:
-  #     - "80:80"
-  #   volumes:
-  #     - ./configs/nginx.conf:/etc/nginx/nginx.conf
-  #   depends_on:
-  #     - envoy
+      - "10000:10000"
 
   backend-cardlist:
     image: lamlance/trello-backend:cardlist-latest
