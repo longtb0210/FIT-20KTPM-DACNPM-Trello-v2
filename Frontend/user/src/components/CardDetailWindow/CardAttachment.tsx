@@ -163,13 +163,19 @@ function CardAttachmentTile({
   //API
   const [deleteCardFeatureAPI] = CardApiRTQ.CardApiSlice.useDeleteCardFeatureMutation()
 
-  async function handleRemove() {
-    const response = await deleteCardFeatureAPI({
+  function handleRemove() {
+    deleteCardFeatureAPI({
       cardlist_id: cardlistId,
       card_id: cardId,
       feature_id: attachment._id!
     })
-    setCurrentCard(response.data.data)
+      .unwrap()
+      .then((response) => {
+        setCurrentCard(response.data)
+      })
+      .catch((error) => {
+        console.log('ERROR: delete attachment from card - ', error)
+      })
   }
 
   return (

@@ -6,11 +6,21 @@ import { Card } from '@trello-v2/shared/src/schemas/CardList'
 
 interface SidebarButtonCopyProps {
   type: ButtonType
+  boardId: string
+  cardlistId: string
+  cardId: string
   currentCard: Card
   setCurrentCard: (newState: Card) => void
 }
 
-export function SidebarButtonCopy({ type, currentCard, setCurrentCard }: SidebarButtonCopyProps) {
+export function SidebarButtonCopy({
+  type,
+  boardId,
+  cardlistId,
+  cardId,
+  currentCard,
+  setCurrentCard
+}: SidebarButtonCopyProps) {
   const boxRef = useRef(null)
   const [anchorEl, setAnchorEl] = useState<null | HTMLDivElement>(null)
   const [isOpenModal, setIsOpenModal] = useState(false)
@@ -37,6 +47,9 @@ export function SidebarButtonCopy({ type, currentCard, setCurrentCard }: Sidebar
       {isOpenModal && (
         <CopyCardModal
           anchorEl={anchorEl}
+          boardId={boardId}
+          cardlistId={cardlistId}
+          cardId={cardId}
           currentCard={currentCard}
           setCurrentCard={setCurrentCard}
           handleClose={handleCloseModal}

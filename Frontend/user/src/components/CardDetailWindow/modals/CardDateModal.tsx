@@ -84,10 +84,10 @@ export function SelectCardDatesModal({
     setReminderDateValue(event.target.value as string)
   }
 
-  async function updateCardDates() {
+  function updateCardDates() {
     const featureDateIndex = currentCard.features.findIndex((feature) => feature.type === 'date')
     if (featureDateIndex === -1) {
-      const response = await addCardFeatureAPI({
+      addCardFeatureAPI({
         cardlist_id: cardlistId,
         card_id: cardId,
         feature: {
@@ -96,11 +96,17 @@ export function SelectCardDatesModal({
           due_date: dueDateValue!.toDate()
         }
       })
-      const updatedCard = {
-        ...currentCard,
-        features: [...currentCard.features, response.data.data]
-      }
-      setCurrentCard(updatedCard)
+        .unwrap()
+        .then((response) => {
+          const updatedCard = {
+            ...currentCard,
+            features: [...currentCard.features, response.data]
+          }
+          setCurrentCard(updatedCard)
+        })
+        .catch((error) => {
+          console.log('ERROR: add card dates - ', error)
+        })
     } else {
       const featureDate = currentCard.features[featureDateIndex] as Feature_Date
       updateCardFeatureAPI({
@@ -129,18 +135,24 @@ export function SelectCardDatesModal({
     }
   }
 
-  async function handleRemoveCardDate() {
+  function handleRemoveCardDate() {
     const featureDateIndex = currentCard.features.findIndex((feature) => feature.type === 'date')
     if (featureDateIndex === -1) {
       return
     } else {
       const featureDate = currentCard.features[featureDateIndex] as Feature_Date
-      const response = await deleteCardFeatureAPI({
+      deleteCardFeatureAPI({
         cardlist_id: cardlistId,
         card_id: cardId,
         feature_id: featureDate._id!
       })
-      setCurrentCard(response.data.data)
+        .unwrap()
+        .then((response) => {
+          setCurrentCard(response.data)
+        })
+        .catch((error) => {
+          console.log('ERROR: remove card dates - ', error)
+        })
     }
   }
 
