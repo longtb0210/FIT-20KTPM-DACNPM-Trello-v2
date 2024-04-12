@@ -1,7 +1,6 @@
-import { InjectController, InjectRoute, SwaggerApi } from '@app/common/decorators'
+import { InjectController, InjectRoute } from '@app/common/decorators'
 import { ZodValidationPipe } from '@app/common/pipes'
 import { Body, InternalServerErrorException, NotFoundException, Query } from '@nestjs/common'
-import { getSchemaPath } from '@nestjs/swagger'
 import { TrelloApi } from '@trello-v2/shared'
 
 import { CardRoutes } from '../card.routes'
@@ -16,23 +15,12 @@ export class CardController {
   constructor(private cardService: CardService) {}
 
   @InjectRoute(CardRoutes.createCard)
-  @SwaggerApi({
-    secure: false,
-    body: {
-      schema: { $ref: getSchemaPath('CreateCardRequestSchema') },
-    },
-    responses: [
-      {
-        status: 200,
-        schema: { $ref: getSchemaPath('CreateCardRespondSchema') },
-      },
-    ],
-  })
   async createCard(
+    @AuthenticatedUser() user: UserInfoDto,
     @Body(new ZodValidationPipe(TrelloApi.CardApi.CreateCardRequestSchema))
     body: TrelloApi.CardApi.CreateCardRequest,
   ): Promise<TrelloApi.CardApi.CreateCardRespond> {
-    const cardData = await this.cardService.createCard(body)
+    const cardData = await this.cardService.createCard(body, user.email)
     if (!cardData || !cardData._id) throw new InternalServerErrorException("Can't create card")
     return {
       data: {
@@ -43,21 +31,6 @@ export class CardController {
   }
 
   @InjectRoute(CardRoutes.getAllCardsOfCardlist)
-  @SwaggerApi({
-    secure: false,
-    query: {
-      name: 'query',
-      schema: { $ref: getSchemaPath('GetAllCardsOfCardlistRequestSchema') },
-      style: 'form',
-      explode: true,
-    },
-    responses: [
-      {
-        status: 200,
-        schema: { $ref: getSchemaPath('GetAllCardsOfCardlistResponseSchema') },
-      },
-    ],
-  })
   async getAllCardsOfCardlist(
     @Query(new ZodValidationPipe(TrelloApi.CardApi.GetAllCardsOfCardlistRequestSchema))
     query: TrelloApi.CardApi.GetCardsOfCardlistRequest,
@@ -87,20 +60,6 @@ export class CardController {
   }
 
   @InjectRoute(CardRoutes.getCardDetail)
-  @SwaggerApi({
-    query: {
-      name: 'query',
-      schema: { $ref: getSchemaPath('GetCardDetailRequestSchema') },
-      style: 'form',
-      explode: true,
-    },
-    responses: [
-      {
-        status: 200,
-        schema: { $ref: getSchemaPath('GetCardDetailResponseSchema') },
-      },
-    ],
-  })
   async getCardDetail(
     @Query(new ZodValidationPipe(TrelloApi.CardApi.GetCardDetailRequestSchema))
     query: TrelloApi.CardApi.GetCardDetailRequest,
@@ -113,21 +72,12 @@ export class CardController {
   }
 
   @InjectRoute(CardRoutes.updateCardDetail)
-  @SwaggerApi({
-    secure: false,
-    body: { schema: { $ref: getSchemaPath('UpdateCardDetailRequestSchema') } },
-    responses: [
-      {
-        status: 200,
-        schema: { $ref: getSchemaPath('UpdateCardDetailResponseSchema') },
-      },
-    ],
-  })
   async updateCardDetail(
+    @AuthenticatedUser() user: UserInfoDto,
     @Body(new ZodValidationPipe(TrelloApi.CardApi.UpdateCardDetailRequestSchema))
     body: TrelloApi.CardApi.UpdateCardDetailRequest,
   ): Promise<TrelloApi.CardApi.UpdateCardDetailResponse> {
-    const card = await this.cardService.updateCardDetail(body)
+    const card = await this.cardService.updateCardDetail(body, user.email)
     if (!card) throw new NotFoundException("Can't find card")
 
     return {
@@ -139,21 +89,12 @@ export class CardController {
   }
 
   @InjectRoute(CardRoutes.addFeatureToCard)
-  @SwaggerApi({
-    secure: false,
-    body: { schema: { $ref: getSchemaPath('AddCardFeatureRequestSchema') } },
-    responses: [
-      {
-        status: 200,
-        schema: { $ref: getSchemaPath('AddCardFeatureResponseSchema') },
-      },
-    ],
-  })
   async addFeatureToCard(
+    @AuthenticatedUser() user: UserInfoDto,
     @Body(new ZodValidationPipe(TrelloApi.CardApi.AddCardFeatureRequestSchema))
     body: TrelloApi.CardApi.AddCardFeatureRequest,
   ): Promise<TrelloApi.CardApi.AddCardFeatureResponse> {
-    const feature = await this.cardService.addFeatureToCard(body)
+    const feature = await this.cardService.addFeatureToCard(body, user.email)
     if (!feature || !feature._id) throw new InternalServerErrorException("Can't add feature")
 
     return {
@@ -165,16 +106,12 @@ export class CardController {
   }
 
   @InjectRoute(CardRoutes.updateFeatureToCard)
-  @SwaggerApi({
-    secure: false,
-    body: { schema: { $ref: getSchemaPath('UpdateCardFeatureRequestSchema') } },
-    responses: [{ status: 200, schema: { $ref: getSchemaPath('') } }],
-  })
   async updateFeatureToCard(
+    @AuthenticatedUser() user: UserInfoDto,
     @Body(new ZodValidationPipe(TrelloApi.CardApi.UpdateCardFeatureRequestSchema))
     body: TrelloApi.CardApi.UpdateCardFeatureRequest,
   ): Promise<TrelloApi.CardApi.UpdateCardFeatureResponse> {
-    const feature = await this.cardService.updateFeatureOfCard(body)
+    const feature = await this.cardService.updateFeatureOfCard(body, user.email)
     if (!feature || !feature._id) throw new InternalServerErrorException("Can't update card feature")
     return {
       data: {
@@ -185,21 +122,12 @@ export class CardController {
   }
 
   @InjectRoute(CardRoutes.addWatcherToCard)
-  @SwaggerApi({
-    secure: false,
-    body: { schema: { $ref: getSchemaPath('AddWatcherToCardRequestSchema') } },
-    responses: [
-      {
-        status: 200,
-        schema: { $ref: getSchemaPath('AddWatcherToCardResponseSchema') },
-      },
-    ],
-  })
   async addWatcherToCard(
+    @AuthenticatedUser() user: UserInfoDto,
     @Body(new ZodValidationPipe(TrelloApi.CardApi.AddWatcherToCardRequestSchema))
     body: TrelloApi.CardApi.AddWatcherToCardRequest,
   ): Promise<TrelloApi.CardApi.AddWatcherToCardResponse> {
-    const card = await this.cardService.addWatcherToCard(body)
+    const card = await this.cardService.addWatcherToCard(body, user.email)
     if (!card || !card._id) throw new InternalServerErrorException("Can't add watcher to card")
 
     return {
@@ -211,23 +139,12 @@ export class CardController {
   }
 
   @InjectRoute(CardRoutes.deleteWatcherToCard)
-  @SwaggerApi({
-    secure: false,
-    body: {
-      schema: { $ref: getSchemaPath('DeleteWatcherToCardRequestSchema') },
-    },
-    responses: [
-      {
-        status: 200,
-        schema: { $ref: getSchemaPath('DeleteWatcherToCardResponseSchema') },
-      },
-    ],
-  })
   async deleteWatcherToCard(
+    @AuthenticatedUser() user: UserInfoDto,
     @Body(new ZodValidationPipe(TrelloApi.CardApi.DeleteWatcherToCardRequestSchema))
     body: TrelloApi.CardApi.DeleteWatcherToCardRequest,
   ): Promise<TrelloApi.CardApi.DeleteWatcherToCardResponse> {
-    const card = await this.cardService.deleteWatcherFromCard(body)
+    const card = await this.cardService.deleteWatcherFromCard(body, user.email)
     if (!card || !card._id) throw new InternalServerErrorException("Can't add watcher to card")
 
     return {
@@ -239,20 +156,12 @@ export class CardController {
   }
 
   @InjectRoute(CardRoutes.archiveCard)
-  @SwaggerApi({
-    body: { schema: { $ref: getSchemaPath('ArchiveCardRequestSchema') } },
-    responses: [
-      {
-        status: 200,
-        schema: { $ref: getSchemaPath('ArchiveCardResponseSchema') },
-      },
-    ],
-  })
   async archiveCard(
+    @AuthenticatedUser() user: UserInfoDto,
     @Body(new ZodValidationPipe(TrelloApi.CardApi.ArchiveCardRequestSchema))
     body: TrelloApi.CardApi.ArchiveCardRequest,
   ): Promise<TrelloApi.CardApi.ArchiveCardResponse> {
-    const card = await this.cardService.archiveCard(body)
+    const card = await this.cardService.archiveCard(body, user.email)
     if (!card || !card._id) throw new InternalServerErrorException("Can't archive card")
     return {
       data: {
@@ -263,20 +172,12 @@ export class CardController {
   }
 
   @InjectRoute(CardRoutes.unarchiveCard)
-  @SwaggerApi({
-    body: { schema: { $ref: getSchemaPath('UnArchiveCardRequestSchema') } },
-    responses: [
-      {
-        status: 200,
-        schema: { $ref: getSchemaPath('UnArchiveCardResponseSchema') },
-      },
-    ],
-  })
   async unArchiveCard(
+    @AuthenticatedUser() user: UserInfoDto,
     @Body(new ZodValidationPipe(TrelloApi.CardApi.UnArchiveCardRequestSchema))
     body: TrelloApi.CardApi.ArchiveCardRequest,
   ): Promise<TrelloApi.CardApi.UnArchiveCardResponse> {
-    const card = await this.cardService.unArchiveCard(body)
+    const card = await this.cardService.unArchiveCard(body, user.email)
     if (!card || !card._id) throw new InternalServerErrorException("Can't unarchive card")
     return {
       data: {
@@ -287,15 +188,6 @@ export class CardController {
   }
 
   @InjectRoute(CardRoutes.moveCard)
-  @SwaggerApi({
-    body: { schema: { $ref: getSchemaPath('MoveCardSamelistRequestSchema') } },
-    responses: [
-      {
-        status: 200,
-        schema: { $ref: getSchemaPath('MoveCardSamelistResponseSchema') },
-      },
-    ],
-  })
   async moveCardSamelist(
     @Body(new ZodValidationPipe(TrelloApi.CardApi.MoveCardSamelistRequestSchema))
     body: TrelloApi.CardApi.MoveCardSamelistRequest,
@@ -308,12 +200,6 @@ export class CardController {
   }
 
   @InjectRoute(CardRoutes.moveCardNew)
-  @SwaggerApi({
-    body: {
-      schema: { $ref: getSchemaPath('MoveCardRequestSchema') },
-    },
-    responses: [{ status: 200, schema: { $ref: getSchemaPath('MoveCardResponseSchema') } }],
-  })
   async moveCard(
     @Body(new ZodValidationPipe(TrelloApi.CardApi.MoveCardRequestSchema)) data: TrelloApi.CardApi.MoveCardRequest,
   ): Promise<TrelloApi.CardApi.MoveCardSamelistResponse> {
@@ -323,14 +209,11 @@ export class CardController {
   }
 
   @InjectRoute(CardRoutes.deleteFeatureToCard)
-  @SwaggerApi({
-    body: { schema: { $ref: getSchemaPath('DeleteFeatureRequestSchema') } },
-    responses: [{ status: 200, schema: { $ref: getSchemaPath('MoveCardResponseSchema') } }],
-  })
   async deleteFeature(
+    @AuthenticatedUser() user: UserInfoDto,
     @Body(new ZodValidationPipe(TrelloApi.CardApi.DeleteFeatureRequestSchema)) body: TrelloApi.CardApi.DeleteFeatureRequest,
   ): Promise<TrelloApi.CardApi.DeleteFeatureResponse> {
-    const card = await this.cardService.deleteFeature(body)
+    const card = await this.cardService.deleteFeature(body, user.email)
     return {
       data: card,
     }
@@ -348,6 +231,7 @@ export class CardController {
       ...data,
     }
   }
+
   @InjectRoute(CardRoutes.deleteMemberToCard)
   async deleteMemberToCard(
     @AuthenticatedUser() user: UserInfoDto,
@@ -358,6 +242,17 @@ export class CardController {
     return {
       _id: data._id,
       ...data,
+    }
+  }
+
+  @InjectRoute(CardRoutes.makeComment)
+  async makeComment(
+    @AuthenticatedUser() user: UserInfoDto,
+    @Body(new ZodValidationPipe(TrelloApi.CardApi.MakeCommentSchemaRequestSchema)) body: TrelloApi.CardApi.MakeCommentRequest,
+  ): Promise<TrelloApi.CardApi.MakeCommentResponse> {
+    const card = await this.cardService.commentCard(body, user.email)
+    return {
+      data: card,
     }
   }
 }
