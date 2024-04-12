@@ -70,16 +70,18 @@ export const WorkspaceSetting: React.FC = () => {
   return (
     <div style={darkLightMode} className={``}>
       <Box sx={{ display: 'flex' }}>
-        <CssBaseline />
-        {open ? (
-          <BackButton onClick={handleDrawerClose} edge="start" color="inherit" aria-label="close">
-            <ChevronLeftIcon />
-          </BackButton>
-        ) : (
-          <IconButton onClick={handleDrawerOpen} edge="start" color="inherit" aria-label="open">
-            <ChevronRightIcon />
-          </IconButton>
-        )}
+        <Box sx={{ position: 'fixed', top: 60, left: 10, zIndex: 999 }}>
+          <CssBaseline />
+          {open ? (
+            <IconButton onClick={handleDrawerClose} edge="start" color="inherit" aria-label="close" sx={{ color: colors.text }}>
+              <ChevronLeftIcon/>
+            </IconButton>
+          ) : (
+            <IconButton onClick={handleDrawerOpen} edge="start" color="inherit" aria-label="open" sx={{ color: colors.text }}>
+              <ChevronRightIcon />
+            </IconButton>
+          )}
+        </Box>
         <SidebarCateWorkSpace open={open} handleDrawerClose={handleDrawerClose} />
         <Main open={open} sx={{ padding: 0 }}>
           <Settings />
