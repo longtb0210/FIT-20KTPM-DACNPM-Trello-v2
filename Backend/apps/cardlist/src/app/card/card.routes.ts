@@ -57,4 +57,14 @@ export const CardRoutes = {
     method: RequestMethod.POST,
     jwtSecure: false,
   } as IRouteParams,
+  moveCardNew: {
+    path: 'move',
+    method: RequestMethod.POST,
+    jwtSecure: false,
+  },
+  deleteFeatureToCard: {
+    path: 'feature',
+    method: RequestMethod.DELETE,
+    jwtSecure: false,
+  } as IRouteParams,
 } as const

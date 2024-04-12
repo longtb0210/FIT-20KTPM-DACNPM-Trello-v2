@@ -2,12 +2,30 @@ import { faPlus } from '@fortawesome/free-solid-svg-icons'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { Avatar, Box, Tooltip } from '@mui/material'
 import { useState } from 'react'
-import { _Card } from '.'
 import { CardMemberModal } from './modals/CardMemberModal'
 import { useTheme } from '../Theme/themeContext'
+import { Card } from '@trello-v2/shared/src/schemas/CardList'
+import React from 'react'
 
 // eslint-disable-next-line react-refresh/only-export-components
 export const bgColors: string[] = ['#8a2be2', '#1e90ff', '#66cdaa', '#ffa500', '#FFD700', '#DC143C']
+
+// eslint-disable-next-line react-refresh/only-export-components
+export function stringToColor(string: string) {
+  let hash = 0
+  let i
+  /* eslint-disable no-bitwise */
+  for (i = 0; i < string.length; i += 1) {
+    hash = string.charCodeAt(i) + ((hash << 5) - hash)
+  }
+  let color = '#'
+  for (i = 0; i < 3; i += 1) {
+    const value = (hash >> (i * 8)) & 0xff
+    color += `00${value.toString(16)}`.slice(-2)
+  }
+  /* eslint-enable no-bitwise */
+  return color
+}
 
 const getContrastColor = (hexColor: string) => {
   if (!hexColor) {
@@ -54,12 +72,14 @@ export function MemberAvatar({ memberName, bgColor }: MemberAvatarProps) {
 }
 
 interface AddMemberButtonProps {
-  currentCard: _Card
-  setCurrentCard: (newState: _Card) => void
+  cardlistId: string
+  cardId: string
+  currentCard: Card
+  setCurrentCard: (newState: Card) => void
   boardMembers: string[]
 }
 
-function AddMemberButton({ currentCard, setCurrentCard, boardMembers }: AddMemberButtonProps) {
+function AddMemberButton({ cardlistId, cardId, currentCard, setCurrentCard, boardMembers }: AddMemberButtonProps) {
   const { colors } = useTheme()
   const [anchorEl, setAnchorEl] = useState<null | HTMLDivElement>(null)
   const [isOpenCardMemberModal, setIsOpenCardMemberModal] = useState(false)
@@ -96,6 +116,8 @@ function AddMemberButton({ currentCard, setCurrentCard, boardMembers }: AddMembe
       {isOpenCardMemberModal && (
         <CardMemberModal
           anchorEl={anchorEl}
+          cardlistId={cardlistId}
+          cardId={cardId}
           currentCard={currentCard}
           setCurrentCard={setCurrentCard}
           boardMembers={boardMembers}
@@ -107,45 +129,63 @@ function AddMemberButton({ currentCard, setCurrentCard, boardMembers }: AddMembe
 }
 
 interface CardMemberListProps {
-  currentCard: _Card
-  setCurrentCard: (newState: _Card) => void
+  cardlistId: string
+  cardId: string
+  currentCard: Card
+  setCurrentCard: (newState: Card) => void
   boardMembers: string[]
 }
 
-export default function CardMemberList({ currentCard, setCurrentCard, boardMembers }: CardMemberListProps) {
+export default function CardMemberList({
+  cardlistId,
+  cardId,
+  currentCard,
+  setCurrentCard,
+  boardMembers
+}: CardMemberListProps) {
   const { colors } = useTheme()
   return (
-    <Box sx={{ margin: '10px 16px 0 0' }}>
-      <h2 style={{ color: colors.text }} className='mb-2 text-xs font-bold'>
-        Members
-      </h2>
-      <div className='flex flex-row space-x-1'>
-        {currentCard.watcher_email.map((email, index) => (
-          <Tooltip
-            arrow
-            key={index}
-            title={email}
-            placement='bottom'
-            slotProps={{
-              popper: {
-                modifiers: [
-                  {
-                    name: 'offset',
-                    options: {
-                      offset: [0, -8]
-                    }
+    <React.Fragment>
+      {currentCard.watcher_email.length !== 0 && (
+        <Box sx={{ margin: '10px 16px 0 0' }}>
+          <h2 style={{ color: colors.text }} className='mb-2 text-xs font-bold'>
+            Members
+          </h2>
+          <div className='flex flex-row space-x-1'>
+            {currentCard!.watcher_email.map((email, index) => (
+              <Tooltip
+                arrow
+                key={index}
+                title={email}
+                placement='bottom'
+                slotProps={{
+                  popper: {
+                    modifiers: [
+                      {
+                        name: 'offset',
+                        options: {
+                          offset: [0, -8]
+                        }
+                      }
+                    ]
                   }
-                ]
-              }
-            }}
-          >
-            <div style={{ display: 'inline-block' }}>
-              <MemberAvatar memberName={email.slice(0, 2).toUpperCase()} bgColor={bgColors[index]} />
-            </div>
-          </Tooltip>
-        ))}
-        <AddMemberButton currentCard={currentCard} setCurrentCard={setCurrentCard} boardMembers={boardMembers} />
-      </div>
-    </Box>
+                }}
+              >
+                <div style={{ display: 'inline-block' }}>
+                  <MemberAvatar memberName={email.slice(0, 2).toUpperCase()} bgColor={stringToColor(email)} />
+                </div>
+              </Tooltip>
+            ))}
+            <AddMemberButton
+              cardlistId={cardlistId}
+              cardId={cardId}
+              currentCard={currentCard}
+              setCurrentCard={setCurrentCard}
+              boardMembers={boardMembers}
+            />
+          </div>
+        </Box>
+      )}
+    </React.Fragment>
   )
 }

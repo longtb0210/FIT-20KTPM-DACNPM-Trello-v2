@@ -1,0 +1,20 @@
+syntax = "proto3";
+package trello.cardlist;
+
+message Void {
+    bool is_success = 1;
+}
+
+message CloneCardListByBoardRequest{
+    string board_input_id = 1;
+    string board_output_id = 2;
+}
+
+message DeleteCardListsByBoardRequest{
+    string board_id = 1;
+}
+
+service CardlistService {
+  rpc cloneCardlist(CloneCardListByBoardRequest) returns (Void);
+  rpc deleteCardlist(DeleteCardListsByBoardRequest) returns (Void);
+}

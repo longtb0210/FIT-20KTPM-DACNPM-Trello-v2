@@ -25,6 +25,7 @@ export class CardService {
       watcher_email: [],
       activities: [],
       features: [],
+      created_at: new Date(),
     })
     await cardlist.save()
 
@@ -141,7 +142,7 @@ export class CardService {
         _id: data.cardlist_id,
         cards: { $elemMatch: { _id: data.card_id } },
       },
-      { $set: { 'cards.$.archive_at': new Date().toISOString() } },
+      { $set: { 'cards.$.archive_at': new Date().toISOString(), index: null } },
       { new: true, fields: { 'cards.features': 0, 'cards.activities': 0 } },
     )
     const card = res?.toJSON().cards.find((e) => e._id?.toString() === data.card_id)
@@ -178,5 +179,86 @@ export class CardService {
     }
     await cardlist.save()
     return cardlist.toJSON().cards
+  }
+
+  async moveCard({ data }: TrelloApi.CardApi.MoveCardRequest) {
+    const lists = await this.CardlistMModel.find(
+      {
+        _id: {
+          $in: !data.destination_new_list
+            ? [data.source_list.cardlist_id]
+            : [data.source_list.cardlist_id, data.destination_new_list.cardlist_id],
+        },
+      },
+      {
+        board_id: 0,
+        name: 0,
+        archive_at: 0,
+        created_at: 0,
+        watcher_email: 0,
+        // 'cards.activities': 0,
+        // 'cards.features': 0,
+        // 'cards.watcher_email': 0,
+        // 'cards.archive_at': 0,
+        // 'cards.cover': 0,
+        // 'cards.description': 0,
+      },
+    )
+
+    const srcIdx = lists.findIndex((cl) => cl._id.toString() === data.source_list.cardlist_id)
+    if (srcIdx < 0) return null
+
+    const dstIdx = lists.length === 2 ? (srcIdx === 0 ? 1 : 0) : -1
+
+    data.source_list.cards_id_index.forEach((id, index) => {
+      const cardIdx = lists[srcIdx].cards.findIndex((c) => c._id.toString() === id)
+      if (cardIdx < 0) return
+      lists[srcIdx].cards[cardIdx].index = index
+    })
+
+    //same list
+    if (dstIdx < 0) {
+      lists[srcIdx].save()
+      return lists.map((c) => c.toJSON())
+    }
+
+    const targetCard = lists[srcIdx].cards.find((c) => c._id.toString() === data.source_list.target_card_id)
+    if (!targetCard) return null
+
+    lists[srcIdx].cards = lists[srcIdx].cards.filter((c) => c._id.toString() !== data.source_list.target_card_id)
+
+    lists[dstIdx].cards.push(targetCard)
+    data.destination_new_list.cards_id_index.forEach((id, index) => {
+      const cardIdx = lists[dstIdx].cards.findIndex((c) => c._id.toString() === id)
+      if (cardIdx < 0) return
+      lists[dstIdx].cards[cardIdx].index = index
+    })
+
+    lists[srcIdx].save()
+    lists[dstIdx].save()
+    return lists.map((c) => c.toJSON())
+  }
+
+  async deleteFeature(data: TrelloApi.CardApi.DeleteFeatureRequest) {
+    const res = await this.CardlistMModel.findOneAndUpdate(
+      {
+        _id: data.cardlist_id,
+        cards: {
+          $elemMatch: {
+            features: { $elemMatch: { _id: data.feature_id } },
+          },
+        },
+      },
+      {
+        $pull: {
+          'cards.$[i].features': { _id: data.feature_id },
+        },
+      },
+      {
+        new: true,
+        arrayFilters: [{ 'i._id': data.card_id }],
+      },
+    )
+    return res.toJSON().cards.find((c) => data.card_id === c._id.toString())
   }
 }

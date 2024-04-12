@@ -19,12 +19,14 @@ export const FeatureChecklistSchema = z.object({
     .object({ name: z.string(), is_check: z.boolean().default(false) })
     .array(),
 });
+
 export const FeatureDateSchema = z.object({
   _id: z.string().optional(),
   type: z.literal("date"),
   start_date: z.coerce.date().optional(),
   due_date: z.coerce.date(),
 });
+
 export const FeatureAttachmentSchema = z.object({
   _id: z.string().optional(),
 

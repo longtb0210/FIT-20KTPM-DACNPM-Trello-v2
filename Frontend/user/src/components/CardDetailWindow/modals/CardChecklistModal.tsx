@@ -1,20 +1,26 @@
 import { faXmark } from '@fortawesome/free-solid-svg-icons'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { Box, Grid, Popover } from '@mui/material'
-import { _Card, _Feature_Activity, _Feature_Checklist } from '..'
 import { useState } from 'react'
-import moment from 'moment'
+// import moment from 'moment'
 import { useTheme } from '~/components/Theme/themeContext'
+import { Card } from '@trello-v2/shared/src/schemas/CardList'
+import { Activity } from '@trello-v2/shared/src/schemas/Activity'
+import { CardApiRTQ } from '~/api'
 
 interface CreateCardChecklistModalProps {
   anchorEl: (EventTarget & HTMLDivElement) | null
-  currentCard: _Card
-  setCurrentCard: (newState: _Card) => void
+  cardlistId: string
+  cardId: string
+  currentCard: Card
+  setCurrentCard: (newState: Card) => void
   handleClose: () => void
 }
 
 export function CreateCardChecklistModal({
   anchorEl,
+  cardlistId,
+  cardId,
   currentCard,
   setCurrentCard,
   handleClose
@@ -26,28 +32,38 @@ export function CreateCardChecklistModal({
     setTextFieldValue(event.target.value)
   }
 
-  function createChecklist() {
-    const trimmedValue = textFieldValue.replace(/\s+/g, ' ').trim()
-    const newChecklist: _Feature_Checklist = {
-      _id: currentCard.checklists.length.toString(),
-      name: trimmedValue,
-      type: 'checklist',
-      items: []
+  // API
+  const [addCardFeatureAPI] = CardApiRTQ.CardApiSlice.useAddCardFeatureMutation()
+
+  async function createChecklist() {
+    try {
+      const trimmedValue = textFieldValue.replace(/\s+/g, ' ').trim()
+      const response = await addCardFeatureAPI({
+        cardlist_id: cardlistId,
+        card_id: cardId,
+        feature: {
+          type: 'checklist',
+          name: trimmedValue,
+          items: []
+        }
+      })
+      const newActivity: Activity = {
+        workspace_id: '0',
+        board_id: '0',
+        cardlist_id: cardlistId,
+        card_id: cardId,
+        content: `TrelloUser added ${trimmedValue} to this card`
+        // time: moment().format()
+      }
+      const updatedCard: Card = {
+        ...currentCard,
+        features: [...currentCard.features, response.data.data],
+        activities: [...currentCard.activities, newActivity]
+      }
+      setCurrentCard(updatedCard)
+    } catch (error) {
+      console.error('Error while adding checklist to card:', error)
     }
-    const newActivity: _Feature_Activity = {
-      workspace_id: '0',
-      board_id: '0',
-      cardlist_id: '0',
-      card_id: '0',
-      content: `TrelloUser added ${trimmedValue} to this card`,
-      time: moment().format()
-    }
-    const updatedCard = {
-      ...currentCard,
-      checklists: [...currentCard.checklists, newChecklist],
-      activities: [...currentCard.activities, newActivity]
-    }
-    setCurrentCard(updatedCard)
   }
 
   return (

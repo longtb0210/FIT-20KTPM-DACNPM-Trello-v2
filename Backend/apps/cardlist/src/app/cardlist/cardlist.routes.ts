@@ -165,6 +165,69 @@ export const CardlistRoutes = {
     },
     // jwtSecure: false,
   } as IRouteParams,
+  sortCardsByOldestDate: {
+    path: '/sort_oldest_cards/:cardlistId',
+    method: RequestMethod.GET,
+    swaggerInfo: {
+      params: {
+        name: 'cardlistId',
+        schema: {
+          type: 'string',
+        },
+      },
+      responses: [
+        {
+          status: 200,
+          schema: {
+            $ref: getSchemaPath('SortCardByOldestDateResponseSchema'),
+          },
+        },
+      ],
+    },
+    // jwtSecure: false,
+  } as IRouteParams,
+  sortCardsByNewestDate: {
+    path: '/sort_newest_card/:cardlistId',
+    method: RequestMethod.GET,
+    swaggerInfo: {
+      params: {
+        name: 'cardlistId',
+        schema: {
+          type: 'string',
+        },
+      },
+      responses: [
+        {
+          status: 200,
+          schema: {
+            $ref: getSchemaPath('SortCardByNewestDateResponseSchema'),
+          },
+        },
+      ],
+    },
+    // jwtSecure: false,
+  } as IRouteParams,
+  sortCardsByName: {
+    path: '/sort_name_cards/:cardlistId',
+    method: RequestMethod.GET,
+    swaggerInfo: {
+      params: {
+        name: 'cardlistId',
+        schema: {
+          type: 'string',
+        },
+      },
+      responses: [
+        {
+          status: 200,
+          schema: {
+            $ref: getSchemaPath('SortCardByNameResponseSchema'),
+          },
+        },
+      ],
+    },
+    // jwtSecure: false,
+  } as IRouteParams,
   updateCardlists: {
     path: '/update',
     method: RequestMethod.PUT,
@@ -264,8 +327,32 @@ export const CardlistRoutes = {
     },
     // jwtSecure: false,
   } as IRouteParams,
-  testRoute: {
-    path: '/api/cardlist/test',
-    method: RequestMethod.GET,
+  cloneCardlists: {
+    path: '/clone_cardlists',
+    method: RequestMethod.POST,
+    swaggerInfo: {
+      body: { schema: { $ref: getSchemaPath('CloneCardlistsToNewBoardRequestSchema') } },
+      responses: [
+        {
+          status: 200,
+          schema: { $ref: getSchemaPath('CloneCardlistsToNewBoardResponseSchema') },
+        },
+      ],
+    },
+    // jwtSecure: false,
+  } as IRouteParams,
+  deleteCardlistsByBoardId: {
+    path: '/delete_cardlists_by_board_id',
+    method: RequestMethod.DELETE,
+    swaggerInfo: {
+      body: { schema: { $ref: getSchemaPath('DeleteCardlistsByBoardIdRequestSchema') } },
+      responses: [
+        {
+          status: 200,
+          // schema: { $ref: getSchemaPath('CloneCardlistsToNewBoardResponseSchema') },
+        },
+      ],
+    },
+    // jwtSecure: false,
   } as IRouteParams,
 } as const

@@ -6,7 +6,6 @@ import { ZodValidationPipe } from '@app/common/pipes'
 import { TrelloApi } from '@trello-v2/shared'
 import { SwaggerApi } from '@app/common/decorators'
 import { getSchemaPath } from '@nestjs/swagger'
-import { UserGrpcService } from '../services/user.grpc.service'
 
 @InjectController({
   name: 'user',
@@ -15,7 +14,6 @@ import { UserGrpcService } from '../services/user.grpc.service'
 export class UserController {
   constructor(
     private userService: UserService,
-    private userGrpcService: UserGrpcService,
   ) {}
 
   @InjectRoute(UserRoutes.createUser)
@@ -36,7 +34,7 @@ export class UserController {
     body: TrelloApi.UserApi.CreateUserRequest,
   ): Promise<TrelloApi.UserApi.CreateUserResponse> {
     const user = await this.userService.createUser(body)
-    if (!user || !user._id) throw new InternalServerErrorException("Can't create user")
+    if (!user) throw new InternalServerErrorException("Can't create user")
     return {
       data: user,
     }
@@ -162,7 +160,7 @@ export class UserController {
     body: TrelloApi.UserApi.CreateActivityRequest,
   ): Promise<TrelloApi.UserApi.CreateActivityResponse> {
     const activity = await this.userService.createActivity(email, body)
-    if (!activity || !activity._id) throw new InternalServerErrorException("Can't create activity")
+    if (!activity) throw new InternalServerErrorException("Can't create activity")
     return {
       data: activity,
     }
@@ -236,10 +234,5 @@ export class UserController {
     return {
       data: user,
     }
-  }
-
-  @InjectRoute({ path: '/api/grpc/test', method: RequestMethod.GET })
-  test() {
-    return this.userGrpcService.echoService.Echo({ name: 'User service' })
   }
 }

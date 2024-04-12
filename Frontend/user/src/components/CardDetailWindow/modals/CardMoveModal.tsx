@@ -1,15 +1,15 @@
 import { Box, FormControl, Grid, MenuItem, Popover, Select, SelectChangeEvent } from '@mui/material'
-import { _Card } from '..'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { faList, faLocationDot, faXmark } from '@fortawesome/free-solid-svg-icons'
 import { useState } from 'react'
 import { faFlipboard } from '@fortawesome/free-brands-svg-icons'
 import { useTheme } from '~/components/Theme/themeContext'
+import { Card } from '@trello-v2/shared/src/schemas/CardList'
 
 interface MoveCardModalProps {
   anchorEl: (EventTarget & HTMLDivElement) | null
-  currentCard: _Card
-  setCurrentCard: (newState: _Card) => void
+  currentCard: Card
+  setCurrentCard: (newState: Card) => void
   handleClose: () => void
 }
 
@@ -17,7 +17,7 @@ const boardChoices: string[] = ['Project Trello', 'Front-end', 'Back-end']
 const listChoices: string[] = ['To do', 'Doing', 'Done', 'Week 1', 'Week 2']
 const positionChoices: string[] = ['1', '2', '3', '4']
 
-export function MoveCardModal({ anchorEl, currentCard, setCurrentCard, handleClose }: MoveCardModalProps) {
+export function MoveCardModal({ anchorEl, handleClose }: MoveCardModalProps) {
   const { colors } = useTheme()
   const menuItemFontSize = 14
   const [selectedBoard, setSelectedBoard] = useState('Project Trello')

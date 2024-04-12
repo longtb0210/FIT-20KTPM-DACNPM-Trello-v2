@@ -1,5 +1,6 @@
 import { useState, useEffect, lazy, Suspense } from 'react'
-import { List, Card } from './type/index'
+import { lists } from './testData/test_data'
+import { List, Card, defaultCard } from './type/index'
 
 import {
   DndContext,
@@ -13,19 +14,23 @@ import {
   useSensor,
   useSensors,
   DragMoveEvent,
-  MouseSensor
+  rectIntersection,
+  closestCenter,
+  Active,
+  Over
 } from '@dnd-kit/core'
 import { arrayMove } from '@dnd-kit/sortable'
 
 import { cloneDeep, isEmpty } from 'lodash'
-import { BoardLayout } from '~/layouts'
-import { generatePlaceHolderCard } from '~/utils/fomatter'
-import LoadingComponent from '~/components/Loading'
+import { BoardLayout } from '../../layouts'
+import { generatePlaceHolderCard } from '../../utils/fomatter'
+import LoadingComponent from '../../components/Loading'
 import { CardComponent, ListComponent } from './components'
-import { useTheme } from '~/components/Theme/themeContext'
-import { getAllListAPI } from '~/api/List'
-import { CardlistApiRTQ } from '~/api'
+import { useTheme } from '../../components/Theme/themeContext'
+import { getAllListAPI } from '../../api/List'
+import { CardlistApiRTQ } from '../../api'
 import { TrelloApi } from '@trello-v2/shared'
+import { board_id } from '~/api/getInfo'
 const MOCK_CARD_DATA: TrelloApi.CardlistApi.GetallCardlistResponse = {
   data: [
     {
@@ -55,21 +60,24 @@ const ACTIVE_DRAG_ITEM_TYPE = {
   COLUMN: 'ACTIVE_DRAG_ITEM_TYPE_COLUMN',
   CARD: 'ACTIVE_DRAG_ITEM_TYPE_CARD'
 }
-
 // const LazyCardComponent = lazy(() => import('./components/Card'))
 // const LazyListComponent = lazy(() => import('./components/List'))
 const LazyListsComponent = lazy(() => import('./components/Lists'))
 export function Board() {
-  const [getAllCardlist, { data: cardlistData }] = CardlistApiRTQ.CardListApiSlice.useLazyGetAllCardlistQuery()
+  // const [getAllCardlist, { data: cardlistData }] = CardlistApiRTQ.CardListApiSlice.useLazyGetAllCardlistQuery()
+  const [getCardListByBoardId, { data: cardlistDataByBoardId }] =
+    CardlistApiRTQ.CardListApiSlice.useLazyGetCardlistByBoardIdQuery()
   // const { colors, darkMode } = useTheme()
   const [oldListWhenDragging, setOldListWhenDraggingCard] = useState<List>()
   const [listsData, setListsData] = useState<Array<List>>()
   const [activeDragItemId, setActiveDragItemId] = useState<string>('')
   const [activeDragItemType, setActiveDragItemType] = useState<string>('')
   const [activeDragItemData, setActiveDragItemData] = useState<any>()
+  const [openCardSetting, setOpenCardSetting] = useState<string>('')
+  const [resetManually, setResetManually] = useState<boolean>(false)
   // const [overListData, setOverListData] = useState<List>()
   // const [cardsData, setCardsData] = useState<Card[]>(cards)
-
+  const [selectedCard, setSelectedCard] = useState<Card>()
   // const [isDragCardToCard, setIsDragCardToCard] = useState<boolean>(false)
   // const [isMoveList, setIsMoveList] = useState<boolean>(false)
   const [action, setAction] = useState<boolean>(false)
@@ -90,7 +98,8 @@ export function Board() {
   //   }
   // })
   useEffect(() => {
-    const updatedLists_placeHolder = [...(cardlistData?.data || []), ...MOCK_CARD_DATA.data].map((list) => ({
+    // if (!cardlistDataByBoardId) return
+    const updatedLists_placeHolder = MOCK_CARD_DATA.data.map((list) => ({
       ...list,
       cards: list.cards.map(
         (card) =>
@@ -114,83 +123,30 @@ export function Board() {
       return list
     })
     setListsData(updatedLists)
-  }, [cardlistData])
+  }, [cardlistDataByBoardId])
   const sensors = useSensors(
-    useSensor(MouseSensor)
-    // useSensor(PointerSensor, {
-    //   activationConstraint: {
-    //     distance: 10
-    //   }
-    // })
+    useSensor(PointerSensor, {
+      activationConstraint: {
+        distance: 10
+      }
+    })
   )
   async function getAllList() {
-    getAllCardlist()
-    // const res = await getAllListAPI()
-    // if (res.status === 200) {
-    //   const updatedLists_placeHolder = res.data.map((list: List) => ({
-    //     ...list,
-    //     data: list.cards.map((task) => ({
-    //       ...task,
-    //       placeHolder: false // Set your default value for placeHolder
-    //     }))
-    //   }))
-    //   const updatedLists = updatedLists_placeHolder?.map((list: List) => {
-    //     // Check if data array is empty
-    //     if (list.cards.length === 0) {
-    //       // Add a new item to data array
-    //       const newItem = generatePlaceHolderCard(list)
-
-    //       return {
-    //         ...list,
-    //         data: [newItem]
-    //       }
-    //     }
-
-    //     return list // If data array is not empty, keep it unchanged
-    //   })
-
-    //   setListsData(updatedLists)
-    // }
+    // getAllCardlist()
+    getCardListByBoardId({ id: board_id })
   }
   useEffect(() => {
     console.log('update list')
     getAllList()
+
     // You can call your API update function here
-  }, [])
-  // useEffect(() => {
-  //   console.log('update list')
+  }, [openCardSetting])
+  
 
-  //   const updatedLists_placeHolder = lists.map((list) => ({
-  //     ...list,
-  //     data: list.data.map((task) => ({
-  //       ...task,
-  //       placeHolder: false // Set your default value for placeHolder
-  //     }))
-  //   }))
-  //   const updatedLists = updatedLists_placeHolder.map((list) => {
-  //     // Check if data array is empty
-  //     if (list.data.length === 0) {
-  //       // Add a new item to data array
-  //       const newItem = generatePlaceHolderCard(list)
-
-  //       return {
-  //         ...list,
-  //         data: [newItem]
-  //       }
-  //     }
-
-  //     return list // If data array is not empty, keep it unchanged
-  //   })
-  //   setListsData(updatedLists)
-  //   console.log(updatedLists)
-
-  //   // You can call your API update function here
-  // }, [])
-
-  function findListByCardId(cardId: any) {
+  function findListByCardId(cardId: string) {
     return listsData?.find((list) => list?.cards?.map((card) => card._id)?.includes(cardId))
   }
-  function isCard(obj: any): obj is Card {
+  function isCard(obj: Card): obj is Card {
     return 'cards' in obj == false
   }
   function handleUpdateAfterDragging() {
@@ -199,8 +155,8 @@ export function Board() {
   function handleMoveCardBetweenDifferenceColumn(
     overList: List,
     overCardId: UniqueIdentifier,
-    active: any,
-    over: any,
+    active: Active,
+    over: Over,
     activeList: List,
     activeDragingCardId: UniqueIdentifier,
     activeDraggingCardData: any
@@ -249,7 +205,7 @@ export function Board() {
     setActiveDragItemData(e?.active?.data?.current)
 
     if (e?.active?.data?.current?.list_id) {
-      setOldListWhenDraggingCard(findListByCardId(e?.active?.id))
+      setOldListWhenDraggingCard(findListByCardId(e?.active?.id as string))
     }
   }
 
@@ -270,8 +226,8 @@ export function Board() {
     } = active
     const { id: overCardId } = over
 
-    const activeList = findListByCardId(activeDragingCardId)
-    const overList = findListByCardId(overCardId)
+    const activeList = findListByCardId(activeDragingCardId as string)
+    const overList = findListByCardId(overCardId as string)
     if (!activeList || !overList) {
       console.log('!activeColumn')
       return
@@ -301,8 +257,8 @@ export function Board() {
       } = active
       const { id: overCardId } = over
 
-      const activeList = findListByCardId(activeDragingCardId)
-      const overList = findListByCardId(overCardId)
+      const activeList = findListByCardId(activeDragingCardId as string)
+      const overList = findListByCardId(overCardId as string)
       if (!activeList || !overList || !oldListWhenDragging) {
         console.log('!activeColumn')
         return
@@ -361,15 +317,15 @@ export function Board() {
       }
     })
   }
-  const [openCardSetting, setOpenCardSetting] = useState<string>('')
-  useEffect(() => {
-    console.log(openCardSetting)
-    if (openCardSetting) {
-      document.body.style.overflow = 'hidden'
-    } else {
-      document.body.style.overflow = 'auto'
-    }
-  }, [openCardSetting])
+
+  // useEffect(() => {
+  //   console.log(openCardSetting)
+  //   if (openCardSetting) {
+  //     document.body.style.overflow = 'hidden'
+  //   } else {
+  //     document.body.style.overflow = 'auto'
+  //   }
+  // }, [openCardSetting])
 
   return (
     <BoardLayout openCardSetting={openCardSetting}>
@@ -383,15 +339,33 @@ export function Board() {
           {(listsData || []) && (
             <div className={`relative mt-[64px] w-[100%]`}>
               <Suspense fallback={<LoadingComponent />}>
-                <LazyListsComponent lists={listsData || []} setOpenCardSetting={setOpenCardSetting} />
+                <LazyListsComponent
+                  cardSelected={setSelectedCard}
+                  lists={listsData || []}
+                  resetManually={resetManually}
+                  setResetManually={setResetManually}
+                  setOpenCardSetting={setOpenCardSetting}
+                />
               </Suspense>
               <DragOverlay dropAnimation={customDropAnimation}>
                 {!activeDragItemId || !activeDragItemType}
                 {activeDragItemId && activeDragItemType === ACTIVE_DRAG_ITEM_TYPE.COLUMN && (
-                  <ListComponent list={activeDragItemData} setOpenCardSetting={(data) => setOpenCardSetting(data)} />
+                  <ListComponent
+                    index={0}
+                    maxHeight={10}
+                    list={activeDragItemData}
+                    cardSelected={(defaultCard) => {}}
+                    setResetManually={() => {}}
+                    resetManually={false}
+                    setOpenCardSetting={(data) => setOpenCardSetting(data)}
+                  />
                 )}
                 {activeDragItemId && activeDragItemType === ACTIVE_DRAG_ITEM_TYPE.CARD && (
-                  <CardComponent card={activeDragItemData} setOpenCardSetting={(data) => setOpenCardSetting(data)} />
+                  <CardComponent
+                    card={activeDragItemData}
+                    cardSelected={(defaultCard) => {}}
+                    setOpenCardSetting={(data) => setOpenCardSetting(data)}
+                  />
                 )}
               </DragOverlay>
             </div>

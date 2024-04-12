@@ -1,4 +1,5 @@
-import { Card, List, defaultCard } from '~/pages/Board/type'
+import { Card, List, defaultCard } from '../pages/Board/type'
+
 export function generatePlaceHolderCard(list: List) {
   const cardPlaceHolder = {
     ...defaultCard,
