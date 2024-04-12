@@ -37,7 +37,7 @@ const WorkspaceApiSlice = createApi({
         method: 'GET'
       })
     }),
-    getAllUserWorkspace: builder.query<TrelloApi.WorkspaceApi.WorspaceListByEmailResponse, void>({
+    getAllUserWorkspace: builder.query<TrelloApi.WorkspaceApi.WorkspaceListByEmailResponse, void>({
       query: () => ({
         url: `/api/workspace/all`,
         method: 'GET'
@@ -59,7 +59,7 @@ const WorkspaceApiSlice = createApi({
         body: data
       })
     }),
-    getWorkspaceInfo: builder.query<TrelloApi.WorkspaceApi.WorspaceResponse, string>({
+    getWorkspaceInfo: builder.query<TrelloApi.WorkspaceApi.WorkspaceResponse, string>({
       query: (id) => ({
         url: `/api/workspace/${id}`,
         method: 'GET'
@@ -82,7 +82,7 @@ const WorkspaceApiSlice = createApi({
       }
     }),
     changeWorkspaceVisibility: builder.mutation<
-      TrelloApi.WorkspaceApi.WorspaceResponse,
+      TrelloApi.WorkspaceApi.WorkspaceResponse,
       TrelloApi.WorkspaceApi.ChangeWorkspaceVisibilityRequest
     >({
       query: (data) => ({
@@ -97,7 +97,7 @@ const WorkspaceApiSlice = createApi({
         method: 'DELETE'
       })
     }),
-    getWorkspaceByID: builder.mutation<TrelloApi.WorkspaceApi.WorspaceResponse, { workspace_id: string }>({
+    getWorkspaceByID: builder.mutation<TrelloApi.WorkspaceApi.WorkspaceResponse, { workspace_id: string }>({
       query: ({ workspace_id }) => ({
         url: `/api/workspace/${workspace_id}`,
         method: 'GET'
