@@ -22,27 +22,37 @@ import { SidebarButtonArchive } from './sidebar/CardArchiveSidebar'
 import { useTheme } from '../Theme/themeContext'
 import { Card } from '@trello-v2/shared/src/schemas/CardList'
 import { Feature_Checklist } from '@trello-v2/shared/src/schemas/Feature'
-import { testBoardLabels, testBoardMembers, testCard } from './test_data'
+import { testBoardMembers, testCard } from './test_data'
 import { BoardLabel } from '@trello-v2/shared/src/schemas/Board'
-import { CardApiRTQ, CardlistApiRTQ } from '~/api'
+import { BoardApiRTQ, CardApiRTQ, CardlistApiRTQ } from '~/api'
 
 const focusInputColor = '#0ff'
 
 interface CardDetailWindowProps {
-  cardlistId: string
-  cardId: string
+  _boardId: string
+  _cardlistId: string
+  _cardId: string
   isOpenCDW: boolean
   handleCloseCDW: () => void
 }
 
-export default function CardDetailWindow({ cardlistId, cardId, isOpenCDW, handleCloseCDW }: CardDetailWindowProps) {
+export default function CardDetailWindow({
+  _boardId,
+  _cardlistId,
+  _cardId,
+  isOpenCDW,
+  handleCloseCDW
+}: CardDetailWindowProps) {
+  const boardId = '66129cdda4db23ff8d3f7193'
+  const cardlistId = '6614987bd7c4037142d55000'
+  const cardId = '6614988cd7c4037142d55003'
   const { colors } = useTheme()
 
   // Card data (MOCK UP)
   const [_currentCardState, _setCurrentCardState] = useState<Card>(testCard)
 
   // Card states
-  const [currentCardState, setCurrentCardState] = useState<Card | null>()
+  const [currentCardState, setCurrentCardState] = useState<Card>()
   const [cardNameFieldValue, setCardNameFieldValue] = useState<string>('')
   const [initialCardNameFieldValue, setInitialCardNameFieldValue] = useState<string>('')
   const [isWatching, setIsWatching] = useState<boolean>(false)
@@ -51,37 +61,56 @@ export default function CardDetailWindow({ cardlistId, cardId, isOpenCDW, handle
   const [currentCardlistNameState, setCurrentCardlistNameState] = useState<string>('')
 
   // Board states
-  const [boardLabelState, setBoardLabelState] = useState<BoardLabel[]>(testBoardLabels)
+  const [boardLabelState, setBoardLabelState] = useState<BoardLabel[]>([])
 
   // API
+  const [getBoardLabelAPI] = BoardApiRTQ.BoardApiSlice.useLazyGetBoardLabelQuery()
   const [getAllCardlistAPI] = CardlistApiRTQ.CardListApiSlice.useLazyGetAllCardlistQuery()
   const [getCardDetailAPI] = CardApiRTQ.CardApiSlice.useLazyGetCardDetailQuery()
   const [updateCardDetailAPI] = CardApiRTQ.CardApiSlice.useUpdateCardDetailMutation()
 
-  const fetchCardlistName = async () => {
-    try {
-      const { data: allCardlistData } = await getAllCardlistAPI()
-      const currentCardlist = allCardlistData?.data.find((cardlist) => cardlist._id === cardlistId)
-      setCurrentCardlistNameState(currentCardlist!.name)
-    } catch (err) {
-      console.error('Error fetching card data:', err)
-    }
+  function fetchBoardLabel() {
+    getBoardLabelAPI({
+      boardId: boardId
+    })
+      .unwrap()
+      .then((response) => {
+        setBoardLabelState(response.data)
+      })
+      .catch((error) => {
+        console.log('ERROR: fetch board labels', error)
+      })
   }
 
-  const fetchCardData = async () => {
-    try {
-      const { data: cardData } = await getCardDetailAPI({
-        cardlist_id: cardlistId,
-        card_id: cardId
+  function fetchCardlistName() {
+    getAllCardlistAPI()
+      .unwrap()
+      .then((response) => {
+        const currentCardlist = response.data.find((cardlist) => cardlist._id === cardlistId)
+        setCurrentCardlistNameState(currentCardlist!.name)
       })
-      setCurrentCardState(cardData?.data)
-    } catch (err) {
-      console.error('Error fetching card data:', err)
-    }
+      .catch((error) => {
+        console.log('ERROR: fetch cardlist name - ', error)
+      })
+  }
+
+  function fetchCardData() {
+    getCardDetailAPI({
+      cardlist_id: cardlistId,
+      card_id: cardId
+    })
+      .unwrap()
+      .then((response) => {
+        setCurrentCardState(response.data)
+      })
+      .catch((error) => {
+        console.log('ERROR: fetch card data - ', error)
+      })
   }
 
   // Fetch card data
   useEffect(() => {
+    fetchBoardLabel()
     fetchCardData()
     fetchCardlistName()
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -131,10 +160,7 @@ export default function CardDetailWindow({ cardlistId, cardId, isOpenCDW, handle
   }
 
   return (
-    <Backdrop
-      sx={{ bgcolor: 'rgba(0, 0, 0, 0.64)', zIndex: (theme) => theme.zIndex.drawer + 1, marginTop: '55px' }}
-      open={isOpenCDW}
-    >
+    <Backdrop sx={{ bgcolor: 'rgba(0, 0, 0, 0.64)', zIndex: (theme) => theme.zIndex.drawer + 1 }} open={true}>
       <Box
         sx={{
           width: '100%',
@@ -221,6 +247,7 @@ export default function CardDetailWindow({ cardlistId, cardId, isOpenCDW, handle
                       boardMembers={testBoardMembers}
                     />
                     <CardLabelList
+                      boardId={boardId}
                       cardlistId={cardlistId}
                       cardId={cardId}
                       currentCard={currentCardState!}
@@ -270,7 +297,12 @@ export default function CardDetailWindow({ cardlistId, cardId, isOpenCDW, handle
                       )
                     })}
                   {/* END: Checklist */}
-                  <CardActivity currentCard={currentCardState!} setCurrentCard={setCurrentCardState} />
+                  <CardActivity
+                    cardlistId={cardlistId}
+                    cardId={cardId}
+                    currentCard={currentCardState!}
+                    setCurrentCard={setCurrentCardState}
+                  />
                 </Grid>
                 <Grid item xs={3} sx={{ padding: '0 16px 8px 8px' }}>
                   <Stack sx={{ padding: '10px 0 0 0' }}>
@@ -287,6 +319,7 @@ export default function CardDetailWindow({ cardlistId, cardId, isOpenCDW, handle
                     />
                     <SidebarButtonLabels
                       type={ButtonType.Labels}
+                      boardId={boardId}
                       cardlistId={cardlistId}
                       cardId={cardId}
                       currentCard={currentCardState!}
@@ -325,8 +358,11 @@ export default function CardDetailWindow({ cardlistId, cardId, isOpenCDW, handle
                     />
                     <SidebarButtonCopy
                       type={ButtonType.Copy}
-                      currentCard={_currentCardState}
-                      setCurrentCard={_setCurrentCardState}
+                      boardId={boardId}
+                      cardlistId={cardlistId}
+                      cardId={cardId}
+                      currentCard={currentCardState!}
+                      setCurrentCard={setCurrentCardState}
                     />
                     <Box sx={{ width: '100%', height: 2, padding: '0 0 10px 0' }}>
                       <Box sx={{ width: '100%', height: 2, bgcolor: colors.button }}></Box>
