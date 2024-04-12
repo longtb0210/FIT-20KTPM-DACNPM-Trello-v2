@@ -113,6 +113,9 @@ const SidebarCateWorkSpace: React.FC<Props> = ({ open, handleDrawerClose }) => {
                     padding: '8px 14px',
                     borderRadius: '6px',
                     backgroundImage: 'linear-gradient(to bottom, #E774BB, #943D73)',
+                    width: '40px',
+                    height: '40px', 
+                    textAlign: 'center',
                   }}
                 >
                   {workspaceData?.data.name.charAt(0)}

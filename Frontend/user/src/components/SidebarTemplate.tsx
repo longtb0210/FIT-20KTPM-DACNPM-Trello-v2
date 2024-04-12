@@ -186,7 +186,10 @@ const SidebarTemplate: React.FC<ProfileProps> = ({ userInfo }) => {
                             fontWeight: 700,
                             padding: '8px 14px',
                             borderRadius: '6px',
-                            backgroundImage: 'linear-gradient(to bottom, #E774BB, #943D73)'
+                            backgroundImage: 'linear-gradient(to bottom, #E774BB, #943D73)',
+                            width: '40px', 
+                            height: '40px', 
+                            textAlign: 'center',
                           }}
                         >
                           {w.name.charAt(0)}
@@ -500,7 +503,10 @@ const SidebarTemplate: React.FC<ProfileProps> = ({ userInfo }) => {
                             fontWeight: 700,
                             padding: '8px 14px',
                             borderRadius: '6px',
-                            backgroundImage: 'linear-gradient(to bottom, #E774BB, #943D73)'
+                            backgroundImage: 'linear-gradient(to bottom, #E774BB, #943D73)',
+                            width: '45px',
+                            height: '40px', 
+                            textAlign: 'center',
                           }}
                         >
                           {w.name.charAt(0)}
