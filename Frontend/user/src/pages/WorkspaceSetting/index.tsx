@@ -31,14 +31,6 @@ const Main = styled('main', { shouldForwardProp: (prop) => prop !== 'open' })<{
   })
 }))
 
-const BackButton = styled(IconButton)({
-  position: 'fixed',
-  top: 10,
-  left: 10,
-  zIndex: 999
-})
-
-
 export const WorkspaceSetting: React.FC = () => {
   const [selectedTab, setSelectedTab] = useState<string>('')
 
