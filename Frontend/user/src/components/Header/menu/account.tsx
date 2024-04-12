@@ -8,9 +8,11 @@ import { stringToColor } from '~/utils/StringToColor'
 
 export default function Account() {
   const [open, setOpen] = React.useState(false)
+  const [profile, setProfile] = React.useState({ email: '', name: '' })
   const anchorRef = React.useRef<HTMLButtonElement>(null)
   const { darkMode, toggleDarkMode, colors } = useTheme()
   const authContext = React.useContext(AuthContext)
+
   // const [getUser, { data: dataUser }] = UserApiRTQ.UserApiSlice.useGetUserMutation()
 
   // React.useEffect(() => {
@@ -18,7 +20,14 @@ export default function Account() {
   // }, [])
 
   // console.log(dataUser)
-  const profile = JSON.parse(localStorage.getItem('profile') || `{ email: '', name: '' }`)
+  // Lấy dữ liệu từ localStorage, nếu không tồn tại thì sử dụng giá trị mặc định
+  const storedProfile = localStorage.getItem('profile')
+  React.useEffect(() => {
+    const profileSave = storedProfile ? JSON.parse(storedProfile) : { email: '', name: '' }
+    setProfile({ ...profileSave })
+  }, [storedProfile])
+
+  console.log(profile)
 
   const handleToggle = () => {
     setOpen((prevOpen) => !prevOpen)
@@ -58,21 +67,26 @@ export default function Account() {
   }
 
   const getFirstTwoCharsOfLastWord = (inputString: string) => {
-    const words = inputString.split(' ')
+    if (inputString) {
+      const words = inputString.split(' ')
 
-    if (words.length >= 2) {
-      const secondToLastWord = words[words.length - 2]
-      const lastWord = words[words.length - 1]
+      if (words.length >= 2) {
+        const secondToLastWord = words[words.length - 2]
+        const lastWord = words[words.length - 1]
 
-      let firstLetters = `${secondToLastWord.charAt(0)}${lastWord.charAt(0)}`
+        let firstLetters = `${secondToLastWord.charAt(0)}${lastWord.charAt(0)}`
 
-      if (!firstLetters.match(/[A-Z]/)) {
-        firstLetters = firstLetters.toUpperCase()
+        if (!firstLetters.match(/[A-Z]/)) {
+          firstLetters = firstLetters.toUpperCase()
+        }
+
+        return firstLetters
+      } else {
+        return null
       }
-
-      return firstLetters
+    } else {
+      return null
     }
-    return null
   }
 
   return (
@@ -102,11 +116,11 @@ export default function Account() {
               lineHeight: '13px',
               fontWeight: 600,
               color: '#fff',
-              backgroundColor: '#172b4d',
+              backgroundColor: stringToColor(profile.name),
               borderRadius: '50%'
             }}
           >
-            HT
+            {getFirstTwoCharsOfLastWord(profile.name)}
           </Box>
         </Box>
 
