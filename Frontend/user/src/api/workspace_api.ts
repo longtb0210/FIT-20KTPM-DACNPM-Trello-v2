@@ -1,6 +1,7 @@
+import { RootState } from '~/store'
+
 import { createApi, fetchBaseQuery } from '@reduxjs/toolkit/query/react'
 import { TrelloApi } from '@trello-v2/shared'
-import { RootState } from '~/store'
 
 interface InviteMembers2WorkspaceRequestWithId extends TrelloApi.WorkspaceApi.InviteMembers2WorkspaceRequest {
   id: string | undefined
