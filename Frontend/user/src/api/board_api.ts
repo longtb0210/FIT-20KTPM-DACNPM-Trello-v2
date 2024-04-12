@@ -1,13 +1,18 @@
 import { createApi, fetchBaseQuery } from '@reduxjs/toolkit/query/react'
 import { TrelloApi } from '@trello-v2/shared'
-import { token } from './getInfo'
+import { RootState } from '~/store'
 
 const BoardApiSlice = createApi({
   reducerPath: 'BoardApi',
   baseQuery: fetchBaseQuery({
     baseUrl: import.meta.env.VITE_URL_API,
-    headers: {
-      Authorization: `Bearer ${token}`
+    prepareHeaders: (headers, { getState }) => {
+      const token = (getState() as RootState).KC_TOKEN?.acessToken
+
+      if (token) {
+        headers.set('authorization', `Bearer ${token}`)
+      }
+      return headers
     }
   }),
   endpoints: (builder) => ({
@@ -27,6 +32,12 @@ const BoardApiSlice = createApi({
     getBoardById: builder.query<TrelloApi.BoardApi.GetBoardInfoByBoardIdResponse, TrelloApi.BoardApi.BoardIdRequest>({
       query: (id) => ({
         url: `/api/board/${id}`,
+        method: 'GET'
+      })
+    }),
+    getBoardByWorkspaceId: builder.query<TrelloApi.BoardApi.getBoardsByWorkspaceIdResponse, { workspaceId: string | undefined }>({
+      query: ({workspaceId}) => ({
+        url: `/api/board/workspace/${workspaceId}`,
         method: 'GET'
       })
     }),

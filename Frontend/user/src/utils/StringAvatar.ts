@@ -1,4 +1,4 @@
-import { stringToColor } from "./StringToColor"
+import { stringToColor } from './StringToColor'
 
 export function stringAvatar(name: string) {
   let abbreviation = ''

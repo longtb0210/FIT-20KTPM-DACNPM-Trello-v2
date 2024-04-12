@@ -1,6 +1,7 @@
+import { RootState } from '~/store'
+
 import { createApi, fetchBaseQuery } from '@reduxjs/toolkit/query/react'
 import { TrelloApi } from '@trello-v2/shared'
-import { token } from './getInfo'
 
 interface InviteMembers2WorkspaceRequestWithId extends TrelloApi.WorkspaceApi.InviteMembers2WorkspaceRequest {
   id: string | undefined
@@ -10,14 +11,19 @@ const WorkspaceApiSlice = createApi({
   reducerPath: 'WorkspaceApi',
   baseQuery: fetchBaseQuery({
     baseUrl: import.meta.env.VITE_URL_API,
-    headers: {
-      Authorization: `Bearer ${token}`
+    prepareHeaders: (headers, { getState }) => {
+      const token = (getState() as RootState).KC_TOKEN?.acessToken
+
+      if (token) {
+        headers.set('authorization', `Bearer ${token}`)
+      }
+      return headers
     }
   }),
   endpoints: (builder) => ({
     createWorkspace: builder.mutation<
-      TrelloApi.WorkspaceApi.WorspaceResponse,
-      TrelloApi.WorkspaceApi.CreateWorspaceRequest
+      TrelloApi.WorkspaceApi.WorkspaceResponse,
+      TrelloApi.WorkspaceApi.CreateWorkspaceRequest
     >({
       query: (data) => ({
         url: '/api/workspace',
@@ -25,26 +31,26 @@ const WorkspaceApiSlice = createApi({
         method: 'POST'
       })
     }),
-    getAllWorkspace: builder.query<TrelloApi.WorkspaceApi.WorspaceListByEmailResponse, void>({
+    getAllWorkspace: builder.query<TrelloApi.WorkspaceApi.WorkspaceListByEmailResponse, void>({
       query: () => ({
         url: '/api/workspace/all',
         method: 'GET'
       })
     }),
-    getAllWorkspaceByEmail: builder.query<TrelloApi.WorkspaceApi.WorspaceListByEmailResponse, { email: string }>({
-      query: ({ email }) => ({
-        url: `/api/workspace/all/${email}`,
+    getAllUserWorkspace: builder.query<TrelloApi.WorkspaceApi.WorkspaceListByEmailResponse, void>({
+      query: () => ({
+        url: `/api/workspace/all`,
         method: 'GET'
       })
     }),
-    getOwnerWorkspacebyEmail: builder.query<TrelloApi.WorkspaceApi.WorspaceResponse, { email: string }>({
+    getOwnerWorkspacebyEmail: builder.query<TrelloApi.WorkspaceApi.WorkspaceResponse, { email: string }>({
       query: ({ email }) => ({
         url: `/api/workspace/role/owner/${email}`,
         method: 'GET'
       })
     }),
     updateWorkspace: builder.mutation<
-      TrelloApi.WorkspaceApi.WorspaceResponse,
+      TrelloApi.WorkspaceApi.WorkspaceResponse,
       TrelloApi.WorkspaceApi.UpdateWorkspaceInfoRequest
     >({
       query: (data) => ({
@@ -53,38 +59,48 @@ const WorkspaceApiSlice = createApi({
         body: data
       })
     }),
-    getWorkspaceInfo: builder.query<TrelloApi.WorkspaceApi.WorspaceResponse, string>({
+    getWorkspaceInfo: builder.query<TrelloApi.WorkspaceApi.WorkspaceResponse, string>({
       query: (id) => ({
         url: `/api/workspace/${id}`,
         method: 'GET'
       })
     }),
     inviteMember2Workspace: builder.mutation<
-      TrelloApi.WorkspaceApi.WorspaceResponse,
+      TrelloApi.WorkspaceApi.WorkspaceResponse,
       InviteMembers2WorkspaceRequestWithId
     >({
       query: (data) => {
         // Omit the id field from the data object
         const { id, ...requestData } = data
-
+        console.log(id)
+        console.log(requestData)
         return {
           url: `/api/workspace/invite/${id}`,
           method: 'POST',
-          body: { data: requestData }
+          body: { ...requestData }
         }
       }
     }),
-    changeWorkspaceVisibility: builder.mutation<void, TrelloApi.WorkspaceApi.ChangeWorkspaceVisibilityRequest>({
+    changeWorkspaceVisibility: builder.mutation<
+      TrelloApi.WorkspaceApi.WorkspaceResponse,
+      TrelloApi.WorkspaceApi.ChangeWorkspaceVisibilityRequest
+    >({
       query: (data) => ({
         url: `/api/workspace/visibility`,
         method: 'PUT',
-        body: { data }
+        body: { ...data }
       })
     }),
-    deleteWorkspace: builder.mutation<TrelloApi.WorkspaceApi.WorspaceResponse, { workspace_id: string }>({
+    deleteWorkspace: builder.mutation<TrelloApi.WorkspaceApi.WorkspaceResponse, { workspace_id: string }>({
       query: (data) => ({
         url: `/api/workspace/${data.workspace_id}`,
         method: 'DELETE'
+      })
+    }),
+    getWorkspaceByID: builder.mutation<TrelloApi.WorkspaceApi.WorkspaceResponse, { workspace_id: string }>({
+      query: ({ workspace_id }) => ({
+        url: `/api/workspace/${workspace_id}`,
+        method: 'GET'
       })
     })
   })

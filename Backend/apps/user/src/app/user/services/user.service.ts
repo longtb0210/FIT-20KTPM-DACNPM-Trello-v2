@@ -3,7 +3,6 @@ import { DbSchemas, TrelloApi } from '@trello-v2/shared'
 import { Model } from 'mongoose'
 
 export abstract class IUserService {
-
   abstract createUser(data: TrelloApi.UserApi.CreateUserRequest)
 
   abstract getAllUser()
@@ -28,7 +27,7 @@ export class UserService implements IUserService {
     private UserMModel: Model<DbSchemas.UserSchema.User>,
     @InjectModel(DbSchemas.COLLECTION_NAMES[5])
     private ActivityMModel: Model<DbSchemas.UserSchema.Activity>,
-  ) { }
+  ) {}
 
   async createUser(data: TrelloApi.UserApi.CreateUserRequest) {
     const model = new this.UserMModel(data)
@@ -134,7 +133,7 @@ export class UserServiceMock implements IUserService {
     return new Promise<DbSchemas.UserSchema.User>((res) => {
       res({
         ...data,
-        email
+        email,
       })
     })
   }
@@ -154,13 +153,7 @@ export class UserServiceMock implements IUserService {
 
   createActivity(email: string, data: TrelloApi.UserApi.CreateActivityRequest) {
     return new Promise<DbSchemas.UserSchema.Activity>((res) => {
-      res({
-        workspace_id: 'any_workspace_id',
-        board_id: 'any_board_id',
-        cardlist_id: 'any_cardlist_id',
-        card_id: 'any_card_id',
-        content: 'any_content'
-      })
+      res(data)
     })
   }
 
@@ -177,7 +170,9 @@ export class UserServiceMock implements IUserService {
         board_id: 'any_board_id',
         cardlist_id: 'any_cardlist_id',
         card_id: 'any_card_id',
-        content: 'any_content'
+        content: 'any_content',
+        create_time: new Date(),
+        creator_email: 'mail@lam.com',
       })
     })
   }

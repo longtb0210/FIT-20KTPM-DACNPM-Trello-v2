@@ -1,0 +1,8 @@
+version: "3.8"
+services:
+  keycloak:
+    image: keycloak/keycloak:24.0
+    command: start-dev
+    volumes:
+      - ${WEBAPP_STORAGE_HOME}/data:/opt/keycloak/data
+    restart: always

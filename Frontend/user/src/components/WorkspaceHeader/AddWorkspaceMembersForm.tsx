@@ -5,6 +5,7 @@ import { FaRegCircleCheck } from 'react-icons/fa6'
 import { HiLink } from 'react-icons/hi'
 import { Workspace } from '@trello-v2/shared/src/schemas/Workspace'
 import { WorkspaceApiRTQ } from '~/api'
+import WorkspaceInfo from './WorkspaceInfo'
 interface InviteFormProps {
   workspace: Workspace | undefined
 }
@@ -14,6 +15,7 @@ const InviteForm: React.FC<InviteFormProps> = ({ workspace }) => {
   const [isVisible, setIsVisible] = useState<boolean>(false)
   const [searchTerm, setSearchTerm] = useState<string>('')
   const [selectedEmail, setSelectedEmail] = useState<string[]>([])
+  const [selectedEmailName, setSelectedEmailName] = useState<string[]>([])
   const [isLoading, setIsLoading] = useState<boolean>(false)
   const [originalEmails, setOriginalEmails] = useState<string[]>(['123@gmail.com', '456@gmail.com', '457@gmail.com'])
   const [filteredEmails, setFilteredEmails] = useState<string[]>(originalEmails)
@@ -22,7 +24,7 @@ const InviteForm: React.FC<InviteFormProps> = ({ workspace }) => {
   const containerRef_Form = useRef<HTMLDivElement>(null)
   const [linkToCopy, setLinkToCopy] = useState<string>('Link abcxyz')
   const [copied, setCopied] = useState(false)
-
+  const [workspaceInfo, setWorkspaceInfo] = useState<Workspace | undefined>()
   const copyToClipboard = async (text: string) => {
     try {
       await navigator.clipboard.writeText(text)
@@ -32,6 +34,9 @@ const InviteForm: React.FC<InviteFormProps> = ({ workspace }) => {
       console.error('Failed to copy:', err)
     }
   }
+  useEffect(() => {
+    setWorkspaceInfo(workspace)
+  }, [workspace])
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
       if (containerRef.current && !containerRef.current.contains(event.target as Node)) {
@@ -62,7 +67,7 @@ const InviteForm: React.FC<InviteFormProps> = ({ workspace }) => {
   }
 
   const handleEmailSelect = (email: string) => {
-    setSelectedEmail([...selectedEmail, email.split('@')[0]]) // Only the part before "@"
+    setSelectedEmail([...selectedEmail, email]) // Only the part before "@"
     setSearchTerm('') // Set search term to show the selected email
   }
 
@@ -82,9 +87,10 @@ const InviteForm: React.FC<InviteFormProps> = ({ workspace }) => {
       email: email,
       status: 'member' // or you can omit this property if it's optional
     }))
-    if (workspace)
+
+    if (workspaceInfo)
       inviteMember2Workspace({
-        id: workspace._id,
+        id: workspaceInfo?._id,
         members: members
       })
     // Reset states or close the form after sending the invite
@@ -155,7 +161,7 @@ const InviteForm: React.FC<InviteFormProps> = ({ workspace }) => {
                         style={{ color: colors.text }}
                         className={` mr-2 flex flex-row items-center justify-center rounded-md px-2 text-sm ${darkMode ? 'bg-[#282e33] hover:bg-[#333c43]' : 'bg-gray-100 hover:bg-[#dcdfe4]'} `}
                       >
-                        <p className='pr-2'>{email + ''}</p>
+                        <p className='pr-2'>{email.split('@')[0] + ''}</p>
                         <button
                           key={index}
                           onClick={() => handleClearEmail(index)}

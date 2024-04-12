@@ -74,7 +74,10 @@ const CardContent = () => {
           </div>
           <div className='flex'>
             <Link to={'/workspace/123'}>
-              <button className='mr-1 flex rounded border-[1px] border-solid border-[#384148] px-[60px] py-1 transition-colors duration-200 hover:bg-[#dcdfe439]' style={{paddingBottom: '12px'}}>
+              <button
+                className='mr-1 flex rounded border-[1px] border-solid border-[#384148] px-[60px] py-1 transition-colors duration-200 hover:bg-[#dcdfe439]'
+                style={{ paddingBottom: '12px' }}
+              >
                 <FontAwesomeIcon icon={faCheck} className='mr-1 mt-[5px]' /> Complete
               </button>
             </Link>
