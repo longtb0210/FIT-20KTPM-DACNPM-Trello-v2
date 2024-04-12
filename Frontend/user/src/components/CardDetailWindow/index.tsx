@@ -358,8 +358,11 @@ export default function CardDetailWindow({
                     />
                     <SidebarButtonCopy
                       type={ButtonType.Copy}
-                      currentCard={_currentCardState}
-                      setCurrentCard={_setCurrentCardState}
+                      boardId={boardId}
+                      cardlistId={cardlistId}
+                      cardId={cardId}
+                      currentCard={currentCardState!}
+                      setCurrentCard={setCurrentCardState}
                     />
                     <Box sx={{ width: '100%', height: 2, padding: '0 0 10px 0' }}>
                       <Box sx={{ width: '100%', height: 2, bgcolor: colors.button }}></Box>

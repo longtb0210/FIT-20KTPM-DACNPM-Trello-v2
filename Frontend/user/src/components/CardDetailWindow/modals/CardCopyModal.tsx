@@ -1,12 +1,12 @@
 import { Box, FormControl, Grid, MenuItem, Popover, Select, SelectChangeEvent, TextareaAutosize } from '@mui/material'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { faList, faLocationDot, faXmark } from '@fortawesome/free-solid-svg-icons'
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import { faFlipboard } from '@fortawesome/free-brands-svg-icons'
 import { useTheme } from '~/components/Theme/themeContext'
-import { Card } from '@trello-v2/shared/src/schemas/CardList'
-import { BoardApiRTQ, WorkspaceApiRTQ } from '~/api'
-import { Workspace } from '@trello-v2/shared/src/schemas/Workspace'
+import { Card, CardList } from '@trello-v2/shared/src/schemas/CardList'
+import { BoardApiRTQ, CardApiRTQ, CardlistApiRTQ, WorkspaceApiRTQ } from '~/api'
+import { Board } from '@trello-v2/shared/src/schemas/Board'
 
 interface CardElementTileProps {
   isChecked: boolean
@@ -34,42 +34,109 @@ function CardElementTile({ isChecked, handleCheckboxChange, elementName, element
 
 interface CopyCardModalProps {
   anchorEl: (EventTarget & HTMLDivElement) | null
+  boardId: string
+  cardlistId: string
+  cardId: string
   currentCard: Card
   setCurrentCard: (newState: Card) => void
   handleClose: () => void
 }
 
-const boardChoices: string[] = ['Project Trello', 'Front-end', 'Back-end']
-const listChoices: string[] = ['To do', 'Doing', 'Done', 'Week 1', 'Week 2']
-const positionChoices: string[] = ['1', '2', '3', '4']
-
-export function CopyCardModal({ anchorEl, currentCard, handleClose }: CopyCardModalProps) {
+export function CopyCardModal({ anchorEl, boardId, cardlistId, cardId, currentCard, handleClose }: CopyCardModalProps) {
   const { colors } = useTheme()
   const menuItemFontSize = 14
   const [textFieldValue, setTextFieldValue] = useState('')
   const [isChecked, setIsChecked] = useState([false, false, false, false])
-  const [selectedBoard, setSelectedBoard] = useState('Project Trello')
-  const [selectedList, setSelectedList] = useState('Doing')
-  const [selectedPosition, setSelectedPosition] = useState('3')
-  const [allWorkspaces, setAllWorkspaces] = useState<Workspace[]>([])
+  const [selectedBoard, setSelectedBoard] = useState<string>(boardId)
+  const [selectedCardlist, setSelectedCardlist] = useState<string>(cardlistId)
+  const [selectedPosition, setSelectedPosition] = useState(1)
+  const [allBoards, setAllBoards] = useState<Board[]>([])
+  const [allCardlists, setAllCardlists] = useState<CardList[] | null>([])
+  const [cardlistLength, setCardlistLength] = useState<number>(0)
+  const [canSubmit, setCanSubmit] = useState<boolean>(false)
 
   //API
   const [getAllWorkspacesAPI] = WorkspaceApiRTQ.WorkspaceApiSlice.useLazyGetAllWorkspaceQuery()
-  const [getBoardByWorkspaceIdAPI] = BoardApiRTQ.BoardApiSlice.useLazyGetBoardByIdQuery()
+  const [getBoardsByWorkspaceIdAPI] = BoardApiRTQ.BoardApiSlice.useLazyGetBoardsByWorkspaceIDQuery()
+  const [getCardlistByBoardIdAPI] = CardlistApiRTQ.CardListApiSlice.useLazyGetCardlistByBoardIdQuery()
+  const [getCardsOfCardlistAPI] = CardApiRTQ.CardApiSlice.useLazyGetCardsOfCardlistQuery()
 
-  function fetchAllWorkspaces() {
-    getAllWorkspacesAPI()
+  async function fetchAllBoards() {
+    await getAllWorkspacesAPI()
       .unwrap()
       .then((response) => {
-        setAllWorkspaces([...response.data.owner, ...response.data.admin])
+        let tempAllBoards: Board[] = []
+        const ownerPromises = response.data.owner.map((workspace) => {
+          return getBoardsByWorkspaceIdAPI({
+            workspace_id: workspace._id!
+          })
+            .then((response1) => {
+              tempAllBoards = [...tempAllBoards, ...response1.data.data]
+            })
+            .catch((error) => {
+              console.log('ERROR: fetch boards in Card Move Modal - ', error)
+            })
+        })
+        const adminPromises = response.data.admin.map((workspace) => {
+          return getBoardsByWorkspaceIdAPI({
+            workspace_id: workspace._id!
+          })
+            .then((response2) => {
+              tempAllBoards = [...tempAllBoards, ...response2.data.data]
+            })
+            .catch((error) => {
+              console.log('ERROR: fetch boards in Card Move Modal - ', error)
+            })
+        })
+        Promise.all([...ownerPromises, ...adminPromises]).then(() => {
+          setAllBoards(tempAllBoards)
+        })
+      })
+      .catch((error) => {
+        console.log('ERROR: fetch all boards in Card Move Modal - ', error)
       })
   }
 
-  function fetchAllBoards() {
-    getBoardByWorkspaceIdAPI({
-      
+  function fetchAllCardlists() {
+    getCardlistByBoardIdAPI({
+      id: selectedBoard
     })
+      .unwrap()
+      .then((response) => {
+        setAllCardlists(response.data)
+      })
+      .catch((error) => {
+        console.log('ERROR: fetch cardlists in Card Move Modal - ', error)
+      })
   }
+
+  function fetchCardlistLength() {
+    getCardsOfCardlistAPI({
+      cardlist_id: selectedCardlist!
+    })
+      .unwrap()
+      .then((response) => {
+        setCardlistLength(response.data.cards.length)
+      })
+      .catch((error) => {
+        console.log('ERROR: fetch cardlist length - ', error)
+      })
+  }
+
+  useEffect(() => {
+    fetchAllBoards()
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [])
+
+  useEffect(() => {
+    fetchAllCardlists()
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [selectedBoard])
+
+  useEffect(() => {
+    fetchCardlistLength()
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [selectedCardlist])
 
   function handleTextFieldChange(event: React.ChangeEvent<HTMLTextAreaElement>) {
     setTextFieldValue(event.target.value)
@@ -79,12 +146,12 @@ export function CopyCardModal({ anchorEl, currentCard, handleClose }: CopyCardMo
     setSelectedBoard(event.target.value as string)
   }
 
-  function handleSelectList(event: SelectChangeEvent) {
-    setSelectedList(event.target.value as string)
+  function handleSelectCardlist(event: SelectChangeEvent) {
+    setSelectedCardlist(event.target.value as string)
   }
 
   function handleSelectPosition(event: SelectChangeEvent) {
-    setSelectedPosition(event.target.value as string)
+    setSelectedPosition(Number(event.target.value))
   }
 
   function handleCreateCard() {
@@ -97,16 +164,30 @@ export function CopyCardModal({ anchorEl, currentCard, handleClose }: CopyCardMo
     setIsChecked(updatedIsChecked)
   }
 
+  function handleCanSubmit() {
+    if (textFieldValue.trim() === '' || selectedCardlist === '' || allCardlists!.length === 0) {
+      console.log(allCardlists)
+      setCanSubmit(false)
+    } else {
+      setCanSubmit(true)
+    }
+  }
+
+  useEffect(() => {
+    handleCanSubmit()
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [textFieldValue, selectedBoard, allCardlists, selectedPosition])
+
   return (
     <Popover
       open={true}
       anchorEl={anchorEl}
       anchorOrigin={{
-        vertical: 'bottom',
+        vertical: 'top',
         horizontal: 'left'
       }}
       transformOrigin={{
-        vertical: 'top',
+        vertical: 'center',
         horizontal: 'left'
       }}
       onClose={handleClose}
@@ -159,35 +240,50 @@ export function CopyCardModal({ anchorEl, currentCard, handleClose }: CopyCardMo
           placeholder='Title of new card'
         />
         {/* Select card elements to keep */}
-        <p style={{ margin: '10px 0 8px 0', color: colors.text }} className='text-xs font-bold'>
-          Keep...
-        </p>
-        <Box sx={{ width: '100%', height: 'fit-content' }} className='flex flex-col'>
-          <CardElementTile
-            isChecked={isChecked[0]}
-            handleCheckboxChange={() => handleCheckboxChange(0)}
-            elementName='Checklists'
-            elementQuantity={currentCard.features.filter((feature) => feature.type === 'checklist').length}
-          />
-          <CardElementTile
-            isChecked={isChecked[1]}
-            handleCheckboxChange={() => handleCheckboxChange(1)}
-            elementName='Labels'
-            elementQuantity={currentCard.features.filter((feature) => feature.type === 'label').length}
-          />
-          <CardElementTile
-            isChecked={isChecked[2]}
-            handleCheckboxChange={() => handleCheckboxChange(2)}
-            elementName='Members'
-            elementQuantity={currentCard.watcher_email.length}
-          />
-          <CardElementTile
-            isChecked={isChecked[3]}
-            handleCheckboxChange={() => handleCheckboxChange(3)}
-            elementName='Attachments'
-            elementQuantity={currentCard.features.filter((feature) => feature.type === 'attachment').length}
-          />
-        </Box>
+        {(currentCard.features.filter((feature) => feature.type === 'checklist').length !== 0 ||
+          currentCard.features.filter((feature) => feature.type === 'label').length !== 0 ||
+          currentCard.watcher_email.length !== 0 ||
+          currentCard.features.filter((feature) => feature.type === 'attachment').length !== 0) && (
+          <>
+            <p style={{ margin: '10px 0 8px 0', color: colors.text }} className='text-xs font-bold'>
+              Keep...
+            </p>
+            <Box sx={{ width: '100%', height: 'fit-content' }} className='flex flex-col'>
+              {currentCard.features.filter((feature) => feature.type === 'checklist').length !== 0 && (
+                <CardElementTile
+                  isChecked={isChecked[0]}
+                  handleCheckboxChange={() => handleCheckboxChange(0)}
+                  elementName='Checklists'
+                  elementQuantity={currentCard.features.filter((feature) => feature.type === 'checklist').length}
+                />
+              )}
+              {currentCard.features.filter((feature) => feature.type === 'label').length !== 0 && (
+                <CardElementTile
+                  isChecked={isChecked[1]}
+                  handleCheckboxChange={() => handleCheckboxChange(1)}
+                  elementName='Labels'
+                  elementQuantity={currentCard.features.filter((feature) => feature.type === 'label').length}
+                />
+              )}
+              {currentCard.watcher_email.length !== 0 && (
+                <CardElementTile
+                  isChecked={isChecked[2]}
+                  handleCheckboxChange={() => handleCheckboxChange(2)}
+                  elementName='Members'
+                  elementQuantity={currentCard.watcher_email.length}
+                />
+              )}
+              {currentCard.features.filter((feature) => feature.type === 'attachment').length !== 0 && (
+                <CardElementTile
+                  isChecked={isChecked[3]}
+                  handleCheckboxChange={() => handleCheckboxChange(3)}
+                  elementName='Attachments'
+                  elementQuantity={currentCard.features.filter((feature) => feature.type === 'attachment').length}
+                />
+              )}
+            </Box>
+          </>
+        )}
         {/* Select card move destination */}
         <p style={{ margin: '20px 0 8px 0', color: colors.text }} className='text-xs font-bold'>
           Copy to destination...
@@ -215,7 +311,7 @@ export function CopyCardModal({ anchorEl, currentCard, handleClose }: CopyCardMo
               MenuProps={{
                 PaperProps: {
                   style: {
-                    maxHeight: 144,
+                    maxHeight: 148,
                     marginTop: 8,
                     background: colors.background_modal,
                     color: colors.text
@@ -223,9 +319,9 @@ export function CopyCardModal({ anchorEl, currentCard, handleClose }: CopyCardMo
                 }
               }}
             >
-              {boardChoices.map((choice, index) => (
-                <MenuItem key={index} value={choice} sx={{ fontSize: menuItemFontSize }}>
-                  {choice}
+              {allBoards.map((board, index) => (
+                <MenuItem key={index} value={board._id} sx={{ fontSize: menuItemFontSize }}>
+                  {board.name}
                 </MenuItem>
               ))}
             </Select>
@@ -243,34 +339,51 @@ export function CopyCardModal({ anchorEl, currentCard, handleClose }: CopyCardMo
               </p>
             </Box>
             <FormControl fullWidth className='flex flex-col'>
-              <Select
-                sx={{
-                  width: '100%',
-                  height: 36,
-                  margin: '0 0 8px 0',
-                  fontSize: 14,
-                  background: colors.background_modal,
-                  color: colors.text
-                }}
-                value={selectedList}
-                onChange={handleSelectList}
-                MenuProps={{
-                  PaperProps: {
-                    style: {
-                      maxHeight: 144,
-                      marginTop: 8,
-                      background: colors.background_modal,
-                      color: colors.text
+              {allCardlists!.length === 0 ? (
+                <Box
+                  sx={{
+                    width: '100%',
+                    height: 36,
+                    margin: '0 0 8px 0',
+                    paddingLeft: '12px',
+                    fontSize: 14,
+                    background: colors.button_hover,
+                    color: colors.text
+                  }}
+                  className='flex items-center rounded-sm'
+                >
+                  <p className='font-semibold italic'>No Lists</p>
+                </Box>
+              ) : (
+                <Select
+                  sx={{
+                    width: '100%',
+                    height: 36,
+                    margin: '0 0 8px 0',
+                    fontSize: 14,
+                    background: colors.background_modal,
+                    color: colors.text
+                  }}
+                  value={selectedCardlist}
+                  onChange={handleSelectCardlist}
+                  MenuProps={{
+                    PaperProps: {
+                      style: {
+                        maxHeight: 148,
+                        marginTop: 8,
+                        background: colors.background_modal,
+                        color: colors.text
+                      }
                     }
-                  }
-                }}
-              >
-                {listChoices.map((choice, index) => (
-                  <MenuItem key={index} value={choice} sx={{ fontSize: menuItemFontSize }}>
-                    {choice}
-                  </MenuItem>
-                ))}
-              </Select>
+                  }}
+                >
+                  {allCardlists!.map((cardlist, index) => (
+                    <MenuItem key={index} value={cardlist._id} sx={{ fontSize: menuItemFontSize }}>
+                      {cardlist.name}
+                    </MenuItem>
+                  ))}
+                </Select>
+              )}
             </FormControl>
           </Grid>
           {/* END: Select list */}
@@ -283,33 +396,50 @@ export function CopyCardModal({ anchorEl, currentCard, handleClose }: CopyCardMo
               </p>
             </Box>
             <FormControl fullWidth className='flex flex-col'>
-              <Select
-                sx={{
-                  height: 36,
-                  margin: '0 0 8px 0',
-                  fontSize: 14,
-                  background: colors.background_modal,
-                  color: colors.text
-                }}
-                value={selectedPosition}
-                onChange={handleSelectPosition}
-                MenuProps={{
-                  PaperProps: {
-                    style: {
-                      maxHeight: 144,
-                      marginTop: 8,
-                      background: colors.background_modal,
-                      color: colors.text
+              {allCardlists!.length === 0 ? (
+                <Box
+                  sx={{
+                    width: '100%',
+                    height: 36,
+                    margin: '0 0 8px 0',
+                    paddingLeft: '12px',
+                    fontSize: 14,
+                    background: colors.button_hover,
+                    color: colors.text
+                  }}
+                  className='flex items-center rounded-sm'
+                >
+                  <p className='font-semibold italic'>N/A</p>
+                </Box>
+              ) : (
+                <Select
+                  sx={{
+                    height: 36,
+                    margin: '0 0 8px 0',
+                    fontSize: 14,
+                    background: colors.background_modal,
+                    color: colors.text
+                  }}
+                  value={selectedPosition!.toString()}
+                  onChange={handleSelectPosition}
+                  MenuProps={{
+                    PaperProps: {
+                      style: {
+                        maxHeight: 148,
+                        marginTop: 8,
+                        background: colors.background_modal,
+                        color: colors.text
+                      }
                     }
-                  }
-                }}
-              >
-                {positionChoices.map((choice, index) => (
-                  <MenuItem key={index} value={choice} sx={{ fontSize: menuItemFontSize }}>
-                    {choice}
-                  </MenuItem>
-                ))}
-              </Select>
+                  }}
+                >
+                  {Array.from({ length: cardlistLength + 1 }, (_, index) => index).map((choice, index) => (
+                    <MenuItem key={index} value={choice} sx={{ fontSize: menuItemFontSize }}>
+                      {choice + 1}
+                    </MenuItem>
+                  ))}
+                </Select>
+              )}
             </FormControl>
           </Grid>
           {/* END: Select position */}
@@ -318,22 +448,25 @@ export function CopyCardModal({ anchorEl, currentCard, handleClose }: CopyCardMo
         {/* Button */}
         <Box
           sx={{
-            bgcolor: colors.button_primary,
+            bgcolor: canSubmit ? colors.button_primary : colors.button_hover,
             width: 'fit-content',
             height: 32,
             margin: '10px 0 10px 0',
             padding: '0 20px',
-            color: colors.button_primary_text,
+            color: canSubmit ? colors.button_primary_text : colors.text,
             fontSize: 14,
             fontWeight: 500,
             '&:hover': {
               filter: 'brightness(90%)'
-            }
+            },
+            ...(canSubmit ? { cursor: 'pointer' } : {})
           }}
-          className='flex cursor-pointer items-center justify-center rounded'
+          className='flex items-center justify-center rounded'
           onClick={() => {
-            handleCreateCard()
-            handleClose()
+            if (canSubmit) {
+              handleCreateCard()
+              handleClose()
+            }
           }}
         >
           <p>Create card</p>
