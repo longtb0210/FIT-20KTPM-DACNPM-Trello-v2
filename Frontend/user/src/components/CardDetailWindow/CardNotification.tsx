@@ -6,14 +6,16 @@ import { useTheme } from '../Theme/themeContext'
 interface CardNotificationProps {
   isWatching: boolean
   setIsWatching: (newState: boolean) => void
+  handleWatching: () => void
 }
 
-export default function CardNotification({ isWatching, setIsWatching }: CardNotificationProps) {
+export default function CardNotification({ isWatching, setIsWatching, handleWatching }: CardNotificationProps) {
   const { colors } = useTheme()
   const tipIsWatching = 'You are receiving notifactions for updates on this card (click to stop watching)'
   const tipNotWatching = 'Watch to get notifactions for updates on this card'
 
   function handleCheckboxClick() {
+    handleWatching()
     setIsWatching(!isWatching)
   }
 
