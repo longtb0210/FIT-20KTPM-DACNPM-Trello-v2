@@ -12,6 +12,26 @@ interface AutocompleteContainerProps {
   onClose: () => void
 }
 
+interface Workspace {
+  data: {
+    data: {
+      name: string
+      members: {
+        email: string | null
+        role: string
+        _id?: string | undefined
+        status?: string | undefined
+      }[]
+      visibility: string
+      short_name: string
+      logo: string
+      _id?: string | undefined
+      description?: string | undefined // Make description optional
+      website?: string | undefined
+    }
+  }
+}
+
 const type = [
   'Choose...',
   'Marketing',
@@ -24,7 +44,8 @@ const type = [
 ]
 
 export default function CreateWorkspace(props: AutocompleteContainerProps) {
-  const [createWorkspace] = WorkspaceApiRTQ.WorkspaceApiSlice.useCreateWorkspaceMutation()
+  const [createWorkspace, { data: dataCreateWorkspace }] =
+    WorkspaceApiRTQ.WorkspaceApiSlice.useCreateWorkspaceMutation()
   const [getAllWorkspace] = WorkspaceApiRTQ.WorkspaceApiSlice.useLazyGetAllWorkspaceQuery()
   const [valueWorkspace, setValueWorkspace] = React.useState<string | undefined>(type[0])
   const [inputValueWorkspace, setInputValueWorkspace] = React.useState('')
@@ -34,26 +55,20 @@ export default function CreateWorkspace(props: AutocompleteContainerProps) {
   const navigator = useNavigate()
 
   const onSubmit = async () => {
-    // const data = {
-    //   name: workspaceName,
-    //   description: workspaceDescription
-    // }
-    // try {
-    //   const response = await axios.post('http://localhost:3333/api/worspace', data)
-
-    //   if (response && response.statusText === 'OK') {
-    //     navigator(`/workspace/${response.data.data._id}`)
-    //     props.onClose()
-    //   }
-    // } catch (error) {
-    //   console.error('Error fetching data:', error)
-    // }
-
     createWorkspace({
       name: workspaceName || '',
       description: workspaceDescription || ''
-    }).then(() => getAllWorkspace())
+    })
   }
+
+  React.useEffect(() => {
+    if (dataCreateWorkspace) {
+      getAllWorkspace()
+      props.onClose()
+      navigator(`/workspaceboard/${dataCreateWorkspace.data._id}`)
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [dataCreateWorkspace])
 
   const handleWorkspaceName = (event: React.ChangeEvent<HTMLInputElement>) => {
     setWorkspaceName(event.target.value)
