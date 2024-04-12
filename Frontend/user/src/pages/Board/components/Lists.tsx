@@ -93,7 +93,7 @@ export default function ListsComponent({
         items={lists?.map((l) => l._id) as (UniqueIdentifier | { id: UniqueIdentifier })[]}
         strategy={horizontalListSortingStrategy}
       >
-        <div className='relative flex flex-row items-start p-4'>
+        <div className='relative flex flex-row items-start p-4 '>
           {lists?.map((list, index) => (
             <div key={index} id='list-component'>
               <ListComponent

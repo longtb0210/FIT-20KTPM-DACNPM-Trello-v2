@@ -4,15 +4,57 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { faChevronDown, faStar as starFull } from '@fortawesome/free-solid-svg-icons'
 import noneStar from '~/assets/noneStar.svg'
 import { useTheme } from './../../Theme/themeContext'
-
-const length = 3
+import { BoardApiRTQ, WorkspaceApiRTQ } from '~/api'
 
 export default function Starred() {
   const [open, setOpen] = React.useState(false)
-  const [isHoveredStar, setIsHoveredStar] = React.useState(false)
-  const [star, setStar] = React.useState(true)
   const anchorRef = React.useRef<HTMLButtonElement>(null)
   const { colors } = useTheme()
+  const [getAllBoard, { data: allBoardsData }] = BoardApiRTQ.BoardApiSlice.useLazyGetAllBoardQuery()
+  const [getALlWorkspace, { data: dataWorkspace }] = WorkspaceApiRTQ.WorkspaceApiSlice.useLazyGetAllWorkspaceQuery()
+  const [editBoardByIdAPI] = BoardApiRTQ.BoardApiSlice.useEditBoardByIdMutation()
+  const [workspaceName, setWorkspaceName] = React.useState<string[]>([])
+
+  const listStarBoard = allBoardsData?.data.filter((board) => board?.is_star)
+
+  React.useEffect(() => {
+    getAllBoard()
+    getALlWorkspace()
+  }, [getALlWorkspace, getAllBoard])
+
+  const findWorkspaceById = (workspaceId: string): { name: string } | undefined => {
+    const workspace =
+      dataWorkspace?.data.owner.find((item) => item._id === workspaceId) ||
+      dataWorkspace?.data.member.find((item) => item._id === workspaceId) ||
+      dataWorkspace?.data.guest.find((item) => item._id === workspaceId) ||
+      dataWorkspace?.data.admin.find((item) => item._id === workspaceId)
+
+    return workspace
+  }
+
+  React.useEffect(() => {
+    const names: string[] = []
+
+    listStarBoard?.forEach((board: { workspace_id: string }) => {
+      const workspace = findWorkspaceById(board.workspace_id)
+
+      if (workspace && workspace.name) {
+        names.push(workspace.name)
+      }
+    })
+    setWorkspaceName(names)
+  }, [dataWorkspace, allBoardsData])
+
+  const updateStar = (index: number) => {
+    const boardId = listStarBoard && listStarBoard[index] ? listStarBoard[index]._id : undefined
+
+    if (boardId) {
+      editBoardByIdAPI({
+        _id: boardId,
+        is_star: false
+      }).then(() => getAllBoard())
+    }
+  }
 
   const handleToggle = () => {
     setOpen((prevOpen) => !prevOpen)
@@ -101,7 +143,7 @@ export default function Starred() {
                       borderRadius: '4px'
                     }}
                   >
-                    {length !== 3 ? (
+                    {listStarBoard && listStarBoard?.length === 0 ? (
                       <Box>
                         <img src={noneStar} alt='' style={{ backgroundSize: 'cover', width: '100%' }} />
 
@@ -113,64 +155,63 @@ export default function Starred() {
                         </Typography>
                       </Box>
                     ) : (
-                      <Box
-                        sx={{
-                          display: 'flex',
-                          alignItems: 'center',
-                          justifyContent: 'space-between',
-                          padding: '4px',
-                          cursor: 'pointer',
-                          '&:hover': {
-                            backgroundColor:
-                              colors.background === '#ffffff' ? `rgba(0,0,0,0.1)` : `rgba(255,255,255,0.1)`,
-                            borderRadius: '4px'
-                          }
-                        }}
-                      >
-                        <Box sx={{ display: 'flex', alignItems: 'center' }}>
-                          <Box
-                            sx={{
-                              backgroundImage:
-                                'url("https://trello-backgrounds.s3.amazonaws.com/SharedBackground/480x320/69360d5ef9e7535cda824ab868bb1628/photo-1708058885492-09ef26cd4af8.jpg")',
-                              backgroundSize: 'cover',
-                              backgroundPosition: 'center',
-                              width: '40px',
-                              height: '32px',
+                      listStarBoard?.map((board, index) => (
+                        <Box
+                          key={index}
+                          sx={{
+                            display: 'flex',
+                            alignItems: 'center',
+                            justifyContent: 'space-between',
+                            padding: '4px',
+                            cursor: 'pointer',
+                            '&:hover': {
+                              backgroundColor:
+                                colors.background === '#ffffff' ? `rgba(0,0,0,0.1)` : `rgba(255,255,255,0.1)`,
                               borderRadius: '4px'
-                            }}
-                          ></Box>
+                            }
+                          }}
+                        >
+                          <Box sx={{ display: 'flex', alignItems: 'center' }}>
+                            <Box
+                              sx={{
+                                backgroundImage:
+                                  'url("https://trello-backgrounds.s3.amazonaws.com/SharedBackground/480x320/69360d5ef9e7535cda824ab868bb1628/photo-1708058885492-09ef26cd4af8.jpg")',
+                                backgroundSize: 'cover',
+                                backgroundPosition: 'center',
+                                width: '40px',
+                                height: '32px',
+                                borderRadius: '4px'
+                              }}
+                            ></Box>
 
-                          <Box sx={{ display: 'flex', flexDirection: 'column' }}>
-                            <Typography
-                              variant='body1'
-                              sx={{ fontSize: '14px', fontWeight: 600, color: colors.text, marginLeft: '12px' }}
-                            >
-                              front-end
-                            </Typography>
-                            <Typography
-                              variant='body1'
-                              sx={{ fontSize: '12px', color: colors.text, marginLeft: '12px' }}
-                            >
-                              Trello Workspaces
-                            </Typography>
+                            <Box sx={{ display: 'flex', flexDirection: 'column' }}>
+                              <Typography
+                                variant='body1'
+                                sx={{ fontSize: '14px', fontWeight: 600, color: colors.text, marginLeft: '12px' }}
+                              >
+                                {board.name}
+                              </Typography>
+                              <Typography
+                                variant='body1'
+                                sx={{ fontSize: '12px', color: colors.text, marginLeft: '12px' }}
+                              >
+                                {workspaceName[index]}
+                              </Typography>
+                            </Box>
                           </Box>
-                        </Box>
 
-                        {star && (
                           <FontAwesomeIcon
+                            onClick={() => updateStar(index)}
                             icon={starFull}
                             style={{
-                              color: 'yellow',
+                              color: 'orange',
                               marginRight: '8px',
-                              fontSize: isHoveredStar ? '16px' : '14px',
+                              fontSize: '16px',
                               transition: 'all 0.1s ease-in'
                             }}
-                            onMouseEnter={() => setIsHoveredStar(true)}
-                            onMouseLeave={() => setIsHoveredStar(false)}
-                            onClick={() => setStar(false)}
                           />
-                        )}
-                      </Box>
+                        </Box>
+                      ))
                     )}
                   </MenuList>
                 </ClickAwayListener>

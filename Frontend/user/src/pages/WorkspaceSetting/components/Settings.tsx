@@ -6,9 +6,13 @@ import { FaCheck } from 'react-icons/fa6'
 import { WorkspaceHeader } from '../../../components/WorkspaceHeader/WorkspaceHeader'
 import { WorkspaceApiRTQ } from '~/api'
 import { Workspace } from '@trello-v2/shared/src/schemas/Workspace'
+import { workspace_id } from '~/api/getInfo'
+import { useParams } from 'react-router-dom'
 export const Settings: React.FC = () => {
   // const image = '/src/assets/Profile/profile_img.svg'
   const { colors, darkMode } = useTheme()
+  const params = useParams()
+  const workspaceId = params.workspaceId
   // const [visibility, setVisibility] = useState<string>('private')
   const [workspaceInfo, setWorkspaceInfo] = useState<Workspace>()
   const [getWorkspaceInfo, { data: workspaceInfoRes }] =
@@ -20,22 +24,24 @@ export const Settings: React.FC = () => {
   const [deleteWorkspaceName, setDeleteWorkspaceName] = useState<string>('')
   const [resetUseStateManual, setResetUseStateManual] = useState<boolean>(false)
   useEffect(() => {
-    getWorkspaceInfo({ id: '6609a3b0e9b24bc694e69cf8' }).then(() => {
-      setWorkspaceInfo(workspaceInfoRes?.data)
-    })
+    getWorkspaceInfo({ id: workspaceId && workspaceId !== '123' ? (workspaceId as string) : workspace_id })
   }, [resetUseStateManual])
+
+  useEffect(() => {
+    setWorkspaceInfo(workspaceInfoRes?.data)
+  }, [workspaceInfoRes])
 
   const handleVisibilityChange = (newVisibility: string) => {
     changeVisibility({
       visibility: newVisibility,
-      _id: workspaceInfo?._id
+      _id: workspaceId && workspaceId !== '123' ? (workspaceId as string) : workspace_id
     }).then(() => setResetUseStateManual(!resetUseStateManual))
     setShowForm(false)
   }
   const handleDeleteWorkspace = () => {
     deleteWorkspace({
-      workspace_id: workspaceInfo?._id || ''
-    })
+      workspace_id: workspaceId && workspaceId !== '123' ? (workspaceId as string) : workspace_id
+    }).then(() => setResetUseStateManual(!resetUseStateManual))
   }
   return (
     <>
@@ -116,7 +122,7 @@ export const Settings: React.FC = () => {
                         <MdOutlineLock className='mr-1 p-0 text-red-500' />
                       </span>{' '}
                       Private
-                      {workspaceInfo?.visibility === 'private' && (
+                      {workspaceInfo && workspaceInfo.visibility === 'private' && (
                         <>
                           <span>
                             {' '}
@@ -139,7 +145,7 @@ export const Settings: React.FC = () => {
                         <MdPublic className='mr-1 p-0 text-green-500' />
                       </span>{' '}
                       Public
-                      {workspaceInfo?.visibility === 'public' && (
+                      {workspaceInfo && workspaceInfo.visibility === 'public' && (
                         <>
                           <span>
                             {' '}
@@ -185,7 +191,7 @@ export const Settings: React.FC = () => {
                 </div>
               </div>
               <div className={`mt-3`}>
-                <h1 className={`text-base font-bold`}>Enter Workspace name "My Workspace" to delete</h1>
+                <h1 className={`text-base font-bold`}>Enter Workspace name "{workspaceInfo?.name}" to delete</h1>
                 <p className={`my-2 text-xs font-semibold`}>Things to know</p>
                 <ul className={`ml-5 list-disc space-y-2`}>
                   <li className=''>
@@ -217,10 +223,10 @@ export const Settings: React.FC = () => {
                 />
                 <button
                   onClick={() => handleDeleteWorkspace()}
-                  disabled={deleteWorkspaceName !== 'My Workspace'}
+                  disabled={deleteWorkspaceName !== workspaceInfo?.name}
                   className={`mt-2 flex w-full items-center justify-center rounded px-5 py-2
                 ${
-                  deleteWorkspaceName !== 'My Workspace'
+                  deleteWorkspaceName !== workspaceInfo?.name
                     ? darkMode
                       ? 'cursor-not-allowed bg-gray-800 opacity-50'
                       : 'cursor-not-allowed bg-gray-100 opacity-50'

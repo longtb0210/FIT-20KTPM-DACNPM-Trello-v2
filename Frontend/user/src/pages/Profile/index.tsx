@@ -3,7 +3,6 @@ import React, { useEffect, useState } from 'react'
 import { ActivityComponent, Header, Profile } from './components'
 import { useTheme } from '../../components/Theme/themeContext'
 import { User } from '@trello-v2/shared/src/schemas/User'
-import { mockUser } from './testData'
 import { UserApiRTQ } from '~/api'
 
 type AccountManagementProps = {
@@ -21,7 +20,7 @@ export const AccountManagement: React.FC<AccountManagementProps> = ({ page }) =>
   }, [userInfoRes])
   useEffect(() => {
     getUserInfo({
-      email: '1@gmail.com'
+      email: 'tuitenteo1212@gmail.com'
     })
   }, [resetManually])
   useEffect(() => {
@@ -37,9 +36,9 @@ export const AccountManagement: React.FC<AccountManagementProps> = ({ page }) =>
   }
   return (
     <div style={darkLightMode} className='font-sans'>
+      <Header userInfo={userInfo} onSelectTab={handleTabSelect} currentTab={selectedTab} />
       {selectedTab === 'profile' ? (
         <>
-          <Header userInfo={userInfo} onSelectTab={handleTabSelect} currentTab={selectedTab} />
           <Profile
             userInfo={userInfo}
             handleUpdateProfile={() => {
@@ -49,7 +48,6 @@ export const AccountManagement: React.FC<AccountManagementProps> = ({ page }) =>
         </>
       ) : (
         <>
-          <Header userInfo={userInfo} onSelectTab={handleTabSelect} currentTab={selectedTab} />
           <ActivityComponent userInfo={userInfo} />
         </>
       )}
