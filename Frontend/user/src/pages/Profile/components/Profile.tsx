@@ -19,6 +19,17 @@ export const Profile: React.FC<ProfileProps> = ({ userInfo, handleUpdateProfile 
   const [username, setUsername] = useState<string>() // State for username input
   const [bio, setBio] = useState<string>() // State for bio input
   const [updateProfile] = UserApiRTQ.UserApiSlice.useUpdateUserMutation()
+
+  const [profile, setProfile] = React.useState({ email: '', name: '' })
+
+  const storedProfile = localStorage.getItem('profile')
+
+  useEffect(() => {
+    const profileSave = storedProfile ? JSON.parse(storedProfile) : { email: '', name: '' }
+    setProfile({ ...profileSave })
+    setUsername(profile.email)
+  }, [profile.email, storedProfile])
+
   useEffect(() => {
     setSelectedOption('Instantly')
   }, [])

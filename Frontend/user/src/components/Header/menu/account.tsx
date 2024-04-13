@@ -13,21 +13,11 @@ export default function Account() {
   const { darkMode, toggleDarkMode, colors } = useTheme()
   const authContext = React.useContext(AuthContext)
 
-  // const [getUser, { data: dataUser }] = UserApiRTQ.UserApiSlice.useGetUserMutation()
-
-  // React.useEffect(() => {
-  //   getUser()
-  // }, [])
-
-  // console.log(dataUser)
-  // Lấy dữ liệu từ localStorage, nếu không tồn tại thì sử dụng giá trị mặc định
   const storedProfile = localStorage.getItem('profile')
   React.useEffect(() => {
     const profileSave = storedProfile ? JSON.parse(storedProfile) : { email: '', name: '' }
     setProfile({ ...profileSave })
   }, [storedProfile])
-
-  console.log(profile)
 
   const handleToggle = () => {
     setOpen((prevOpen) => !prevOpen)
