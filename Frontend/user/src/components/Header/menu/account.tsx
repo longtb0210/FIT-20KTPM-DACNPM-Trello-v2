@@ -1,9 +1,10 @@
 import * as React from 'react'
-import { Box, ClickAwayListener, Grow, Paper, Popper, MenuList, Stack, Typography } from '@mui/material'
+import { Box, ClickAwayListener, Grow, Paper, Popper, MenuList, Stack, Typography, Avatar } from '@mui/material'
 import { Link } from 'react-router-dom'
 import { useTheme } from './../../Theme/themeContext'
 import { AuthContext } from '~/components/AuthProvider/AuthProvider'
 import { stringToColor } from '~/utils/StringToColor'
+import { stringAvatar } from '~/utils/StringAvatar'
 
 export default function Account() {
   const [open, setOpen] = React.useState(false)
@@ -98,19 +99,7 @@ export default function Account() {
             cursor: 'pointer'
           }}
         >
-          <Box
-            sx={{
-              padding: '4px',
-              fontSize: '10px',
-              lineHeight: '13px',
-              fontWeight: 600,
-              color: '#fff',
-              backgroundColor: stringToColor(profile.name),
-              borderRadius: '50%'
-            }}
-          >
-            {getFirstTwoCharsOfLastWord(profile.name)}
-          </Box>
+          <Avatar {...stringAvatar(profile.name, '9px', 22, 22)} className={`font-bold`} />
         </Box>
 
         <Popper
@@ -153,21 +142,7 @@ export default function Account() {
                           padding: '0 20px'
                         }}
                       >
-                        <Typography
-                          variant='h4'
-                          sx={{
-                            display: 'inline-block',
-                            fontSize: '14px',
-                            lineHeight: '22px',
-                            color: '#fff',
-                            fontWeight: 700,
-                            padding: '8px 10px',
-                            borderRadius: '50%',
-                            backgroundColor: stringToColor(profile.name)
-                          }}
-                        >
-                          {getFirstTwoCharsOfLastWord(profile.name)}
-                        </Typography>
+                        <Avatar {...stringAvatar(profile.name, '14px', 44, 44)} className={`font-bold`} />
 
                         <Box sx={{ display: 'flex', flexDirection: 'column' }}>
                           <Typography variant='body1' sx={{ fontSize: '14px', color: colors.text, marginLeft: '12px' }}>
