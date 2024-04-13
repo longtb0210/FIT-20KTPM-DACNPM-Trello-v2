@@ -63,10 +63,6 @@ export default function WorkSpaces() {
     prevOpen.current = open
   }, [open])
 
-  const generateRandomColor = () => {
-    return '#' + Math.floor(Math.random() * 16777215).toString(16)
-  }
-
   return (
     <Stack direction='row' spacing={2}>
       <Box>

@@ -1,5 +1,5 @@
 import * as React from 'react'
-import { Box, Button, Autocomplete, TextField, SelectChangeEvent, makeStyles } from '@mui/material'
+import { Box, Button, Autocomplete, TextField } from '@mui/material'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { faCheck, faChevronLeft, faClose } from '@fortawesome/free-solid-svg-icons'
 import bgHeader from '~/assets/bg_header_create_board.svg'

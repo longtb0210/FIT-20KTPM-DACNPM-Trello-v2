@@ -13,7 +13,7 @@ type AuthContext = {
 export const AuthContext = createContext<AuthContext | null>(null)
 
 export function AuthProvider({ children }: { children?: React.ReactNode }) {
-  const [isLoggedIn, setIsLoggedIn] = useState(JSON.parse(localStorage.getItem('isLogin') || 'false'))
+  const [isLoggedIn, setIsLoggedIn] = useState(false)
   const keycloak = useRef<Keycloak>()
   const dispatch = useDispatch()
   useEffect(() => {
@@ -25,12 +25,10 @@ export function AuthProvider({ children }: { children?: React.ReactNode }) {
     })
     keycloak.current.onAuthSuccess = () => {
       dispatch(TokenSlice.actions.setToken(keycloak.current?.token || ''))
-
-      // localStorage.setItem('isLogin', JSON.stringify(true))
     }
     keycloak.current
       .init({
-        redirectUri: 'http://localhost:3000/login',
+        // redirectUri: 'http://localhost:3000/login',
         onLoad: 'check-sso'
       })
       .then((success) => {
@@ -40,7 +38,6 @@ export function AuthProvider({ children }: { children?: React.ReactNode }) {
             keycloak.current
               .loadUserProfile()
               .then((profile) => {
-                // Trích xuất email và tên từ thông tin hồ sơ
                 const email = profile.email
                 const name = profile.firstName + ' ' + profile.lastName
 
@@ -65,6 +62,7 @@ export function AuthProvider({ children }: { children?: React.ReactNode }) {
 
   const logout = () => {
     if (keycloak.current) {
+      localStorage.clear()
       keycloak.current.logout({ redirectUri: 'http://localhost:3000/login' })
     }
   }

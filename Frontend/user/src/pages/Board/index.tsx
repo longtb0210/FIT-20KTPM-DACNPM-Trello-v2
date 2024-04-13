@@ -81,24 +81,30 @@ export function Board() {
   const [selectedCard, setSelectedCard] = useState<Card>()
   const params = useParams()
   const boardId = params.boardId
-  // useEffect(() => {
-  //   if (boardId) {
-  //     if (boardId) {
-  //       const exists = savedValues.includes(boardId)
-  //       if (exists) {
-  //         const filteredValues = savedValues.filter((value) => value !== boardId)
-  //         setSavedValues([boardId, ...filteredValues])
-  //       } else {
-  //         setSavedValues([boardId, ...savedValues])
-  //       }
-  //     }
-  //   }
-  // }, [boardId, params, savedValues])
 
-  // Lưu savedValues vào localStorage mỗi khi nó thay đổi
-  // useEffect(() => {
-  //   localStorage.setItem('savedValues', JSON.stringify(savedValues))
-  // }, [savedValues])
+  const savedValuesString = localStorage.getItem('savedValues') ? localStorage.getItem('savedValues') : '[]'
+
+  useEffect(() => {
+    if (savedValuesString) {
+      const savedValues: string[] = JSON.parse(savedValuesString)
+
+      if (boardId) {
+        const index = savedValues.indexOf(boardId)
+
+        if (index !== -1) {
+          const filteredValues = savedValues.filter((value) => value !== boardId)
+          const updatedValues = [boardId, ...filteredValues]
+          localStorage.setItem('savedValues', JSON.stringify(updatedValues))
+        } else {
+          const updatedValues = [boardId, ...savedValues]
+          localStorage.setItem('savedValues', JSON.stringify(updatedValues))
+        }
+      }
+    } else {
+      localStorage.setItem('savedValues', JSON.stringify([]))
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [boardId])
 
   const [action, setAction] = useState<boolean>(false)
   useEffect(() => {

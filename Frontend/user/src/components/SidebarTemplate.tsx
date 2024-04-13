@@ -1,5 +1,4 @@
-import React, { useEffect, useState } from 'react'
-import { User } from '@trello-v2/shared/src/schemas/User'
+import React, { useState } from 'react'
 import { Menu, MenuItem, SubMenu } from 'react-pro-sidebar'
 import { Box, Typography } from '@mui/material'
 import { faTrello } from '@fortawesome/free-brands-svg-icons'
@@ -9,7 +8,7 @@ import { WorkspaceApiRTQ } from '~/api'
 import { faChessBoard, faGear, faTableCells, faUserGroup, faHome } from '@fortawesome/free-solid-svg-icons'
 import { faHeart } from '@fortawesome/free-regular-svg-icons'
 import { useTheme } from './Theme/themeContext'
-import {handleWorkspaceName} from '../utils/handleWorkspaceName'
+import { handleWorkspaceName } from '../utils/handleWorkspaceName'
 
 const menuItems = [
   'Business',
@@ -29,12 +28,11 @@ const menuItems = [
 ]
 
 const SidebarTemplate = () => {
-  const [getAllWorkspace, {data:workspaceData}] = WorkspaceApiRTQ.WorkspaceApiSlice.useLazyGetAllUserWorkspaceQuery()
+  const [getAllWorkspace, { data: workspaceData }] = WorkspaceApiRTQ.WorkspaceApiSlice.useLazyGetAllUserWorkspaceQuery()
   const [activeItem, setActiveItem] = useState<string | null>(null)
   const [hoveredItem, setHoveredItem] = useState<string | null>(null)
-  const { darkMode, colors } = useTheme()
+  const { colors } = useTheme()
   const location = useLocation()
-  console.log(location)
 
   const handleMouseEnter = (itemKey: string) => {
     setHoveredItem(itemKey)
@@ -64,25 +62,17 @@ const SidebarTemplate = () => {
   ))
 
   React.useEffect(() => {
-    const targetPaths = [
-      `/boards`,
-      `/template`,
-      `/template/item`,
-      `/`
-    ];
+    const targetPaths = [`/boards`, `/template`, `/template/item`, `/`]
 
     if (targetPaths.includes(location.pathname)) {
-      setActiveItem(location.pathname);
+      setActiveItem(location.pathname)
     }
-    getAllWorkspace().then((v:any) => console.log(v))
+    getAllWorkspace()
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [location.pathname])
 
-  console.log(workspaceData)
-
   return (
-    <div
-      className='detail-sidebar-container max-h-95vh fixed max-h-screen overflow-y-auto pt-2 text-sm'
-    >
+    <div className='detail-sidebar-container max-h-95vh fixed max-h-screen overflow-y-auto pt-2 text-sm'>
       <Menu style={{ backgroundColor: colors.background, color: colors.text }}>
         <MenuItem
           className='menu-item rounded-md font-bold'
@@ -163,7 +153,7 @@ const SidebarTemplate = () => {
         className='workspaces'
         style={{ backgroundColor: colors.background, color: colors.text, marginBottom: '100px' }}
       >
-        {workspaceData?.data?.owner.map((w: any, index: any) => (
+        {workspaceData?.data?.owner.map((w, index) => (
           <div key={index}>
             <Menu>
               <SubMenu
@@ -187,9 +177,9 @@ const SidebarTemplate = () => {
                             padding: '8px 14px',
                             borderRadius: '6px',
                             backgroundImage: 'linear-gradient(to bottom, #E774BB, #943D73)',
-                            width: '40px', 
-                            height: '40px', 
-                            textAlign: 'center',
+                            width: '40px',
+                            height: '40px',
+                            textAlign: 'center'
                           }}
                         >
                           {w.name.charAt(0)}
@@ -317,7 +307,7 @@ const SidebarTemplate = () => {
           </div>
         ))}
 
-        {workspaceData?.data?.member.map((w: any, index: any) => (
+        {workspaceData?.data?.member.map((w, index) => (
           <div key={index}>
             <Menu>
               <SubMenu
@@ -468,7 +458,7 @@ const SidebarTemplate = () => {
           </div>
         ))}
 
-        {workspaceData?.data?.guest.map((w: any, index: any) => (
+        {workspaceData?.data?.guest.map((w, index) => (
           <div key={index}>
             <Menu>
               <SubMenu
@@ -493,8 +483,8 @@ const SidebarTemplate = () => {
                             borderRadius: '6px',
                             backgroundImage: 'linear-gradient(to bottom, #E774BB, #943D73)',
                             width: '45px',
-                            height: '40px', 
-                            textAlign: 'center',
+                            height: '40px',
+                            textAlign: 'center'
                           }}
                         >
                           {w.name.charAt(0)}
@@ -620,11 +610,10 @@ const SidebarTemplate = () => {
               </SubMenu>
             </Menu>
           </div>
-        ))}      
+        ))}
       </div>
     </div>
   )
 }
 
 export default SidebarTemplate
-

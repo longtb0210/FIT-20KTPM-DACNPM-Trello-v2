@@ -3,7 +3,6 @@ import { Box, ClickAwayListener, Grow, Paper, Popper, MenuList, Stack, Typograph
 import { Link } from 'react-router-dom'
 import { useTheme } from './../../Theme/themeContext'
 import { AuthContext } from '~/components/AuthProvider/AuthProvider'
-import { UserApiRTQ } from '~/api'
 import { stringToColor } from '~/utils/StringToColor'
 
 export default function Account() {

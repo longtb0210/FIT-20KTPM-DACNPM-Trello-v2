@@ -36,7 +36,7 @@ export default function BoardsPageRow({
       ))}
       {enableAddBoard ? (
         <Grid item xs={3}>
-          <BoardsPageCardAdd />
+          <BoardsPageCardAdd workspaceId={workspaceId} />
         </Grid>
       ) : null}
     </Grid>
