@@ -133,165 +133,170 @@ const SidebarCateWorkSpace: React.FC<Props> = ({ open, handleDrawerClose }) => {
         </DrawerHeader>
 
         <Divider />
-        <Sidebar className='text-sm'>
-          <Menu>
-            <Link to={`/workspaceboard/${workspaceId}`}>
-              <MenuItem
-                className='menu-item rounded-md'
-                style={{ 
-                  height: '40px', 
-                  backgroundColor:
-                  hoveredItem === 'boards'
-                    ? colors.bg_button_hover
-                    : activeItem === `/workspaceboard/${workspaceId}` 
-                      ? colors.bg_button_active_hover 
-                      : colors.background  
-                }}
-                onMouseEnter={() => handleMouseEnter('boards')}
-                onMouseLeave={() => handleMouseLeave()}
-              >
-                <div className='flex items-center'>
-                  <FontAwesomeIcon icon={faTrello} fontSize='small' className='mr-2' />
-                  Boards
-                </div>
-              </MenuItem>
-            </Link>
-            <Link to={`/workspace/${workspaceId}/members`}>
-              <MenuItem
-                style={{ 
-                  height: '40px', 
-                  backgroundColor:
-                  hoveredItem === 'members'
-                    ? colors.bg_button_hover
-                    : activeItem === `/workspace/${workspaceId}/members`
-                      ? colors.bg_button_active_hover
-                      : colors.background 
-                }}
-                onMouseEnter={() => handleMouseEnter('members')}
-                onMouseLeave={() => handleMouseLeave()}
-              >
-                <div className='flex w-full items-center justify-between'>
+
+        <Box sx={{overflowY: 'auto', paddingBottom: '50px'}}>
+          <Sidebar className='text-sm'>
+            <Menu>
+              <Link to={`/workspaceboard/${workspaceId}`}>
+                <MenuItem
+                  className='menu-item rounded-md'
+                  style={{ 
+                    height: '40px', 
+                    backgroundColor:
+                    hoveredItem === 'boards'
+                      ? colors.bg_button_hover
+                      : activeItem === `/workspaceboard/${workspaceId}` 
+                        ? colors.bg_button_active_hover 
+                        : colors.background  
+                  }}
+                  onMouseEnter={() => handleMouseEnter('boards')}
+                  onMouseLeave={() => handleMouseLeave()}
+                >
                   <div className='flex items-center'>
-                    <FontAwesomeIcon icon={faUserGroup} fontSize='small' className='mr-2' />
-                    Members
+                    <FontAwesomeIcon icon={faTrello} fontSize='small' className='mr-2' />
+                    Boards
                   </div>
-                </div>
-              </MenuItem>
-            </Link>
-
-            <Link to={`/workspaceSetting/${workspaceId}`}>
-              <MenuItem
-                style={{ 
-                  height: '40px', 
-                  backgroundColor:
-                  hoveredItem === 'settings'
-                    ? colors.bg_button_hover
-                    : activeItem === `/workspace/${workspaceId}/workspaceSetting`
-                      ? colors.bg_button_active_hover
-                      : colors.background 
-                }}
-                onMouseEnter={() => handleMouseEnter('settings')}
-                onMouseLeave={() => handleMouseLeave()}
-              >
-                <div className='flex items-center'>
-                  <FontAwesomeIcon icon={faGear} fontSize='small' className='mr-2' />
-                  <div>Workspace settings</div>
-                </div>
-              </MenuItem>
-            </Link>
-          </Menu>
-        </Sidebar>
-
-        <h2 className='my-2 pl-5 text-sm font-medium leading-6 text-ds-text overflow-hidden whitespace-nowrap'>
-          Workspaces
-        </h2>
-
-        <Sidebar className='workspaces text-sm'>
-          <div>
-            <Menu>
-              <MenuItem
-                className='menu-item'
-                style={{ 
-                  height: '40px', 
-                  backgroundColor:
-                  hoveredItem === 'table'
-                    ? colors.bg_button_hover
-                    : activeItem === `/table`
-                      ? colors.bg_button_active_hover
-                      : colors.background 
-                }}
-                onMouseEnter={() => handleMouseEnter('table')}
-                onMouseLeave={() => handleMouseLeave()}
-              >
-                <div className='flex items-center'>
-                  <FontAwesomeIcon icon={faTableCellsLarge} fontSize='small' className='mr-2'/>
-                  Table
-                </div>
-              </MenuItem>
-
-              <MenuItem
-                className='menu-item'
-                style={{ 
-                  height: '40px', 
-                  backgroundColor:
-                  hoveredItem === 'calendar'
-                    ? colors.bg_button_hover
-                    : activeItem === `/calendar`
-                      ? colors.bg_button_active_hover
-                      : colors.background 
-                }}
-                onMouseEnter={() => handleMouseEnter('calendar')}
-                onMouseLeave={() => handleMouseLeave()}
-              >
-                <div className='flex items-center'>
-                  <FontAwesomeIcon icon={faCalendarDays} fontSize='small' className='mr-2'/>
-                  Calendar
-                </div>
-              </MenuItem>
-            </Menu>
-          </div>
-        </Sidebar>
-
-        <div className='flex w-full items-center justify-between'>
-          <h2 className='my-2 pl-5 text-sm font-medium leading-6 text-ds-text overflow-hidden whitespace-nowrap'>
-            Your boards
-          </h2>
-        </div>
-
-        <Sidebar className='workspaces mb-10 text-sm'>
-          <div>
-            <Menu>
-              {boardData?.data?.map((board) => (
-                <Link to={`/workspace/${workspaceId}/board/${board._id}`}>
-                  <MenuItem
-                    key={board._id}
-                    className='menu-item'
-                    style={{ 
-                      height: '40px', 
-                      backgroundColor:
-                      hoveredItem === board._id
-                        ? colors.bg_button_hover
-                        : activeItem === `/workspace/${workspaceId}/board/${board._id}`
-                          ? colors.bg_button_active_hover
-                          : colors.background 
-                    }}
-                    onMouseEnter={() => handleMouseEnter(board._id || '')}
-                    onMouseLeave={() => handleMouseLeave()}
-                  >
+                </MenuItem>
+              </Link>
+              <Link to={`/workspace/${workspaceId}/members`}>
+                <MenuItem
+                  style={{ 
+                    height: '40px', 
+                    backgroundColor:
+                    hoveredItem === 'members'
+                      ? colors.bg_button_hover
+                      : activeItem === `/workspace/${workspaceId}/members`
+                        ? colors.bg_button_active_hover
+                        : colors.background 
+                  }}
+                  onMouseEnter={() => handleMouseEnter('members')}
+                  onMouseLeave={() => handleMouseLeave()}
+                >
+                  <div className='flex w-full items-center justify-between'>
                     <div className='flex items-center'>
-                      <FontAwesomeIcon icon={faTableColumns} fontSize='small' className='mr-2' />
-                      {board.name}
+                      <FontAwesomeIcon icon={faUserGroup} fontSize='small' className='mr-2' />
+                      Members
                     </div>
-                  </MenuItem>
-                </Link>
-              ))}
+                  </div>
+                </MenuItem>
+              </Link>
+
+              <Link to={`/workspaceSetting/${workspaceId}`}>
+                <MenuItem
+                  style={{ 
+                    height: '40px', 
+                    backgroundColor:
+                    hoveredItem === 'settings'
+                      ? colors.bg_button_hover
+                      : activeItem === `/workspace/${workspaceId}/workspaceSetting`
+                        ? colors.bg_button_active_hover
+                        : colors.background 
+                  }}
+                  onMouseEnter={() => handleMouseEnter('settings')}
+                  onMouseLeave={() => handleMouseLeave()}
+                >
+                  <div className='flex items-center'>
+                    <FontAwesomeIcon icon={faGear} fontSize='small' className='mr-2' />
+                    <div>Workspace settings</div>
+                  </div>
+                </MenuItem>
+              </Link>
             </Menu>
+          </Sidebar>
+
+          <div className='flex w-full items-center justify-between'>
+            <h2 className='my-2 pl-5 text-sm font-medium leading-6 text-ds-text overflow-hidden whitespace-nowrap'>
+              Workspace views
+            </h2>
           </div>
-        </Sidebar>
+
+          <Sidebar className='workspaces text-sm'>
+            <div>
+              <Menu>
+                <MenuItem
+                  className='menu-item'
+                  style={{ 
+                    height: '40px', 
+                    backgroundColor:
+                    hoveredItem === 'table'
+                      ? colors.bg_button_hover
+                      : activeItem === `/table`
+                        ? colors.bg_button_active_hover
+                        : colors.background 
+                  }}
+                  onMouseEnter={() => handleMouseEnter('table')}
+                  onMouseLeave={() => handleMouseLeave()}
+                >
+                  <div className='flex items-center'>
+                    <FontAwesomeIcon icon={faTableCellsLarge} fontSize='small' className='mr-2'/>
+                    Table
+                  </div>
+                </MenuItem>
+
+                <MenuItem
+                  className='menu-item'
+                  style={{ 
+                    height: '40px', 
+                    backgroundColor:
+                    hoveredItem === 'calendar'
+                      ? colors.bg_button_hover
+                      : activeItem === `/calendar`
+                        ? colors.bg_button_active_hover
+                        : colors.background 
+                  }}
+                  onMouseEnter={() => handleMouseEnter('calendar')}
+                  onMouseLeave={() => handleMouseLeave()}
+                >
+                  <div className='flex items-center'>
+                    <FontAwesomeIcon icon={faCalendarDays} fontSize='small' className='mr-2'/>
+                    Calendar
+                  </div>
+                </MenuItem>
+              </Menu>
+            </div>
+          </Sidebar>
+
+          <div className='flex w-full items-center justify-between'>
+            <h2 className='my-2 pl-5 text-sm font-medium leading-6 text-ds-text overflow-hidden whitespace-nowrap'>
+              Your boards
+            </h2>
+          </div>
+
+          <Sidebar className='workspaces mb-10 text-sm'>
+            <div>
+              <Menu>
+                {boardData?.data?.map((board) => (
+                  <Link to={`/workspace/${workspaceId}/board/${board._id}`}>
+                    <MenuItem
+                      key={board._id}
+                      className='menu-item'
+                      style={{ 
+                        height: '40px', 
+                        backgroundColor:
+                        hoveredItem === board._id
+                          ? colors.bg_button_hover
+                          : activeItem === `/workspace/${workspaceId}/board/${board._id}`
+                            ? colors.bg_button_active_hover
+                            : colors.background 
+                      }}
+                      onMouseEnter={() => handleMouseEnter(board._id || '')}
+                      onMouseLeave={() => handleMouseLeave()}
+                    >
+                      <div className='flex items-center'>
+                        <FontAwesomeIcon icon={faTableColumns} fontSize='small' className='mr-2' />
+                        {board.name}
+                      </div>
+                    </MenuItem>
+                  </Link>
+                ))}
+              </Menu>
+            </div>
+          </Sidebar>
+        </Box>
 
         <div 
           className='p-3 flex justify-center items-end border-t border-grey-50'
-          style={{ zIndex: 100, position: 'absolute', bottom: 40, left: 0, right: 0 }}
+          style={{ zIndex: 100, position: 'absolute', bottom: 40, left: 0, right: 0, backgroundColor: colors.background }}
         >
           <Button 
             className='flex w-full'
