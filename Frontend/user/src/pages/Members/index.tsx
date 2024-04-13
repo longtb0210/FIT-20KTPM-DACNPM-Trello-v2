@@ -23,6 +23,7 @@ import Typography from '@mui/material/Typography'
 
 import SidebarCateWorkSpace from '../CategoryWorkspace/component/SidebarCateWorkspace'
 import AddMemberDialog from './AddMemberDialog'
+import { useParams } from 'react-router-dom'
 
 function stringToColor(string: string) {
   let hash = 0
@@ -93,6 +94,7 @@ const Main = styled('main', { shouldForwardProp: (prop) => prop !== 'open' })<{
 }))
 
 export default function PageMembers() {
+  const { workspaceId } = useParams()
   const { colors, darkMode } = useTheme()
   // const [getUserByEmail] = UserApiRTQ.UserApiSlice.useLazyGetUserByEmailQuery()
   const [getWorkspaceById, { data: workspaceData }] = WorkspaceApiRTQ.WorkspaceApiSlice.useLazyGetWorkspaceInfoQuery()
@@ -115,8 +117,10 @@ export default function PageMembers() {
     setOpenShare(false)
   }
   React.useEffect(() => {
+    if (workspaceId !== undefined) {
+      getWorkspaceById(workspaceId)
+    }
     // getWorkspaceById(workspaceData.workspace_id)
-    getWorkspaceById('661972bd0b338229249433c4')
   }, [getWorkspaceById])
   console.log(workspaceData)
 
@@ -276,7 +280,7 @@ export default function PageMembers() {
                 >
                   <Box
                     sx={{
-                      width: '1075px'
+                      maxWidth: '1075px'
                     }}
                   >
                     <Box>
@@ -367,7 +371,7 @@ export default function PageMembers() {
                         </Grid>
                         <Grid className='flex flex-col items-center justify-end text-right' item xs={4}>
                           <Button
-                            className={`flex h-10 flex-row items-center bg-[#F1F2F4] p-2 text-left text-[14px] font-semibold hover:bg-slate-600 ${darkMode ? 'hover:bg-slate-600 dark:bg-slate-800' : 'hover:bg-slate-300'}`}
+                            className={`flex h-10 flex-row items-center bg-[#F1F2F4] p-2 text-left text-[14px] font-semibold  ${darkMode ? 'hover:bg-slate-600 dark:bg-slate-800' : 'hover:bg-slate-300'}`}
                             onClick={handleClickOpenShare}
                           >
                             <FaLink className='mr-1 mt-1' size={14} />
@@ -405,19 +409,20 @@ export default function PageMembers() {
                                           </Button>
                                           <Button
                                             disabled
-                                            className={`mr-2 h-8 w-[95px] bg-[#F1F2F4] px-3 py-1 text-[14px] font-semibold ${darkMode ? 'text-gray-600 dark:bg-slate-800' : 'hover:bg-slate-300'}`}
+                                            className={`mr-2 w-[95px] bg-[#F1F2F4] px-3 py-1 py-2 text-[14px] font-semibold ${darkMode ? 'text-gray-600 dark:bg-slate-800' : 'bg-slate-300'}`}
                                           >
                                             <Box className='flex flex-row'>
                                               {member.role}
                                               <AiOutlineQuestionCircle size={15} className='ml-[5px] mt-[2.5px]' />
                                             </Box>
                                           </Button>
+
                                           <Button
-                                            className={`box-border h-8 w-[115px] bg-[#F1F2F4] text-[14px] font-semibold  ${darkMode ? 'hover:bg-slate-600 dark:bg-slate-800' : 'hover:bg-slate-300'}`}
+                                            className={`mt-2 box-border w-[115px] bg-[#F1F2F4] py-2 text-[14px] font-semibold  ${darkMode ? 'hover:bg-slate-600 dark:bg-slate-800' : 'hover:bg-slate-300'}`}
                                           >
                                             <Box className='flex flex-row'>
-                                              <IoMdClose size={15} className='mr-[1px] mt-[2.5px]' />
-                                              Remove
+                                              <IoMdClose size={15} className='ml-4' />
+                                              <p>Remove</p>
                                             </Box>
                                           </Button>
                                         </Box>
