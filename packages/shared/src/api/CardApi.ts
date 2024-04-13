@@ -262,3 +262,16 @@ export const DeleteCardMemberRequestSchema = AddCardMemberRequestSchema;
 export const DeleteCardMemberResponseSchema = AddCardFeatureResponseSchema;
 export type DeleteCardMemberRequest = AddCardMemberRequest;
 export type DeleteCardMemberResponse = AddCardMemberResponse;
+
+export const MakeCommentSchemaRequestSchema = z.object({
+  card_id: z.string(),
+  cardlist_id: z.string(),
+  content: z.string(),
+});
+export type MakeCommentRequest = z.infer<typeof MakeCommentSchemaRequestSchema>;
+export const MakeCommentSchemaResponseSchema = z.object({
+  data: CardSchema,
+});
+export type MakeCommentResponse = z.infer<
+  typeof MakeCommentSchemaResponseSchema
+>;

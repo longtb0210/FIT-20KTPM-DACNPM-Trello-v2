@@ -11,5 +11,6 @@ export const ActivitySchema = z.object({
   content: z.string().default("<b>Some one</b> has update <b>something</b>"),
   create_time: z.coerce.date().default(new Date()),
   creator_email: z.string(),
+  is_comment: z.literal<boolean>(true).optional(),
 });
 export type Activity = z.infer<typeof ActivitySchema>;
