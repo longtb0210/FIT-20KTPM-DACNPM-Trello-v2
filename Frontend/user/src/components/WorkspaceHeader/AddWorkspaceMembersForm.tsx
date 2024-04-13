@@ -16,8 +16,7 @@ const InviteForm: React.FC<InviteFormProps> = ({ workspace }) => {
   const [isVisible, setIsVisible] = useState<boolean>(false)
   const [searchTerm, setSearchTerm] = useState<string>('')
   const [selectedEmail, setSelectedEmail] = useState<string[]>([])
-  const [selectedEmailName, setSelectedEmailName] = useState<string[]>([])
-  const [isLoading, setIsLoading] = useState<boolean>(false)
+  // const [isLoading, setIsLoading] = useState<boolean>(false)
   const [originalEmails, setOriginalEmails] = useState<string[]>(['123@gmail.com', '456@gmail.com', '457@gmail.com'])
   const [filteredEmails, setFilteredEmails] = useState<string[]>([])
   const [textFocus, setTextFocus] = useState(false)
@@ -61,7 +60,6 @@ const InviteForm: React.FC<InviteFormProps> = ({ workspace }) => {
     const { value } = event.target
     setSearchTerm(value)
     // Filter emails based on the search term before the "@" symbol
-    const filtered = originalEmails.filter((email) => email.split('@')[0].toLowerCase().includes(value.toLowerCase()))
 
     setFilteredEmails([value])
   }
@@ -83,7 +81,6 @@ const InviteForm: React.FC<InviteFormProps> = ({ workspace }) => {
   const handleSendInvite = () => {
     // Implement send invite functionality here
     // You can use selectedEmail to send the invite
-    console.log('Sending invite to:', selectedEmail)
     const members = selectedEmail.map((email) => ({
       role: 'member',
       email: email,
@@ -229,7 +226,7 @@ const InviteForm: React.FC<InviteFormProps> = ({ workspace }) => {
                 </button>
               )}
             </div>
-            {isLoading && <div>Loading...</div>}
+            {/* {isLoading && <div>Loading...</div>} */}
 
             {selectedEmail && selectedEmail.length > 0 && (
               <textarea

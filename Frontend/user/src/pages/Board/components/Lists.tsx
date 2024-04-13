@@ -7,7 +7,7 @@ import { SortableContext, horizontalListSortingStrategy } from '@dnd-kit/sortabl
 import { useEffect, useRef, useState } from 'react'
 import { UniqueIdentifier } from '@dnd-kit/core'
 import { CardlistApiRTQ } from '~/api'
-import { board_id } from '~/api/getInfo'
+
 import { useParams } from 'react-router-dom'
 import LoadingComponent from '~/components/Loading'
 
@@ -18,7 +18,6 @@ export default function ListsComponent({
   setOpenCardSetting,
   resetManually
 }: ListsComponentProps) {
-  const [getAllCardlist, { data: cardlistData }] = CardlistApiRTQ.CardListApiSlice.useLazyGetAllCardlistQuery()
   const [getCardListByBoardId, { data: cardlistDataByBoardId }] =
     CardlistApiRTQ.CardListApiSlice.useLazyGetCardlistByBoardIdQuery()
   const [createCardlist] = CardlistApiRTQ.CardListApiSlice.useCreateCardlistMutation()

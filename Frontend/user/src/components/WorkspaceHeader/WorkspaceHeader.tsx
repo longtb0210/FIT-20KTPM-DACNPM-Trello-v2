@@ -1,4 +1,4 @@
-import React, { ChangeEvent, useEffect, useRef, useState } from 'react'
+import React, { useEffect, useState } from 'react'
 
 import { useTheme } from '~/components/Theme/themeContext'
 
@@ -15,7 +15,7 @@ interface HeaderWpSetting {
 }
 
 export const WorkspaceHeader: React.FC<HeaderWpSetting> = ({ visibility }) => {
-  const { colors, darkMode } = useTheme()
+  const { darkMode } = useTheme()
   const params = useParams()
   const workspaceId = params.workspaceId
   const [workspaceInfo, setWorkspaceInfo] = useState<Workspace>()
@@ -37,7 +37,7 @@ export const WorkspaceHeader: React.FC<HeaderWpSetting> = ({ visibility }) => {
   useEffect(() => {
     getWorkspaceInfo(workspaceId ? workspaceId : '')
   }, [resetWorkspaceManually])
-  
+
   useEffect(() => {
     getWorkspaceInfo(workspaceId ? workspaceId : '')
   }, [workspaceId])
@@ -46,7 +46,6 @@ export const WorkspaceHeader: React.FC<HeaderWpSetting> = ({ visibility }) => {
   }, [visibility])
   useEffect(() => {
     setWorkspaceInfo(workspaceInfoRes?.data)
-    console.log('My workspace123', workspaceInfoRes?.data)
     setFormData({
       _id: workspaceId,
       name: workspaceInfoRes?.data.name,
@@ -70,7 +69,6 @@ export const WorkspaceHeader: React.FC<HeaderWpSetting> = ({ visibility }) => {
   }
 
   const handleCancelClick = () => {
-    // Handle cancel functionality here
     setIsEditing(false)
   }
 
@@ -79,7 +77,7 @@ export const WorkspaceHeader: React.FC<HeaderWpSetting> = ({ visibility }) => {
       <div className='my-4 flex max-w-2xl items-center space-x-4 pl-[10%]'>
         {!isEditing ? (
           <>
-            <LogoSection />
+            <LogoSection name={workspaceInfo?.name} />
             <WorkspaceInfo
               workspaceName={workspaceInfo?.name}
               visibility={visibilityState}
