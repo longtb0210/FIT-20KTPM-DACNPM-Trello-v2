@@ -332,16 +332,9 @@ export class CardlistService implements ICardlistService {
       return { status: 'Not Found', msg: "Can't find any cardlist" } as any
     }
     for (let i = 0; i < cardlist.cards.length; i++) {
-      const card = await this.CardMModel.findById(cardlist.cards[i]._id)
-      if (!card) {
-        return { status: 'Not Found', msg: "Can't find any card" } as any
-      }
-      card.archive_at = currentDate
       cardlist.cards[i].archive_at = currentDate
-      await card.save()
-      await cardlist.save()
     }
-    return cardlist.save()
+    return await cardlist.save()
   }
 
   async archiveCardlist(cardlist_id: string) {
