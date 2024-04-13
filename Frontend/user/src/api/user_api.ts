@@ -16,6 +16,12 @@ const UserApiSlice = createApi({
     }
   }),
   endpoints: (builder) => ({
+    getUser: builder.mutation<TrelloApi.UserApi.GetUserResponse, void>({
+      query: () => ({
+        url: `/api/user`,
+        method: 'GET'
+      })
+    }),
     updateUser: builder.mutation<TrelloApi.UserApi.UpdateUserResponse, TrelloApi.UserApi.UpdateUserRequest>({
       query: (data) => ({
         url: `/api/user/${data.email}`,

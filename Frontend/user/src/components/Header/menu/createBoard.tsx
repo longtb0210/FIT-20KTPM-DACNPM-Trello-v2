@@ -8,7 +8,7 @@ import { useTheme } from './../../Theme/themeContext'
 // import axios from 'axios'
 import { BoardApiRTQ, WorkspaceApiRTQ } from '~/api'
 import { useEffect, useRef, useState } from 'react'
-import { Workspace } from '@trello-v2/shared/src/schemas/Workspace'
+import { useNavigate } from 'react-router-dom'
 
 interface AutocompleteContainerProps {
   onClose: () => void
@@ -54,18 +54,19 @@ const bg_color = [
 ]
 
 export default function CreateBoard(props: AutocompleteContainerProps) {
-  const [createBoard] = BoardApiRTQ.BoardApiSlice.useCreateBoardMutation()
+  const [createBoard, { data: workspace }] = BoardApiRTQ.BoardApiSlice.useCreateBoardMutation()
   const [getAllBoard] = BoardApiRTQ.BoardApiSlice.useLazyGetAllBoardQuery()
   const [getALlWorkspace, { data: workspaceData }] = WorkspaceApiRTQ.WorkspaceApiSlice.useLazyGetAllWorkspaceQuery()
-  const [valueWorkspace, setValueWorkspace] = useState<string>(workspaceData?.data.owner[0].name || '')
+  const [valueWorkspace, setValueWorkspace] = useState<string>(workspaceData?.data.owner[0]?.name || '')
   const [valueVisibility, setValueVisibility] = useState<string>(visibility[0])
   const [inputValueWorkspace, setInputValueWorkspace] = useState('')
   const [inputValueVisibility, setInputValueVisibility] = useState('')
-  const [idWorkspace, setIdWorkspace] = useState(workspaceData?.data.owner[0]._id || '')
+  const [idWorkspace, setIdWorkspace] = useState(workspaceData?.data.owner[0]?._id || '')
   const [boardTitle, setBoardTitle] = useState('')
   const [activeBg, setActiveBg] = useState({ check: true, index: 0, type: 'color', data: bg_color[0].color })
   const anchorRef = useRef<HTMLButtonElement>(null)
   const { darkMode, colors } = useTheme()
+  const navigator = useNavigate()
 
   useEffect(() => {
     getALlWorkspace()
@@ -87,6 +88,14 @@ export default function CreateBoard(props: AutocompleteContainerProps) {
       background: activeBg.data
     }).then(() => getAllBoard())
   }
+
+  useEffect(() => {
+    if (workspace) {
+      props.onClose()
+      navigator(`/workspace/${workspace.data._id}`)
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [workspace])
 
   return (
     <Box sx={{ padding: '0 12px', overflowY: 'scroll' }}>

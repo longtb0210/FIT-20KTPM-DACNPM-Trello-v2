@@ -35,10 +35,10 @@ export function CreateCardChecklistModal({
   // API
   const [addCardFeatureAPI] = CardApiRTQ.CardApiSlice.useAddCardFeatureMutation()
 
-  async function createChecklist() {
-    try {
-      const trimmedValue = textFieldValue.replace(/\s+/g, ' ').trim()
-      const response = await addCardFeatureAPI({
+  function createChecklist() {
+    const trimmedValue = textFieldValue.replace(/\s+/g, ' ').trim()
+    if (trimmedValue !== '') {
+      addCardFeatureAPI({
         cardlist_id: cardlistId,
         card_id: cardId,
         feature: {
@@ -47,22 +47,27 @@ export function CreateCardChecklistModal({
           items: []
         }
       })
-      const newActivity: Activity = {
-        workspace_id: '0',
-        board_id: '0',
-        cardlist_id: cardlistId,
-        card_id: cardId,
-        content: `TrelloUser added ${trimmedValue} to this card`
-        // time: moment().format()
-      }
-      const updatedCard: Card = {
-        ...currentCard,
-        features: [...currentCard.features, response.data.data],
-        activities: [...currentCard.activities, newActivity]
-      }
-      setCurrentCard(updatedCard)
-    } catch (error) {
-      console.error('Error while adding checklist to card:', error)
+        .unwrap()
+        .then((response) => {
+          const newActivity: Activity = {
+            workspace_id: '0',
+            board_id: '0',
+            cardlist_id: cardlistId,
+            card_id: cardId,
+            content: `vu@gmail.com added ${trimmedValue} to this card`,
+            create_time: new Date(),
+            creator_email: 'vu@gmail.com'
+          }
+          const updatedCard: Card = {
+            ...currentCard,
+            features: [...currentCard.features, response.data],
+            activities: [...currentCard.activities, newActivity]
+          }
+          setCurrentCard(updatedCard)
+        })
+        .catch((error) => {
+          console.log('ERROR: create checklist - ', error)
+        })
     }
   }
 

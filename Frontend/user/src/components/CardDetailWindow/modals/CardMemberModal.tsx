@@ -83,10 +83,11 @@ export function CardMemberModal({
     const newActivity: Activity = {
       workspace_id: '0',
       board_id: '0',
-      cardlist_id: '0',
-      card_id: '0',
-      content: `TrelloUser added ${member} to this card`
-      //time: moment().format()
+      cardlist_id: cardlistId,
+      card_id: cardId,
+      content: `vu@gmail.com added ${member} to this card`,
+      create_time: new Date(),
+      creator_email: 'vu@gmail.com'
     }
     const updatedCard: Card = {
       ...currentCard,
@@ -105,10 +106,11 @@ export function CardMemberModal({
     const newActivity: Activity = {
       workspace_id: '0',
       board_id: '0',
-      cardlist_id: '0',
-      card_id: '0',
-      content: `TrelloUser removed ${member} from this card`
-      //time: moment().format()
+      cardlist_id: cardlistId,
+      card_id: cardId,
+      content: `vu@gmail.com removed ${member} from this card`,
+      create_time: new Date(),
+      creator_email: 'vu@gmail.com'
     }
     const updatedCard = {
       ...currentCard,

@@ -8,7 +8,7 @@ function App() {
 
   return (
     <ThemeProvider>
-      {!isLoginPage && <Header />}
+      {/* {!isLoginPage && <Header />} */}
       <div style={{ paddingTop: !isLoginPage ? '50px' : '0' }}>
         <Outlet />
       </div>

@@ -23,6 +23,16 @@ export const CardApiSlice = createApi({
         body: data
       })
     }),
+    getCardsOfCardlist: build.query<
+      TrelloApi.CardApi.GetAllCardsOfCardlistResponse,
+      TrelloApi.CardApi.GetCardsOfCardlistRequest
+    >({
+      query: (params) => ({
+        url: '/api/card',
+        method: 'GET',
+        params: params
+      })
+    }),
     getCardDetail: build.query<TrelloApi.CardApi.GetCardDetailResponse, TrelloApi.CardApi.GetCardDetailRequest>({
       query: (params) => ({
         url: '/api/card/detail',

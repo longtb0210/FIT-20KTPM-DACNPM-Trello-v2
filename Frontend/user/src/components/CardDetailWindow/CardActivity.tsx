@@ -1,13 +1,14 @@
 import { faListUl } from '@fortawesome/free-solid-svg-icons'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { Box, TextareaAutosize, Tooltip } from '@mui/material'
-import { ChangeEvent, useState } from 'react'
+import { ChangeEvent, useEffect, useState } from 'react'
 import moment from 'moment'
-// import dayjs from 'dayjs'
+import dayjs from 'dayjs'
 import { useTheme } from '../Theme/themeContext'
 import { Activity } from '@trello-v2/shared/src/schemas/Activity'
 import { Card } from '@trello-v2/shared/src/schemas/CardList'
 import { MemberAvatar, stringToColor } from './CardMemberList'
+import React from 'react'
 
 function ShowDetailsButton() {
   const { colors } = useTheme()
@@ -110,14 +111,17 @@ function TextAreaControl({
 }
 
 interface CardActivityProps {
+  cardlistId: string
+  cardId: string
   currentCard: Card
   setCurrentCard: (newState: Card) => void
 }
 
-export default function CardActivity({ currentCard, setCurrentCard }: CardActivityProps) {
+export default function CardActivity({ cardlistId, cardId, currentCard, setCurrentCard }: CardActivityProps) {
   const { colors } = useTheme()
   const sortedActivities = currentCard.activities
-  // const sortedActivities = currentCard.activities.sort((a, b) => moment(a.time).diff(moment(b.time))).reverse()
+    .sort((a, b) => moment(a.create_time).diff(moment(b.create_time)))
+    .reverse()
   const [textAreaMinRows, setTextAreaMinRows] = useState<number>(1)
   const [textAreaValue, setTextAreaValue] = useState('')
   const [textAreaFocus, setTextAreaFocus] = useState(false)
@@ -146,13 +150,14 @@ export default function CardActivity({ currentCard, setCurrentCard }: CardActivi
 
   function handleCreateComment() {
     const trimmedValue = textAreaValue.replace(/\s+/g, ' ').trim()
-    const newActivity = {
+    const newActivity: Activity = {
       workspace_id: '0',
       board_id: '0',
-      cardlist_id: '0',
-      card_id: '0',
-      content: `TrelloUser commented: ${trimmedValue}`,
-      time: moment().format()
+      cardlist_id: cardlistId,
+      card_id: cardId,
+      content: `vu@gmail.com commented: ${trimmedValue}`,
+      create_time: new Date(),
+      creator_email: 'vu@gmail.com'
     }
     const updatedCard = {
       ...currentCard,
@@ -208,10 +213,10 @@ export default function CardActivity({ currentCard, setCurrentCard }: CardActivi
         </Box>
       </div>
       <Box
-        sx={{ width: '100%', height: 'fit-content', margin: '10px 0 0 0', paddingLeft: '40px' }}
+        sx={{ width: '100%', height: 'fit-content', margin: '10px 0 0 0', paddingLeft: '0' }}
         className='flex flex-col items-start'
       >
-        {currentCard.activities.map((activity, index) => (
+        {sortedActivities.map((activity, index) => (
           <CardActivityTile key={index} activity={activity} />
         ))}
       </Box>
@@ -226,91 +231,139 @@ interface CardActivityTileProps {
 
 function CardActivityTile({ activity }: CardActivityTileProps) {
   const { colors } = useTheme()
-  // const [formattedTime, setFormattedTime] = useState('')
+  const [formattedTime, setFormattedTime] = useState('')
 
-  // eslint-disable-next-line react-hooks/exhaustive-deps
-  // function updateFormattedTime() {
-  //   const formatted = formatActivityTime(activity.time)
-  //   setFormattedTime(formatted)
-  // }
+  //eslint-disable-next-line react-hooks/exhaustive-deps
+  function updateFormattedTime() {
+    const formatted = formatActivityTime(activity.create_time.toString())
+    setFormattedTime(formatted)
+  }
 
-  // useEffect(() => {
-  //   updateFormattedTime()
-  //   const intervalId = setInterval(updateFormattedTime, 10000)
-  //   return () => clearInterval(intervalId)
-  // }, [activity.time, updateFormattedTime])
+  useEffect(() => {
+    updateFormattedTime()
+    const intervalId = setInterval(updateFormattedTime, 10000)
+    return () => clearInterval(intervalId)
+  }, [activity.create_time, updateFormattedTime])
 
   return (
     <Box
       sx={{
         width: '100%',
         height: 'fit-content',
-        margin: '0 0 12px 0',
-        padding: '8px',
-        color: colors.text,
-        bgcolor: colors.background_modal,
-        boxShadow: '0 2px 2px rgba(0,0,0,0.2)',
-        '&:hover': {
-          bgcolor: colors.button_hover
-        }
+        color: colors.text
       }}
-      className='flex flex-col justify-between rounded-md'
+      className='flex flex-row items-center justify-between rounded-md'
     >
-      <Box sx={{ width: '100%', height: 'fit-content' }}>
-        <p className='text-sm font-medium'>{activity.content}</p>
-      </Box>
-      <Tooltip
-        // title={formatActivityTimeToolTip(activity.time)}
-        title='Activity time ?'
-        placement='bottom-start'
-        slotProps={{
-          popper: {
-            modifiers: [
-              {
-                name: 'offset',
-                options: {
-                  offset: [-4, -10]
-                }
-              }
-            ]
-          }
+      {/* Avatar */}
+      <MemberAvatar
+        memberName={activity.creator_email.slice(0, 2).toUpperCase()}
+        bgColor={stringToColor(activity.creator_email)}
+      />
+      {/* Activity content */}
+      <Box
+        sx={{
+          width: '100%',
+          height: 'fit-content',
+          marginLeft: '10px',
+          padding: '8px',
+          color: colors.text
         }}
+        className='flex flex-col justify-between rounded-md'
       >
-        <Box sx={{ width: 'fit-content', height: 20 }} className='cursor-pointer text-xs hover:underline'>
-          <p className='text-xs'>time?</p>
+        <Box sx={{ width: '100%', height: 'fit-content' }}>
+          <p className='text-sm'>{formatActivityContent(activity)}</p>
         </Box>
-      </Tooltip>
+        <Tooltip
+          title={formatActivityTimeToolTip(activity.create_time.toString())}
+          placement='bottom-start'
+          slotProps={{
+            popper: {
+              modifiers: [
+                {
+                  name: 'offset',
+                  options: {
+                    offset: [-4, -10]
+                  }
+                }
+              ]
+            }
+          }}
+        >
+          <Box sx={{ width: 'fit-content', height: 20 }} className='cursor-pointer text-xs hover:underline'>
+            <p className='text-xs'>{formattedTime}</p>
+          </Box>
+        </Tooltip>
+      </Box>
     </Box>
   )
 }
 
-// function formatActivityTime(activityTime: string) {
-//   const now = moment()
-//   const activityMoment = moment(activityTime)
-//   const diffSeconds = now.diff(activityMoment, 'seconds')
-//   const diffMinutes = now.diff(activityMoment, 'minutes')
+function formatActivityContent(activity: Activity) {
+  const parts = activity.content.split(activity.creator_email)
+  return (
+    <span>
+      {parts.map((part, index) => (
+        <React.Fragment key={index}>
+          {part}
+          {index < parts.length - 1 && <b>{activity.creator_email}</b>}
+        </React.Fragment>
+      ))}
+    </span>
+  )
+}
 
-//   if (diffSeconds < 10) {
-//     return 'just now'
-//   } else if (diffSeconds < 60) {
-//     return 'a few seconds ago'
-//   } else if (diffSeconds < 120) {
-//     return '1 minute ago'
-//   } else if (diffMinutes < 60) {
-//     return `${diffMinutes} minutes ago`
-//   } else if (diffMinutes < 120) {
-//     return `1 hour ago`
-//   } else if (activityMoment.isSame(now, 'day')) {
-//     const diffHours = now.diff(activityMoment, 'hours')
-//     return `${diffHours} hours ago`
-//   } else if (activityMoment.isSame(now.clone().subtract(1, 'day'), 'day')) {
-//     return 'yesterday at ' + activityMoment.format('HH:mm')
-//   } else {
-//     return activityMoment.format('MMM D [at] HH:mm A')
-//   }
-// }
+function formatActivityTime(activityTime: string) {
+  const now = new Date()
+  const activityMoment = new Date(activityTime)
+  const diffMilliseconds = now.getTime() - activityMoment.getTime()
+  const diffSeconds = Math.floor(diffMilliseconds / 1000)
+  const diffMinutes = Math.floor(diffSeconds / 60)
+  const diffHours = Math.floor(diffMinutes / 60)
 
-// function formatActivityTimeToolTip(activityTime: string) {
-//   const formattedTime = dayjs(activityTime).format('MMMM D, YYYY h:mm A')
-//   return formattedTime
-// }
+  if (diffSeconds < 10) {
+    return 'just now'
+  } else if (diffSeconds < 60) {
+    return 'a few seconds ago'
+  } else if (diffMinutes < 2) {
+    return '1 minute ago'
+  } else if (diffMinutes < 60) {
+    return `${diffMinutes} minutes ago`
+  } else if (diffHours < 2) {
+    return `1 hour ago`
+  } else if (diffHours < 24) {
+    return `${diffHours} hours ago`
+  } else if (isSameDay(now, activityMoment)) {
+    return 'today'
+  } else if (isYesterday(now, activityMoment)) {
+    return `yesterday at ${formatTime(activityMoment)}`
+  } else {
+    return `${formatDate(activityMoment)} at ${formatTime(activityMoment)}`
+  }
+}
+
+function isSameDay(date1: Date, date2: Date): boolean {
+  return (
+    date1.getFullYear() === date2.getFullYear() &&
+    date1.getMonth() === date2.getMonth() &&
+    date1.getDate() === date2.getDate()
+  )
+}
+
+function isYesterday(date1: Date, date2: Date): boolean {
+  const yesterday = new Date(date1)
+  yesterday.setDate(date1.getDate() - 1)
+  return isSameDay(yesterday, date2)
+}
+
+function formatTime(date: Date): string {
+  return date.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
+}
+
+function formatDate(date: Date): string {
+  return date.toLocaleDateString()
+}
+
+function formatActivityTimeToolTip(activityTime: string) {
+  const formattedTime = dayjs(activityTime).format('MMMM D, YYYY h:mm A')
+  return formattedTime
+}

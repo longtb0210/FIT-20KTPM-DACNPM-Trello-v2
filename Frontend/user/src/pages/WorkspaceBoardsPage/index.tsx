@@ -21,6 +21,8 @@ import CssBaseline from '@mui/material/CssBaseline'
 import ChevronRightIcon from '@mui/icons-material/ChevronRight'
 import ChevronLeftIcon from '@mui/icons-material/ChevronLeft'
 import SidebarCateWorkSpace from '../CategoryWorkspace/component/SidebarCateWorkspace'
+import { WorkspaceApiSlice } from '~/api/workspace_api'
+import { stringToColor } from '~/utils/StringToColor'
 
 const sortMethods = ['Most recently active', 'Least recently active', 'Alphabetically A-Z', 'Alphabetically Z-A']
 
@@ -55,6 +57,7 @@ export function WorkspaceBoardsPage() {
 
   //API
   const [getBoardsByWorkspaceIdAPI] = BoardApiRTQ.BoardApiSlice.useLazyGetBoardsByWorkspaceIDQuery()
+  const [getWorkspaceById, { data: dataWorkspace }] = WorkspaceApiSlice.useGetWorkspaceByIDMutation()
 
   function fetchBoardsByWorkspaceId() {
     getBoardsByWorkspaceIdAPI({
@@ -62,6 +65,8 @@ export function WorkspaceBoardsPage() {
     })
       .unwrap()
       .then((response) => {
+        console.log(response)
+
         setBoardsState(response.data)
         setFilteredBoardsState(response.data)
       })
@@ -73,7 +78,12 @@ export function WorkspaceBoardsPage() {
   useEffect(() => {
     fetchBoardsByWorkspaceId()
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [])
+  }, [workspaceId])
+
+  useEffect(() => {
+    getWorkspaceById({ workspace_id: workspaceId || '' })
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [boardsState])
 
   function handleSelectSort(event: SelectChangeEvent) {
     setSelectedSort(event.target.value as string)
