@@ -1,8 +1,11 @@
 import * as React from 'react'
 import { Box, Button, ClickAwayListener, Grow, Paper, Popper, MenuList, Stack, Typography } from '@mui/material'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
-import { faChevronDown, faStar as starFull } from '@fortawesome/free-solid-svg-icons'
-import { faStar } from '@fortawesome/free-regular-svg-icons'
+import {
+  faChevronDown
+  // faStar as starFull
+} from '@fortawesome/free-solid-svg-icons'
+// import { faStar } from '@fortawesome/free-regular-svg-icons'
 import { useTheme } from './../../Theme/themeContext'
 import { BoardApiRTQ, WorkspaceApiRTQ } from '~/api'
 import noWorkspace from '~/assets/no_workspace.svg'
@@ -41,9 +44,9 @@ interface Board {
 
 export default function Recent() {
   const [open, setOpen] = React.useState(false)
-  const [isHovered, setIsHovered] = React.useState(false)
-  const [isHoveredStar, setIsHoveredStar] = React.useState(false)
-  const [star, setStar] = React.useState(false)
+  // const [isHovered, setIsHovered] = React.useState(false)
+  // const [isHoveredStar, setIsHoveredStar] = React.useState(false)
+  // const [star, setStar] = React.useState(false)
   const anchorRef = React.useRef<HTMLButtonElement>(null)
   const { colors } = useTheme()
   const [getBoardById] = BoardApiRTQ.BoardApiSlice.useLazyGetBoardByIdQuery()
@@ -201,8 +204,8 @@ export default function Recent() {
                                 borderRadius: '4px'
                               }
                             }}
-                            onMouseEnter={() => setIsHovered(true)}
-                            onMouseLeave={() => setIsHovered(false)}
+                            // onMouseEnter={() => setIsHovered(true)}
+                            // onMouseLeave={() => setIsHovered(false)}
                           >
                             <Box sx={{ display: 'flex', alignItems: 'center' }}>
                               <Box
@@ -235,7 +238,7 @@ export default function Recent() {
                               </Box>
                             </Box>
 
-                            {isHovered && (
+                            {/* {isHovered && (
                               <FontAwesomeIcon
                                 icon={faStar}
                                 style={{
@@ -263,7 +266,7 @@ export default function Recent() {
                                 onMouseLeave={() => setIsHoveredStar(false)}
                                 onClick={() => setStar(false)}
                               />
-                            )}
+                            )} */}
                           </Box>
                         </Link>
                       ))
