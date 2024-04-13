@@ -76,12 +76,12 @@ export default function HomePage() {
         }}
       >
         <div className='flex flex-row items-start justify-center'>
-          <nav className='sticky top-10 mr-20 w-64'>
+          <nav className='sticky top-10 w-64'>
             <SidebarTemplate />
           </nav>
 
           {/* highlight main content */}
-          <div className='ml-24 mt-3 pl-12'>
+          <div className='ml-24 mt-3'>
             <div className='relative z-0'>
               <div className='pb-5'>
                 {/* content: Icon + HighLight */}
