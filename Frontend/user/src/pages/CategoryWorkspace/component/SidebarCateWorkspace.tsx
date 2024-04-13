@@ -50,13 +50,15 @@ const SidebarCateWorkSpace: React.FC<Props> = ({ open, handleDrawerClose }) => {
   const location = useLocation()
   console.log(location)
   const workspaceId = params.workspaceId
+  const boardId = params.boardId
+  console.log('params: ' + boardId)
 
   useEffect(() => {
     const targetPaths = [
       `/workspaceboard/${workspaceId}`,
       `/workspace/${workspaceId}/members`,
-      `/workspace/${workspaceId}/workspaceSetting`,
-      `/cardlist`
+      `/workspaceSetting/${workspaceId}`,
+      `/workspace/${workspaceId}/board/${boardId}`
     ];
 
     if (targetPaths.includes(location.pathname)) {
@@ -178,7 +180,6 @@ const SidebarCateWorkSpace: React.FC<Props> = ({ open, handleDrawerClose }) => {
             </Link>
 
             <Link to={`/workspaceSetting/${workspaceId}`}>
-
               <MenuItem
                 style={{ 
                   height: '40px', 
@@ -261,7 +262,7 @@ const SidebarCateWorkSpace: React.FC<Props> = ({ open, handleDrawerClose }) => {
           <div>
             <Menu>
               {boardData?.data?.map((board) => (
-                <Link to={`/workspace/${workspaceId}`}>
+                <Link to={`/workspace/${workspaceId}/board/${board._id}`}>
                   <MenuItem
                     key={board._id}
                     className='menu-item'
@@ -270,7 +271,7 @@ const SidebarCateWorkSpace: React.FC<Props> = ({ open, handleDrawerClose }) => {
                       backgroundColor:
                       hoveredItem === board._id
                         ? colors.bg_button_hover
-                        : activeItem === `/cardlist`
+                        : activeItem === `/workspace/${workspaceId}/board/${board._id}`
                           ? colors.bg_button_active_hover
                           : colors.background 
                     }}
