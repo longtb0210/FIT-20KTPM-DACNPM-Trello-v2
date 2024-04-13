@@ -53,7 +53,7 @@ const Main = styled('main', { shouldForwardProp: (prop) => prop !== 'open' })<{
 }))
 
 export function CategoryWorkspace() {
-  const [open, setOpen] = React.useState(false)
+  const [open, setOpen] = React.useState(true)
 
   const handleDrawerOpen = () => {
     setOpen(true)
