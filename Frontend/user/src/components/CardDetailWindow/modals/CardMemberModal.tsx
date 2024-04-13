@@ -52,6 +52,12 @@ export function CardMemberModal({
   setCurrentCard,
   handleClose
 }: CardMemberModalProps) {
+  const [profile, setProfile] = useState({ email: '', name: '' })
+  const storedProfile = localStorage.getItem('profile')
+  useEffect(() => {
+    const profileSave = storedProfile ? JSON.parse(storedProfile) : { email: '', name: '' }
+    setProfile({ ...profileSave })
+  }, [storedProfile])
   const { colors } = useTheme()
   const [searchValue, setSearchValue] = useState('')
   // Card member emails
@@ -85,9 +91,9 @@ export function CardMemberModal({
       board_id: '0',
       cardlist_id: cardlistId,
       card_id: cardId,
-      content: `vu@gmail.com added ${member} to this card`,
+      content: `<b>${profile.email}</b> added ${member} to this card`,
       create_time: new Date(),
-      creator_email: 'vu@gmail.com'
+      creator_email: profile.email
     }
     const updatedCard: Card = {
       ...currentCard,
@@ -108,9 +114,9 @@ export function CardMemberModal({
       board_id: '0',
       cardlist_id: cardlistId,
       card_id: cardId,
-      content: `vu@gmail.com removed ${member} from this card`,
+      content: `<b>${profile.email}</b> removed ${member} from this card`,
       create_time: new Date(),
-      creator_email: 'vu@gmail.com'
+      creator_email: profile.email
     }
     const updatedCard = {
       ...currentCard,

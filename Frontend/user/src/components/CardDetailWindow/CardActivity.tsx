@@ -2,13 +2,12 @@ import { faListUl } from '@fortawesome/free-solid-svg-icons'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { Box, TextareaAutosize, Tooltip } from '@mui/material'
 import { ChangeEvent, useEffect, useState } from 'react'
-import moment from 'moment'
 import dayjs from 'dayjs'
 import { useTheme } from '../Theme/themeContext'
 import { Activity } from '@trello-v2/shared/src/schemas/Activity'
 import { Card } from '@trello-v2/shared/src/schemas/CardList'
 import { MemberAvatar, stringToColor } from './CardMemberList'
-import React from 'react'
+import { CardApiRTQ } from '~/api'
 
 function ShowDetailsButton() {
   const { colors } = useTheme()
@@ -50,7 +49,7 @@ function TextAreaControl({
   handleCreateComment
 }: TextAreaControlProps) {
   const { colors } = useTheme()
-  const [isChecked, setIsChecked] = useState(false)
+  // const [isChecked, setIsChecked] = useState(false)
 
   function handleSave() {
     handleCreateComment()
@@ -59,9 +58,9 @@ function TextAreaControl({
     setTextAreaFocus(false)
   }
 
-  function handleCheckboxChange(event: ChangeEvent<HTMLInputElement>) {
-    setIsChecked(event.target.checked)
-  }
+  // function handleCheckboxChange(event: ChangeEvent<HTMLInputElement>) {
+  //   setIsChecked(event.target.checked)
+  // }
 
   return (
     <Box sx={{ height: 32 }} className='mt-2 flex flex-row items-center gap-2'>
@@ -80,13 +79,13 @@ function TextAreaControl({
       >
         <p className='text-sm font-semibold'>Save</p>
       </button>
-      <Box
+      {/* <Box
         sx={{ width: 'fit-content', height: 32, color: colors.text, padding: '0 6px' }}
         className='flex cursor-pointer items-center justify-center rounded'
       >
         <input style={{ width: 16, height: 16 }} type='checkbox' checked={isChecked} onChange={handleCheckboxChange} />
         <p className='ml-2 text-sm'>Watch</p>
-      </Box>
+      </Box> */}
       <button
         style={{
           width: 'fit-content',
@@ -119,13 +118,16 @@ interface CardActivityProps {
 
 export default function CardActivity({ cardlistId, cardId, currentCard, setCurrentCard }: CardActivityProps) {
   const { colors } = useTheme()
-  const sortedActivities = currentCard.activities
-    .sort((a, b) => moment(a.create_time).diff(moment(b.create_time)))
-    .reverse()
+  // const sortedActivities = currentCard.activities
+  //   .sort((a, b) => moment(a.create_time).diff(moment(b.create_time)))
+  //   .reverse()
   const [textAreaMinRows, setTextAreaMinRows] = useState<number>(1)
   const [textAreaValue, setTextAreaValue] = useState('')
   const [textAreaFocus, setTextAreaFocus] = useState(false)
   const [buttonEnabled, setButtonEnabled] = useState(false)
+
+  //API
+  const [addCommentAPI] = CardApiRTQ.CardApiSlice.useAddCommentMutation()
 
   // function handleTextAreaBlur() {
   //   setTextAreaMinRows(1)
@@ -150,20 +152,18 @@ export default function CardActivity({ cardlistId, cardId, currentCard, setCurre
 
   function handleCreateComment() {
     const trimmedValue = textAreaValue.replace(/\s+/g, ' ').trim()
-    const newActivity: Activity = {
-      workspace_id: '0',
-      board_id: '0',
-      cardlist_id: cardlistId,
+    addCommentAPI({
       card_id: cardId,
-      content: `vu@gmail.com commented: ${trimmedValue}`,
-      create_time: new Date(),
-      creator_email: 'vu@gmail.com'
-    }
-    const updatedCard = {
-      ...currentCard,
-      activities: [...currentCard.activities, newActivity]
-    }
-    setCurrentCard(updatedCard)
+      cardlist_id: cardlistId,
+      content: trimmedValue
+    })
+      .unwrap()
+      .then((response) => {
+        setCurrentCard(response.data)
+      })
+      .catch((error) => {
+        console.log('ERROR: add comment to card - ', error)
+      })
   }
 
   return (
@@ -216,7 +216,7 @@ export default function CardActivity({ cardlistId, cardId, currentCard, setCurre
         sx={{ width: '100%', height: 'fit-content', margin: '10px 0 0 0', paddingLeft: '0' }}
         className='flex flex-col items-start'
       >
-        {sortedActivities.map((activity, index) => (
+        {currentCard.activities.map((activity, index) => (
           <CardActivityTile key={index} activity={activity} />
         ))}
       </Box>
@@ -271,7 +271,9 @@ function CardActivityTile({ activity }: CardActivityTileProps) {
         className='flex flex-col justify-between rounded-md'
       >
         <Box sx={{ width: '100%', height: 'fit-content' }}>
-          <p className='text-sm'>{formatActivityContent(activity)}</p>
+          <p className='text-sm'>
+            <div dangerouslySetInnerHTML={{ __html: activity.content }} />
+          </p>
         </Box>
         <Tooltip
           title={formatActivityTimeToolTip(activity.create_time.toString())}
@@ -295,20 +297,6 @@ function CardActivityTile({ activity }: CardActivityTileProps) {
         </Tooltip>
       </Box>
     </Box>
-  )
-}
-
-function formatActivityContent(activity: Activity) {
-  const parts = activity.content.split(activity.creator_email)
-  return (
-    <span>
-      {parts.map((part, index) => (
-        <React.Fragment key={index}>
-          {part}
-          {index < parts.length - 1 && <b>{activity.creator_email}</b>}
-        </React.Fragment>
-      ))}
-    </span>
   )
 }
 
