@@ -103,7 +103,6 @@ export default function ListSetting({ closeListSetting, setAddCardOnTop, list }:
     }).then(() => getAllCardlistByBoardId({ id: list.board_id }))
   }
   const handleRemoveWatcher = () => {
-    console.log('email: ', profile.email)
     removeWatcherCardList({
       _id: list._id,
       watcher: profile.email

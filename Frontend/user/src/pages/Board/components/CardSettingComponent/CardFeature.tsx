@@ -4,7 +4,7 @@ import { useTheme } from '~/components/Theme/themeContext'
 interface CardFeatureProps {
   icon: JSX.Element
   title: string
-  onClick: () => void
+  onClick?: () => void
 }
 
 export const CardFeature: React.FC<CardFeatureProps> = ({ icon, title, onClick }) => {

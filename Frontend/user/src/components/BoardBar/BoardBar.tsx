@@ -76,6 +76,7 @@ function BoardBar() {
       fetchBoardMembers()
     }
   }, [boardData, getUserByEmail])
+  console.log(boardMembers)
 
   // console.log(boardMembers)
   const [anchor, setAnchor] = React.useState<null | HTMLElement>(null)
@@ -363,6 +364,12 @@ function BoardBar() {
                   return (
                     <Tooltip title={infoUser.data.username}>
                       <Avatar {...stringAvatar(infoUser.data.username)} />
+                    </Tooltip>
+                  )
+                } else {
+                  return (
+                    <Tooltip title='guest'>
+                      <Avatar {...stringAvatar('Guest')} />
                     </Tooltip>
                   )
                 }

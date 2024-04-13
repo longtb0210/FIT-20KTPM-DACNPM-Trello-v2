@@ -38,9 +38,9 @@ export default function ListComponent({
   const [createCardOnTop, { data: createCardRes }] = CardApiRTQ.CardApiSlice.useCreateCardMutation()
   const [updateCardList] = CardlistApiRTQ.CardListApiSlice.useUpdateCardListMutation()
   // const [getAllCardlist] = CardlistApiRTQ.CardListApiSlice.useLazyGetAllCardlistQuery()
-  const [getCardListByBoardId, { data: cardlistDataByBoardId }] =
+  const [getCardListByBoardId] =
     CardlistApiRTQ.CardListApiSlice.useLazyGetCardlistByBoardIdQuery()
-  const [moveCardAPI, { data: moveCardAPIRes }] = CardApiRTQ.CardApiSlice.useMoveCardMutation()
+  const [moveCardAPI] = CardApiRTQ.CardApiSlice.useMoveCardMutation()
   const { colors, darkMode } = useTheme()
   const [listSettingOpen, setListSettingOpen] = useState<string>()
   const [addCardOpenAt, setAddCardOpenAt] = useState<string>('')
@@ -95,8 +95,6 @@ export default function ListComponent({
       const listIdArray = list.cards.map((card) => card._id)
       const listIdArraySrc = [createCardRes.data._id, ...listIdArray]
       const listIdArrayDes = [createCardRes.data._id, ...listIdArray]
-      console.log('listsrc ', listIdArraySrc)
-      console.log('listdes ', listIdArrayDes)
       moveCardAPI({
         data: {
           source_list: {
@@ -144,7 +142,6 @@ export default function ListComponent({
   const [newCardName, setNewCardName] = useState<string>('')
   async function handleAddCard() {
     const index = list.cards.length == 1 && list.cards[0].placeHolder ? 0 : list.cards.length
-    console.log(list.cards.length)
     if (boardId)
       createCard({
         name: newCardName,

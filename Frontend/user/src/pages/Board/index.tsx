@@ -107,9 +107,7 @@ export function Board() {
   }, [boardId])
 
   const [action, setAction] = useState<boolean>(false)
-  useEffect(() => {
-    console.log('My list: ', listsData)
-  }, [listsData])
+
   const setIndexToCards = (lists: List[]) => {
     return lists.map((list) => ({
       ...list,
@@ -123,7 +121,7 @@ export function Board() {
   }
   useEffect(() => {
     if (!cardlistDataByBoardId) return
-    console.log('Res =', cardlistDataByBoardId)
+
     const list_data = [...cardlistDataByBoardId.data]
     const updatedLists_placeHolder = list_data
       .sort((a, b) => (a.index ?? Infinity) - (b.index ?? Infinity))
@@ -162,14 +160,13 @@ export function Board() {
   )
   async function getAllList() {
     // getAllCardlist()
-    if (boardId) getCardListByBoardId({ id: boardId !== '123' ? boardId : board_id }).catch((err) => console.log(err))
+    if (boardId) getCardListByBoardId({ id: boardId !== '123' ? boardId : board_id })
   }
   useEffect(() => {
-    console.log('update list')
     getAllList()
 
     // You can call your API update function here
-  }, [openCardSetting])
+  }, [boardId])
 
   function findListByCardId(cardId: string) {
     return listsData?.find((list) => list?.cards?.map((card) => card._id)?.includes(cardId))
@@ -187,7 +184,6 @@ export function Board() {
     activeDragingCardId: UniqueIdentifier,
     activeDraggingCardData: any
   ) {
-    console.log('handleMoveCardBetweenDifferenceColumn')
     setListsData((prevList) => {
       const overCard = overList?.cards?.find((card) => card._id === overCardId)
       const isBelowOverItem =
@@ -196,7 +192,6 @@ export function Board() {
       const modifier = (overCard?.index as number) >= 0 ? (isBelowOverItem ? 1 : 0) : isBelowOverItem ? 0 : -1
 
       const newCardIndex = (overCard?.index as number) + modifier
-      console.log('overCardIndex: ', overCard?.index, modifier)
       const nextList = cloneDeep(prevList)
       const nextActiveList = nextList?.find((list) => list._id === activeList._id)
       const nextOverList = nextList?.find((list) => list._id === overList._id)
@@ -225,19 +220,6 @@ export function Board() {
               .map((card) => card._id)
               .filter((id) => id != activeDragingCardId)
             const overCardIdArray = nextOverList.cards.map((card) => card._id)
-            // console.log('move card data', {
-            //   source_list: {
-            //     cardlist_id: oldListWhenDragging._id,
-            //     target_card_id: activeDragingCardId as string,
-            //     cards_id_index: activeCardIdArray
-            //   },
-            //   destination_new_list: {
-            //     cardlist_id: nextOverList._id,
-            //     cards_id_index: overCardIdArray
-            //   }
-            // })
-            // console.log('activeCardArray ', oldListWhenDragging)
-            // console.log('overListArray', nextOverList)
             moveCardAPI({
               data: {
                 source_list: {
@@ -250,21 +232,16 @@ export function Board() {
                   cards_id_index: overCardIdArray
                 }
               }
-            }).then(() => {
-              console.log('move card res: ', moveCardAPIRes)
             })
           }
         }
       }
-
-      console.log('nextList = ', nextOverList)
       // setOverListData(nextOverList)
       return nextList
     })
     getCardListByBoardId({ id: boardId })
   }
   function handleDragStart(e: DragStartEvent) {
-    console.log('Drag Start: ', e)
     setActiveDragItemId(e?.active?.id.toString())
     setActiveDragItemType(e?.active?.data?.current?.list_id ? ACTIVE_DRAG_ITEM_TYPE.CARD : ACTIVE_DRAG_ITEM_TYPE.COLUMN)
     setActiveDragItemData(e?.active?.data?.current)
@@ -278,9 +255,6 @@ export function Board() {
     if (activeDragItemType === ACTIVE_DRAG_ITEM_TYPE.COLUMN) {
       return
     }
-    console.log('DragOver')
-    // const active = e.active
-    // const over = e.over
     const { active, over } = e
     if (!active || !over) {
       return
@@ -294,11 +268,9 @@ export function Board() {
     const activeList = findListByCardId(activeDragingCardId as string)
     const overList = findListByCardId(overCardId as string)
     if (!activeList || !overList) {
-      console.log('!activeColumn')
       return
     }
     if (activeList._id !== overList._id) {
-      console.log('Drag Over In')
       handleMoveCardBetweenDifferenceColumn(
         false,
         overList,
@@ -313,7 +285,6 @@ export function Board() {
   }
 
   function handleDragEnd(e: DragEndEvent) {
-    console.log('handleDragEnd: ', e)
     const { active, over } = e
     if (!active || !over) return
     if (activeDragItemType === ACTIVE_DRAG_ITEM_TYPE.CARD) {
@@ -326,7 +297,6 @@ export function Board() {
       const activeList = findListByCardId(activeDragingCardId as string)
       const overList = findListByCardId(overCardId as string)
       if (!activeList || !overList || !oldListWhenDragging) {
-        console.log('!activeColumn')
         return
       }
       if (oldListWhenDragging._id !== overList._id) {
@@ -353,17 +323,6 @@ export function Board() {
           }
           const activeCardIdArray = oldListWhenDragging.cards.map((card) => card._id)
           const overCardIdArray = overList.cards.map((card) => card._id).filter((id) => id !== overCardId)
-          console.log('move card data', {
-            source_list: {
-              cardlist_id: activeList._id,
-              target_card_id: activeDragingCardId as string,
-              cards_id_index: activeCardIdArray
-            },
-            destination_new_list: {
-              cardlist_id: overList._id,
-              cards_id_index: overCardIdArray
-            }
-          })
           moveCardAPI({
             data: {
               source_list: {
@@ -376,8 +335,6 @@ export function Board() {
                 cards_id_index: overCardIdArray
               }
             }
-          }).then(() => {
-            console.log('move card res: ', moveCardAPIRes)
           })
           return nextList
         })
@@ -386,12 +343,8 @@ export function Board() {
     }
     if (activeDragItemType === ACTIVE_DRAG_ITEM_TYPE.COLUMN) {
       if (active.id !== over.id && listsData) {
-        console.log('keo tha column')
-
         const oldIndex = listsData?.findIndex((data) => data._id === active.id)
         const newIndex = listsData?.findIndex((data) => data._id === over.id)
-        console.log('old: ', oldIndex)
-        console.log('new: ', newIndex)
         const newListsData = arrayMove(listsData, oldIndex, newIndex)
         const sortList = newListsData.map((list, index) => ({ ...list, index }))
         setListsData(sortList)
@@ -399,7 +352,6 @@ export function Board() {
           cardlist_id: list._id,
           index: list.index ?? 0 // Use 0 as the default index if it's nullish
         }))
-        console.log('move List Index ', activeCardIdArray)
         if (boardId)
           moveListAPI({
             board_id: boardId,

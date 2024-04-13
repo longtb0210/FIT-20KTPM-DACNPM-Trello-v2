@@ -222,7 +222,7 @@ export const Settings: React.FC = () => {
                   className={`w-full rounded-sm border-[3px]  ${darkMode ? 'border-[#738496] bg-[#1d2125] hover:bg-opacity-70' : 'border-[#9da6b5] bg-white hover:bg-gray-50'} p-1 px-2 focus:border-[3px] focus:border-blue-400 focus:outline-none`}
                 />
                 <button
-                  onClick={() => handleDeleteWorkspace()}
+                  // onClick={() => handleDeleteWorkspace()}
                   disabled={deleteWorkspaceName !== workspaceInfo?.name}
                   className={`mt-2 flex w-full items-center justify-center rounded px-5 py-2
                 ${

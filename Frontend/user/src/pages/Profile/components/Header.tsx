@@ -78,22 +78,7 @@ export const Header: React.FC<HeaderProps> = ({ currentTab, userInfo, onSelectTa
             padding: '0 20px'
           }}
         >
-          <Typography
-            variant='h4'
-            // sx={{
-            //   display: 'inline-block',
-            //   fontSize: '20px',
-            //   lineHeight: '24px',
-            //   color: '#fff',
-            //   fontWeight: 700,
-            //   padding: '22px',
-            //   borderRadius: '50%', // Set border radius to 50% to create a circle
-            //   backgroundColor: stringToColor(profile.name)
-            //   // width: '68px', // Adjust width based on content length
-            //   // height: 'fit-content' // Adjust height based on content length
-            // }}
-            className='text-center'
-          >
+          <Typography variant='h4' className='text-center'>
             <Avatar {...stringAvatar(profile.name, '20px', 68, 68)} className={`font-bold`} />
           </Typography>
 
