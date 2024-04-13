@@ -1,6 +1,6 @@
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { faCreditCard, faEye, faTimes } from '@fortawesome/free-solid-svg-icons'
-import { Backdrop, Box, CircularProgress, Grid, Stack } from '@mui/material'
+import { Backdrop, Box, CircularProgress, Dialog, Grid, Stack } from '@mui/material'
 import CardMemberList from './CardMemberList'
 import CardLabelList from './CardLabelList'
 import CardNotification from './CardNotification'
@@ -102,7 +102,9 @@ export default function CardDetailWindow({
       .unwrap()
       .then((response) => {
         setCurrentCardState(response.data)
+        console.log(response.data)
         const tempIsWatching: boolean = response.data?.watcher_email.includes(myEmail) ?? false
+        console.log(tempIsWatching)
         setIsWatching(tempIsWatching)
       })
       .catch((error) => {
@@ -123,7 +125,6 @@ export default function CardDetailWindow({
     if (currentCardState) {
       setCardNameFieldValue(currentCardState!.name)
       setInitialCardNameFieldValue(currentCardState!.name)
-      setIsWatching(false)
     }
   }, [currentCardState])
 
@@ -157,10 +158,6 @@ export default function CardDetailWindow({
     }
   }
 
-  function handleNotification() {
-    setIsWatching(!isWatching)
-  }
-
   function handleWatching() {
     // Add watcher
     if (isWatching === false) {
@@ -175,11 +172,12 @@ export default function CardDetailWindow({
             watcher_email: [...(currentCardState?.watcher_email || []), myEmail]
           }
           setCurrentCardState(updatedCard)
+          setIsWatching((prevState) => !prevState)
         })
         .catch((error) => {
           console.log('ERROR: add card watcher - ', error)
         })
-    } else {
+    } else if (isWatching === true) {
       deleteCardWatcherAPI({
         cardlist_id: cardlistId,
         card_id: cardId,
@@ -191,6 +189,7 @@ export default function CardDetailWindow({
             watcher_email: currentCardState?.watcher_email.filter((email) => email !== myEmail) || []
           }
           setCurrentCardState(updatedCard)
+          setIsWatching((prevState) => !prevState)
         })
         .catch((error) => {
           console.log('ERROR: delete card watcher - ', error)
@@ -217,252 +216,250 @@ export default function CardDetailWindow({
   }
 
   return (
-    <Backdrop sx={{ bgcolor: 'rgba(0, 0, 0, 0.64)', zIndex: (theme) => theme.zIndex.drawer + 1 }} open={isOpenCDW}>
-      <Box
-        sx={{
-          width: '100%',
-          height: '100%',
-          overflowY: 'auto'
-        }}
-        className='flex items-start justify-center'
-      >
+    <Dialog open={isOpenCDW}>
+      <Backdrop sx={{ bgcolor: 'rgba(0, 0, 0, 0.64)' }} open={isOpenCDW}>
         <Box
           sx={{
-            width: 768,
-            minHeight: 'calc(100vh - 78px)',
-            height: 'fit-content',
-            margin: '52px 0 52px 0',
-            paddingBottom: '40px',
-            boxShadow: '0 2px 4px rgba(0, 0, 0, 0.5)',
-            backgroundColor: colors.background_modal,
-            color: colors.text
+            width: '100%',
+            height: '100%',
+            overflowY: 'auto'
           }}
-          className='m-auto rounded-2xl'
+          className='flex items-start justify-center'
         >
-          {currentCardState ? (
-            <>
-              {/* START: Header */}
-              <Box sx={{ width: '100%', height: 89, padding: '8px 0' }} className='flex flex-row'>
-                <Box sx={{ width: 46 }}>
-                  <Box sx={{ padding: '14px 0 0 20px' }}>
-                    <FontAwesomeIcon icon={faCreditCard} style={{ color: colors.text, width: 20, height: 20 }} />
-                  </Box>
-                </Box>
-                <Box sx={{ width: 660, padding: '6px 0' }}>
-                  <input
-                    type='text'
-                    style={{
-                      width: '100%',
-                      height: '37px',
-                      padding: '6px 10px',
-                      backgroundColor: colors.background_modal
-                    }}
-                    onFocus={(e) => {
-                      e.currentTarget.style.borderColor = focusInputColor
-                      e.currentTarget.style.backgroundColor = colors.background_modal_secondary
-                    }}
-                    onBlur={(e) => {
-                      handleCardNameFieldBlur
-                      e.currentTarget.style.backgroundColor = colors.background_modal
-                    }}
-                    value={cardNameFieldValue}
-                    onChange={(e) => handleCardNameChange(e)}
-                    className='text-xl font-semibold'
-                  />
-                  <Box
-                    sx={{ height: '20px', padding: '0 0 0 10px', color: colors.text }}
-                    className='flex flex-row items-center text-sm'
-                  >
-                    <p style={{ marginRight: '4px' }}>in list</p>
-                    <p style={{ marginRight: '16px' }} className='cursor-pointer font-medium underline'>
-                      {currentCardlistNameState}
-                    </p>
-                    {isWatching && <FontAwesomeIcon icon={faEye} />}
-                  </Box>
-                </Box>
-                <Box sx={{ width: 52, padding: '7px 6px 0 0' }} className='flex items-start justify-end'>
-                  <Box
-                    sx={{ width: 40, height: 40, '&:hover': { bgcolor: colors.button_hover } }}
-                    className='flex cursor-pointer items-center justify-center rounded-full'
-                    onClick={handleCloseCDW}
-                  >
-                    <FontAwesomeIcon icon={faTimes} style={{ color: colors.text, width: 20, height: 20 }} />
-                  </Box>
-                </Box>
-              </Box>
-              {/* END: Header */}
-              {/* START: Body */}
-              <Grid container>
-                <Grid item xs={9} sx={{ padding: '0 8px 8px 16px' }}>
-                  {/* START: Hero */}
-                  <div style={{ padding: '0 0 0 40px' }} className='flex flex-row flex-wrap gap-1'>
-                    <CardMemberList
-                      boardId={boardId}
-                      cardlistId={cardlistId}
-                      cardId={cardId}
-                      currentCard={currentCardState!}
-                      setCurrentCard={setCurrentCardState!}
-                    />
-                    <CardLabelList
-                      boardId={boardId}
-                      cardlistId={cardlistId}
-                      cardId={cardId}
-                      currentCard={currentCardState!}
-                      setCurrentCard={setCurrentCardState}
-                      boardLabelState={boardLabelState}
-                      setBoardLabelState={setBoardLabelState}
-                    />
-                    <CardNotification
-                      isWatching={isWatching}
-                      setIsWatching={handleNotification}
-                      handleWatching={handleWatching}
-                    />
-                    <CardDate
-                      cardlistId={cardlistId}
-                      cardId={cardId}
-                      currentCard={currentCardState!}
-                      setCurrentCard={setCurrentCardState}
-                    />
-                  </div>
-                  {/* END: Hero */}
-                  {/* START: Description */}
-                  <CardDescription
-                    cardlistId={cardlistId}
-                    cardId={cardId}
-                    currentCard={currentCardState!}
-                    setCurrentCard={setCurrentCardState}
-                  />
-                  {/* END: Description */}
-                  {/* START: Attachment */}
-                  <CardAttachment
-                    cardlistId={cardlistId}
-                    cardId={cardId}
-                    currentCard={currentCardState!}
-                    setCurrentCard={setCurrentCardState}
-                  />
-                  {/* END: Attachment */}
-                  {/* START: Checklist */}
-                  {currentCardState.features
-                    .filter((_feature) => _feature.type === 'checklist')
-                    .map((feature, index) => {
-                      const checklist = feature as Feature_Checklist
-                      return (
-                        <CardChecklist
-                          key={index}
-                          cardlistId={cardlistId}
-                          cardId={cardId}
-                          currentChecklist={checklist}
-                          currentCard={currentCardState!}
-                          setCurrentCard={setCurrentCardState}
-                        />
-                      )
-                    })}
-                  {/* END: Checklist */}
-                  <CardActivity
-                    cardlistId={cardlistId}
-                    cardId={cardId}
-                    currentCard={currentCardState!}
-                    setCurrentCard={setCurrentCardState}
-                  />
-                </Grid>
-                <Grid item xs={3} sx={{ padding: '0 16px 8px 8px' }}>
-                  <Stack sx={{ padding: '10px 0 0 0' }}>
-                    <h2 style={{ color: colors.text }} className='mb-2 text-xs font-bold'>
-                      Add to card
-                    </h2>
-                    <SidebarButtonMembers
-                      type={ButtonType.Members}
-                      boardId={boardId}
-                      cardlistId={cardlistId}
-                      cardId={cardId}
-                      currentCard={currentCardState}
-                      setCurrentCard={setCurrentCardState}
-                    />
-                    <SidebarButtonLabels
-                      type={ButtonType.Labels}
-                      boardId={boardId}
-                      cardlistId={cardlistId}
-                      cardId={cardId}
-                      currentCard={currentCardState!}
-                      setCurrentCard={setCurrentCardState}
-                      boardLabelState={boardLabelState}
-                      setBoardLabelState={setBoardLabelState}
-                    />
-                    <SidebarButtonChecklist
-                      type={ButtonType.Checklists}
-                      cardlistId={cardlistId}
-                      cardId={cardId}
-                      currentCard={currentCardState!}
-                      setCurrentCard={setCurrentCardState}
-                    />
-                    <SidebarButtonDates
-                      type={ButtonType.Dates}
-                      cardlistId={cardlistId}
-                      cardId={cardId}
-                      currentCard={currentCardState!}
-                      setCurrentCard={setCurrentCardState}
-                    />
-                    <SidebarButtonAttachments
-                      type={ButtonType.Attachments}
-                      cardlistId={cardlistId}
-                      cardId={cardId}
-                      currentCard={currentCardState!}
-                      setCurrentCard={setCurrentCardState}
-                    />
-                    <h2 style={{ color: colors.text }} className='mb-2 mt-6 text-xs font-bold'>
-                      Actions
-                    </h2>
-                    <SidebarButtonMove
-                      type={ButtonType.Move}
-                      currentCard={currentCardState!}
-                      setCurrentCard={setCurrentCardState}
-                    />
-                    <SidebarButtonCopy
-                      type={ButtonType.Copy}
-                      boardId={boardId}
-                      cardlistId={cardlistId}
-                      cardId={cardId}
-                      currentCard={currentCardState!}
-                      setCurrentCard={setCurrentCardState}
-                    />
-                    <Box sx={{ width: '100%', height: 2, padding: '0 0 10px 0' }}>
-                      <Box sx={{ width: '100%', height: 2, bgcolor: colors.button }}></Box>
+          <Box
+            sx={{
+              width: 768,
+              minHeight: 'calc(100vh - 78px)',
+              height: 'fit-content',
+              margin: '52px 0 52px 0',
+              paddingBottom: '40px',
+              boxShadow: '0 2px 4px rgba(0, 0, 0, 0.5)',
+              backgroundColor: colors.background_modal,
+              color: colors.text
+            }}
+            className='m-auto rounded-2xl'
+          >
+            {currentCardState ? (
+              <>
+                {/* START: Header */}
+                <Box sx={{ width: '100%', height: 89, padding: '8px 0' }} className='flex flex-row'>
+                  <Box sx={{ width: 46 }}>
+                    <Box sx={{ padding: '14px 0 0 20px' }}>
+                      <FontAwesomeIcon icon={faCreditCard} style={{ color: colors.text, width: 20, height: 20 }} />
                     </Box>
-                    {!isArchived ? (
-                      <SidebarButtonArchive type={ButtonType.Archive} handleArchive={handleArchive} />
-                    ) : (
-                      <SidebarButtonUnArchive type={ButtonType.UnArchive} handleUnArchive={handleUnArchive} />
-                    )}
-                  </Stack>
+                  </Box>
+                  <Box sx={{ width: 660, padding: '6px 0' }}>
+                    <input
+                      type='text'
+                      style={{
+                        width: '100%',
+                        height: '37px',
+                        padding: '6px 10px',
+                        backgroundColor: colors.background_modal
+                      }}
+                      onFocus={(e) => {
+                        e.currentTarget.style.borderColor = focusInputColor
+                        e.currentTarget.style.backgroundColor = colors.background_modal_secondary
+                      }}
+                      onBlur={(e) => {
+                        handleCardNameFieldBlur
+                        e.currentTarget.style.backgroundColor = colors.background_modal
+                      }}
+                      value={cardNameFieldValue}
+                      onChange={(e) => handleCardNameChange(e)}
+                      className='text-xl font-semibold'
+                    />
+                    <Box
+                      sx={{ height: '20px', padding: '0 0 0 10px', color: colors.text }}
+                      className='flex flex-row items-center text-sm'
+                    >
+                      <p style={{ marginRight: '4px' }}>in list</p>
+                      <p style={{ marginRight: '16px' }} className='cursor-pointer font-medium underline'>
+                        {currentCardlistNameState}
+                      </p>
+                      {isWatching && <FontAwesomeIcon icon={faEye} />}
+                    </Box>
+                  </Box>
+                  <Box sx={{ width: 52, padding: '7px 6px 0 0' }} className='flex items-start justify-end'>
+                    <Box
+                      sx={{ width: 40, height: 40, '&:hover': { bgcolor: colors.button_hover } }}
+                      className='flex cursor-pointer items-center justify-center rounded-full'
+                      onClick={handleCloseCDW}
+                    >
+                      <FontAwesomeIcon icon={faTimes} style={{ color: colors.text, width: 20, height: 20 }} />
+                    </Box>
+                  </Box>
+                </Box>
+                {/* END: Header */}
+                {/* START: Body */}
+                <Grid container>
+                  <Grid item xs={9} sx={{ padding: '0 8px 8px 16px' }}>
+                    {/* START: Hero */}
+                    <div style={{ padding: '0 0 0 40px' }} className='flex flex-row flex-wrap gap-1'>
+                      <CardMemberList
+                        boardId={boardId}
+                        cardlistId={cardlistId}
+                        cardId={cardId}
+                        currentCard={currentCardState!}
+                        setCurrentCard={setCurrentCardState!}
+                      />
+                      <CardLabelList
+                        boardId={boardId}
+                        cardlistId={cardlistId}
+                        cardId={cardId}
+                        currentCard={currentCardState!}
+                        setCurrentCard={setCurrentCardState}
+                        boardLabelState={boardLabelState}
+                        setBoardLabelState={setBoardLabelState}
+                      />
+                      <CardNotification isWatching={isWatching} handleWatching={handleWatching} />
+                      <CardDate
+                        cardlistId={cardlistId}
+                        cardId={cardId}
+                        currentCard={currentCardState!}
+                        setCurrentCard={setCurrentCardState}
+                      />
+                    </div>
+                    {/* END: Hero */}
+                    {/* START: Description */}
+                    <CardDescription
+                      cardlistId={cardlistId}
+                      cardId={cardId}
+                      currentCard={currentCardState!}
+                      setCurrentCard={setCurrentCardState}
+                    />
+                    {/* END: Description */}
+                    {/* START: Attachment */}
+                    <CardAttachment
+                      cardlistId={cardlistId}
+                      cardId={cardId}
+                      currentCard={currentCardState!}
+                      setCurrentCard={setCurrentCardState}
+                    />
+                    {/* END: Attachment */}
+                    {/* START: Checklist */}
+                    {currentCardState.features
+                      .filter((_feature) => _feature.type === 'checklist')
+                      .map((feature, index) => {
+                        const checklist = feature as Feature_Checklist
+                        return (
+                          <CardChecklist
+                            key={index}
+                            cardlistId={cardlistId}
+                            cardId={cardId}
+                            currentChecklist={checklist}
+                            currentCard={currentCardState!}
+                            setCurrentCard={setCurrentCardState}
+                          />
+                        )
+                      })}
+                    {/* END: Checklist */}
+                    <CardActivity
+                      cardlistId={cardlistId}
+                      cardId={cardId}
+                      currentCard={currentCardState!}
+                      setCurrentCard={setCurrentCardState}
+                    />
+                  </Grid>
+                  <Grid item xs={3} sx={{ padding: '0 16px 8px 8px' }}>
+                    <Stack sx={{ padding: '10px 0 0 0' }}>
+                      <h2 style={{ color: colors.text }} className='mb-2 text-xs font-bold'>
+                        Add to card
+                      </h2>
+                      <SidebarButtonMembers
+                        type={ButtonType.Members}
+                        boardId={boardId}
+                        cardlistId={cardlistId}
+                        cardId={cardId}
+                        currentCard={currentCardState}
+                        setCurrentCard={setCurrentCardState}
+                      />
+                      <SidebarButtonLabels
+                        type={ButtonType.Labels}
+                        boardId={boardId}
+                        cardlistId={cardlistId}
+                        cardId={cardId}
+                        currentCard={currentCardState!}
+                        setCurrentCard={setCurrentCardState}
+                        boardLabelState={boardLabelState}
+                        setBoardLabelState={setBoardLabelState}
+                      />
+                      <SidebarButtonChecklist
+                        type={ButtonType.Checklists}
+                        cardlistId={cardlistId}
+                        cardId={cardId}
+                        currentCard={currentCardState!}
+                        setCurrentCard={setCurrentCardState}
+                      />
+                      <SidebarButtonDates
+                        type={ButtonType.Dates}
+                        cardlistId={cardlistId}
+                        cardId={cardId}
+                        currentCard={currentCardState!}
+                        setCurrentCard={setCurrentCardState}
+                      />
+                      <SidebarButtonAttachments
+                        type={ButtonType.Attachments}
+                        cardlistId={cardlistId}
+                        cardId={cardId}
+                        currentCard={currentCardState!}
+                        setCurrentCard={setCurrentCardState}
+                      />
+                      <h2 style={{ color: colors.text }} className='mb-2 mt-6 text-xs font-bold'>
+                        Actions
+                      </h2>
+                      <SidebarButtonMove
+                        type={ButtonType.Move}
+                        currentCard={currentCardState!}
+                        setCurrentCard={setCurrentCardState}
+                      />
+                      <SidebarButtonCopy
+                        type={ButtonType.Copy}
+                        boardId={boardId}
+                        cardlistId={cardlistId}
+                        cardId={cardId}
+                        currentCard={currentCardState!}
+                        setCurrentCard={setCurrentCardState}
+                      />
+                      <Box sx={{ width: '100%', height: 2, padding: '0 0 10px 0' }}>
+                        <Box sx={{ width: '100%', height: 2, bgcolor: colors.button }}></Box>
+                      </Box>
+                      {!isArchived ? (
+                        <SidebarButtonArchive type={ButtonType.Archive} handleArchive={handleArchive} />
+                      ) : (
+                        <SidebarButtonUnArchive type={ButtonType.UnArchive} handleUnArchive={handleUnArchive} />
+                      )}
+                    </Stack>
+                  </Grid>
                 </Grid>
-              </Grid>
-              {/* END: Body */}
-            </>
-          ) : (
-            <Box sx={{ width: '100%' }} className='flex items-center justify-center'>
-              {/* START: Header */}
-              <Box sx={{ width: '100%', height: 89, padding: '8px 0' }} className='flex flex-row'>
-                <Box sx={{ width: 46 }}>
-                  <Box sx={{ padding: '14px 0 0 20px' }}>
-                    <CircularProgress />
+                {/* END: Body */}
+              </>
+            ) : (
+              <Box sx={{ width: '100%' }} className='flex items-center justify-center'>
+                {/* START: Header */}
+                <Box sx={{ width: '100%', height: 89, padding: '8px 0' }} className='flex flex-row'>
+                  <Box sx={{ width: 46 }}>
+                    <Box sx={{ padding: '14px 0 0 20px' }}>
+                      <CircularProgress />
+                    </Box>
+                  </Box>
+                  <Box sx={{ width: 660, padding: '6px 0' }}></Box>
+                  <Box sx={{ width: 52, padding: '7px 6px 0 0' }} className='flex items-start justify-end'>
+                    <Box
+                      sx={{ width: 40, height: 40, '&:hover': { bgcolor: colors.button_hover } }}
+                      className='flex cursor-pointer items-center justify-center rounded-full'
+                      onClick={handleCloseCDW}
+                    >
+                      <FontAwesomeIcon icon={faTimes} style={{ color: colors.text, width: 20, height: 20 }} />
+                    </Box>
                   </Box>
                 </Box>
-                <Box sx={{ width: 660, padding: '6px 0' }}></Box>
-                <Box sx={{ width: 52, padding: '7px 6px 0 0' }} className='flex items-start justify-end'>
-                  <Box
-                    sx={{ width: 40, height: 40, '&:hover': { bgcolor: colors.button_hover } }}
-                    className='flex cursor-pointer items-center justify-center rounded-full'
-                    onClick={handleCloseCDW}
-                  >
-                    <FontAwesomeIcon icon={faTimes} style={{ color: colors.text, width: 20, height: 20 }} />
-                  </Box>
-                </Box>
+                {/* END: Header */}
               </Box>
-              {/* END: Header */}
-            </Box>
-          )}
+            )}
+          </Box>
         </Box>
-      </Box>
-    </Backdrop>
+      </Backdrop>
+    </Dialog>
   )
 }

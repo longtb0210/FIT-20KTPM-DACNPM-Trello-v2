@@ -52,7 +52,12 @@ export function SidebarButtonLabels({
     })
       .unwrap()
       .then((response) => {
-        setBoardLabelState([...boardLabelState, response])
+        const newBoardLabel: BoardLabel = {
+          _id: response._id,
+          color: color,
+          name: name
+        }
+        setBoardLabelState([...boardLabelState, newBoardLabel])
       })
       .catch((error) => {
         console.log('ERROR: add board label', error)
