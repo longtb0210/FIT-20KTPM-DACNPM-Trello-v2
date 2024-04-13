@@ -17,6 +17,7 @@ import { useTheme } from '~/components/Theme/themeContext'
 
 // eslint-disable-next-line react-refresh/only-export-components
 export enum ButtonType {
+  Join = 'Join',
   Members = 'Members',
   Labels = 'Labels',
   Checklists = 'Checklists',
@@ -31,6 +32,7 @@ export enum ButtonType {
 
 // eslint-disable-next-line react-refresh/only-export-components
 export const buttonTypeIconMap: Record<ButtonType, IconProp> = {
+  Join: faUser,
   Members: faUser,
   Labels: faTag,
   Checklists: faSquareCheck,
