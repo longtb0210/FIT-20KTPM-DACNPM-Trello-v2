@@ -30,7 +30,7 @@ const AppBar = styled(MuiAppBar, {
       easing: theme.transitions.easing.easeOut,
       duration: theme.transitions.duration.enteringScreen
     })
-  }),
+  })
 }))
 
 const Main = styled('main', { shouldForwardProp: (prop) => prop !== 'open' })<{
@@ -64,7 +64,7 @@ export function CategoryWorkspace() {
   }
 
   return (
-    <div>
+    <div className='overflow-auto'>
       <Box sx={{ display: 'flex' }}>
         <CssBaseline />
         <AppBar
@@ -82,7 +82,17 @@ export function CategoryWorkspace() {
               sx={{ mr: 2, ...(open && { display: 'none' }) }}
             >
               <div className='relative'>
-                <div style={{borderRadius: '50%', border: '2px solid #888', width: '36px', height: '36px', display: 'flex', justifyContent: 'center', alignItems: 'center'}}>
+                <div
+                  style={{
+                    borderRadius: '50%',
+                    border: '2px solid #888',
+                    width: '36px',
+                    height: '36px',
+                    display: 'flex',
+                    justifyContent: 'center',
+                    alignItems: 'center'
+                  }}
+                >
                   <ChevronRightIcon className='h-6 w-6' />
                 </div>
               </div>

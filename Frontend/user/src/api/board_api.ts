@@ -35,8 +35,11 @@ const BoardApiSlice = createApi({
         method: 'GET'
       })
     }),
-    getBoardByWorkspaceId: builder.query<TrelloApi.BoardApi.getBoardsByWorkspaceIdResponse, { workspaceId: string | undefined }>({
-      query: ({workspaceId}) => ({
+    getBoardByWorkspaceId: builder.query<
+      TrelloApi.BoardApi.getBoardsByWorkspaceIdResponse,
+      { workspaceId: string | undefined }
+    >({
+      query: ({ workspaceId }) => ({
         url: `/api/board/workspace/${workspaceId}`,
         method: 'GET'
       })
@@ -115,6 +118,13 @@ const BoardApiSlice = createApi({
       query: ({ boardId, _id }) => ({
         url: `/api/board/${boardId}/label/remove`,
         body: { _id },
+        method: 'POST'
+      })
+    }),
+    addMemberToBoard: builder.mutation<TrelloApi.BoardApi.AddMemberResponse, TrelloApi.BoardApi.AddMemberRequest>({
+      query: (data) => ({
+        url: `/api/board/members/add`,
+        body: data,
         method: 'POST'
       })
     })

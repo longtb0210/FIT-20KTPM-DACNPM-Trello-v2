@@ -286,7 +286,11 @@ export default function Starred() {
                       </Box>
                     ) : (
                       listBoard?.map((board, index) => (
-                        <Link key={index} to={`/workspace/${board._id}`} onClick={() => setOpen(false)}>
+                        <Link
+                          key={index}
+                          to={`workspace/${board.workspace_id}/board/${board._id}`}
+                          onClick={() => setOpen(false)}
+                        >
                           <Box
                             sx={{
                               display: 'flex',

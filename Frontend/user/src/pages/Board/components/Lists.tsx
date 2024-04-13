@@ -1,5 +1,5 @@
 import { useTheme } from '~/components/Theme/themeContext'
-import { ListsComponentProps } from '../type'
+import { List, ListsComponentProps } from '../type'
 import { ListComponent } from './index'
 import AddListForm from './AddNewList'
 
@@ -8,6 +8,8 @@ import { useEffect, useRef, useState } from 'react'
 import { UniqueIdentifier } from '@dnd-kit/core'
 import { CardlistApiRTQ } from '~/api'
 import { board_id } from '~/api/getInfo'
+import { useParams } from 'react-router-dom'
+import LoadingComponent from '~/components/Loading'
 
 export default function ListsComponent({
   lists,
@@ -23,6 +25,12 @@ export default function ListsComponent({
   const { colors, darkMode } = useTheme()
   const [showAddListForm, setShowAddListForm] = useState(false)
   const [newListName, setNewListName] = useState<string>('')
+  const params = useParams()
+  const boardId = params.boardId
+  const [listsData, setListsData] = useState<List[]>()
+  useEffect(() => {
+    setListsData(lists.sort((a, b) => (a.index ?? Infinity) - (b.index ?? Infinity)))
+  }, [lists])
   const handleAddListClick = () => {
     setShowAddListForm(true)
   }
@@ -62,7 +70,7 @@ export default function ListsComponent({
     }
   }, [lists])
   useEffect(() => {
-    if (!cardlistDataByBoardId) getCardListByBoardId({ id: board_id })
+    if (!cardlistDataByBoardId) getCardListByBoardId({ id: boardId })
     document.addEventListener('mousedown', handleClickOutside)
     return () => {
       document.removeEventListener('mousedown', handleClickOutside)
@@ -75,60 +83,69 @@ export default function ListsComponent({
     setNewListName('')
   }
   async function createList() {
-    createCardlist({
-      name: newListName,
-      board_id: board_id,
-      index: cardlistDataByBoardId?.data.length || 0,
-      watcher_email: [],
-      archive_at: undefined,
-      created_at: new Date()
-    }).then(() => getCardListByBoardId({ id: board_id }))
+    if (boardId)
+      createCardlist({
+        name: newListName,
+        board_id: boardId,
+        index: cardlistDataByBoardId?.data.length || 0,
+        watcher_email: [],
+        archive_at: undefined,
+        created_at: new Date()
+      }).then(() => getCardListByBoardId({ id: boardId }))
     // const res = await createListAPI(data)
     // console.log(res)
   }
 
   return (
     <>
-      <SortableContext
-        items={lists?.map((l) => l._id) as (UniqueIdentifier | { id: UniqueIdentifier })[]}
-        strategy={horizontalListSortingStrategy}
-      >
-        <div className='relative flex flex-row items-start p-4 '>
-          {lists?.map((list, index) => (
-            <div key={index} id='list-component'>
-              <ListComponent
-                cardSelected={cardSelected}
-                maxHeight={biggestHeight}
-                index={index}
-                list={list}
-                resetManually={resetManually}
-                setResetManually={setResetManually}
-                setOpenCardSetting={setOpenCardSetting}
-              />
+      {listsData ? (
+        <>
+          <SortableContext
+            items={listsData?.map((l) => l._id) as (UniqueIdentifier | { id: UniqueIdentifier })[]}
+            strategy={horizontalListSortingStrategy}
+          >
+            <div className='relative flex flex-row items-start p-4 '>
+              {listsData?.map((list, index) => (
+                <div key={index} id='list-component'>
+                  <ListComponent
+                    cardSelected={cardSelected}
+                    maxHeight={biggestHeight}
+                    index={index}
+                    list={list}
+                    resetManually={resetManually}
+                    setResetManually={setResetManually}
+                    setOpenCardSetting={setOpenCardSetting}
+                  />
+                </div>
+              ))}
+              {/* <p>The maximum height of ListComponents is: {biggestHeight}px</p> */}
+              {showAddListForm ? (
+                <div ref={listFormRef} className={`h-[120px]`}>
+                  <AddListForm
+                    darkMode={darkMode}
+                    colors={colors}
+                    newListName={newListName}
+                    setShowAddListForm={setShowAddListForm}
+                    setNewListName={setNewListName}
+                    handleSaveListClick={handleSaveListClick}
+                  />
+                </div>
+              ) : (
+                <button
+                  className={`h-fit w-[300px]   rounded-xl border bg-black bg-opacity-20 p-3 text-left font-semibold text-white`}
+                  onClick={handleAddListClick}
+                >
+                  + Add another list
+                </button>
+              )}
             </div>
-          ))}
-          {/* <p>The maximum height of ListComponents is: {biggestHeight}px</p> */}
-          {showAddListForm ? (
-            <div ref={listFormRef} className={`h-[120px]`}>
-              <AddListForm
-                darkMode={darkMode}
-                colors={colors}
-                newListName={newListName}
-                setShowAddListForm={setShowAddListForm}
-                setNewListName={setNewListName}
-                handleSaveListClick={handleSaveListClick}
-              />
-            </div>
-          ) : (
-            <button
-              className={`h-fit w-[300px]   rounded-xl border bg-black bg-opacity-20 p-3 text-left font-semibold text-white`}
-              onClick={handleAddListClick}
-            >
-              + Add another list
-            </button>
-          )}
-        </div>
-      </SortableContext>
+          </SortableContext>
+        </>
+      ) : (
+        <>
+          <LoadingComponent />
+        </>
+      )}
     </>
   )
 }

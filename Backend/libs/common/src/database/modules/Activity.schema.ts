@@ -10,4 +10,8 @@ export const ActivityMSchema = new Schema<DbSchemas.ActivitySchema.Activity>({
   content: String,
   create_time: Date,
   creator_email: String,
+  is_comment: {
+    type: Boolean,
+    required: false,
+  },
 })

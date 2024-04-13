@@ -101,148 +101,150 @@ export default function CardComponent({ card, cardSelected, setOpenCardSetting }
   }
   return (
     <div>
-      <div>
-        {!cardSettingOpen && (
-          <div ref={setNodeRef} style={styleList} {...attributes} {...listeners}>
-            <div
-              style={{
-                backgroundColor: colors.background,
-                color: colors.text,
-                border: '1px solid',
-                borderColor: isHovered ? colors.card_border : colors.background
-              }}
-              className={`mx-3  space-y-2 rounded-lg  p-2  ${darkMode ? `` : ' shadow-sm shadow-gray-300'} ${card.placeHolder ? 'invisible -mt-3 max-h-0  border-0 p-0' : 'visible'}`}
-              onMouseEnter={() => setIsHovered(true)}
-              onMouseLeave={() => setIsHovered(false)}
-              onClick={() => cardSelected(card)}
-            >
-              <div className={`flex flex-row items-center justify-between`}>
-                <p className={` text-left`}>{card.name}</p>
-                {isHovered && (
-                  <BsPencil
-                    className=''
-                    onClick={(e) => {
-                      e.stopPropagation() // Prevent click event from bubbling up
-                      setCardSettingOpen(card._id)
-                      setOpenCardSetting(card._id)
-                    }}
-                  />
-                )}
-              </div>
-              {card.watcher_email && card.watcher_email.length > 0 && (
-                <div className={`flex flex-row items-center justify-between`}>
-                  <div className='flex-grow'>
-                    <MdOutlineRemoveRedEye className={`ml-2`} />
-                  </div>
-                  {card.watcher_email.map((watcher, index) => (
-                    <div key={index} className={`relative z-10 flex flex-row items-center justify-center`}>
-                      <div onMouseEnter={() => handleMouseOver(watcher)} onMouseLeave={handleMouseLeave}>
-                        <div
-                          style={{ backgroundColor: bgColorEmailWatcher[index] }}
-                          className={`mx-1 h-[22px] w-[23px] rounded-full pt-[3px] text-center  text-[10px]  font-semibold text-white hover:opacity-50`}
-                        >
-                          HM
-                        </div>
-                        {isHoveredWatcher && isHoveredWatcher === watcher && (
-                          <div className='absolute -bottom-10 left-2 z-20 ml-6 bg-yellow-200 p-1 text-black hover:bg-gray-100'>
-                            {watcher}
-                          </div>
-                        )}
-                      </div>
-                    </div>
-                  ))}
-                </div>
-              )}
-            </div>
-          </div>
-        )}
-        {cardSettingOpen && cardSettingOpen === card._id && (
-          <div className={` pointer-events-auto relative `}>
-            <div
-              style={{
-                position: 'fixed',
-                top: 0,
-                left: 0,
-                width: '100%',
-                height: '100%',
-                backgroundColor: 'rgba(0, 0, 0, 0.6)', // Semi-transparent black color
-                zIndex: 10 // Ensure it's above other content
-              }}
-            ></div>
-            <div ref={componentRef} className={`flex flex-col`}>
+      {card && !card.archive_at && (
+        <div>
+          {!cardSettingOpen && (
+            <div ref={setNodeRef} style={styleList} {...attributes} {...listeners}>
               <div
                 style={{
                   backgroundColor: colors.background,
                   color: colors.text,
-                  zIndex: 10
+                  border: '1px solid',
+                  borderColor: isHovered ? colors.card_border : colors.background
                 }}
-                className={`relative mx-3  ${darkMode ? `` : ' shadow-sm shadow-gray-300'} flex rounded-lg`}
+                className={`mx-3  space-y-2 rounded-lg  p-2  ${darkMode ? `` : ' shadow-sm shadow-gray-300'} ${card.placeHolder ? 'invisible -mt-3 max-h-0  border-0 p-0' : 'visible'}`}
+                onMouseEnter={() => setIsHovered(true)}
+                onMouseLeave={() => setIsHovered(false)}
+                onClick={() => cardSelected(card)}
               >
-                <div
-                  className={` w-full space-y-2 rounded-lg   p-2  ${card.placeHolder ? 'invisible m-0 h-0 border-0 p-0' : 'visible'}`}
-                  // onMouseEnter={() => setIsHoveredTextInput(true)}
-                  // onMouseLeave={() => setIsHoveredTextInput(false)}
-                >
-                  <div className={`flex flex-row items-center   justify-between`}>
-                    <input
-                      style={{
-                        backgroundColor: colors.background,
-                        color: colors.text
+                <div className={`flex flex-row items-center justify-between`}>
+                  <p className={` text-left`}>{card.name}</p>
+                  {isHovered && (
+                    <BsPencil
+                      className=''
+                      onClick={(e) => {
+                        e.stopPropagation() // Prevent click event from bubbling up
+                        setCardSettingOpen(card._id)
+                        setOpenCardSetting(card._id)
                       }}
-                      className={` w-full border-0 px-2 pb-7 text-left focus:border-0 focus:outline-none  `}
-                      autoFocus
-                      value={editedName}
-                      onChange={handleNameChange}
-                    ></input>
-                  </div>
-                  {card.watcher_email && card.watcher_email.length > 0 && (
-                    <div className={`flex flex-row items-center justify-between`}>
-                      <div className='flex-grow'>
-                        <MdOutlineRemoveRedEye className={`ml-2`} />
-                      </div>
-                      {card.watcher_email.map((watcher, index) => (
-                        <div key={index} className={` flex flex-row items-center justify-between`}>
-                          <div onMouseOver={() => handleMouseOver(watcher)} onMouseLeave={handleMouseLeave}>
-                            <div
-                              style={{ backgroundColor: bgColorEmailWatcher[index] }}
-                              className={`mx-1 h-[22px] w-[23px] rounded-full pt-[3px] text-center  text-[10px]  font-semibold text-white hover:opacity-50`}
-                            >
-                              HM
-                            </div>
-                            {isHoveredWatcher && isHoveredWatcher === watcher && (
-                              <div className='absolute -bottom-10 right-0 z-20 ml-6 bg-yellow-100 p-1 hover:bg-gray-100'>
-                                {watcher}
-                              </div>
-                            )}
-                          </div>
-                        </div>
-                      ))}
-                    </div>
+                    />
                   )}
                 </div>
-
-                <CardSetting />
+                {card.watcher_email && card.watcher_email.length > 0 && (
+                  <div className={`flex flex-row items-center justify-between`}>
+                    <div className='flex-grow'>
+                      <MdOutlineRemoveRedEye className={`ml-2`} />
+                    </div>
+                    {card.watcher_email.map((watcher, index) => (
+                      <div key={index} className={`relative z-10 flex flex-row items-center justify-center`}>
+                        <div onMouseEnter={() => handleMouseOver(watcher)} onMouseLeave={handleMouseLeave}>
+                          <div
+                            style={{ backgroundColor: bgColorEmailWatcher[index] }}
+                            className={`mx-1 h-[22px] w-[23px] rounded-full pt-[3px] text-center  text-[10px]  font-semibold text-white hover:opacity-50`}
+                          >
+                            HM
+                          </div>
+                          {isHoveredWatcher && isHoveredWatcher === watcher && (
+                            <div className='absolute -bottom-10 left-2 z-20 ml-6 bg-yellow-200 p-1 text-black hover:bg-gray-100'>
+                              {watcher}
+                            </div>
+                          )}
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                )}
               </div>
-              <button
-                style={{
-                  backgroundColor: !isHovered_SaveBtn ? colors.save_card : colors.save_card_hover,
-                  color: darkMode ? 'black' : 'white',
-                  zIndex: 10
-                }}
-                onMouseEnter={() => setIsHovered_SaveBtn(true)}
-                onMouseLeave={() => setIsHovered_SaveBtn(false)}
-                className={`absolute top-full ml-3 mt-2 w-[65px] rounded-md py-2`}
-                onClick={() => {
-                  alert('save')
-                  editCardName()
-                }}
-              >
-                Save
-              </button>
             </div>
-          </div>
-        )}
-      </div>
+          )}
+          {cardSettingOpen && cardSettingOpen === card._id && (
+            <div className={` pointer-events-auto relative `}>
+              <div
+                style={{
+                  position: 'fixed',
+                  top: 0,
+                  left: 0,
+                  width: '100%',
+                  height: '100%',
+                  backgroundColor: 'rgba(0, 0, 0, 0.6)', // Semi-transparent black color
+                  zIndex: 10 // Ensure it's above other content
+                }}
+              ></div>
+              <div ref={componentRef} className={`flex flex-col`}>
+                <div
+                  style={{
+                    backgroundColor: colors.background,
+                    color: colors.text,
+                    zIndex: 10
+                  }}
+                  className={`relative mx-3  ${darkMode ? `` : ' shadow-sm shadow-gray-300'} flex rounded-lg`}
+                >
+                  <div
+                    className={` w-full space-y-2 rounded-lg   p-2  ${card.placeHolder ? 'invisible m-0 h-0 border-0 p-0' : 'visible'}`}
+                    // onMouseEnter={() => setIsHoveredTextInput(true)}
+                    // onMouseLeave={() => setIsHoveredTextInput(false)}
+                  >
+                    <div className={`flex flex-row items-center   justify-between`}>
+                      <input
+                        style={{
+                          backgroundColor: colors.background,
+                          color: colors.text
+                        }}
+                        className={` w-full border-0 px-2 pb-7 text-left focus:border-0 focus:outline-none  `}
+                        autoFocus
+                        value={editedName}
+                        onChange={handleNameChange}
+                      ></input>
+                    </div>
+                    {card.watcher_email && card.watcher_email.length > 0 && (
+                      <div className={`flex flex-row items-center justify-between`}>
+                        <div className='flex-grow'>
+                          <MdOutlineRemoveRedEye className={`ml-2`} />
+                        </div>
+                        {card.watcher_email.map((watcher, index) => (
+                          <div key={index} className={` flex flex-row items-center justify-between`}>
+                            <div onMouseOver={() => handleMouseOver(watcher)} onMouseLeave={handleMouseLeave}>
+                              <div
+                                style={{ backgroundColor: bgColorEmailWatcher[index] }}
+                                className={`mx-1 h-[22px] w-[23px] rounded-full pt-[3px] text-center  text-[10px]  font-semibold text-white hover:opacity-50`}
+                              >
+                                HM
+                              </div>
+                              {isHoveredWatcher && isHoveredWatcher === watcher && (
+                                <div className='absolute -bottom-10 right-0 z-20 ml-6 bg-yellow-100 p-1 hover:bg-gray-100'>
+                                  {watcher}
+                                </div>
+                              )}
+                            </div>
+                          </div>
+                        ))}
+                      </div>
+                    )}
+                  </div>
+
+                  <CardSetting />
+                </div>
+                <button
+                  style={{
+                    backgroundColor: !isHovered_SaveBtn ? colors.save_card : colors.save_card_hover,
+                    color: darkMode ? 'black' : 'white',
+                    zIndex: 10
+                  }}
+                  onMouseEnter={() => setIsHovered_SaveBtn(true)}
+                  onMouseLeave={() => setIsHovered_SaveBtn(false)}
+                  className={`absolute top-full ml-3 mt-2 w-[65px] rounded-md py-2`}
+                  onClick={() => {
+                    alert('save')
+                    editCardName()
+                  }}
+                >
+                  Save
+                </button>
+              </div>
+            </div>
+          )}
+        </div>
+      )}
     </div>
   )
 }

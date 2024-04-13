@@ -1,7 +1,6 @@
 import { Routes, Route } from 'react-router-dom'
 import HomePage from '~/pages/Home'
-import CardTemplate from '~/pages/Templates/component/CardTemplate'
-import { AccountManagement, Board, BoardsPage, ErrorPage } from '~/pages'
+import { AccountManagement, BoardsPage, ErrorPage } from '~/pages'
 import { CategoryWorkspace } from '~/pages/CategoryWorkspace'
 import PageMembers from '~/pages/Members'
 import Login from '~/pages/Login'
@@ -11,12 +10,11 @@ import Layout from '~/layouts/Layout/layout'
 import PrivateRoute from './privateRoute'
 import { useContext } from 'react'
 import { AuthContext } from '~/components/AuthProvider/AuthProvider'
-import CardDetailWindow from '~/components/CardDetailWindow'
 import { useAppSelector } from '~/hooks'
+import CardTemplate from '~/pages/Templates/component/CardTemplate'
 
 export const Navigation = () => {
   const authContext = useContext(AuthContext)
-
   const valueToken = useAppSelector((state) => {
     return state.KC_TOKEN
   })
@@ -31,15 +29,13 @@ export const Navigation = () => {
         <Route element={<PrivateRoute isAllowed={isLoggedIn || false} redirectPath='/login' />}>
           <Route element={<Layout />}>
             <Route path='/' element={<HomePage />} />
-            <Route path='/profile/:id' element={<AccountManagement page={`profile`} />} />
+            <Route path='/profile' element={<AccountManagement page={`profile`} />} />
             <Route path='/template' element={<CardTemplate />} />
-            <Route path='/workspace/:workspaceId' element={<CategoryWorkspace />} />
-            <Route path='/boards' element={<BoardsPage />} />
-            <Route path='/activity/:id' element={<AccountManagement page={`activity`} />} />
-            <Route path='/cardlist' element={<Board />} />
-            <Route path='/carddetail' element={<CardDetailWindow />} />
+            <Route path='/workspace/:workspaceId/board/:boardId' element={<CategoryWorkspace />} />
+            <Route path='/boards/:id?' element={<BoardsPage />} />
+            <Route path='/activity' element={<AccountManagement page={`activity`} />} />
             <Route path='/workspace/:workspaceId/members' element={<PageMembers />} />
-            <Route path='/workspace/:workspaceId/workspaceSetting' element={<WorkspaceSetting />} />
+            <Route path='/workspaceSetting/:workspaceId' element={<WorkspaceSetting />} />
             <Route path='/workspaceboard/:workspaceId' element={<WorkspaceBoardsPage />} />
           </Route>
         </Route>

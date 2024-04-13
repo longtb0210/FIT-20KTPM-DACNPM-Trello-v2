@@ -28,7 +28,6 @@ interface Label {
 interface Board {
   name: string
   workspace_id: string
-  workspace_name: string
   watcher_email: string[]
   activities: Activity[]
   background: string
@@ -50,22 +49,22 @@ export default function Recent() {
   const [getBoardById] = BoardApiRTQ.BoardApiSlice.useLazyGetBoardByIdQuery()
   const [getWorkspaceByID, { data: dataWorkspace }] = WorkspaceApiRTQ.WorkspaceApiSlice.useGetWorkspaceByIDMutation()
   const [listBoard, setListBoard] = React.useState<Board[]>([])
+  const [listNameWorkspace, setListNameWorkspace] = React.useState<string[]>([])
 
   const savedValuesString = localStorage.getItem('savedValues')
-  const a = ['661a91f704527b3916b9c002']
 
   React.useEffect(() => {
     if (savedValuesString) {
       const savedValues = JSON.parse(savedValuesString)
-      console.log(savedValues)
 
-      a.map((recent: string) => {
+      setListBoard([])
+
+      savedValues.map((recent: string) => {
         getBoardById(recent).then((res) => {
           if (res.data && res.data.data) {
             const newBoard: Board = {
               name: res.data.data.name || '',
               workspace_id: res.data.data.workspace_id || '',
-              workspace_name: '',
               background: res.data.data.background || '',
               background_list: res.data.data.background_list || [],
               activities: res.data.data.activities || [],
@@ -76,24 +75,25 @@ export default function Recent() {
               watcher_email: res.data.data.watcher_email || [],
               _id: res.data.data._id || ''
             }
-
-            // Gọi hàm để lấy thông tin về workspace tương ứng
-            getWorkspaceByID({ workspace_id: res.data.data.workspace_id })
-              .then(() => {
-                if (dataWorkspace) {
-                  newBoard.workspace_name = dataWorkspace.data.name
-                }
-              })
-              .catch((error) => {
-                console.error('Error while fetching workspace details:', error)
-              })
-
-            setListBoard((prev) => [newBoard, ...prev])
+            setListBoard((prev) => [...prev, newBoard])
           }
         })
       })
     }
-  }, [getBoardById, getWorkspaceByID, savedValuesString])
+  }, [getBoardById, savedValuesString])
+
+  React.useEffect(() => {
+    if (listBoard) {
+      listBoard.map((board) => {
+        getWorkspaceByID({ workspace_id: board.workspace_id }).then(() => {
+          if (dataWorkspace) {
+            const workspaceName = dataWorkspace.data?.name || ''
+            setListNameWorkspace((prev) => [workspaceName, ...prev])
+          }
+        })
+      })
+    }
+  }, [dataWorkspace, getWorkspaceByID, listBoard])
 
   const handleToggle = () => {
     setOpen((prevOpen) => !prevOpen)
@@ -183,7 +183,11 @@ export default function Recent() {
                   >
                     {listBoard.length !== 0 ? (
                       listBoard.map((board, index) => (
-                        <Link key={index} to={``} onClick={() => setOpen(false)}>
+                        <Link
+                          key={index}
+                          to={`workspace/${board.workspace_id}/board/${board._id}`}
+                          onClick={() => setOpen(false)}
+                        >
                           <Box
                             sx={{
                               display: 'flex',
@@ -226,7 +230,7 @@ export default function Recent() {
                                   variant='body1'
                                   sx={{ fontSize: '12px', color: colors.text, marginLeft: '12px' }}
                                 >
-                                  {board.workspace_name}
+                                  {listNameWorkspace[index]}
                                 </Typography>
                               </Box>
                             </Box>

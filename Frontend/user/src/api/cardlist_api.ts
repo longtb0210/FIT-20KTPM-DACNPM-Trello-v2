@@ -64,17 +64,18 @@ export const CardListApiSlice = createApi({
         }
       })
     }),
-    moveCardList: build.mutation<TrelloApi.CardlistApi.MoveCardlistResponse, TrelloApi.CardlistApi.MoveCardlistRequest>(
-      {
-        query: (data) => ({
-          method: 'PUT',
-          url: '/api/cardlist/move',
-          body: {
-            ...data
-          }
-        })
-      }
-    ),
+    moveCardList: build.mutation<
+      TrelloApi.CardlistApi.MoveCardlistInBoardResponse,
+      TrelloApi.CardlistApi.MoveCardlistInBoardRequest
+    >({
+      query: (data) => ({
+        method: 'PUT',
+        url: '/api/cardlist/move_cardlists_in_board',
+        body: {
+          ...data
+        }
+      })
+    }),
     copyCardList: build.mutation<TrelloApi.CardlistApi.CopyCardlistResponse, TrelloApi.CardlistApi.CopyCardlistRequest>(
       {
         query: (data) => ({
@@ -99,6 +100,27 @@ export const CardListApiSlice = createApi({
       query: ({ cardListId }) => ({
         method: 'PATCH',
         url: `/api/cardlist/archive_card_list/${cardListId}`
+      })
+    }),
+    getCardListArchiveByBoardId: build.mutation<TrelloApi.CardlistApi.ArchiveCardlistResponse, string>({
+      query: (boardID) => ({
+        url: `/api/cardlist/cardlist_archived_by_board/${boardID}`,
+        method: 'GET'
+      })
+    }),
+    restoreCartListByBoard: build.mutation<TrelloApi.CardlistApi.GetallCardlistNonArchivedByBoardIdResponse, string>({
+      query: (boardId) => ({
+        url: `/api/cardlist/cardlist_non_archived_by_board/${boardId}`,
+        method: 'POST'
+      })
+    }),
+    deleteCardListByBoard: build.mutation<
+      TrelloApi.CardlistApi.GetallCardlistArchivedByBoardIdResponse,
+      TrelloApi.CardlistApi.DeleteCardlistsByBoardIdRequest
+    >({
+      query: (boardID) => ({
+        url: `/api/cardlist/delete_cardlists_by_board_id/${boardID}`,
+        method: 'POST'
       })
     })
   })

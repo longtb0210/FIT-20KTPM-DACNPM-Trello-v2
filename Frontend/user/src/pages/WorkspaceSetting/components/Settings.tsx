@@ -24,7 +24,7 @@ export const Settings: React.FC = () => {
   const [deleteWorkspaceName, setDeleteWorkspaceName] = useState<string>('')
   const [resetUseStateManual, setResetUseStateManual] = useState<boolean>(false)
   useEffect(() => {
-    getWorkspaceInfo({ id: workspaceId && workspaceId !== '123' ? (workspaceId as string) : workspace_id })
+    getWorkspaceInfo(workspaceId && workspaceId !== '123' ? (workspaceId as string) : workspace_id)
   }, [resetUseStateManual])
 
   useEffect(() => {

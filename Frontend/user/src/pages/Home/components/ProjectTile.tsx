@@ -4,6 +4,7 @@ import { useTheme } from '~/components/Theme/themeContext'
 import { WorkspaceApiRTQ } from '~/api'
 import React from 'react'
 import { DbSchemas } from '@trello-v2/shared'
+import { Link } from 'react-router-dom'
 
 interface ProjectTileProps {
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -33,15 +34,14 @@ const ProjectTile: React.FC<ProjectTileProps> = ({ boardData }) => {
       onMouseEnter={() => setIsHovered(true)} // Khi hover vào div, setIsHovered(true)
       onMouseLeave={() => setIsHovered(false)} // Khi rời khỏi div, setIsHovered(false)
     >
-      <a
-        href={`/workspace/${boardData.workspace_id}&${boardData._id}`}
+      <Link
+        to={`/workspace/${boardData.workspace_id}/board/${boardData._id}`}
         className='relative m-0 box-border flex h-12 w-full cursor-pointer items-center rounded border-0 p-0 py-2 pl-2 pr-10 font-normal text-gray-700 no-underline shadow-none transition hover:bg-[#091e4224]'
       >
         <div
           className='mr-2 block h-6 w-8 flex-initial rounded bg-cover'
           style={{
-            backgroundImage:
-              'url("https://trello-backgrounds.s3.amazonaws.com/SharedBackground/480x270/09b457ee43a8833c515e9d3d5796f59f/photo-1698859858637-9aa64302f629.jpg")'
+            backgroundImage: `url(${boardData.background || 'https://trello-backgrounds.s3.amazonaws.com/SharedBackground/480x270/09b457ee43a8833c515e9d3d5796f59f/photo-1698859858637-9aa64302f629.jpg'})`
           }}
         ></div>
         <span className='mr-2 block overflow-hidden'>
@@ -55,10 +55,10 @@ const ProjectTile: React.FC<ProjectTileProps> = ({ boardData }) => {
             className='mt-0 block overflow-hidden text-ellipsis whitespace-nowrap text-xs font-normal leading-3 text-gray-700'
             style={{ color: colors.text }}
           >
-            {workspaceData?.data.description}
+            {workspaceData?.data.name}
           </span>
         </span>
-      </a>
+      </Link>
       {/* Hiển thị icon ngôi sao khi hover vào ProjectTile hoặc khi hover vào icon */}
       {(isHovered || isStar) && (
         <button
