@@ -224,7 +224,7 @@ export function CardMemberModal({
         sx={{
           width: 304,
           height: 'fit-content',
-          padding: '4px 8px',
+          padding: '4px 8px 12px 8px',
           color: colors.text,
           backgroundColor: colors.background_modal_secondary
         }}

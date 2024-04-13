@@ -25,7 +25,7 @@ export function WorkspaceBoardsPageCardAdd() {
     <React.Fragment>
       <Box
         sx={{
-          width: 300,
+          maxWidth: 300,
           height: 96,
           padding: '8px',
           color: colors.text,
