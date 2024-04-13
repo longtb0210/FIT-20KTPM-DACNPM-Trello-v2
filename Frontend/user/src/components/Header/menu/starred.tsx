@@ -146,7 +146,7 @@ export default function Starred() {
 
   console.log(listBoard)
 
-  const updateStar = (index: number, item: Board) => {
+  const updateStar = (index: number) => {
     const boardId = listBoard && listBoard[index] ? listBoard[index]._id : undefined
 
     if (boardId) {
@@ -155,28 +155,7 @@ export default function Starred() {
         is_star: false
       })
         .then(() => {
-          if (item?._id !== undefined) {
-            getAllBoardById({ workspace_id: item._id })
-              .then((res) => {
-                const responseData = res.data
-                if (responseData && responseData.data) {
-                  const updatedListBoard = responseData.data.map((board) => ({
-                    name: board.name ?? '',
-                    workspace_id: board.workspace_id ?? '',
-                    background: board.background ?? '',
-                    background_list: board.background_list ?? [],
-                    activities: board.activities ?? [],
-                    _id: board._id ?? '',
-                    workspace_name: item.name ?? '',
-                    is_star: board.is_star ?? false
-                  }))
-                  setListBoard(updatedListBoard as Board[])
-                }
-              })
-              .catch((error) => {
-                console.error('Error fetching boards:', error)
-              })
-          }
+          setListBoard((prevList) => prevList.filter((board, i) => i !== index))
         })
         .catch((error) => {
           console.error('Error updating board:', error)
@@ -335,7 +314,11 @@ export default function Starred() {
                             </Box>
 
                             <FontAwesomeIcon
-                              onClick={() => updateStar(index, board)}
+                              onClick={(event) => {
+                                event.stopPropagation()
+                                event.preventDefault()
+                                updateStar(index)
+                              }}
                               icon={starFull}
                               style={{
                                 color: 'orange',

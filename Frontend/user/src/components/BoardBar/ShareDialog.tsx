@@ -10,7 +10,6 @@ import Avatar from '@mui/material/Avatar'
 import { stringToColor } from '~/utils/StringToColor'
 import React from 'react'
 import { BoardApiRTQ, UserApiRTQ } from '~/api'
-import { board_id } from '~/api/getInfo'
 
 interface Props {
   open: boolean
@@ -27,15 +26,21 @@ const isValidEmail = (email: string) => {
 function stringAvatar(name: string) {
   let abbreviation = ''
 
-  if (name.includes(' ')) {
-    // Nếu tên có ít nhất một khoảng trắng, lấy hai chữ cái đầu tiên từ các từ
-    abbreviation = name
-      .split(' ')
-      .map((word) => word[0])
-      .join('')
+  // Kiểm tra xem tham số name có tồn tại không
+  if (name) {
+    if (name.includes(' ')) {
+      // Nếu tên có ít nhất một khoảng trắng, lấy hai chữ cái đầu tiên từ các từ
+      abbreviation = name
+        .split(' ')
+        .map((word) => word[0])
+        .join('')
+    } else {
+      // Nếu tên chỉ có một từ, lấy chữ cái đầu tiên của từ đó
+      abbreviation = name[0].toUpperCase()
+    }
   } else {
-    // Nếu tên chỉ có một từ, lấy chữ cái đầu tiên của từ đó
-    abbreviation = name[0].toUpperCase()
+    // Xử lý trường hợp name không tồn tại (undefined hoặc null)
+    abbreviation = 'N/A'
   }
 
   return {
@@ -90,8 +95,15 @@ export default function ShareDialog({ open, handleCloseShare, boardID }: Props) 
     setEmailInput(event.target.value)
   }
 
+  const storedProfile = localStorage.getItem('profile')
+  const [profile, setProFile] = React.useState({ email: '', name: '' })
   React.useEffect(() => {
-    getUserByEmail({ email: 'nguyeenkieen141@gmail.com' }).then((a) => console.log(a))
+    const profileSave = storedProfile ? JSON.parse(storedProfile) : { email: '', name: '' }
+    setProFile({ ...profileSave })
+  })
+
+  React.useEffect(() => {
+    getUserByEmail({ email: profile.email }).then((a) => console.log(a))
   }, [getUserByEmail])
   return (
     <Dialog open={open} onClose={handleCloseShare} aria-labelledby='alert-dialog-title' className='rounded-[10px]'>

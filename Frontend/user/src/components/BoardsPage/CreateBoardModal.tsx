@@ -9,6 +9,42 @@ import { BoardApiRTQ, WorkspaceApiRTQ } from '~/api'
 import { Workspace } from '@trello-v2/shared/src/schemas/Workspace'
 import { useNavigate } from 'react-router-dom'
 
+const bg_image = [
+  {
+    img: 'https://images.unsplash.com/photo-1709374601273-57d0a44c9437?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3MDY2fDB8MXxjb2xsZWN0aW9ufDF8MzE3MDk5fHx8fHwyfHwxNzEwMDQzNDc1fA&ixlib=rb-4.0.3&q=80&w=400'
+  },
+  {
+    img: 'https://images.unsplash.com/photo-1708913156538-7c5fcbd22db5?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3MDY2fDB8MXxjb2xsZWN0aW9ufDJ8MzE3MDk5fHx8fHwyfHwxNzEwMDQzNDc1fA&ixlib=rb-4.0.3&q=80&w=400'
+  },
+  {
+    img: 'https://images.unsplash.com/photo-1709480955041-274cfe798bb0?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3MDY2fDB8MXxjb2xsZWN0aW9ufDN8MzE3MDk5fHx8fHwyfHwxNzEwMDQzNDc1fA&ixlib=rb-4.0.3&q=80&w=400'
+  },
+  {
+    img: 'https://images.unsplash.com/photo-1706661849307-9f0ff8155bc9?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3MDY2fDB8MXxjb2xsZWN0aW9ufDR8MzE3MDk5fHx8fHwyfHwxNzEwMDQzNDc1fA&ixlib=rb-4.0.3&q=80&w=400'
+  }
+]
+
+const bg_color = [
+  {
+    color: 'linear-gradient(to bottom right, #E774BB, #943D73)'
+  },
+  {
+    color: 'linear-gradient(to right bottom, rgb(134, 239, 172), rgb(59, 130, 246), rgb(147, 51, 234))'
+  },
+  {
+    color: 'linear-gradient(to right bottom, rgb(249, 168, 212), rgb(216, 180, 254), rgb(129, 140, 248))'
+  },
+  {
+    color: 'linear-gradient(to right bottom, rgb(254, 240, 138), rgb(187, 247, 208), rgb(34, 197, 94))'
+  },
+  {
+    color: 'linear-gradient(to right bottom, rgb(165, 180, 252), rgb(192, 132, 252))'
+  },
+  {
+    color: 'linear-gradient(to right bottom, rgb(15, 23, 42), rgb(88, 28, 135), rgb(15, 23, 42))'
+  }
+]
+
 const visibilityOptions = ['Private', 'Workspace', 'Public']
 type VisibilityType = 'private' | 'public' | 'workspace'
 
@@ -29,6 +65,7 @@ export default function CreateBoardModal({ anchorEl, workspaceId, isOpen, handle
   const [allWorkspaces, setAllWorkspaces] = useState<Workspace[]>([])
   const [selectedWorkspace, setSelectedWorkspace] = useState('')
   const [selectedVisibility, setSelectedVisibility] = useState<VisibilityType>('private')
+  const [activeBg, setActiveBg] = useState({ check: true, index: 0, type: 'color', data: bg_color[0].color })
 
   //API
   const [getAllWorkspacesAPI] = WorkspaceApiRTQ.WorkspaceApiSlice.useLazyGetAllWorkspaceQuery()
@@ -57,7 +94,7 @@ export default function CreateBoardModal({ anchorEl, workspaceId, isOpen, handle
         name: textFieldValue.trim(),
         workspace_id: selectedWorkspace,
         visibility: selectedVisibility,
-        background: ''
+        background: activeBg.data
       })
         .unwrap()
         .then((response) => {
@@ -80,6 +117,10 @@ export default function CreateBoardModal({ anchorEl, workspaceId, isOpen, handle
 
   function handleSelectVisibility(event: SelectChangeEvent) {
     setSelectedVisibility(event.target.value as VisibilityType)
+  }
+
+  const handleActiveBg = (type: string, index: number, data: string) => {
+    setActiveBg({ check: true, type, index, data })
   }
 
   return (
@@ -148,15 +189,14 @@ export default function CreateBoardModal({ anchorEl, workspaceId, isOpen, handle
         {/* END: Header */}
         {/* START: Body */}
         <Box sx={{ height: 'fit-content' }}>
-          {/* Board preview */}
+          {/* ----- */}
           <Box
             sx={{
               display: 'flex',
               alignItems: 'center',
               justifyContent: 'center',
               margin: '12px auto',
-              backgroundImage:
-                'url("https://trello-backgrounds.s3.amazonaws.com/SharedBackground/480x320/69360d5ef9e7535cda824ab868bb1628/photo-1708058885492-09ef26cd4af8.jpg")',
+              backgroundImage: activeBg.type === 'image' ? `url("${activeBg.data}")` : activeBg.data,
               backgroundSize: 'cover',
               backgroundPosition: 'center',
               width: '200px',
@@ -166,154 +206,102 @@ export default function CreateBoardModal({ anchorEl, workspaceId, isOpen, handle
           >
             <img src={bgHeader} alt='' />
           </Box>
-          {/* Select board background */}
-          <p style={{ fontSize: '12px', fontWeight: 700, marginBottom: '4px', color: colors.secondary }}>Background</p>
+
+          <p style={{ fontSize: '12px', fontWeight: 700, marginBottom: '4px', color: colors.text }}>Background</p>
           <Box sx={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
-            <Box
-              sx={{
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'center',
-                backgroundImage:
-                  'url("https://trello-backgrounds.s3.amazonaws.com/SharedBackground/480x320/69360d5ef9e7535cda824ab868bb1628/photo-1708058885492-09ef26cd4af8.jpg")',
-                backgroundSize: 'cover',
-                backgroundPosition: 'center',
-                width: '25%',
-                height: '40px',
-                borderRadius: '4px',
-                position: 'relative',
-                overflow: 'hidden',
-                '&:hover::before': {
-                  content: '""',
-                  position: 'absolute',
-                  top: 0,
-                  left: 0,
-                  right: 0,
-                  bottom: 0,
-                  background: 'rgba(255, 255, 255, 0.2)'
-                }
-              }}
-            >
-              <Box
-                sx={{
-                  width: '100%',
-                  height: '100%',
-                  display: 'flex',
-                  alignItems: 'center',
-                  justifyContent: 'center',
-                  backgroundColor: 'rgba(255, 255, 255, 0.2)'
-                }}
-              >
-                <FontAwesomeIcon icon={faCheck} style={{ fontSize: '12px' }} />
-              </Box>
-            </Box>
-            <Box
-              sx={{
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'center',
-                backgroundImage:
-                  'url("https://trello-backgrounds.s3.amazonaws.com/SharedBackground/480x320/69360d5ef9e7535cda824ab868bb1628/photo-1708058885492-09ef26cd4af8.jpg")',
-                backgroundSize: 'cover',
-                backgroundPosition: 'center',
-                width: '25%',
-                height: '40px',
-                borderRadius: '4px'
-              }}
-            ></Box>
-            <Box
-              sx={{
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'center',
-                backgroundImage:
-                  'url("https://trello-backgrounds.s3.amazonaws.com/SharedBackground/480x320/69360d5ef9e7535cda824ab868bb1628/photo-1708058885492-09ef26cd4af8.jpg")',
-                backgroundSize: 'cover',
-                backgroundPosition: 'center',
-                width: '25%',
-                height: '40px',
-                borderRadius: '4px'
-              }}
-            ></Box>
-            <Box
-              sx={{
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'center',
-                backgroundImage:
-                  'url("https://trello-backgrounds.s3.amazonaws.com/SharedBackground/480x320/69360d5ef9e7535cda824ab868bb1628/photo-1708058885492-09ef26cd4af8.jpg")',
-                backgroundSize: 'cover',
-                backgroundPosition: 'center',
-                width: '25%',
-                height: '40px',
-                borderRadius: '4px'
-              }}
-            ></Box>
+            {bg_image &&
+              bg_image.map((item, index) => (
+                <Box
+                  onClick={() => handleActiveBg('image', index, item.img)}
+                  key={index}
+                  sx={{
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    backgroundImage: `url("${item.img}")`,
+                    backgroundSize: 'cover',
+                    backgroundPosition: 'center',
+                    flex: 1,
+                    height: '40px',
+                    borderRadius: '4px',
+                    position: 'relative',
+                    overflow: 'hidden',
+                    '&:hover::before': {
+                      content: '""',
+                      cursor: 'pointer',
+                      position: 'absolute',
+                      top: 0,
+                      left: 0,
+                      right: 0,
+                      bottom: 0,
+                      background: 'rgba(255, 255, 255, 0.2)'
+                    }
+                  }}
+                >
+                  {activeBg.check && activeBg.type === 'image' && activeBg.index === index && (
+                    <Box
+                      sx={{
+                        width: '100%',
+                        height: '100%',
+                        display: 'flex',
+                        alignItems: 'center',
+                        justifyContent: 'center',
+                        backgroundColor: 'rgba(255, 255, 255, 0.2)'
+                      }}
+                    >
+                      <FontAwesomeIcon icon={faCheck} style={{ fontSize: '12px' }} />
+                    </Box>
+                  )}
+                </Box>
+              ))}
           </Box>
+
           <Box sx={{ display: 'flex', alignItems: 'center', gap: '6px', marginTop: '8px', marginBottom: '12px' }}>
-            <Box
-              sx={{
-                width: '16.67%',
-                height: '32px',
-                borderRadius: '4px',
-                backgroundImage: 'linear-gradient(to bottom right, #E774BB, #943D73)',
-                position: 'relative',
-                overflow: 'hidden',
-                '&:hover::before': {
-                  content: '""',
-                  position: 'absolute',
-                  top: 0,
-                  left: 0,
-                  right: 0,
-                  bottom: 0,
-                  background: 'rgba(255, 255, 255, 0.2)'
-                }
-              }}
-            ></Box>
-            <Box
-              sx={{
-                width: '16.67%',
-                height: '32px',
-                borderRadius: '4px',
-                backgroundImage:
-                  'linear-gradient(to right bottom, rgb(134, 239, 172), rgb(59, 130, 246), rgb(147, 51, 234))'
-              }}
-            ></Box>
-            <Box
-              sx={{
-                width: '16.67%',
-                height: '32px',
-                borderRadius: '4px',
-                backgroundImage:
-                  'linear-gradient(to right bottom, rgb(249, 168, 212), rgb(216, 180, 254), rgb(129, 140, 248))'
-              }}
-            ></Box>
-            <Box
-              sx={{
-                width: '16.67%',
-                height: '32px',
-                borderRadius: '4px',
-                backgroundImage:
-                  'linear-gradient(to right bottom, rgb(254, 240, 138), rgb(187, 247, 208), rgb(34, 197, 94))'
-              }}
-            ></Box>
-            <Box
-              sx={{
-                width: '16.67%',
-                height: '32px',
-                borderRadius: '4px',
-                backgroundImage: 'linear-gradient(to right bottom, rgb(165, 180, 252), rgb(192, 132, 252))'
-              }}
-            ></Box>
-            <Box
-              sx={{
-                width: '16.67%',
-                height: '32px',
-                borderRadius: '4px',
-                backgroundImage: 'linear-gradient(to right bottom, rgb(15, 23, 42), rgb(88, 28, 135), rgb(15, 23, 42))'
-              }}
-            ></Box>
+            {[
+              bg_color &&
+                bg_color.map((item, index) => (
+                  <Box
+                    onClick={() => handleActiveBg('color', index, item.color)}
+                    key={index}
+                    sx={{
+                      flex: 1,
+                      height: '32px',
+                      borderRadius: '4px',
+                      backgroundImage: item.color,
+                      position: 'relative',
+                      overflow: 'hidden',
+                      cursor: 'pointer',
+                      '&:hover::before': {
+                        content: '""',
+                        position: 'absolute',
+                        top: 0,
+                        left: 0,
+                        right: 0,
+                        bottom: 0,
+                        background: 'rgba(255, 255, 255, 0.2)'
+                      }
+                    }}
+                  >
+                    {activeBg.check && activeBg.type === 'color' && activeBg.index === index && (
+                      <Box
+                        sx={{
+                          width: '100%',
+                          height: '100%',
+                          display: 'flex',
+                          alignItems: 'center',
+                          justifyContent: 'center',
+                          backgroundColor: 'rgba(255, 255, 255, 0.2)'
+                        }}
+                      >
+                        <FontAwesomeIcon icon={faCheck} style={{ fontSize: '12px' }} />
+                      </Box>
+                    )}
+                  </Box>
+                ))
+            ]}
           </Box>
+          {/* ------ */}
+
           {/* Input board title */}
           <Box sx={{ marginBottom: '8px' }}>
             <p style={{ fontSize: '12px', fontWeight: 700, color: colors.text, marginBottom: '4px' }}>

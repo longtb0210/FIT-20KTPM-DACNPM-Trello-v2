@@ -183,6 +183,7 @@ function BoardBar() {
               onKeyDown={handleChangeName}
               style={{
                 width: `${Math.max(boardData?.data?.name.length !== undefined ? boardData?.data?.name.length : 5, 1) * 10}px`
+                // minWidth: '50px'
               }}
             />
           </Box>
@@ -442,11 +443,11 @@ function BoardBar() {
         {popupContent}
       </BasePopup>
       <More open={openMore} handleDrawerClose={handleDrawerClose} />
-      {boardId !== undefined ? (
+      {/* {boardId !== undefined ? (
         <ShareDialog open={openShare} handleCloseShare={handleCloseShare} boardID={boardId} />
       ) : (
         ''
-      )}
+      )} */}
       {/* <ShareDialog open={openShare} handleCloseShare={handleCloseShare} boardID={boardId} /> */}
     </>
   )
