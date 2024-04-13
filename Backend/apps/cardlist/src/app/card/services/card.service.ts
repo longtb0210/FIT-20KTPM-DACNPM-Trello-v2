@@ -318,7 +318,7 @@ export class CardService {
       },
       {
         $push: {
-          'cards.$.activities': {
+          'cards.$[i].activities': {
             workspace_id: 'workspace_id',
             content: `<b>${creator_email}</b> has delete a feature`,
             create_time: new Date(),
