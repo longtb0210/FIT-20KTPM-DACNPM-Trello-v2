@@ -6,7 +6,8 @@ import { faXmark } from '@fortawesome/free-solid-svg-icons'
 import { useTheme } from '~/components/Theme/themeContext'
 import { Card } from '@trello-v2/shared/src/schemas/CardList'
 import { Activity } from '@trello-v2/shared/src/schemas/Activity'
-import { BoardApiRTQ, CardApiRTQ } from '~/api'
+import { BoardApiRTQ, CardApiRTQ, WorkspaceApiRTQ } from '~/api'
+import { useParams } from 'react-router-dom'
 
 interface MemberAvatarAndNameProps {
   email: string
@@ -52,6 +53,7 @@ export function CardMemberModal({
   setCurrentCard,
   handleClose
 }: CardMemberModalProps) {
+  const { workspaceId } = useParams()
   const [profile, setProfile] = useState({ email: '', name: '' })
   const storedProfile = localStorage.getItem('profile')
   useEffect(() => {
@@ -65,11 +67,16 @@ export function CardMemberModal({
   // Board member emails
   const [boardMemberListState, setBoardMemberListState] = useState<string[] | undefined>([])
   const [filteredBoardMemberListState, setFilteredBoardMemberListState] = useState<string[] | undefined>([])
+  // Workspace member emails
+  const [workspaceMemberListState, setWorkspaceMemberListState] = useState<string[] | undefined>([])
+  const [filteredWorkspaceMemberListState, setFilteredWorkspaceMemberListState] = useState<string[] | undefined>([])
 
   // API
   const [addCardMemberAPI] = CardApiRTQ.CardApiSlice.useAddCardMemberMutation()
   const [deleteCardMemberAPI] = CardApiRTQ.CardApiSlice.useDeleteCardMemberMutation()
   const [getBoardByIdAPI] = BoardApiRTQ.BoardApiSlice.useLazyGetBoardByIdQuery()
+  const [addBoardMemberAPI] = BoardApiRTQ.BoardApiSlice.useAddMemberToBoardMutation()
+  const [getWorkspaceByIdAPI] = WorkspaceApiRTQ.WorkspaceApiSlice.useLazyGetWorkspaceInfoQuery()
 
   function filterMemberLists(event: React.ChangeEvent<HTMLInputElement>) {
     setSearchValue(event.currentTarget.value)
@@ -83,6 +90,25 @@ export function CardMemberModal({
         .filter((member) => !currentCard.member_email.includes(member))
         .filter((email) => email.toLowerCase().includes(event.currentTarget.value.toLowerCase()))
     )
+    // Filter workspace member list
+    setFilteredWorkspaceMemberListState(
+      workspaceMemberListState!
+        .filter((member) => !currentCard.member_email.includes(member) && !boardMemberListState?.includes(member))
+        .filter((email) => email.toLowerCase().includes(event.currentTarget.value.toLowerCase()))
+    )
+  }
+
+  function addMemberFromWorkspaceToCard(member: string) {
+    addBoardMemberAPI({
+      _id: boardId,
+      email: member
+    })
+      .then(() => {
+        addMemberToCard(member)
+      })
+      .catch((error) => {
+        console.log('ERROR: add member to Card from Workspace - ', error)
+      })
   }
 
   function addMemberToCard(member: string) {
@@ -140,16 +166,36 @@ export function CardMemberModal({
           response.data?.members_email.filter((member) => !currentCard.member_email.includes(member))
         )
       })
+      .catch((error) => {
+        console.log('ERROR: fetch board members - ', error)
+      })
+  }
+
+  function fetchWorkspaceMembers() {
+    getWorkspaceByIdAPI(workspaceId!)
+      .unwrap()
+      .then((response) => {
+        setWorkspaceMemberListState(response.data.members.map((member) => member.email!))
+      })
+      .catch((error) => {
+        console.log('ERROR: fetch workspace members - ', error)
+      })
   }
 
   useEffect(() => {
     fetchBoardMembers()
+    fetchWorkspaceMembers()
   })
 
   useEffect(() => {
     setCardMemberListState(currentCard.member_email)
     setFilteredBoardMemberListState(
       boardMemberListState!.filter((member) => !currentCard.member_email.includes(member))
+    )
+    setFilteredWorkspaceMemberListState(
+      workspaceMemberListState!.filter(
+        (member) => !currentCard.member_email.includes(member) && !boardMemberListState?.includes(member)
+      )
     )
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [boardMemberListState, currentCard])
@@ -243,6 +289,24 @@ export function CardMemberModal({
                   email={email}
                   bgColor={stringToColor(email)}
                   onClick={() => addMemberToCard(email)}
+                />
+              ))}
+            </Box>
+          </div>
+        )}
+        {/* Workspace member list */}
+        {filteredWorkspaceMemberListState!.length != 0 && (
+          <div>
+            <p style={{ margin: '20px 0 10px 0', color: colors.text }} className='text-xs font-semibold'>
+              Workspace members
+            </p>
+            <Box className='flex flex-col'>
+              {filteredWorkspaceMemberListState!.map((email, index) => (
+                <MemberAvatarAndName
+                  key={index}
+                  email={email}
+                  bgColor={stringToColor(email)}
+                  onClick={() => addMemberFromWorkspaceToCard(email)}
                 />
               ))}
             </Box>

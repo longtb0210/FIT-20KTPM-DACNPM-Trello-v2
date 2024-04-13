@@ -189,19 +189,17 @@ export function CardLabelListModal({
         <p style={{ margin: '10px 0', color: colors.text }} className='text-xs font-semibold'>
           Labels
         </p>
-        {boardLabels
-          .filter((label) => label.name.toLowerCase().includes(searchValue.toLowerCase()))
-          .map((label, index) => (
-            <CardLabelListTile
-              key={index}
-              currentLabel={label}
-              setSelectedLabel={setSelectedLabel}
-              isChecked={isLabelIncluded(label)}
-              handleIncludeLabel={(label) => handleIncludeLabel(label)}
-              handleExcludeLabel={(label) => handleExcludeLabel(label)}
-              openEditLabelModal={openEditLabelModal}
-            />
-          ))}
+        {boardLabels.map((label, index) => (
+          <CardLabelListTile
+            key={index}
+            currentLabel={label}
+            setSelectedLabel={setSelectedLabel}
+            isChecked={isLabelIncluded(label)}
+            handleIncludeLabel={(label) => handleIncludeLabel(label)}
+            handleExcludeLabel={(label) => handleExcludeLabel(label)}
+            openEditLabelModal={openEditLabelModal}
+          />
+        ))}
         {/* Line */}
         <Box sx={{ width: '100%', height: 2, margin: '10px 0 4px 0', padding: '0 12px' }}>
           <Box sx={{ width: '100%', height: 2, bgcolor: colors.button }}></Box>

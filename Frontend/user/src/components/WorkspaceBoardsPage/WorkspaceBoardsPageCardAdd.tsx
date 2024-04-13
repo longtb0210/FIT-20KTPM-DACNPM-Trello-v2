@@ -3,8 +3,10 @@ import React from 'react'
 import { useState } from 'react'
 import { useTheme } from '../Theme/themeContext'
 import CreateBoardModal from '../BoardsPage/CreateBoardModal'
+import { useParams } from 'react-router-dom'
 
 export function WorkspaceBoardsPageCardAdd() {
+  const { workspaceId } = useParams()
   const { colors } = useTheme()
   const [anchorEl, setAnchorEl] = useState<HTMLDivElement | null>(null)
   const [openModal, setOpenModal] = useState(false)
@@ -45,7 +47,14 @@ export function WorkspaceBoardsPageCardAdd() {
           <p className='text-sm font-semibold'>Create new board</p>
         </Box>
       </Box>
-      {openModal && <CreateBoardModal anchorEl={anchorEl} isOpen={openModal} handleCloseDialog={handleCloseDialog} />}
+      {openModal && (
+        <CreateBoardModal
+          anchorEl={anchorEl}
+          workspaceId={workspaceId!}
+          isOpen={openModal}
+          handleCloseDialog={handleCloseDialog}
+        />
+      )}
     </React.Fragment>
   )
 }
