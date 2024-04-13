@@ -31,12 +31,38 @@ export default function ListSetting({ closeListSetting, setAddCardOnTop, list }:
   // const board_id = params.boardId
   const [copyCardList] = CardlistApiRTQ.CardListApiSlice.useCopyCardListMutation()
   const [archiveAllCard] = CardlistApiRTQ.CardListApiSlice.useArchiveAllCardInCardListMutation()
-  const [archiveCardList] = CardlistApiRTQ.CardListApiSlice.useArchiveCardListMutation()
+  const [removeWatcherCardList] = CardlistApiRTQ.CardListApiSlice.useRemoveWatcherCardListMutation()
+  // const [archiveCardList] = CardlistApiRTQ.CardListApiSlice.useArchiveCardListMutation()
+  const [sortCardOldestOrder, { data: mydata }] = CardlistApiRTQ.CardListApiSlice.useLazySortCardOldestQuery()
+  const [updateCardList] = CardlistApiRTQ.CardListApiSlice.useUpdateCardListMutation()
   const [getAllCardlistByBoardId] = CardlistApiRTQ.CardListApiSlice.useLazyGetCardlistByBoardIdQuery()
+  const [addWatcherAPI] = CardlistApiRTQ.CardListApiSlice.useAddWatcherCardListMutation()
+  const [profile, setProfile] = useState({ email: '' })
+
+  const storedProfile = localStorage.getItem('profile')
+  useEffect(() => {
+    const profileSave = storedProfile ? JSON.parse(storedProfile) : { email: '' }
+    setProfile({ ...profileSave })
+  }, [storedProfile])
   const handleChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     const newValue = event.target.value
     setValue(newValue)
     setIsEmpty(newValue.trim() === '')
+  }
+  const handleSortCardOldestOrder = () => {
+    sortCardOldestOrder({
+      id: list._id
+    }).then(() => {
+      getAllCardlistByBoardId({ id: list.board_id })
+    })
+  }
+  const handleAddWatcher = () => {
+    addWatcherAPI({
+      email: profile.email,
+      _id: list._id
+    }).then(() => {
+      getAllCardlistByBoardId({ id: list.board_id })
+    })
   }
   const handleCopyList = () => {
     if (isEmpty) {
@@ -71,9 +97,19 @@ export default function ListSetting({ closeListSetting, setAddCardOnTop, list }:
     }).then(() => getAllCardlistByBoardId({ id: list.board_id }))
   }
   const handleArchiveList = () => {
-    archiveCardList({
-      cardListId: list._id
+    updateCardList({
+      _id: list._id,
+      archive_at: new Date()
     }).then(() => getAllCardlistByBoardId({ id: list.board_id }))
+  }
+  const handleRemoveWatcher = () => {
+    console.log('email: ', profile.email)
+    removeWatcherCardList({
+      _id: list._id,
+      watcher: profile.email
+    }).then(() => {
+      getAllCardlistByBoardId({ id: list.board_id })
+    })
   }
   return (
     <div
@@ -261,7 +297,18 @@ export default function ListSetting({ closeListSetting, setAddCardOnTop, list }:
               >
                 Move list
               </button>
-              <button className={`m-0 w-full p-2 text-left hover:bg-gray-200`}>Watch</button>
+              <button
+                className={`m-0 w-full p-2 text-left hover:bg-gray-200`}
+                onClick={() => {
+                  if (list.watcher_email.includes(profile.email)) {
+                    handleRemoveWatcher()
+                  } else {
+                    handleAddWatcher()
+                  }
+                }}
+              >
+                Watch
+              </button>
             </div>
             <div className='my-2 flex justify-center'>
               <hr className={`h-[1px] w-11/12 border-0 ${darkMode ? 'bg-gray-500' : 'bg-gray-300'}`}></hr>
@@ -269,7 +316,9 @@ export default function ListSetting({ closeListSetting, setAddCardOnTop, list }:
             <div className={``}>
               <p className={`w-full p-2 text-left text-xs font-bold`}>Sort by...</p>
               <button className={`m-0 w-full p-2 text-left hover:bg-gray-200`}>Dated created (newest List)</button>
-              <button className={`m-0 w-full p-2 text-left hover:bg-gray-200`}>Dated created (oldest List)</button>
+              <button className={`m-0 w-full p-2 text-left hover:bg-gray-200`} onClick={handleSortCardOldestOrder}>
+                Dated created (oldest List)
+              </button>
               <button className={`m-0 w-full p-2 text-left hover:bg-gray-200`}>Card name (alphabetically)</button>
             </div>
             <div className='my-2 flex justify-center'>

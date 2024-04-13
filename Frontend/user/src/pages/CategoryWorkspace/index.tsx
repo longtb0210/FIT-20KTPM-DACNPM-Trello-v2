@@ -64,7 +64,7 @@ export function CategoryWorkspace() {
   }
 
   return (
-    <div className='overflow-auto'>
+    <div>
       <Box sx={{ display: 'flex' }}>
         <CssBaseline />
         <AppBar

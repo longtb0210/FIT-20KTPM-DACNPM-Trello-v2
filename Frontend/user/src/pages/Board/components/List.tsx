@@ -14,6 +14,7 @@ import { CardApiRTQ, CardlistApiRTQ } from '~/api'
 import { TrelloApi } from '@trello-v2/shared'
 import { board_id } from '~/api/getInfo'
 import { useParams } from 'react-router-dom'
+import { MdOutlineRemoveRedEye } from 'react-icons/md'
 export default function ListComponent({
   list,
   index,
@@ -25,6 +26,12 @@ export default function ListComponent({
 }: ListComponentProps) {
   const params = useParams()
   const boardId = params.boardId
+  const [profile, setProfile] = useState({ email: '' })
+  const storedProfile = localStorage.getItem('profile')
+  useEffect(() => {
+    const profileSave = storedProfile ? JSON.parse(storedProfile) : { email: '' }
+    setProfile({ ...profileSave })
+  }, [storedProfile])
   const [cardsData, setCardsData] = useState<Card[]>([])
   const [createCard] = CardApiRTQ.CardApiSlice.useCreateCardMutation()
   const [createCardOnTop, { data: createCardRes }] = CardApiRTQ.CardApiSlice.useCreateCardMutation()
@@ -174,7 +181,7 @@ export default function ListComponent({
   })
   const [isHovered, setIsHovered] = useState(false)
   const styleList = {
-    transform: CSS.Translate.toString(transform),
+    transform: CSS.Transform.toString(transform),
     opacity: isDragging ? 0.5 : undefined,
     height: '100%',
     backgroundColor: darkMode ? 'black' : '#f1f2f6',
@@ -229,7 +236,12 @@ export default function ListComponent({
                 onFocus={handleInputFocus}
               />
             )}
-
+            {list.watcher_email && list.watcher_email.includes(profile.email) && (
+              <MdOutlineRemoveRedEye
+                size={'20px'}
+                className={` top-50 absolute right-10 rounded-lg   ${darkMode ? 'hover:bg-gray-600' : 'hover:bg-gray-300'}`}
+              />
+            )}
             <HiOutlineDotsHorizontal
               size={'20px'}
               className={` top-50 absolute right-0 rounded-lg   ${darkMode ? 'hover:bg-gray-600' : 'hover:bg-gray-300'}`}

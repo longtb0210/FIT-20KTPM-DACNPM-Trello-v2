@@ -1,7 +1,15 @@
 import { createApi, fetchBaseQuery } from '@reduxjs/toolkit/query/react'
 import { TrelloApi } from '@trello-v2/shared'
 import { RootState } from '~/store'
+type CardlistIndex = {
+  cardlist_id: string
+  index: number
+}
 
+type MoveListType = {
+  board_id: string
+  cardlist_id_idx: CardlistIndex[]
+}
 export const CardListApiSlice = createApi({
   reducerPath: 'CardlistApi',
   baseQuery: fetchBaseQuery({
@@ -64,10 +72,7 @@ export const CardListApiSlice = createApi({
         }
       })
     }),
-    moveCardList: build.mutation<
-      TrelloApi.CardlistApi.MoveCardlistInBoardResponse,
-      TrelloApi.CardlistApi.MoveCardlistInBoardRequest
-    >({
+    moveCardList: build.mutation<TrelloApi.CardlistApi.MoveCardlistInBoardResponse, MoveListType>({
       query: (data) => ({
         method: 'PUT',
         url: '/api/cardlist/move_cardlists_in_board',
@@ -96,6 +101,16 @@ export const CardListApiSlice = createApi({
         url: `/api/cardlist/archive_cards_in_list/${cardListId}`
       })
     }),
+    addWatcherCardList: build.mutation<
+      TrelloApi.CardlistApi.AddWatcherResponse,
+      TrelloApi.CardlistApi.AddWatcherRequest
+    >({
+      query: (data) => ({
+        method: 'PATCH',
+        url: `/api/cardlist/add_watcher/`,
+        body: { ...data }
+      })
+    }),
     archiveCardList: build.mutation<TrelloApi.CardlistApi.ArchiveAllCardsInListResponse, { cardListId: string }>({
       query: ({ cardListId }) => ({
         method: 'PATCH',
@@ -121,6 +136,20 @@ export const CardListApiSlice = createApi({
       query: (boardID) => ({
         url: `/api/cardlist/delete_cardlists_by_board_id/${boardID}`,
         method: 'POST'
+      })
+    }),
+    removeWatcherCardList: build.mutation<null, { _id: string; watcher: string }>({
+      query: (data) => ({
+        method: 'PATCH',
+        url: `/api/cardlist/remove_watcher/`,
+        body: { ...data }
+      })
+    }),
+    sortCardOldest: build.query<TrelloApi.CardlistApi.SortCardlistByOldestDateResponse, { id: string }>({
+      query: ({ id }) => ({
+        method: 'GET',
+        url: `/api/cardlist/sort_oldest_cards/${id}`
+
       })
     })
   })
