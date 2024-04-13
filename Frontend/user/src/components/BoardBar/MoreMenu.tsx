@@ -9,7 +9,8 @@ import { useTheme } from '../Theme/themeContext'
 import { faBoxArchive, faCheck, faCopy, faEye, faList, faRightFromBracket } from '@fortawesome/free-solid-svg-icons'
 import ChangeBackground from './ConponentMoreMenu/ChangeBackground'
 import { BoardApiRTQ } from '~/api'
-
+import ArchivedItems from './ConponentMoreMenu/ArchiveCard'
+import Activity from './ConponentMoreMenu/Activity'
 const drawerWidth = 320
 
 const DrawerHeader = styled('div')(({ theme }) => ({
@@ -30,26 +31,29 @@ const MoreMenu: React.FC<Props> = ({ open, handleDrawerClose }) => {
   const url = window.location.href
   const workspaceIndex = url.indexOf('workspace/')
   const idsPart = url.substring(workspaceIndex + 'workspace/'.length)
-  const [boardId] = idsPart.split('&')
-  const { colors } = useTheme()
-  const [isOpenChangeBg, setOpenBg] = React.useState(false)
+  const [workspaceId, boardId] = idsPart.split('&')
+  const { colors, darkMode } = useTheme()
   const [isWatching, setWatch] = React.useState<boolean>(true)
-  // const [getBoardById, { data: boardData }] = BoardApiRTQ.BoardApiSlice.useLazyGetBoardByIdQuery()
+  const [getBoardById, { data: boardData }] = BoardApiRTQ.BoardApiSlice.useLazyGetBoardByIdQuery()
   const [addWatcherToBoard] = BoardApiRTQ.BoardApiSlice.useAddWatcherMemberMutation()
   const [removeWatcherFromBoard] = BoardApiRTQ.BoardApiSlice.useRemoveWatcherMemberMutation()
   const [removeMemberInBoardByEmail] = BoardApiRTQ.BoardApiSlice.useRemoveMemberInBoardByEmailMutation()
 
-  const handleChangeBgClose = () => {
-    setOpenBg(false)
+  const [openDrawerIndex, setOpenDrawerIndex] = React.useState(null)
+
+  const handleDrawerOpen = (index: number | React.SetStateAction<null>) => {
+    setOpenDrawerIndex(index)
   }
-  const handleChangeBgOpen = () => {
-    setOpenBg(true)
+
+  const handleDetailTabClose = () => {
+    setOpenDrawerIndex(null)
   }
 
   const handleSetWatching = () => {
     setWatch(!isWatching)
-    if (isWatching) addWatcherToBoard({ _id: boardId, email: 'nguyeenkieen141@gmail.com' })
-    else removeWatcherFromBoard({ _id: boardId, email: 'nguyeenkieen141@gmail.com' })
+    if (isWatching) {
+      addWatcherToBoard({ _id: boardId, email: 'nguyeenkieen141@gmail.com' }).then((a) => console.log(a))
+    } else removeWatcherFromBoard({ _id: boardId, email: 'nguyeenkieen141@gmail.com' })
   }
 
   const handleLeaveBoard = () => {
@@ -71,13 +75,13 @@ const MoreMenu: React.FC<Props> = ({ open, handleDrawerClose }) => {
   }
 
   React.useEffect(() => {
-    // getBoardById(boardId).then((a) => {
-    //   console.log(boardData?.data?.visibility[0])
-    //   if (boardData?.data?.watcher_email.includes('nguyeenkieen141@gmail.com')) {
-    //     setWatch(true)
-    //   }
-    // })
-  })
+    getBoardById(boardId).then((a) => {
+      console.log(boardData)
+      // if (boardData?.data?.watcher_email.includes('nguyeenkieen141@gmail.com')) {
+      //   setWatch(true)
+      // }
+    })
+  }, [boardData, boardId, getBoardById])
 
   // const [activeItem, setActiveItem] = useState<string | null>(null)
 
@@ -121,8 +125,8 @@ const MoreMenu: React.FC<Props> = ({ open, handleDrawerClose }) => {
         <Sidebar width='100%' className='overflow-hidden text-sm'>
           <Menu>
             <MenuItem
-              className={`menu-item h-[50px] bg-[${colors.button}] text-[${colors.text}] hover:bg-[${colors.bg_button_hover}]`}
-              // onClick={() => handleItemClick('boards')}
+              className={`menu-item h-[50px] ${darkMode ? 'bg-[#1D2125] text-white hover:bg-slate-600' : `bg-${colors.button} text-${colors.text} hover:bg-[#DCDFE4]`}`}
+              onClick={() => handleDrawerOpen(0)}
             >
               <div className='flex items-center'>
                 <FontAwesomeIcon icon={faList} fontSize='small' className='mr-4' />
@@ -132,7 +136,8 @@ const MoreMenu: React.FC<Props> = ({ open, handleDrawerClose }) => {
           </Menu>
           <Menu>
             <MenuItem
-              className={`menu-item h-[50px] bg-[${colors.button}] text-[${colors.text}] hover:bg-[${colors.bg_button_hover}]`}
+              className={`menu-item h-[50px] ${darkMode ? 'bg-[#1D2125] text-white hover:bg-slate-700' : `bg-[${colors.button}] text-[${colors.text}] hover:bg-[#DCDFE4]`}`}
+              onClick={() => handleDrawerOpen(1)}
             >
               <div className='flex items-center'>
                 <FontAwesomeIcon icon={faBoxArchive} fontSize='small' className='mr-4' />
@@ -143,9 +148,9 @@ const MoreMenu: React.FC<Props> = ({ open, handleDrawerClose }) => {
           <Divider />
           <Menu>
             <MenuItem
-              className={`menu-item h-[50px] bg-[${colors.button}] text-[${colors.text}] hover:bg-[${colors.bg_button_hover}]`}
+              className={`menu-item h-[50px] ${darkMode ? 'bg-[#1D2125] text-white hover:bg-slate-600' : `bg-${colors.button} text-${colors.text} hover:bg-[#DCDFE4]`}`}
               // onClick={() => handleItemClick('boards')}
-              onClick={handleChangeBgOpen}
+              onClick={() => handleDrawerOpen(2)}
             >
               <div className='flex items-center'>
                 <span
@@ -156,7 +161,8 @@ const MoreMenu: React.FC<Props> = ({ open, handleDrawerClose }) => {
                     borderRadius: '3px',
                     backgroundPosition: '50%',
                     marginRight: '10px',
-                    backgroundImage: `url(${'https://images.unsplash.com/photo-1551963831-b3b1ca40c98e'})`
+                    // backgroundImage: `url(${boardData?.data?.background !== undefined ? boardData?.data?.background : })`
+                    backgroundImage: `url(${boardData?.data?.background || 'https://images.unsplash.com/photo-1551963831-b3b1ca40c98e'})`
                   }}
                 ></span>
                 ChangeBackground
@@ -165,7 +171,8 @@ const MoreMenu: React.FC<Props> = ({ open, handleDrawerClose }) => {
           </Menu>
           <Menu>
             <MenuItem
-              className={`menu-item h-[50px] bg-[${colors.button}] text-[${colors.text}] hover:bg-[${colors.bg_button_hover}]`}
+              className={`menu-item h-[50px] ${darkMode ? 'bg-[#1D2125] text-white hover:bg-slate-600' : `bg-${colors.button} text-${colors.text} hover:bg-[##DCDFE4]`}`}
+
               // onClick={() => handleItemClick('boards')}
             >
               <div className='flex items-center'>
@@ -177,7 +184,8 @@ const MoreMenu: React.FC<Props> = ({ open, handleDrawerClose }) => {
           <Divider />
           <Menu>
             <MenuItem
-              className={`menu-item h-[50px] bg-[${colors.button}] text-[${colors.text}] hover:bg-[${colors.bg_button_hover}]`}
+              className={`menu-item h-[50px] ${darkMode ? 'bg-[#1D2125] text-white hover:bg-slate-600' : `bg-${colors.button} text-${colors.text} hover:bg-[##DCDFE4]`}`}
+
               // onClick={() => handleItemClick('boards')}
             >
               <div className='flex items-center' onClick={handleSetWatching}>
@@ -189,7 +197,8 @@ const MoreMenu: React.FC<Props> = ({ open, handleDrawerClose }) => {
           </Menu>
           <Menu>
             <MenuItem
-              className={`menu-item h-[50px] bg-[${colors.button}] text-[${colors.text}] hover:bg-[${colors.bg_button_hover}]`}
+              className={`menu-item h-[50px] ${darkMode ? 'bg-[#1D2125] text-white hover:bg-slate-600' : `bg-${colors.button} text-${colors.text} hover:bg-[##DCDFE4]`}`}
+
               // onClick={() => handleItemClick('boards')}
             >
               <div className='flex items-center'>
@@ -200,7 +209,8 @@ const MoreMenu: React.FC<Props> = ({ open, handleDrawerClose }) => {
           </Menu>
           <Menu>
             <MenuItem
-              className={`menu-item h-[50px] bg-[${colors.button}] text-[${colors.text}] hover:bg-[${colors.bg_button_hover}]`}
+              className={`menu-item h-[50px] ${darkMode ? 'bg-[#1D2125] text-white hover:bg-slate-600' : `bg-${colors.button} text-${colors.text} hover:bg-[##DCDFE4]`}`}
+
               // onClick={() => handleItemClick('boards')}
             >
               <div className='flex items-center' onClick={handleLeaveBoard}>
@@ -211,7 +221,9 @@ const MoreMenu: React.FC<Props> = ({ open, handleDrawerClose }) => {
           </Menu>
         </Sidebar>
       </Drawer>
-      <ChangeBackground open={isOpenChangeBg} handleDrawerClose={handleChangeBgClose} />
+      <Activity open={openDrawerIndex === 0} handleDrawerClose={handleDetailTabClose} />
+      <ArchivedItems open={openDrawerIndex === 1} handleDrawerClose={handleDetailTabClose} />
+      <ChangeBackground open={openDrawerIndex === 2} handleDrawerClose={handleDetailTabClose} />
     </div>
   )
 }

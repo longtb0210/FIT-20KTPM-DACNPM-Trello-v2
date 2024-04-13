@@ -30,14 +30,14 @@ export const Navigation = () => {
             <Route path='/' element={<HomePage />} />
             <Route path='/profile/:id' element={<AccountManagement page={`profile`} />} />
             <Route path='/template' element={<CardTemplate />} />
-            <Route path='/workspace/:workspaceId' element={<CategoryWorkspace />} />
+            <Route path='/workspace/:workspaceId/:boardId' element={<CategoryWorkspace />} />
             <Route path='/boards' element={<BoardsPage />} />
             <Route path='/activity/:id' element={<AccountManagement page={`activity`} />} />
             <Route path='/cardlist' element={<Board />} />
             <Route path='/carddetail' element={<CardDetailWindow />} />
             <Route path='/workspace/:workspaceId/members' element={<PageMembers />} />
             <Route path='/workspace/:workspaceId/workspaceSetting' element={<WorkspaceSetting />} />
-            <Route path='/workspaceboard/:workspaceId' element={<WorkspaceBoardsPage />} />
+            <Route path='/workspaceboard/:workspaceId/:workspace' element={<WorkspaceBoardsPage />} />
           </Route>
         </Route>
       )}

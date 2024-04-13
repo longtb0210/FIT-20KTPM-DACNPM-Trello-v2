@@ -3,7 +3,6 @@ import StarBorderIcon from '@mui/icons-material/StarBorder'
 import { useTheme } from '~/components/Theme/themeContext'
 import { WorkspaceApiRTQ } from '~/api'
 import React from 'react'
-import { DbSchemas } from '@trello-v2/shared'
 
 interface ProjectTileProps {
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -40,8 +39,7 @@ const ProjectTile: React.FC<ProjectTileProps> = ({ boardData }) => {
         <div
           className='mr-2 block h-6 w-8 flex-initial rounded bg-cover'
           style={{
-            backgroundImage:
-              'url("https://trello-backgrounds.s3.amazonaws.com/SharedBackground/480x270/09b457ee43a8833c515e9d3d5796f59f/photo-1698859858637-9aa64302f629.jpg")'
+            backgroundImage: `url(${boardData.background || 'https://trello-backgrounds.s3.amazonaws.com/SharedBackground/480x270/09b457ee43a8833c515e9d3d5796f59f/photo-1698859858637-9aa64302f629.jpg'})`
           }}
         ></div>
         <span className='mr-2 block overflow-hidden'>
@@ -55,7 +53,7 @@ const ProjectTile: React.FC<ProjectTileProps> = ({ boardData }) => {
             className='mt-0 block overflow-hidden text-ellipsis whitespace-nowrap text-xs font-normal leading-3 text-gray-700'
             style={{ color: colors.text }}
           >
-            {workspaceData?.data.description}
+            {workspaceData?.data.name}
           </span>
         </span>
       </a>

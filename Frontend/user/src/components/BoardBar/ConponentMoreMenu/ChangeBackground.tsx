@@ -6,6 +6,7 @@ import { useTheme } from '~/components/Theme/themeContext'
 import Button from '@mui/material/Button'
 import { LuPlus } from 'react-icons/lu'
 import { BoardApiRTQ } from '~/api'
+import { IoClose } from 'react-icons/io5'
 
 const drawerWidth = 320
 
@@ -95,7 +96,8 @@ const ChangeBackground: React.FC<Props> = ({ open, handleDrawerClose }) => {
   const url = window.location.href
   const workspaceIndex = url.indexOf('workspace/')
   const idsPart = url.substring(workspaceIndex + 'workspace/'.length)
-  const [boardId] = idsPart.split('&')
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  const [workspaceId, boardId] = idsPart.split('&')
 
   const { colors } = useTheme()
 
@@ -105,7 +107,8 @@ const ChangeBackground: React.FC<Props> = ({ open, handleDrawerClose }) => {
   //   setActiveItem(item)
   // }
 
-  const [addBackgroundById, { data: boardData }] = BoardApiRTQ.BoardApiSlice.useAddBackgroundBoardMutation()
+  const [addBackgroundById] = BoardApiRTQ.BoardApiSlice.useAddBackgroundBoardMutation()
+  const [getBoardById, { data: boardData }] = BoardApiRTQ.BoardApiSlice.useLazyGetBoardByIdQuery()
 
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const [selectedFile, setSelectedFile] = useState<any | null>(null)
@@ -116,6 +119,10 @@ const ChangeBackground: React.FC<Props> = ({ open, handleDrawerClose }) => {
 
   // Cập nhật previewUrl khi selectedFile thay đổi
   React.useEffect(() => {
+    getBoardById(boardId).then(() => {
+      // console.log(a)
+      console.log(boardData?.data)
+    })
     if (!selectedFile) {
       setPreviewUrl('')
       return
@@ -126,7 +133,7 @@ const ChangeBackground: React.FC<Props> = ({ open, handleDrawerClose }) => {
 
     // Dọn dẹp khi component unmount hoặc selectedFile thay đổi
     return () => URL.revokeObjectURL(objectUrl)
-  }, [selectedFile])
+  }, [boardData, boardId, getBoardById, selectedFile])
 
   const handleFileChange = (event: ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files && event.target.files[0]
@@ -135,14 +142,38 @@ const ChangeBackground: React.FC<Props> = ({ open, handleDrawerClose }) => {
       // Kiểm tra nếu file có đúng định dạng
       if (file.type === 'image/png' || file.type === 'image/jpeg') {
         setSelectedFile(file)
-        console.log('File đã được chọn:', file)
+        // console.log('File đã được chọn:', file)
         //lưu file vào local
-        addBackgroundById({ id: boardId, background: file })
+        addBackgroundById({ id: boardId, background: file }).then((response) => {
+          // Xử lý response ở đây nếu cần
+          console.log(response)
+        })
+        // .catch((error) => {
+        //   // Kiểm tra nếu có lỗi và hiển thị thông báo
+        //   if (error.response) {
+        //     alert(error.response.data.message) // Hiển thị message từ response
+        //   } else {
+        //     alert('Đã xảy ra lỗi khi thực hiện yêu cầu.')
+        //   }
+        // })
       } else {
         alert('Vui lòng chỉ chọn file có định dạng là PNG hoặc JPG.')
       }
     }
   }
+
+  //Thêm xử lí xóa ảnh
+  const [showCloseIcon, setShowCloseIcon] = useState(false)
+
+  const handleMouseEnter = () => {
+    setShowCloseIcon(true)
+  }
+
+  const handleMouseLeave = () => {
+    setShowCloseIcon(false)
+  }
+
+  const handleDeleteBackGround = () => {}
 
   return (
     <div style={{ position: 'absolute' }}>
@@ -244,8 +275,11 @@ const ChangeBackground: React.FC<Props> = ({ open, handleDrawerClose }) => {
                 marginTop: '15px',
                 borderRadius: '8px'
               }}
+              onMouseEnter={handleMouseEnter}
+              onMouseLeave={handleMouseLeave}
             >
               <ImageSrc style={{ backgroundImage: `url(${previewUrl})` }} />
+              {showCloseIcon && <IoClose onClick={handleDeleteBackGround} />}
               <ImageBackdrop className='MuiImageBackdrop-root' />
             </ImageButton>
           )}
