@@ -15,12 +15,22 @@ export const AccountManagement: React.FC<AccountManagementProps> = ({ page }) =>
   const [getUserInfo, { data: userInfoRes }] = UserApiRTQ.UserApiSlice.useLazyGetUserByEmailQuery()
   const [resetManually, setResetManually] = useState<boolean>()
   const { colors } = useTheme()
+  const [profile, setProfile] = React.useState({ email: '', name: '' })
+
+  const storedProfile = localStorage.getItem('profile')
+  useEffect(() => {
+    const profileSave = storedProfile ? JSON.parse(storedProfile) : { email: '', name: '' }
+    setProfile({ ...profileSave })
+    getUserInfo({
+      email: profile.email
+    })
+  }, [profile.email, storedProfile])
   useEffect(() => {
     setUserInfo(userInfoRes?.data)
   }, [userInfoRes])
   useEffect(() => {
     getUserInfo({
-      email: 'tuitenteo1212@gmail.com'
+      email: profile.email
     })
   }, [resetManually])
   useEffect(() => {

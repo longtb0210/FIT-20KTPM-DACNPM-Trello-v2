@@ -4,6 +4,7 @@ import { useTheme } from '~/components/Theme/themeContext'
 import { WorkspaceApiRTQ } from '~/api'
 import React from 'react'
 import { DbSchemas } from '@trello-v2/shared'
+import { Link } from 'react-router-dom'
 
 interface ProjectTileProps {
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -33,8 +34,8 @@ const ProjectTile: React.FC<ProjectTileProps> = ({ boardData }) => {
       onMouseEnter={() => setIsHovered(true)} // Khi hover vào div, setIsHovered(true)
       onMouseLeave={() => setIsHovered(false)} // Khi rời khỏi div, setIsHovered(false)
     >
-      <a
-        href={`/workspace/${boardData.workspace_id}&${boardData._id}`}
+      <Link
+        to={`/workspace/${boardData.workspace_id}/board/${boardData._id}`}
         className='relative m-0 box-border flex h-12 w-full cursor-pointer items-center rounded border-0 p-0 py-2 pl-2 pr-10 font-normal text-gray-700 no-underline shadow-none transition hover:bg-[#091e4224]'
       >
         <div
@@ -58,7 +59,7 @@ const ProjectTile: React.FC<ProjectTileProps> = ({ boardData }) => {
             {workspaceData?.data.description}
           </span>
         </span>
-      </a>
+      </Link>
       {/* Hiển thị icon ngôi sao khi hover vào ProjectTile hoặc khi hover vào icon */}
       {(isHovered || isStar) && (
         <button

@@ -131,7 +131,7 @@ const InviteForm: React.FC<InviteFormProps> = ({ workspace }) => {
                 </div>
               )}
 
-              <div className='absolute right-0 top-0 mt-4 '>
+              <div className='absolute right-5 top-0 mt-4 '>
                 <button onClick={() => setIsVisible(false)}>
                   <AiOutlineClose className='rounded-md p-1  hover:bg-gray-300' size={`30px`} />
                 </button>
