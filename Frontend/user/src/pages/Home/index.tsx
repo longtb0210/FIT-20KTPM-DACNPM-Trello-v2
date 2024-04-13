@@ -9,20 +9,18 @@ import { BoardApiRTQ, WorkspaceApiRTQ } from '~/api'
 import React, { useState } from 'react'
 
 export default function HomePage() {
-  const storedProfile = localStorage.getItem('profile')
-  const [profile, setProFile] = React.useState({ email: '', name: '' })
   const { darkMode, colors } = useTheme()
 
   const [getAllWorkspaceByEmail, { data: WorkspaceData }] =
     WorkspaceApiRTQ.WorkspaceApiSlice.useLazyGetAllWorkspaceQuery()
 
-  React.useEffect(() => {
-    const profileSave = storedProfile ? JSON.parse(storedProfile) : { email: '', name: '' }
-    setProFile({ ...profileSave })
-  })
+  const storedProfile = localStorage.getItem('profile')
+  const [profile, setProFile] = React.useState({ email: '', name: '' })
 
   React.useEffect(() => {
     getAllWorkspaceByEmail().then((a) => console.log(a))
+    const profileSave = storedProfile ? JSON.parse(storedProfile) : { email: '', name: '' }
+    setProFile({ ...profileSave })
   }, [getAllWorkspaceByEmail])
   // console.log(boardData?.data)
 

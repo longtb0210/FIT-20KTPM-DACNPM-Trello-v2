@@ -10,7 +10,6 @@ import Avatar from '@mui/material/Avatar'
 import { stringToColor } from '~/utils/StringToColor'
 import React from 'react'
 import { BoardApiRTQ, UserApiRTQ } from '~/api'
-import { board_id } from '~/api/getInfo'
 
 interface Props {
   open: boolean
