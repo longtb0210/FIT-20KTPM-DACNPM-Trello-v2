@@ -1,16 +1,14 @@
-import React, { useEffect, useState } from 'react'
+import { useEffect, useState } from 'react'
 import BoardsPageRowTemplate from '~/components/BoardsPage/BoardsPageRowTemplate'
 import { faTrello } from '@fortawesome/free-brands-svg-icons'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 //import AccessTimeIcon from '@mui/icons-material/AccessTime'
-import StarIcon from '@mui/icons-material/Star'
-import { Box, FormControl, Grid, MenuItem, Select, SelectChangeEvent } from '@mui/material'
+import { Box, FormControl, MenuItem, Select, SelectChangeEvent } from '@mui/material'
 import { Workspace } from '@trello-v2/shared/src/schemas/Workspace'
 import { BoardApiRTQ, WorkspaceApiRTQ } from '~/api'
 import BoardsPagegWorkspaceSection from '~/components/BoardsPage/BoardsPageWorkspaceSection'
 import { useTheme } from '~/components/Theme/themeContext'
 import { Board } from '@trello-v2/shared/src/schemas/Board'
-import { BoardsPageCard } from '~/components/BoardsPage/BoardsPageCard'
 import PageWithSidebar from '../Templates'
 
 export type BoardTemplate = {
@@ -163,17 +161,15 @@ export function BoardsPage() {
           </p>
           {/* END: Board Templates section */}
           {/* START: Starred Boards section */}
-          <Box sx={{ height: 28 }}></Box>
+          {/* <Box sx={{ height: 28 }}></Box>
           {allBoards.filter((board) => board.is_star === true).length != 0 && (
             <React.Fragment>
-              {/* Title */}
               <Box style={{ color: colors.text }} className='my-3 flex items-center'>
                 <StarIcon style={{ fontSize: 24 }} />
                 <h2 style={{ fontSize: 16 }} className='ml-2 p-0 text-center font-bold'>
                   Starred boards
                 </h2>
               </Box>
-              {/* Board list */}
               <Grid container spacing={2}>
                 {allBoards
                   .filter((board) => board.is_star === true)
@@ -191,7 +187,7 @@ export function BoardsPage() {
                   ))}
               </Grid>
             </React.Fragment>
-          )}
+          )} */}
           {/* END: Starred Boards section */}
           {/* <Box sx={{ height: 28 }}></Box> */}
           {/* START: Recently Viewed Boards section */}

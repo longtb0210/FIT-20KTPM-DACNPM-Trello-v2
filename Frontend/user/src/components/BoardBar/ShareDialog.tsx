@@ -94,11 +94,13 @@ export default function ShareDialog({ open, handleCloseShare, boardID }: Props) 
   React.useEffect(() => {
     const profileSave = storedProfile ? JSON.parse(storedProfile) : { email: '', name: '' }
     setProFile({ ...profileSave })
-  })
+  }, [storedProfile])
+  console.log(profile)
 
   React.useEffect(() => {
     getUserByEmail({ email: profile.email }).then((a) => console.log(a))
   }, [getUserByEmail])
+
   return (
     <Dialog open={open} onClose={handleCloseShare} aria-labelledby='alert-dialog-title' className='rounded-[10px]'>
       <DialogTitle id='alert-dialog-title' sx={{ display: 'flex', justifyContent: 'space-between' }}>
@@ -132,7 +134,6 @@ export default function ShareDialog({ open, handleCloseShare, boardID }: Props) 
               className={`hover:bg-[${colors.button_hover}]`}
             >
               <option value='member'>Member</option>
-              <option value='member'>Unknow</option>
             </select>
             <Box
               sx={{
@@ -180,12 +181,12 @@ export default function ShareDialog({ open, handleCloseShare, boardID }: Props) 
               }
             >
               <Box sx={{ marginRight: '10px' }}>
-                <Avatar {...stringAvatar(UserData.data.username)} />
+                <Avatar {...stringAvatar(profile.name)} />
               </Box>
               <Box>
-                <Box sx={{ fontSize: '13px', fontWeight: '300x' }}>{UserData.data.username} (you)</Box>
+                <Box sx={{ fontSize: '13px', fontWeight: '300x' }}>{profile.name} (you)</Box>
                 <Box sx={{ fontSize: '12px', fontWeight: '300x' }}>
-                  @{UserData.data.username} - {UserData.data.bio}
+                  @{profile.name} - {profile.email}
                 </Box>
               </Box>
             </ListItem>
