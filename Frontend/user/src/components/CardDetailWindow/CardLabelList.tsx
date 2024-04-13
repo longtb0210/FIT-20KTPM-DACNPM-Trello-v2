@@ -8,7 +8,7 @@ import { Card } from '@trello-v2/shared/src/schemas/CardList'
 import { Feature_CardLabel } from '@trello-v2/shared/src/schemas/Feature'
 import React from 'react'
 import { BoardLabel } from '@trello-v2/shared/src/schemas/Board'
-import { BoardApiRTQ, CardApiRTQ } from '~/api'
+import { BoardApiRTQ, CardApiRTQ, CardlistApiRTQ } from '~/api'
 
 // eslint-disable-next-line react-refresh/only-export-components
 export const labelColors: string[] = [
