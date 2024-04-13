@@ -6,6 +6,7 @@ import { HiLink } from 'react-icons/hi'
 import { Workspace } from '@trello-v2/shared/src/schemas/Workspace'
 import { WorkspaceApiRTQ } from '~/api'
 import WorkspaceInfo from './WorkspaceInfo'
+import { isValidEmail } from '~/utils/fomatter'
 interface InviteFormProps {
   workspace: Workspace | undefined
 }
@@ -18,7 +19,7 @@ const InviteForm: React.FC<InviteFormProps> = ({ workspace }) => {
   const [selectedEmailName, setSelectedEmailName] = useState<string[]>([])
   const [isLoading, setIsLoading] = useState<boolean>(false)
   const [originalEmails, setOriginalEmails] = useState<string[]>(['123@gmail.com', '456@gmail.com', '457@gmail.com'])
-  const [filteredEmails, setFilteredEmails] = useState<string[]>(originalEmails)
+  const [filteredEmails, setFilteredEmails] = useState<string[]>([])
   const [textFocus, setTextFocus] = useState(false)
   const containerRef = useRef<HTMLDivElement>(null)
   const containerRef_Form = useRef<HTMLDivElement>(null)
@@ -59,16 +60,17 @@ const InviteForm: React.FC<InviteFormProps> = ({ workspace }) => {
   const handleInputChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     const { value } = event.target
     setSearchTerm(value)
-
     // Filter emails based on the search term before the "@" symbol
     const filtered = originalEmails.filter((email) => email.split('@')[0].toLowerCase().includes(value.toLowerCase()))
 
-    setFilteredEmails(filtered)
+    setFilteredEmails([value])
   }
 
   const handleEmailSelect = (email: string) => {
-    setSelectedEmail([...selectedEmail, email]) // Only the part before "@"
-    setSearchTerm('') // Set search term to show the selected email
+    if (isValidEmail(email)) {
+      setSelectedEmail([...selectedEmail, email]) // Only the part before "@"
+      setSearchTerm('') // Set search term to show the selected email
+    }
   }
 
   const handleClearEmail = (index: number) => {

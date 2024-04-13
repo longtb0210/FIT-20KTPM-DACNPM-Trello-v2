@@ -9,3 +9,10 @@ export function generatePlaceHolderCard(list: List) {
   } as Card
   return cardPlaceHolder
 }
+export function isValidEmail(email: string) {
+  // Regular expression for validating email addresses
+  const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
+
+  // Test the email against the regular expression
+  return emailRegex.test(email)
+}
