@@ -49,7 +49,12 @@ function BoardBar() {
   const [visibility, setVisibility] = useState<string>()
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const [boardMembers, setBoardMembers] = useState<any[]>([])
+  const storedProfile = localStorage.getItem('profile')
+  const [profile, setProFile] = React.useState({ email: '', name: '' })
   React.useEffect(() => {
+    const profileSave = storedProfile ? JSON.parse(storedProfile) : { email: '', name: '' }
+    setProFile({ ...profileSave })
+
     getBoardById(boardId).then(() => {
       // console.log(boardData?.data?.visibility[0])
       setStarred(boardData?.data?.is_star)
@@ -183,7 +188,6 @@ function BoardBar() {
               onKeyDown={handleChangeName}
               style={{
                 width: `${Math.max(boardData?.data?.name.length !== undefined ? boardData?.data?.name.length : 5, 1) * 10}px`
-                // minWidth: '50px'
               }}
             />
           </Box>
@@ -363,8 +367,8 @@ function BoardBar() {
                   )
                 }
               })}
-            <Tooltip title='you'>
-              <Avatar {...stringAvatar('You')} />
+            <Tooltip title={profile.name}>
+              <Avatar {...stringAvatar(profile.name)} />
             </Tooltip>
           </AvatarGroup>
           <Tooltip title='Share'>
@@ -443,11 +447,11 @@ function BoardBar() {
         {popupContent}
       </BasePopup>
       <More open={openMore} handleDrawerClose={handleDrawerClose} />
-      {/* {boardId !== undefined ? (
+      {boardId !== undefined ? (
         <ShareDialog open={openShare} handleCloseShare={handleCloseShare} boardID={boardId} />
       ) : (
         ''
-      )} */}
+      )}
       {/* <ShareDialog open={openShare} handleCloseShare={handleCloseShare} boardID={boardId} /> */}
     </>
   )
