@@ -117,6 +117,12 @@ interface CardActivityProps {
 }
 
 export default function CardActivity({ cardlistId, cardId, currentCard, setCurrentCard }: CardActivityProps) {
+  const [profile, setProfile] = useState({ email: '', name: '' })
+  const storedProfile = localStorage.getItem('profile')
+  useEffect(() => {
+    const profileSave = storedProfile ? JSON.parse(storedProfile) : { email: '', name: '' }
+    setProfile({ ...profileSave })
+  }, [storedProfile])
   const { colors } = useTheme()
   // const sortedActivities = currentCard.activities
   //   .sort((a, b) => moment(a.create_time).diff(moment(b.create_time)))
@@ -182,7 +188,7 @@ export default function CardActivity({ cardlistId, cardId, currentCard, setCurre
       {/* START: Body */}
       <div style={{ width: '100%' }} className='flex items-start'>
         <Box sx={{ width: 44, marginTop: '2px' }}>
-          <MemberAvatar memberName='TA' bgColor={stringToColor('tailwindcss@gmail.com')} />
+          <MemberAvatar memberName={profile.email.slice(0, 2).toUpperCase()} bgColor={stringToColor(profile.email)} />
         </Box>
         <Box style={{ width: '100%', resize: 'none' }} className='flex flex-col'>
           <TextareaAutosize

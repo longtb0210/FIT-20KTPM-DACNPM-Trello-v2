@@ -52,7 +52,7 @@ export function WorkspaceBoardsPageCard({
     <Link to={`/workspace/${workspaceId}/board/${currentBoard._id}`}>
       <Box
         sx={{
-          width: 300,
+          maxWidth: 300,
           height: 96,
           padding: '8px',
           backgroundColor: currentBoard.background ? undefined : colors.button_hover,
