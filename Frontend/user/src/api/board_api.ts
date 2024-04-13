@@ -120,6 +120,13 @@ const BoardApiSlice = createApi({
         body: { _id },
         method: 'POST'
       })
+    }),
+    addMemberToBoard: builder.mutation<TrelloApi.BoardApi.AddMemberResponse, TrelloApi.BoardApi.AddMemberRequest>({
+      query: (data) => ({
+        url: `/api/board/members/add`,
+        body: data,
+        method: 'POST'
+      })
     })
   })
 })

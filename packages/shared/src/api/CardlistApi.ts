@@ -58,6 +58,21 @@ export const AddWatcherRequestSchema = CardlistSchema.omit({
 );
 export type AddWatcherRequest = z.infer<typeof AddWatcherRequestSchema>;
 
+export const RemoveWatcherRequestSchema = CardlistSchema.omit({
+  board_id: true,
+  index: true,
+  name: true,
+  cards: true,
+  watcher_email: true,
+  archive_at: true,
+  created_at: true,
+}).merge(
+  z.object({
+    watcher: z.string(),
+  })
+);
+export type RemoveWatcherRequest = z.infer<typeof RemoveWatcherRequestSchema>;
+
 export const MoveCardlistRequestSchema = CardlistSchema.omit({
   board_id: true,
   name: true,
@@ -72,18 +87,15 @@ export const MoveCardlistRequestSchema = CardlistSchema.omit({
   })
 );
 export type MoveCardlistRequest = z.infer<typeof MoveCardlistRequestSchema>;
-export const MoveCardlistInBoardRequestSchema = CardlistSchema.omit({
-  board_id: true,
-  name: true,
-  cards: true,
-  watcher_email: true,
-  created_at: true,
-  archive_at: true,
-}).merge(
-  z.object({
-    index: z.number(),
-  })
-);
+export const MoveCardlistInBoardRequestSchema = z.object({
+  board_id: z.string(),
+  cardlist_id_idx: z
+    .object({
+      cardlist_id: z.string(),
+      index: z.number(),
+    })
+    .array(),
+});
 export type MoveCardlistInBoardRequest = z.infer<
   typeof MoveCardlistInBoardRequestSchema
 >;
@@ -174,12 +186,17 @@ export const AddWatcherResponseSchema = z.object({
 });
 export type AddWatcherResponse = z.infer<typeof AddWatcherResponseSchema>;
 
+export const RemoveWatcherResponseSchema = z.object({
+  data: CardlistSchema,
+});
+export type RemoveWatcherResponse = z.infer<typeof RemoveWatcherResponseSchema>;
+
 export const MoveCardlistResponseSchema = z.object({
   data: CardlistSchema,
 });
 export type MoveCardlistResponse = z.infer<typeof MoveCardlistResponseSchema>;
 export const MoveCardlistInBoardResponseSchema = z.object({
-  data: CardlistSchema,
+  data: CardlistSchema.omit({ cards: true }).array(),
 });
 export type MoveCardlistInBoardResponse = z.infer<
   typeof MoveCardlistInBoardResponseSchema

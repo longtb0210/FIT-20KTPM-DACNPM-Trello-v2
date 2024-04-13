@@ -20,13 +20,11 @@ import { BoardApiRTQ, UserApiRTQ } from '~/api'
 import ChangeVisibility from './ChangeVisibility'
 import { stringAvatar } from '~/utils/StringAvatar'
 import ShareDialog from './ShareDialog'
+import { useParams } from 'react-router-dom'
 
 function BoardBar() {
   //get id
-  const url = window.location.href
-  const workspaceIndex = url.indexOf('workspace/')
-  const idsPart = url.substring(workspaceIndex + 'workspace/'.length)
-  const [boardId] = idsPart.split('&')
+  const { workspaceId, boardId } = useParams()
 
   // console.log('Workspace ID:', workspaceId)
   // console.log('Board ID:', boardId)
@@ -53,13 +51,11 @@ function BoardBar() {
   const [boardMembers, setBoardMembers] = useState<any[]>([])
   React.useEffect(() => {
     getBoardById(boardId).then(() => {
-      console.log(boardData?.data?.visibility[0])
+      // console.log(boardData?.data?.visibility[0])
       setStarred(boardData?.data?.is_star)
       setVisibility(boardData?.data?.visibility[0])
     })
   }, [boardData?.data?.is_star, boardData?.data?.visibility, boardId, getBoardById])
-
-  console.log(boardData?.data)
 
   React.useEffect(() => {
     if (boardData && boardData.data && boardData.data.members_email) {
@@ -76,7 +72,7 @@ function BoardBar() {
     }
   }, [boardData, getUserByEmail])
 
-  console.log(boardMembers)
+  // console.log(boardMembers)
   const [anchor, setAnchor] = React.useState<null | HTMLElement>(null)
   const [popupContent, setPopupContent] = useState(<div>Kine</div>)
   const handleClick = (event: React.MouseEvent<HTMLElement>, customPopupContent: JSX.Element) => {
@@ -92,11 +88,13 @@ function BoardBar() {
 
   const handleVisibilityChange = (newVisibility: string) => {
     if (newVisibility === 'private' || newVisibility === 'workspace' || newVisibility === 'public') {
-      console.log('newVisibility: ' + newVisibility)
+      // console.log('newVisibility: ' + newVisibility)
       setVisibility(newVisibility)
-      ChangeVisibilityApi({ visibility: newVisibility as 'private' | 'workspace' | 'public', _id: boardId }).then(() =>
-        console.log('Updated')
-      )
+      if (boardId !== undefined) {
+        ChangeVisibilityApi({ visibility: newVisibility as 'private' | 'workspace' | 'public', _id: boardId }).then(
+          () => console.log('Updated Visibility')
+        )
+      }
       setAnchor(null)
     } else {
       // Xử lý trường hợp `newVisibility` không hợp lệ tại đây
@@ -132,15 +130,15 @@ function BoardBar() {
     if (event.key == 'Enter') {
       event.preventDefault()
       const updatedName = inputRef.current?.value
-      console.log(updatedName)
-      if (updatedName) {
+      // console.log(updatedName)
+      if (updatedName && boardId !== undefined) {
         editBoardById({
           _id: boardId,
           name: updatedName
         })
           .unwrap()
           .then((response) => {
-            console.log(response)
+            // console.log(response)
             alert('Thay đổi thành công')
             window.location.reload()
           })
@@ -154,10 +152,10 @@ function BoardBar() {
 
   async function handleClickToStar() {
     await editBoardById({
-      _id: boardId,
+      _id: boardId !== undefined ? boardId : '',
       is_star: !starred
     }).then((response) => {
-      console.log(response)
+      // console.log(response)
       setStarred(!starred)
       alert('Thay đổi thành công')
       // window.location.reload()
@@ -364,26 +362,8 @@ function BoardBar() {
                   )
                 }
               })}
-            <Tooltip title='Trung kien'>
-              <Avatar {...stringAvatar('Trần Khương')} />
-            </Tooltip>
-            <Tooltip title='Hữu Chính'>
-              <Avatar {...stringAvatar('Hữu Chính')} />
-            </Tooltip>
-            <Tooltip title='Bảo Long'>
-              <Avatar {...stringAvatar('Bảo Long')} />
-            </Tooltip>
-            <Tooltip title='Trung kien'>
-              <Avatar {...stringAvatar('Trung Kien')} />
-            </Tooltip>
-            <Tooltip title='Trung kien'>
-              <Avatar {...stringAvatar('Trung Kien')} />
-            </Tooltip>
-            <Tooltip title='Trung kien'>
-              <Avatar {...stringAvatar('Trung Kien')} />
-            </Tooltip>
-            <Tooltip title='Bảo Long'>
-              <Avatar {...stringAvatar('Bảo Long')} />
+            <Tooltip title='you'>
+              <Avatar {...stringAvatar('You')} />
             </Tooltip>
           </AvatarGroup>
           <Tooltip title='Share'>
@@ -462,7 +442,12 @@ function BoardBar() {
         {popupContent}
       </BasePopup>
       <More open={openMore} handleDrawerClose={handleDrawerClose} />
-      <ShareDialog open={openShare} handleCloseShare={handleCloseShare} />
+      {boardId !== undefined ? (
+        <ShareDialog open={openShare} handleCloseShare={handleCloseShare} boardID={boardId} />
+      ) : (
+        ''
+      )}
+      {/* <ShareDialog open={openShare} handleCloseShare={handleCloseShare} boardID={boardId} /> */}
     </>
   )
 }

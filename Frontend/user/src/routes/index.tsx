@@ -10,7 +10,7 @@ import Layout from '~/layouts/Layout/layout'
 import PrivateRoute from './privateRoute'
 import { useContext } from 'react'
 import { AuthContext } from '~/components/AuthProvider/AuthProvider'
-import Templates from '~/components/Header/menu/template'
+import CardTemplate from '~/pages/Templates/component/CardTemplate'
 
 export const Navigation = () => {
   const authContext = useContext(AuthContext)
@@ -28,12 +28,12 @@ export const Navigation = () => {
           <Route element={<Layout />}>
             <Route path='/' element={<HomePage />} />
             <Route path='/profile' element={<AccountManagement page={`profile`} />} />
-            <Route path='/template' element={<Templates />} />
+            <Route path='/template' element={<CardTemplate />} />
             <Route path='/workspace/:workspaceId/board/:boardId' element={<CategoryWorkspace />} />
             <Route path='/boards/:id?' element={<BoardsPage />} />
             <Route path='/activity' element={<AccountManagement page={`activity`} />} />
             <Route path='/workspace/:workspaceId/members' element={<PageMembers />} />
-            <Route path='/workspaceSetting/:workspaceId' element={<WorkspaceSetting />} />       
+            <Route path='/workspaceSetting/:workspaceId' element={<WorkspaceSetting />} />
             <Route path='/workspaceboard/:workspaceId' element={<WorkspaceBoardsPage />} />
           </Route>
         </Route>

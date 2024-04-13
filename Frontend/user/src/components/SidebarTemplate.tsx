@@ -163,7 +163,7 @@ const SidebarTemplate = () => {
         className='workspaces'
         style={{ backgroundColor: colors.background, color: colors.text, marginBottom: '100px' }}
       >
-        {workspaceData?.data?.owner.map((w, index) => (
+        {workspaceData?.data?.owner.map((w: any, index: any) => (
           <div key={index}>
             <Menu>
               <SubMenu
@@ -291,7 +291,7 @@ const SidebarTemplate = () => {
                     </div>
                   </MenuItem>
                 </Link>
-                <Link to={`/workspace/${w._id}/workspaceSetting`}>
+                <Link to={`/workspaceSetting/${w._id}`}>
                   <MenuItem
                     style={{
                       height: '32px',
@@ -317,7 +317,7 @@ const SidebarTemplate = () => {
           </div>
         ))}
 
-        {workspaceData?.data?.member.map((w, index) => (
+        {workspaceData?.data?.member.map((w: any, index: any) => (
           <div key={index}>
             <Menu>
               <SubMenu
@@ -442,7 +442,7 @@ const SidebarTemplate = () => {
                     </div>
                   </MenuItem>
                 </Link>
-                <Link to={`/workspace/${w._id}/workspaceSetting`}>
+                <Link to={`/workspaceSetting/${w._id}`}>
                   <MenuItem
                     style={{
                       height: '32px',
@@ -468,7 +468,7 @@ const SidebarTemplate = () => {
           </div>
         ))}
 
-        {workspaceData?.data?.guest.map((w, index) => (
+        {workspaceData?.data?.guest.map((w: any, index: any) => (
           <div key={index}>
             <Menu>
               <SubMenu
@@ -596,7 +596,7 @@ const SidebarTemplate = () => {
                     </div>
                   </MenuItem>
                 </Link>
-                <Link to={`/workspace/${w._id}/workspaceSetting`}>
+                <Link to={`/workspaceSetting/${w._id}`}>
                   <MenuItem
                     style={{
                       height: '32px',

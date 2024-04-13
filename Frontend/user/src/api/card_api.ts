@@ -160,6 +160,20 @@ export const CardApiSlice = createApi({
         method: 'DELETE',
         body: data
       })
-    })
+    }),
+    restoreCartToBoard: build.mutation<TrelloApi.CardApi.UnArchiveCardResponse, TrelloApi.CardApi.UnArchiveCardRequest>({
+      query: (data) => ({
+        url: '/api/card/archive',
+        method: 'POST',
+        body: data
+      })
+    }),
+    deleteCardArchive: build.mutation<TrelloApi.CardApi.UnArchiveCardResponse, TrelloApi.CardApi.UnArchiveCardRequest>({
+      query: (data) => ({
+        url: '/api/card/archive',
+        method: 'DELETE',
+        body: data
+      })
+    }),
   })
 })

@@ -5,19 +5,35 @@ import { useTheme } from '../../components/Theme/themeContext'
 import SidebarTemplate from '~/components/SidebarTemplate'
 import { Box } from '@mui/material'
 import CardContent from './components/CardContent'
-import { BoardApiRTQ } from '~/api'
+import { BoardApiRTQ, WorkspaceApiRTQ } from '~/api'
 import React, { useState } from 'react'
-import { FaPlus } from 'react-icons/fa6'
-import PageWithSidebar from '../Templates'
 
 export default function HomePage() {
+  const storedProfile = localStorage.getItem('profile')
+  const [profile, setProFile] = React.useState({ email: '', name: '' })
   const { darkMode, colors } = useTheme()
 
   const [getALlBoard, { data: boardData }] = BoardApiRTQ.BoardApiSlice.useLazyGetAllBoardQuery()
+  const [getAllWorkspaceByEmail, { data: WorkspaceData }] =
+    WorkspaceApiRTQ.WorkspaceApiSlice.useLazyGetAllWorkspaceQuery()
+
   React.useEffect(() => {
+    const profileSave = storedProfile ? JSON.parse(storedProfile) : { email: '', name: '' }
+    setProFile({ ...profileSave })
     getALlBoard().then((a) => console.log(a))
-  }, [])
+  }, [getALlBoard])
   console.log(boardData?.data)
+
+  //lấy danh sách email từ workspace
+  const [ListEmail, setListEmail] = useState<string[]>([])
+
+  // React.useEffect(() => {
+  //   getAllWorkspaceByEmail().then((response) => {
+  //     const listEmail: string[] = []
+  //     if(response.data?.data)
+  //   })
+  // }, [getAllWorkspaceByEmail])
+  // console.log(WorkspaceData)
 
   const [starred, setStarred] = useState(false)
 
@@ -27,9 +43,8 @@ export default function HomePage() {
 
   return (
     <>
-    <PageWithSidebar>
       <Box
-        className='flex flex-row items-start'
+        className='flex flex-row items-start justify-center'
         sx={{
           color: colors.text,
           backgroundColor: colors.background,
@@ -44,13 +59,13 @@ export default function HomePage() {
           }
         }}
       >
-        <div className='flex flex-row items-start'>
-          {/* <nav className='sticky top-10 mr-20 w-64'>
+        <div className='flex flex-row items-start justify-center'>
+          <nav className='sticky top-10 mr-20 w-64'>
             <SidebarTemplate />
-          </nav> */}
+          </nav>
 
           {/* highlight main content */}
-          <div>
+          <div className='ml-24 mt-3 pl-12'>
             <div className='relative z-0'>
               <div className='pb-5'>
                 {/* content: Icon + HighLight */}
@@ -92,7 +107,13 @@ export default function HomePage() {
                 <ul data-testid='home-highlights-list'>
                   {/* Add card highlight items here */}
                   <div className='container mx-auto w-[450px] pl-5'>
-                    <CardContent />
+                    {boardData &&
+                      boardData.data &&
+                      boardData.data.map(
+                        (
+                          owner // Mapping qua mảng các chủ sở hữu
+                        ) => <CardContent key={owner._id} boardData={owner} />
+                      )}
                   </div>
                   {/* end add highlight */}
                 </ul>
@@ -133,7 +154,7 @@ export default function HomePage() {
               {/* end home tile */}
             </div>
 
-            <div className='iSLLvvYdGSEgKr'>
+            {/* <div className='iSLLvvYdGSEgKr'>
               <h6 className='mb-4 ml-3 text-[13px] font-semibold'>Links</h6>
               <div className='relative flex h-12 items-center rounded'>
                 <button className='absolute m-0 flex h-[50px] w-[100%] cursor-pointer items-center rounded-md border-0 p-0  font-thin shadow-none hover:bg-[#DCDFE4]'>
@@ -145,11 +166,10 @@ export default function HomePage() {
                   </span>
                 </button>
               </div>
-            </div>
+            </div> */}
           </div>
         </div>
       </Box>
-    </PageWithSidebar>
     </>
   )
 }

@@ -3,7 +3,7 @@ import DialogContent from '@mui/material/DialogContent'
 import DialogTitle from '@mui/material/DialogTitle'
 import Box from '@mui/material/Box'
 import { FormControl } from '@mui/base/FormControl/FormControl'
-import { useTheme } from '../Theme/themeContext'
+import { useTheme } from '~/components/Theme/themeContext'
 import { IoMdClose } from 'react-icons/io'
 import ListItem from '@mui/material/ListItem'
 import Avatar from '@mui/material/Avatar'
@@ -53,7 +53,7 @@ function stringAvatar(name: string) {
   }
 }
 
-export default function ShareDialog({ open, handleCloseShare, boardID }: Props) {
+export default function AddMemberDialog({ open, handleCloseShare, boardID }: Props) {
   const [emailInput, setEmailInput] = React.useState('')
   const { colors } = useTheme()
   const [getUserByEmail, { data: UserData }] = UserApiRTQ.UserApiSlice.useLazyGetUserByEmailQuery()
