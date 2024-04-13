@@ -18,20 +18,25 @@ interface ArchiveCardProps {
 const ArchiveCard: React.FC<ArchiveCardProps> = ({ card, switchToLists, boardId, cardListId }) => {
   //   const restoreCartToBoard = CardApiRTQ.CardApiSlice.useRestoreCartToBoardMutation()
   //   const deleteCardArchive = CardApiRTQ.CardApiSlice.useDeleteCardArchiveMutation()
-
+  const [getCardListByBoardId] = CardlistApiRTQ.CardListApiSlice.useLazyGetCardlistByBoardIdQuery()
   const [restoreCartListByBoard] = CardlistApiRTQ.CardListApiSlice.useRestoreCartListByBoardMutation()
   const [deleteCardListByBoard] = CardlistApiRTQ.CardListApiSlice.useDeleteCardListByBoardMutation()
   const [restoreCartToBoard] = CardApiRTQ.CardApiSlice.useRestoreCartToBoardMutation()
   //   const [deleteCardArchive] = CardApiRTQ.CardApiSlice.useDeleteCardArchiveMutation()
   const handleSendListCardToBoard = () => {
     // Gọi hàm xử lý sự kiện Send to board từ component cha
-    restoreCartListByBoard(boardId).then((a) => console.log(a))
+    restoreCartListByBoard(boardId)
+      .then(() => {
+        getCardListByBoardId({ id: boardId })
+      })
     // onSendToBoard();
   }
 
   const handleDelete = () => {
     // Gọi hàm xử lý sự kiện Delete từ component cha
-    deleteCardListByBoard({ board_id: boardId }).then((a) => console.log(a))
+    deleteCardListByBoard({ board_id: boardId }).then(() => {
+      getCardListByBoardId({ id: boardId })
+    })
     // onDelete();
   }
 

@@ -129,7 +129,7 @@ export default function ListsComponent({
                 </div>
               ) : (
                 <button
-                  className={`h-fit w-[300px]   rounded-xl border bg-black bg-opacity-20 p-3 text-left font-semibold text-white`}
+                  className={`h-fit w-[300px]   rounded-xl border bg-black bg-opacity-20 p-3 text-left font-semibold text-white hover:bg-opacity-50`}
                   onClick={handleAddListClick}
                 >
                   + Add another list
