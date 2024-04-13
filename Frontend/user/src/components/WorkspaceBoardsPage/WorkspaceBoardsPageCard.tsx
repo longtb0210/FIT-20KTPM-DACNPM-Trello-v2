@@ -56,8 +56,8 @@ export function WorkspaceBoardsPageCard({
           height: 96,
           padding: '8px',
           backgroundColor: currentBoard.background ? undefined : colors.button_hover,
-          backgroundImage: currentBoard.background,
-          '&:hover': { filter: 'brightness(80%)' }
+          backgroundImage: `url(${currentBoard.background})`,
+          '&:hover': { filter: 'brightness(90%)' }
         }}
         className='flex cursor-pointer flex-col justify-between rounded'
         onMouseEnter={() => setIsHovered(true)}
