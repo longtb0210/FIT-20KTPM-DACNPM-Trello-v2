@@ -9,7 +9,8 @@ import {
   faGripLines,
   faArrowRight,
   faCopy,
-  faBoxArchive
+  faBoxArchive,
+  faRotateLeft
 } from '@fortawesome/free-solid-svg-icons'
 import { Box } from '@mui/material'
 import { useTheme } from '~/components/Theme/themeContext'
@@ -24,7 +25,8 @@ export enum ButtonType {
   CustomFields = 'Custom Fields',
   Move = 'Move',
   Copy = 'Copy',
-  Archive = 'Archive'
+  Archive = 'Archive',
+  UnArchive = 'Send to board'
 }
 
 // eslint-disable-next-line react-refresh/only-export-components
@@ -37,7 +39,8 @@ export const buttonTypeIconMap: Record<ButtonType, IconProp> = {
   'Custom Fields': faGripLines,
   Move: faArrowRight,
   Copy: faCopy,
-  Archive: faBoxArchive
+  Archive: faBoxArchive,
+  'Send to board': faRotateLeft
 }
 
 interface SidebarButtonProps {

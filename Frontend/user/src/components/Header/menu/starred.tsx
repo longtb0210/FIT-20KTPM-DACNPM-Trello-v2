@@ -45,7 +45,7 @@ export default function Starred() {
         if (item?._id !== undefined) {
           const res = await getAllBoardById({ workspace_id: item._id })
           const responseData = res.data
-          const workspaceName = item.name // Assuming you have a property called workspace_name in your item object
+          const workspaceName = item.name
 
           if (responseData && responseData.data) {
             const boardsWithWorkspaceName = responseData.data.map((board) => ({
