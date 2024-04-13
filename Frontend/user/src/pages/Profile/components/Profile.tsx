@@ -27,7 +27,6 @@ export const Profile: React.FC<ProfileProps> = ({ userInfo, handleUpdateProfile 
   useEffect(() => {
     const profileSave = storedProfile ? JSON.parse(storedProfile) : { email: '', name: '' }
     setProfile({ ...profileSave })
-    setUsername(profile.email)
   }, [profile.email, storedProfile])
 
   useEffect(() => {
@@ -49,8 +48,8 @@ export const Profile: React.FC<ProfileProps> = ({ userInfo, handleUpdateProfile 
   const handleSave = () => {
     // Call the API to update user info with updated username and bio
     const data = {
-      email: userInfo?.email || '',
-      username: username || userInfo?.username || '',
+      email: profile.email,
+      username: username ? username.trim() : '',
       bio: bio || userInfo?.bio || '',
       avatar: userInfo?.avatar || '',
       activities: userInfo?.activities || [], // Ensure activities is always an array

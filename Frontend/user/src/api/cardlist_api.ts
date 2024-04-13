@@ -64,17 +64,18 @@ export const CardListApiSlice = createApi({
         }
       })
     }),
-    moveCardList: build.mutation<TrelloApi.CardlistApi.MoveCardlistResponse, TrelloApi.CardlistApi.MoveCardlistRequest>(
-      {
-        query: (data) => ({
-          method: 'PUT',
-          url: '/api/cardlist/move',
-          body: {
-            ...data
-          }
-        })
-      }
-    ),
+    moveCardList: build.mutation<
+      TrelloApi.CardlistApi.MoveCardlistInBoardResponse,
+      TrelloApi.CardlistApi.MoveCardlistInBoardRequest
+    >({
+      query: (data) => ({
+        method: 'PUT',
+        url: '/api/cardlist/move_cardlists_in_board',
+        body: {
+          ...data
+        }
+      })
+    }),
     copyCardList: build.mutation<TrelloApi.CardlistApi.CopyCardlistResponse, TrelloApi.CardlistApi.CopyCardlistRequest>(
       {
         query: (data) => ({

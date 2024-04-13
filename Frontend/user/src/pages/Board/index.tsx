@@ -14,8 +14,6 @@ import {
   useSensor,
   useSensors,
   DragMoveEvent,
-  rectIntersection,
-  closestCenter,
   Active,
   Over
 } from '@dnd-kit/core'
@@ -33,30 +31,30 @@ import { TrelloApi } from '@trello-v2/shared'
 import { board_id } from '~/api/getInfo'
 // import CardDetailWindow from '~/components/CardDetailWindow'
 import { useParams } from 'react-router-dom'
-const MOCK_CARD_DATA: TrelloApi.CardlistApi.GetallCardlistResponse = {
-  data: [
-    {
-      _id: 'CardlistId1',
-      name: 'Card list 1',
-      watcher_email: [],
-      board_id: 'BoardId1',
-      cards: [
-        { _id: 'CardId1', name: 'Card 1', watcher_email: [], activities: [], features: [], created_at: new Date() },
-        { _id: 'CardId2', name: 'Card 2', watcher_email: [], activities: [], features: [], created_at: new Date() }
-      ]
-    },
-    {
-      _id: 'CardlistId2',
-      name: 'Card list 2',
-      watcher_email: [],
-      board_id: 'BoardId2',
-      cards: [
-        { _id: 'CardId3', name: 'Card 3', watcher_email: [], activities: [], features: [], created_at: new Date() },
-        { _id: 'CardId4', name: 'Card 4', watcher_email: [], activities: [], features: [], created_at: new Date() }
-      ]
-    }
-  ]
-}
+// const MOCK_CARD_DATA: TrelloApi.CardlistApi.GetallCardlistResponse = {
+//   data: [
+//     {
+//       _id: 'CardlistId1',
+//       name: 'Card list 1',
+//       watcher_email: [],
+//       board_id: 'BoardId1',
+//       cards: [
+//         { _id: 'CardId1', name: 'Card 1', watcher_email: [], activities: [], features: [], created_at: new Date() },
+//         { _id: 'CardId2', name: 'Card 2', watcher_email: [], activities: [], features: [], created_at: new Date() }
+//       ]
+//     },
+//     {
+//       _id: 'CardlistId2',
+//       name: 'Card list 2',
+//       watcher_email: [],
+//       board_id: 'BoardId2',
+//       cards: [
+//         { _id: 'CardId3', name: 'Card 3', watcher_email: [], activities: [], features: [], created_at: new Date() },
+//         { _id: 'CardId4', name: 'Card 4', watcher_email: [], activities: [], features: [], created_at: new Date() }
+//       ]
+//     }
+//   ]
+// }
 
 const ACTIVE_DRAG_ITEM_TYPE = {
   COLUMN: 'ACTIVE_DRAG_ITEM_TYPE_COLUMN',
@@ -82,45 +80,58 @@ export function Board() {
   const [resetManually, setResetManually] = useState<boolean>(false)
   const [selectedCard, setSelectedCard] = useState<Card>()
   const params = useParams()
-  const boardId = params.workspaceId
-  const [savedValues, setSavedValues] = useState<string[]>([])
-
-  useEffect(() => {
-    if (boardId) {
-      if (boardId) {
-        const exists = savedValues.includes(boardId)
-        if (exists) {
-          const filteredValues = savedValues.filter((value) => value !== boardId)
-          setSavedValues([boardId, ...filteredValues])
-        } else {
-          setSavedValues([boardId, ...savedValues])
-        }
-      }
-    }
-  }, [boardId, params, savedValues])
+  const boardId = params.boardId
+  // useEffect(() => {
+  //   if (boardId) {
+  //     if (boardId) {
+  //       const exists = savedValues.includes(boardId)
+  //       if (exists) {
+  //         const filteredValues = savedValues.filter((value) => value !== boardId)
+  //         setSavedValues([boardId, ...filteredValues])
+  //       } else {
+  //         setSavedValues([boardId, ...savedValues])
+  //       }
+  //     }
+  //   }
+  // }, [boardId, params, savedValues])
 
   // Lưu savedValues vào localStorage mỗi khi nó thay đổi
-  useEffect(() => {
-    localStorage.setItem('savedValues', JSON.stringify(savedValues))
-  }, [savedValues])
+  // useEffect(() => {
+  //   localStorage.setItem('savedValues', JSON.stringify(savedValues))
+  // }, [savedValues])
 
   const [action, setAction] = useState<boolean>(false)
   useEffect(() => {
     console.log('My list: ', listsData)
   }, [listsData])
+  const setIndexToCards = (lists: List[]) => {
+    return lists.map((list) => ({
+      ...list,
+      cards: list.cards
+        .sort((a, b) => (a.index ?? Infinity) - (b.index ?? Infinity))
+        .map((card, index) => ({
+          ...card,
+          index: index
+        }))
+    }))
+  }
   useEffect(() => {
     if (!cardlistDataByBoardId) return
-    const updatedLists_placeHolder = cardlistDataByBoardId.data.map((list) => ({
-      ...list,
-      cards: list.cards.map(
-        (card) =>
-          ({
-            ...card,
-            list_id: list._id || '',
-            placeHolder: false // Set your default value for placeHolder
-          }) as Card
-      )
-    })) as List[]
+    console.log('Res =', cardlistDataByBoardId)
+    const list_data = [...cardlistDataByBoardId.data]
+    const updatedLists_placeHolder = list_data
+      .sort((a, b) => (a.index ?? Infinity) - (b.index ?? Infinity))
+      .map((list) => ({
+        ...list,
+        cards: list.cards.map(
+          (card) =>
+            ({
+              ...card,
+              list_id: list._id || '',
+              placeHolder: false // Set your default value for placeHolder
+            }) as Card
+        )
+      })) as List[]
     const updatedLists = updatedLists_placeHolder?.map((list) => {
       // Check if data array is empty
       if (list.cards.length === 0) {
@@ -133,7 +144,8 @@ export function Board() {
       }
       return list
     })
-    setListsData(updatedLists)
+    const setIndexToCard = setIndexToCards(updatedLists)
+    setListsData(setIndexToCard)
   }, [cardlistDataByBoardId])
   const sensors = useSensors(
     useSensor(PointerSensor, {
@@ -144,7 +156,7 @@ export function Board() {
   )
   async function getAllList() {
     // getAllCardlist()
-    getCardListByBoardId({ id: boardId !== '123' ? boardId : board_id })
+    if (boardId) getCardListByBoardId({ id: boardId !== '123' ? boardId : board_id }).catch((err) => console.log(err))
   }
   useEffect(() => {
     console.log('update list')
@@ -171,20 +183,21 @@ export function Board() {
   ) {
     console.log('handleMoveCardBetweenDifferenceColumn')
     setListsData((prevList) => {
-      const overCardIndex = overList?.cards?.findIndex((card) => card._id === overCardId)
+      const overCard = overList?.cards?.find((card) => card._id === overCardId)
       const isBelowOverItem =
         active.rect.current.translated && active.rect.current.translated.top > over.rect.top + over.rect.height
 
-      const modifier = isBelowOverItem ? 1 : 0
+      const modifier = (overCard?.index as number) >= 0 ? (isBelowOverItem ? 1 : 0) : isBelowOverItem ? 0 : -1
 
-      const newCardIndex = overCardIndex + modifier
-      console.log('overCardIndex: ', overCardIndex, modifier)
+      const newCardIndex = (overCard?.index as number) + modifier
+      console.log('overCardIndex: ', overCard?.index, modifier)
       const nextList = cloneDeep(prevList)
       const nextActiveList = nextList?.find((list) => list._id === activeList._id)
       const nextOverList = nextList?.find((list) => list._id === overList._id)
 
       if (nextActiveList) {
         nextActiveList.cards = nextActiveList.cards.filter((card) => card._id !== activeDragingCardId)
+        nextActiveList.cards = nextActiveList.cards.map((card, index) => ({ ...card, index }))
         if (isEmpty(nextActiveList.cards)) {
           nextActiveList.cards = [generatePlaceHolderCard(nextActiveList)]
         }
@@ -193,28 +206,32 @@ export function Board() {
         nextOverList.cards = nextOverList.cards.filter((card) => card._id !== activeDragingCardId)
         const rebuild_activeDraggingCardData = {
           ...activeDraggingCardData,
-          list_id: nextOverList._id,
-          index: newCardIndex
+          list_id: nextOverList._id
         } as Card
         // Ensure activeDraggingCardData is not undefined before using it
         if (isCard(activeDraggingCardData)) {
           nextOverList.cards.splice(newCardIndex, 0, rebuild_activeDraggingCardData)
+          nextOverList.cards = nextOverList.cards.map((element, index) => ({ ...element, index }))
           nextOverList.cards = nextOverList.cards.filter((card) => card.placeHolder === false)
 
           if (nextActiveList && nextOverList && oldListWhenDragging && isHandleDragEnd === true) {
-            const activeCardIdArray = oldListWhenDragging.cards.map((card) => card._id)
+            const activeCardIdArray = oldListWhenDragging.cards
+              .map((card) => card._id)
+              .filter((id) => id != activeDragingCardId)
             const overCardIdArray = nextOverList.cards.map((card) => card._id)
-            console.log('move card data', {
-              source_list: {
-                cardlist_id: activeList._id,
-                target_card_id: activeDragingCardId as string,
-                cards_id_index: activeCardIdArray
-              },
-              destination_new_list: {
-                cardlist_id: nextOverList._id,
-                cards_id_index: overCardIdArray
-              }
-            })
+            // console.log('move card data', {
+            //   source_list: {
+            //     cardlist_id: oldListWhenDragging._id,
+            //     target_card_id: activeDragingCardId as string,
+            //     cards_id_index: activeCardIdArray
+            //   },
+            //   destination_new_list: {
+            //     cardlist_id: nextOverList._id,
+            //     cards_id_index: overCardIdArray
+            //   }
+            // })
+            // console.log('activeCardArray ', oldListWhenDragging)
+            // console.log('overListArray', nextOverList)
             moveCardAPI({
               data: {
                 source_list: {
@@ -238,6 +255,7 @@ export function Board() {
       // setOverListData(nextOverList)
       return nextList
     })
+    getCardListByBoardId({ id: boardId })
   }
   function handleDragStart(e: DragStartEvent) {
     console.log('Drag Start: ', e)
@@ -332,7 +350,7 @@ export function Board() {
           console.log('move card data', {
             source_list: {
               cardlist_id: activeList._id,
-              target_card_id: overCardId as string,
+              target_card_id: activeDragingCardId as string,
               cards_id_index: activeCardIdArray
             },
             destination_new_list: {
@@ -366,17 +384,19 @@ export function Board() {
 
         const oldIndex = listsData?.findIndex((data) => data._id === active.id)
         const newIndex = listsData?.findIndex((data) => data._id === over.id)
-        moveListAPI({
-          board_id: board_id,
-          index: newIndex,
-          _id: active.id as string
-        })
-        // console.log('old: ', oldIndex)
-        // console.log('new: ', newIndex)
+        console.log('old: ', oldIndex)
+        console.log('new: ', newIndex)
         const newListsData = arrayMove(listsData, oldIndex, newIndex)
         setListsData(newListsData)
 
-        setAction(!action)
+        if (boardId)
+          moveListAPI({
+            index: newIndex,
+            _id: active.id as string
+          }).then(() => {
+            setAction(!action)
+            getCardListByBoardId({ id: boardId })
+          })
       }
     }
 
@@ -440,7 +460,7 @@ export function Board() {
             </div>
           )}
         </DndContext>
-        {selectedCard && (
+        {selectedCard && boardId && (
           <div className={`relative mt-[32px]`}>
             <Suspense fallback={<div>Loading...</div>}>
               <LazyCardDetailsComponent
@@ -450,6 +470,7 @@ export function Board() {
                 handleCloseCDW={() => {
                   setSelectedCard(undefined)
                 }}
+                boardId={boardId}
               />
             </Suspense>
           </div>

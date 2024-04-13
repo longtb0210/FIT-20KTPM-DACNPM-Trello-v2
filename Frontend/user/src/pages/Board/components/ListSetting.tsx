@@ -5,6 +5,7 @@ import { IoIosArrowBack } from 'react-icons/io'
 import { List } from '../type'
 import { CardlistApiRTQ } from '~/api'
 import { user_id } from '~/api/getInfo'
+import { useParams } from 'react-router-dom'
 
 interface ListSettingProps {
   closeListSetting: () => void
@@ -26,6 +27,8 @@ export default function ListSetting({ closeListSetting, setAddCardOnTop, list }:
   const [selectedPosition, setSelectedPosition] = useState<number | null>(null)
   const [value, setValue] = useState<string>(list.name)
   const [isEmpty, setIsEmpty] = useState<boolean>(false)
+  // const params = useParams()
+  // const board_id = params.boardId
   const [copyCardList] = CardlistApiRTQ.CardListApiSlice.useCopyCardListMutation()
   const [archiveAllCard] = CardlistApiRTQ.CardListApiSlice.useArchiveAllCardInCardListMutation()
   const [archiveCardList] = CardlistApiRTQ.CardListApiSlice.useArchiveCardListMutation()
