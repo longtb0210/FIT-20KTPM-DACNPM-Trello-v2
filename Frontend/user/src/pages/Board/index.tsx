@@ -87,14 +87,12 @@ export function Board() {
 
   useEffect(() => {
     if (boardId) {
-      if (boardId) {
-        const exists = savedValues.includes(boardId)
-        if (exists) {
-          const filteredValues = savedValues.filter((value) => value !== boardId)
-          setSavedValues([boardId, ...filteredValues])
-        } else {
-          setSavedValues([boardId, ...savedValues])
-        }
+      const exists = savedValues.includes(boardId)
+      if (exists) {
+        const filteredValues = savedValues.filter((value) => value !== boardId)
+        setSavedValues([boardId, ...filteredValues])
+      } else {
+        setSavedValues([boardId, ...savedValues])
       }
     }
   }, [boardId, params, savedValues])

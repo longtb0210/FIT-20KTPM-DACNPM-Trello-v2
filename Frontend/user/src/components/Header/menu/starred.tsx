@@ -48,6 +48,76 @@ export default function Starred() {
           const responseData = res.data
           const workspaceName = item.name
 
+          console.log(responseData)
+
+          if (responseData && responseData.data) {
+            const boardsWithWorkspaceName = responseData.data.map((board) => ({
+              ...board,
+              workspace_name: workspaceName
+            })) as Partial<Board>[]
+
+            const updatedBoards: Board[] = boardsWithWorkspaceName.map((board) => ({
+              name: board.name ?? '',
+              workspace_id: board.workspace_id ?? '',
+              background: board.background ?? '',
+              background_list: board.background_list ?? [],
+              activities: board.activities ?? [],
+              _id: board._id ?? '',
+              workspace_name: board.workspace_name ?? '',
+              is_star: board.is_star ?? false
+            }))
+
+            setListBoard((prevList) => [...prevList, ...updatedBoards.filter((board) => board?.is_star)])
+          }
+        }
+      } catch (error) {
+        console.error('Error fetching boards:', error)
+      }
+    })
+
+    dataWorkspace?.data.admin.forEach(async (item) => {
+      try {
+        if (item?._id !== undefined) {
+          const res = await getAllBoardById({ workspace_id: item._id })
+          const responseData = res.data
+          const workspaceName = item.name
+
+          console.log(responseData)
+
+          if (responseData && responseData.data) {
+            const boardsWithWorkspaceName = responseData.data.map((board) => ({
+              ...board,
+              workspace_name: workspaceName
+            })) as Partial<Board>[]
+
+            const updatedBoards: Board[] = boardsWithWorkspaceName.map((board) => ({
+              name: board.name ?? '',
+              workspace_id: board.workspace_id ?? '',
+              background: board.background ?? '',
+              background_list: board.background_list ?? [],
+              activities: board.activities ?? [],
+              _id: board._id ?? '',
+              workspace_name: board.workspace_name ?? '',
+              is_star: board.is_star ?? false
+            }))
+
+            setListBoard((prevList) => [...prevList, ...updatedBoards.filter((board) => board?.is_star)])
+          }
+        }
+      } catch (error) {
+        console.error('Error fetching boards:', error)
+      }
+    })
+
+    dataWorkspace?.data.member.forEach(async (item) => {
+      try {
+        if (item?._id !== undefined) {
+          const res = await getAllBoardById({ workspace_id: item._id })
+          const responseData = res.data
+          const workspaceName = item.name
+
+          console.log(responseData)
+
           if (responseData && responseData.data) {
             const boardsWithWorkspaceName = responseData.data.map((board) => ({
               ...board,
@@ -75,6 +145,8 @@ export default function Starred() {
 
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [dataWorkspace, getAllBoardById, getAllWorkspace])
+
+  console.log(listBoard)
 
   const updateStar = (index: number, item: Board) => {
     const boardId = listBoard && listBoard[index] ? listBoard[index]._id : undefined
@@ -214,9 +286,8 @@ export default function Starred() {
                       </Box>
                     ) : (
                       listBoard?.map((board, index) => (
-                        <Link to={`/workspace/${board._id}`}>
+                        <Link key={index} to={`/workspace/${board._id}`} onClick={() => setOpen(false)}>
                           <Box
-                            key={index}
                             sx={{
                               display: 'flex',
                               alignItems: 'center',

@@ -12,12 +12,15 @@ import PrivateRoute from './privateRoute'
 import { useContext } from 'react'
 import { AuthContext } from '~/components/AuthProvider/AuthProvider'
 import CardDetailWindow from '~/components/CardDetailWindow'
+import { useAppSelector } from '~/hooks'
 
 export const Navigation = () => {
   const authContext = useContext(AuthContext)
-  const isLoggedIn = authContext?.isLoggedIn
 
-  console.log(isLoggedIn)
+  const valueToken = useAppSelector((state) => {
+    return state.KC_TOKEN
+  })
+  const isLoggedIn = authContext?.isLoggedIn && valueToken !== undefined
 
   return (
     <Routes>
@@ -25,7 +28,7 @@ export const Navigation = () => {
         <Route path='/login' element={<Login />} />
       </Route>
       {isLoggedIn !== undefined && (
-        <Route element={<PrivateRoute isAllowed={isLoggedIn} redirectPath='/login' />}>
+        <Route element={<PrivateRoute isAllowed={isLoggedIn || false} redirectPath='/login' />}>
           <Route element={<Layout />}>
             <Route path='/' element={<HomePage />} />
             <Route path='/profile/:id' element={<AccountManagement page={`profile`} />} />
