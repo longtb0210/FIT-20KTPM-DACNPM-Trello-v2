@@ -23,7 +23,12 @@ export const Header: React.FC<HeaderProps> = ({ currentTab, userInfo, onSelectTa
     const profileSave = storedProfile ? JSON.parse(storedProfile) : { email: '', name: '' }
     setProfile({ ...profileSave })
   }, [storedProfile])
-
+  useEffect(() => {
+    const profileSave = storedProfile ? JSON.parse(storedProfile) : { email: '', name: '' }
+    const userIn4 = { email: userInfo?.email, name: userInfo?.username }
+    console.log('userInfo: ', profileSave)
+    setProfile(!userIn4.name ? { ...profileSave } : { ...userIn4 })
+  }, [userInfo, storedProfile])
   useEffect(() => {
     setSelectedTab(currentTab)
   }, [currentTab])
@@ -41,14 +46,13 @@ export const Header: React.FC<HeaderProps> = ({ currentTab, userInfo, onSelectTa
         const lastWord = words[words.length - 1]
 
         let firstLetters = `${secondToLastWord.charAt(0)}${lastWord.charAt(0)}`
+        console.log(firstLetters)
 
-        if (!firstLetters.match(/[A-Z]/)) {
-          firstLetters = firstLetters.toUpperCase()
-        }
+        firstLetters = firstLetters.toUpperCase()
 
         return firstLetters
       } else {
-        return null
+        return inputString[0].toUpperCase()
       }
     } else {
       return null
@@ -82,9 +86,12 @@ export const Header: React.FC<HeaderProps> = ({ currentTab, userInfo, onSelectTa
               color: '#fff',
               fontWeight: 700,
               padding: '22px',
-              borderRadius: '50%',
-              backgroundColor: stringToColor(profile.name)
+              borderRadius: '50%', // Set border radius to 50% to create a circle
+              backgroundColor: stringToColor(profile.name),
+              width: '68px', // Adjust width based on content length
+              height: 'fit-content' // Adjust height based on content length
             }}
+            className='text-center'
           >
             {getFirstTwoCharsOfLastWord(profile.name)}
           </Typography>

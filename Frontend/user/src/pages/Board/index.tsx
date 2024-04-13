@@ -102,17 +102,20 @@ export function Board() {
   useEffect(() => {
     if (!cardlistDataByBoardId) return
     console.log('Res =', cardlistDataByBoardId)
-    const updatedLists_placeHolder = cardlistDataByBoardId.data.map((list) => ({
-      ...list,
-      cards: list.cards.map(
-        (card) =>
-          ({
-            ...card,
-            list_id: list._id || '',
-            placeHolder: false // Set your default value for placeHolder
-          }) as Card
-      )
-    })) as List[]
+    const list_data = [...cardlistDataByBoardId.data]
+    const updatedLists_placeHolder = list_data
+      .sort((a, b) => (a.index ?? Infinity) - (b.index ?? Infinity))
+      .map((list) => ({
+        ...list,
+        cards: list.cards.map(
+          (card) =>
+            ({
+              ...card,
+              list_id: list._id || '',
+              placeHolder: false // Set your default value for placeHolder
+            }) as Card
+        )
+      })) as List[]
     const updatedLists = updatedLists_placeHolder?.map((list) => {
       // Check if data array is empty
       if (list.cards.length === 0) {
@@ -365,18 +368,20 @@ export function Board() {
 
         const oldIndex = listsData?.findIndex((data) => data._id === active.id)
         const newIndex = listsData?.findIndex((data) => data._id === over.id)
+        console.log('old: ', oldIndex)
+        console.log('new: ', newIndex)
         if (boardId)
           moveListAPI({
-            board_id: boardId,
             index: newIndex,
             _id: active.id as string
-          })
-        // console.log('old: ', oldIndex)
-        // console.log('new: ', newIndex)
-        const newListsData = arrayMove(listsData, oldIndex, newIndex)
-        setListsData(newListsData)
+          }).then(() => {
+            const newListsData = arrayMove(listsData, oldIndex, newIndex)
+            const newList = newListsData.map((data, index) => ({ ...data, index }))
+            setListsData(newList)
 
-        setAction(!action)
+            setAction(!action)
+            getCardListByBoardId({ id: boardId })
+          })
       }
     }
 
@@ -440,7 +445,7 @@ export function Board() {
             </div>
           )}
         </DndContext>
-        {selectedCard && (
+        {selectedCard && boardId && (
           <div className={`relative mt-[32px]`}>
             <Suspense fallback={<div>Loading...</div>}>
               <LazyCardDetailsComponent
@@ -450,6 +455,7 @@ export function Board() {
                 handleCloseCDW={() => {
                   setSelectedCard(undefined)
                 }}
+                boardId={boardId}
               />
             </Suspense>
           </div>

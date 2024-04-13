@@ -55,7 +55,7 @@ const SidebarCateWorkSpace: React.FC<Props> = ({ open, handleDrawerClose }) => {
 
   useEffect(() => {
     if (workspaceId) {
-      getWorkspace({ id: workspaceId }).then((v: any) => console.log(v))
+      getWorkspace( workspaceId ).then((v: any) => console.log(v))
       getAllBoard({workspaceId: workspaceId}).then((v: any) => console.log(v))
     }
   }, [])
@@ -164,7 +164,7 @@ const SidebarCateWorkSpace: React.FC<Props> = ({ open, handleDrawerClose }) => {
                 </div>
               </MenuItem>
             </Link>
-            <Link to={'/workspaceSetting'}>
+            <Link to={`/workspaceSetting/${workspaceId}`}>
               <MenuItem
                 style={{ 
                   height: '40px', 

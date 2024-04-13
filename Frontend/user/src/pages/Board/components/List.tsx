@@ -82,7 +82,7 @@ export default function ListComponent({
   useEffect(() => {
     if (createCardRes) {
       const listIdArray = list.cards.map((card) => card._id)
-      const listIdArraySrc = [createCardRes.data._id,...listIdArray]
+      const listIdArraySrc = [createCardRes.data._id, ...listIdArray]
       const listIdArrayDes = [createCardRes.data._id, ...listIdArray]
       console.log('listsrc ', listIdArraySrc)
       console.log('listdes ', listIdArrayDes)
@@ -117,8 +117,7 @@ export default function ListComponent({
       updateCardList({
         _id: list._id,
         index: list.index || undefined,
-        name: inputValue,
-        archive_at: new Date()
+        name: inputValue
       }).then(() => {
         getCardListByBoardId({ id: boardId })
       })
@@ -175,7 +174,7 @@ export default function ListComponent({
   })
   const [isHovered, setIsHovered] = useState(false)
   const styleList = {
-    transform: CSS.Transform.toString(transform),
+    transform: CSS.Translate.toString(transform),
     opacity: isDragging ? 0.5 : undefined,
     height: '100%',
     backgroundColor: darkMode ? 'black' : '#f1f2f6',
@@ -199,273 +198,277 @@ export default function ListComponent({
     )
   }
   return (
-    <div
-      ref={setNodeRef}
-      style={styleList}
-      className={`relative mr-2 flex h-fit w-[300px] max-w-[300px] flex-col rounded-xl border pt-1 shadow-sm`}
-      {...attributes}
-      {...listeners}
-    >
-      <div className=' relative my-1 ml-4 mr-6 flex flex-row items-center justify-between'>
-        {!editName ? (
-          <h2
-            onClick={() => setEditName(true)}
-            className={`-ml-1 w-11/12 rounded-md border-[3px]  px-2 py-1 font-bold ${darkMode ? 'border-black' : 'border-[#f1f2f6]'}  `}
-          >
-            {list.name}
-          </h2>
-        ) : (
-          <input
-            style={{
-              backgroundColor: colors.background,
-              color: colors.text
-            }}
-            className={`-ml-1 w-11/12 rounded-lg border-[3px] px-2 py-1 font-bold ${darkMode ? 'border-black' : 'border-[#f1f2f6]'}  focus:border-[3px] focus:border-blue-400 focus:outline-none`}
-            autoFocus
-            value={inputValue}
-            onChange={handleInputChange}
-            onBlur={handleInputBlur}
-            onFocus={handleInputFocus}
-          />
-        )}
+    <>
+      {list && !list.archive_at && (
+        <div
+          ref={setNodeRef}
+          style={styleList}
+          className={`relative mr-2 flex h-fit w-[300px] max-w-[300px] flex-col rounded-xl border pt-1 shadow-sm`}
+          {...attributes}
+          {...listeners}
+        >
+          <div className=' relative my-1 ml-4 mr-6 flex flex-row items-center justify-between'>
+            {!editName ? (
+              <h2
+                onClick={() => setEditName(true)}
+                className={`-ml-1 w-11/12 rounded-md border-[3px]  px-2 py-1 font-bold ${darkMode ? 'border-black' : 'border-[#f1f2f6]'}  `}
+              >
+                {list.name}
+              </h2>
+            ) : (
+              <input
+                style={{
+                  backgroundColor: colors.background,
+                  color: colors.text
+                }}
+                className={`-ml-1 w-11/12 rounded-lg border-[3px] px-2 py-1 font-bold ${darkMode ? 'border-black' : 'border-[#f1f2f6]'}  focus:border-[3px] focus:border-blue-400 focus:outline-none`}
+                autoFocus
+                value={inputValue}
+                onChange={handleInputChange}
+                onBlur={handleInputBlur}
+                onFocus={handleInputFocus}
+              />
+            )}
 
-        <HiOutlineDotsHorizontal
-          size={'20px'}
-          className={` top-50 absolute right-0 rounded-lg   ${darkMode ? 'hover:bg-gray-600' : 'hover:bg-gray-300'}`}
-          onClick={() => setListSettingOpen(list._id)}
-        />
-      </div>
-      <div className={`relative max-h-[580px]  overscroll-contain`}>
-        {listSettingOpen && listSettingOpen === list._id && (
-          <div ref={componentRef_ListSetting}>
-            <ListSetting
-              closeListSetting={() => setListSettingOpen('')}
-              setAddCardOnTop={setAddCardOnTop}
-              list={list}
+            <HiOutlineDotsHorizontal
+              size={'20px'}
+              className={` top-50 absolute right-0 rounded-lg   ${darkMode ? 'hover:bg-gray-600' : 'hover:bg-gray-300'}`}
+              onClick={() => setListSettingOpen(list._id)}
             />
           </div>
-        )}
-        {addCardOnTop &&
-          addCardOnTop === list._id &&
-          (list.cards[0].placeHolder === false ? (
-            <div ref={componentRef_AddCard} className='mx-3'>
-              <div className={` mt-[10px] rounded-xl  ${darkMode ? `` : ' shadow-sm shadow-gray-300'} `}>
-                <div className={`flex flex-row items-center   justify-between`}>
-                  <input
-                    style={{
-                      backgroundColor: colors.background,
-                      color: colors.text
-                    }}
-                    className={` h-full w-full rounded-lg px-2 pb-8 pt-2 text-left focus:border-0 focus:outline-none focus:ring-0 `}
-                    placeholder='Enter the title for this card...'
-                    value={newCardName}
-                    onChange={(e) => setNewCardName(e.target.value)}
-                    autoFocus
-                  ></input>
+          <div className={`relative max-h-[580px]  overscroll-contain`}>
+            {listSettingOpen && listSettingOpen === list._id && (
+              <div ref={componentRef_ListSetting}>
+                <ListSetting
+                  closeListSetting={() => setListSettingOpen('')}
+                  setAddCardOnTop={setAddCardOnTop}
+                  list={list}
+                />
+              </div>
+            )}
+            {addCardOnTop &&
+              addCardOnTop === list._id &&
+              (list.cards[0].placeHolder === false ? (
+                <div ref={componentRef_AddCard} className='mx-3'>
+                  <div className={` mt-[10px] rounded-xl  ${darkMode ? `` : ' shadow-sm shadow-gray-300'} `}>
+                    <div className={`flex flex-row items-center   justify-between`}>
+                      <input
+                        style={{
+                          backgroundColor: colors.background,
+                          color: colors.text
+                        }}
+                        className={` h-full w-full rounded-lg px-2 pb-8 pt-2 text-left focus:border-0 focus:outline-none focus:ring-0 `}
+                        placeholder='Enter the title for this card...'
+                        value={newCardName}
+                        onChange={(e) => setNewCardName(e.target.value)}
+                        autoFocus
+                      ></input>
+                    </div>
+                  </div>
+                  <div className={`mb-1 mt-[10px] flex flex-row space-x-2`}>
+                    <button
+                      style={{
+                        backgroundColor: !isHovered ? colors.add_card : colors.add_card_hover,
+                        color: darkMode ? 'black' : 'white'
+                      }}
+                      className=' rounded   bg-blue-600 px-3 py-2 hover:bg-blue-700'
+                      onClick={() => {
+                        if (list._id) setAddCardOnTop(list._id)
+                        handleAddCardOnTop()
+                      }}
+                      onMouseEnter={() => setIsHovered(true)}
+                      onMouseLeave={() => setIsHovered(false)}
+                    >
+                      <p className={`text-left ${darkMode ? '' : 'font-semibold'}`}> Add card</p>
+                    </button>
+                    <button
+                      className={` rounded-lg px-3 py-2 ${darkMode ? 'hover:bg-gray-600' : 'hover:bg-gray-300'}`}
+                      onClick={() => {
+                        setAddCardOnTop('')
+                        setNewCardName('')
+                      }}
+                    >
+                      <p className={`text-left font-semibold`}>
+                        {' '}
+                        <IoMdClose className={``} size={'20px'} />{' '}
+                      </p>
+                    </button>
+                  </div>
                 </div>
-              </div>
-              <div className={`mb-1 mt-[10px] flex flex-row space-x-2`}>
-                <button
-                  style={{
-                    backgroundColor: !isHovered ? colors.add_card : colors.add_card_hover,
-                    color: darkMode ? 'black' : 'white'
-                  }}
-                  className=' rounded   bg-blue-600 px-3 py-2 hover:bg-blue-700'
-                  onClick={() => {
-                    if (list._id) setAddCardOnTop(list._id)
-                    handleAddCardOnTop()
-                  }}
-                  onMouseEnter={() => setIsHovered(true)}
-                  onMouseLeave={() => setIsHovered(false)}
-                >
-                  <p className={`text-left ${darkMode ? '' : 'font-semibold'}`}> Add card</p>
-                </button>
-                <button
-                  className={` rounded-lg px-3 py-2 ${darkMode ? 'hover:bg-gray-600' : 'hover:bg-gray-300'}`}
-                  onClick={() => {
-                    setAddCardOnTop('')
-                    setNewCardName('')
-                  }}
-                >
-                  <p className={`text-left font-semibold`}>
-                    {' '}
-                    <IoMdClose className={``} size={'20px'} />{' '}
-                  </p>
-                </button>
-              </div>
-            </div>
-          ) : (
-            <div ref={componentRef_AddCard} className=' mx-3 -mt-3 '>
-              <div className={` space-y-2 rounded-xl  ${darkMode ? `` : ' shadow-sm shadow-gray-300'} `}>
-                <div className={`flex flex-row items-center   justify-between`}>
-                  <input
-                    style={{
-                      backgroundColor: colors.background,
-                      color: colors.text
-                    }}
-                    className={` h-full w-full rounded-lg px-2 pb-8 pt-2 text-left focus:border-0 focus:outline-none focus:ring-0 `}
-                    placeholder='Enter the title for this card...'
-                    value={newCardName}
-                    onChange={(e) => setNewCardName(e.target.value)}
-                    autoFocus
-                  ></input>
+              ) : (
+                <div ref={componentRef_AddCard} className=' mx-3 -mt-3 '>
+                  <div className={` space-y-2 rounded-xl  ${darkMode ? `` : ' shadow-sm shadow-gray-300'} `}>
+                    <div className={`flex flex-row items-center   justify-between`}>
+                      <input
+                        style={{
+                          backgroundColor: colors.background,
+                          color: colors.text
+                        }}
+                        className={` h-full w-full rounded-lg px-2 pb-8 pt-2 text-left focus:border-0 focus:outline-none focus:ring-0 `}
+                        placeholder='Enter the title for this card...'
+                        value={newCardName}
+                        onChange={(e) => setNewCardName(e.target.value)}
+                        autoFocus
+                      ></input>
+                    </div>
+                  </div>
+                  <div className={`mb-1 mt-[10px] flex flex-row space-x-2`}>
+                    <button
+                      style={{
+                        backgroundColor: !isHovered ? colors.add_card : colors.add_card_hover,
+                        color: darkMode ? 'black' : 'white'
+                      }}
+                      className=' rounded   bg-blue-600 px-3 py-2 hover:bg-blue-700'
+                      onClick={() => {
+                        if (list._id) setAddCardOnTop(list._id)
+                        handleAddCardOnTop()
+                      }}
+                    >
+                      <p className={`text-left ${darkMode ? '' : 'font-semibold'}`}> Add card</p>
+                    </button>
+                    <button
+                      className={` rounded-lg px-3 py-2 ${darkMode ? 'hover:bg-gray-600' : 'hover:bg-gray-300'}`}
+                      onClick={() => {
+                        setAddCardOnTop('')
+                        setNewCardName('')
+                      }}
+                    >
+                      <p className={`text-left font-semibold `}>
+                        {' '}
+                        <IoMdClose className={``} size={'20px'} />{' '}
+                      </p>
+                    </button>
+                  </div>
                 </div>
-              </div>
-              <div className={`mb-1 mt-[10px] flex flex-row space-x-2`}>
-                <button
-                  style={{
-                    backgroundColor: !isHovered ? colors.add_card : colors.add_card_hover,
-                    color: darkMode ? 'black' : 'white'
-                  }}
-                  className=' rounded   bg-blue-600 px-3 py-2 hover:bg-blue-700'
-                  onClick={() => {
-                    if (list._id) setAddCardOnTop(list._id)
-                    handleAddCardOnTop()
-                  }}
-                >
-                  <p className={`text-left ${darkMode ? '' : 'font-semibold'}`}> Add card</p>
-                </button>
-                <button
-                  className={` rounded-lg px-3 py-2 ${darkMode ? 'hover:bg-gray-600' : 'hover:bg-gray-300'}`}
-                  onClick={() => {
-                    setAddCardOnTop('')
-                    setNewCardName('')
-                  }}
-                >
-                  <p className={`text-left font-semibold `}>
-                    {' '}
-                    <IoMdClose className={``} size={'20px'} />{' '}
-                  </p>
-                </button>
-              </div>
+              ))}
+            <div className={`my-1`}>
+              <SortableContext
+                items={list.cards.map((c) => c._id) as (UniqueIdentifier | { id: UniqueIdentifier })[]}
+                strategy={verticalListSortingStrategy}
+              >
+                {renderCards(list)}
+              </SortableContext>
             </div>
-          ))}
-        <div className={`my-1`}>
-          <SortableContext
-            items={list.cards.map((c) => c._id) as (UniqueIdentifier | { id: UniqueIdentifier })[]}
-            strategy={verticalListSortingStrategy}
-          >
-            {renderCards(list)}
-          </SortableContext>
-        </div>
-        {addCardOpenAt &&
-          addCardOpenAt === list._id &&
-          (list.cards[0].placeHolder === false ? (
-            <div ref={componentRef_AddCard} className='mx-3'>
-              <div className={` mt-[10px] rounded-xl  ${darkMode ? `` : ' shadow-sm shadow-gray-300'} `}>
-                <div className={`flex flex-row items-center   justify-between`}>
-                  <input
-                    style={{
-                      backgroundColor: colors.background,
-                      color: colors.text
-                    }}
-                    className={` h-full w-full rounded-lg px-2 pb-8 pt-2 text-left focus:border-0 focus:outline-none focus:ring-0 `}
-                    placeholder='Enter the title for this card...'
-                    value={newCardName}
-                    onChange={(e) => setNewCardName(e.target.value)}
-                    autoFocus
-                  ></input>
+            {addCardOpenAt &&
+              addCardOpenAt === list._id &&
+              (list.cards[0].placeHolder === false ? (
+                <div ref={componentRef_AddCard} className='mx-3'>
+                  <div className={` mt-[10px] rounded-xl  ${darkMode ? `` : ' shadow-sm shadow-gray-300'} `}>
+                    <div className={`flex flex-row items-center   justify-between`}>
+                      <input
+                        style={{
+                          backgroundColor: colors.background,
+                          color: colors.text
+                        }}
+                        className={` h-full w-full rounded-lg px-2 pb-8 pt-2 text-left focus:border-0 focus:outline-none focus:ring-0 `}
+                        placeholder='Enter the title for this card...'
+                        value={newCardName}
+                        onChange={(e) => setNewCardName(e.target.value)}
+                        autoFocus
+                      ></input>
+                    </div>
+                  </div>
+                  <div className={`mb-1 mt-[10px] flex flex-row space-x-2`}>
+                    <button
+                      style={{
+                        backgroundColor: !isHovered ? colors.add_card : colors.add_card_hover,
+                        color: darkMode ? 'black' : 'white'
+                      }}
+                      className=' rounded   bg-blue-600 px-3 py-2 hover:bg-blue-700'
+                      onClick={() => {
+                        if (list._id) setAddCardOpenAt(list._id)
+                        handleAddCard()
+                      }}
+                      onMouseEnter={() => setIsHovered(true)}
+                      onMouseLeave={() => setIsHovered(false)}
+                    >
+                      <p className={`text-left ${darkMode ? '' : 'font-semibold'}`}> Add card</p>
+                    </button>
+                    <button
+                      className={` rounded-lg px-3 py-2 ${darkMode ? 'hover:bg-gray-600' : 'hover:bg-gray-300'}`}
+                      onClick={() => {
+                        setAddCardOpenAt('')
+                        setNewCardName('')
+                      }}
+                    >
+                      <p className={`text-left font-semibold`}>
+                        {' '}
+                        <IoMdClose className={``} size={'20px'} />{' '}
+                      </p>
+                    </button>
+                  </div>
                 </div>
-              </div>
-              <div className={`mb-1 mt-[10px] flex flex-row space-x-2`}>
-                <button
-                  style={{
-                    backgroundColor: !isHovered ? colors.add_card : colors.add_card_hover,
-                    color: darkMode ? 'black' : 'white'
-                  }}
-                  className=' rounded   bg-blue-600 px-3 py-2 hover:bg-blue-700'
-                  onClick={() => {
-                    if (list._id) setAddCardOpenAt(list._id)
-                    handleAddCard()
-                  }}
-                  onMouseEnter={() => setIsHovered(true)}
-                  onMouseLeave={() => setIsHovered(false)}
-                >
-                  <p className={`text-left ${darkMode ? '' : 'font-semibold'}`}> Add card</p>
-                </button>
-                <button
-                  className={` rounded-lg px-3 py-2 ${darkMode ? 'hover:bg-gray-600' : 'hover:bg-gray-300'}`}
-                  onClick={() => {
-                    setAddCardOpenAt('')
-                    setNewCardName('')
-                  }}
-                >
-                  <p className={`text-left font-semibold`}>
-                    {' '}
-                    <IoMdClose className={``} size={'20px'} />{' '}
-                  </p>
-                </button>
-              </div>
-            </div>
-          ) : (
-            <div ref={componentRef_AddCard} className=' mx-3 -mt-3 '>
-              <div className={` space-y-2 rounded-xl  ${darkMode ? `` : ' shadow-sm shadow-gray-300'} `}>
-                <div className={`flex flex-row items-center   justify-between`}>
-                  <input
-                    style={{
-                      backgroundColor: colors.background,
-                      color: colors.text
-                    }}
-                    className={` h-full w-full rounded-lg px-2 pb-8 pt-2 text-left focus:border-0 focus:outline-none focus:ring-0 `}
-                    placeholder='Enter the title for this card...'
-                    value={newCardName}
-                    onChange={(e) => setNewCardName(e.target.value)}
-                    autoFocus
-                  ></input>
+              ) : (
+                <div ref={componentRef_AddCard} className=' mx-3 -mt-3 '>
+                  <div className={` space-y-2 rounded-xl  ${darkMode ? `` : ' shadow-sm shadow-gray-300'} `}>
+                    <div className={`flex flex-row items-center   justify-between`}>
+                      <input
+                        style={{
+                          backgroundColor: colors.background,
+                          color: colors.text
+                        }}
+                        className={` h-full w-full rounded-lg px-2 pb-8 pt-2 text-left focus:border-0 focus:outline-none focus:ring-0 `}
+                        placeholder='Enter the title for this card...'
+                        value={newCardName}
+                        onChange={(e) => setNewCardName(e.target.value)}
+                        autoFocus
+                      ></input>
+                    </div>
+                  </div>
+                  <div className={`mb-1 mt-[10px] flex flex-row space-x-2`}>
+                    <button
+                      style={{
+                        backgroundColor: !isHovered ? colors.add_card : colors.add_card_hover,
+                        color: darkMode ? 'black' : 'white'
+                      }}
+                      className=' rounded   bg-blue-600 px-3 py-2 hover:bg-blue-700'
+                      onClick={() => {
+                        if (list._id) setAddCardOpenAt(list._id)
+                        handleAddCard()
+                      }}
+                    >
+                      <p className={`text-left ${darkMode ? '' : 'font-semibold'}`}> Add card</p>
+                    </button>
+                    <button
+                      className={` rounded-lg px-3 py-2 ${darkMode ? 'hover:bg-gray-600' : 'hover:bg-gray-300'}`}
+                      onClick={() => {
+                        setAddCardOpenAt('')
+                        setNewCardName('')
+                      }}
+                    >
+                      <p className={`text-left font-semibold `}>
+                        {' '}
+                        <IoMdClose className={``} size={'20px'} />{' '}
+                      </p>
+                    </button>
+                  </div>
                 </div>
-              </div>
-              <div className={`mb-1 mt-[10px] flex flex-row space-x-2`}>
-                <button
-                  style={{
-                    backgroundColor: !isHovered ? colors.add_card : colors.add_card_hover,
-                    color: darkMode ? 'black' : 'white'
-                  }}
-                  className=' rounded   bg-blue-600 px-3 py-2 hover:bg-blue-700'
-                  onClick={() => {
-                    if (list._id) setAddCardOpenAt(list._id)
-                    handleAddCard()
-                  }}
-                >
-                  <p className={`text-left ${darkMode ? '' : 'font-semibold'}`}> Add card</p>
-                </button>
-                <button
-                  className={` rounded-lg px-3 py-2 ${darkMode ? 'hover:bg-gray-600' : 'hover:bg-gray-300'}`}
-                  onClick={() => {
-                    setAddCardOpenAt('')
-                    setNewCardName('')
-                  }}
-                >
-                  <p className={`text-left font-semibold `}>
-                    {' '}
-                    <IoMdClose className={``} size={'20px'} />{' '}
-                  </p>
-                </button>
-              </div>
+              ))}
+          </div>
+          {!addCardOpenAt && (
+            <div className={`mx-3 my-2 flex flex-row space-x-2`}>
+              <button
+                className={`w-10/12 rounded-lg p-2 ${darkMode ? 'hover:bg-gray-600' : 'hover:bg-gray-300'}`}
+                onClick={() => {
+                  setAddCardOpenAt(list._id)
+                }}
+              >
+                <p className={`text-left font-semibold `}>+ Add a card</p>
+              </button>
+              <button
+                className={` content-center rounded-lg p-2 text-center  ${darkMode ? 'hover:bg-gray-600' : 'hover:bg-gray-300'}`}
+              >
+                <IoImagesOutline className={`text-center`} />
+              </button>
             </div>
-          ))}
-      </div>
-      {!addCardOpenAt && (
-        <div className={`mx-3 my-2 flex flex-row space-x-2`}>
-          <button
-            className={`w-10/12 rounded-lg p-2 ${darkMode ? 'hover:bg-gray-600' : 'hover:bg-gray-300'}`}
-            onClick={() => {
-              setAddCardOpenAt(list._id)
-            }}
-          >
-            <p className={`text-left font-semibold `}>+ Add a card</p>
-          </button>
-          <button
-            className={` content-center rounded-lg p-2 text-center  ${darkMode ? 'hover:bg-gray-600' : 'hover:bg-gray-300'}`}
-          >
-            <IoImagesOutline className={`text-center`} />
-          </button>
-        </div>
-      )}
-      {/* {index !== 0 && (
+          )}
+          {/* {index !== 0 && (
         <div style={{ position: 'absolute', top: '100%', left: 0, width: '100%', height: '200px', zIndex: 50 }}>
         
         </div>
       )} */}
-    </div>
+        </div>
+      )}
+    </>
   )
 }

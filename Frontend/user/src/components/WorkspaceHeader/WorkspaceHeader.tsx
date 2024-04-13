@@ -9,13 +9,15 @@ import WorkspaceInfo from './WorkspaceInfo'
 import EditForm from './EditForm'
 import { WorkspaceApiRTQ } from '~/api'
 import { UpdateWorkspaceInfoRequest } from '@trello-v2/shared/dist/src/api/WorkspaceApi'
-import { workspace_id } from '~/api/getInfo'
+import { useParams } from 'react-router-dom'
 interface HeaderWpSetting {
   visibility: string | undefined
 }
 
 export const WorkspaceHeader: React.FC<HeaderWpSetting> = ({ visibility }) => {
   const { colors, darkMode } = useTheme()
+  const params = useParams()
+  const workspaceId = params.workspaceId
   const [workspaceInfo, setWorkspaceInfo] = useState<Workspace>()
   const [visibilityState, setVisibilityState] = useState<string | undefined>('')
   const [getWorkspaceInfo, { data: workspaceInfoRes }] =
@@ -33,8 +35,12 @@ export const WorkspaceHeader: React.FC<HeaderWpSetting> = ({ visibility }) => {
     members: []
   })
   useEffect(() => {
-    getWorkspaceInfo({ id: workspace_id })
+    getWorkspaceInfo(workspaceId ? workspaceId : '')
   }, [resetWorkspaceManually])
+  
+  useEffect(() => {
+    getWorkspaceInfo(workspaceId ? workspaceId : '')
+  }, [workspaceId])
   useEffect(() => {
     setVisibilityState(visibility)
   }, [visibility])
@@ -42,7 +48,7 @@ export const WorkspaceHeader: React.FC<HeaderWpSetting> = ({ visibility }) => {
     setWorkspaceInfo(workspaceInfoRes?.data)
     console.log('My workspace123', workspaceInfoRes?.data)
     setFormData({
-      _id: workspace_id,
+      _id: workspaceId,
       name: workspaceInfoRes?.data.name,
       short_name: workspaceInfoRes?.data.short_name,
       description: workspaceInfoRes?.data.description,
