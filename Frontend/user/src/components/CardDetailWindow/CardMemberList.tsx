@@ -69,14 +69,14 @@ export function MemberAvatar({ memberName, bgColor }: MemberAvatarProps) {
 }
 
 interface AddMemberButtonProps {
+  boardId: string
   cardlistId: string
   cardId: string
   currentCard: Card
   setCurrentCard: (newState: Card) => void
-  boardMembers: string[]
 }
 
-function AddMemberButton({ cardlistId, cardId, currentCard, setCurrentCard, boardMembers }: AddMemberButtonProps) {
+function AddMemberButton({ boardId, cardlistId, cardId, currentCard, setCurrentCard }: AddMemberButtonProps) {
   const { colors } = useTheme()
   const [anchorEl, setAnchorEl] = useState<null | HTMLDivElement>(null)
   const [isOpenCardMemberModal, setIsOpenCardMemberModal] = useState(false)
@@ -113,11 +113,11 @@ function AddMemberButton({ cardlistId, cardId, currentCard, setCurrentCard, boar
       {isOpenCardMemberModal && (
         <CardMemberModal
           anchorEl={anchorEl}
+          boardId={boardId}
           cardlistId={cardlistId}
           cardId={cardId}
           currentCard={currentCard}
           setCurrentCard={setCurrentCard}
-          boardMembers={boardMembers}
           handleClose={handleClose}
         />
       )}
@@ -126,30 +126,30 @@ function AddMemberButton({ cardlistId, cardId, currentCard, setCurrentCard, boar
 }
 
 interface CardMemberListProps {
+  boardId: string
   cardlistId: string
   cardId: string
   currentCard: Card
   setCurrentCard: (newState: Card) => void
-  boardMembers: string[]
 }
 
 export default function CardMemberList({
+  boardId,
   cardlistId,
   cardId,
   currentCard,
-  setCurrentCard,
-  boardMembers
+  setCurrentCard
 }: CardMemberListProps) {
   const { colors } = useTheme()
   return (
     <React.Fragment>
-      {currentCard.watcher_email.length !== 0 && (
+      {currentCard.member_email.length !== 0 && (
         <Box sx={{ margin: '10px 16px 0 0' }}>
           <h2 style={{ color: colors.text }} className='mb-2 text-xs font-bold'>
             Members
           </h2>
           <div className='flex flex-row space-x-1'>
-            {currentCard!.watcher_email.map((email, index) => (
+            {currentCard!.member_email.map((email, index) => (
               <Tooltip
                 arrow
                 key={index}
@@ -174,11 +174,11 @@ export default function CardMemberList({
               </Tooltip>
             ))}
             <AddMemberButton
+              boardId={boardId}
               cardlistId={cardlistId}
               cardId={cardId}
               currentCard={currentCard}
               setCurrentCard={setCurrentCard}
-              boardMembers={boardMembers}
             />
           </div>
         </Box>

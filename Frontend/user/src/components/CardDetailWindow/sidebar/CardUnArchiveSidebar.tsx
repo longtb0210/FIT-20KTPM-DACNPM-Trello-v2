@@ -1,19 +1,19 @@
 import { ButtonType, SidebarButton, buttonTypeIconMap } from './CardSidebarButton'
 import { Box } from '@mui/material'
 
-interface SidebarButtonArchiveProps {
+interface SidebarButtonUnArchiveProps {
   type: ButtonType
-  handleArchive: () => void
+  handleUnArchive: () => void
 }
 
-export function SidebarButtonArchive({ type, handleArchive }: SidebarButtonArchiveProps) {
+export function SidebarButtonUnArchive({ type, handleUnArchive }: SidebarButtonUnArchiveProps) {
   return (
     <Box>
       <SidebarButton
         icon={buttonTypeIconMap[type]}
         title={type}
         onClick={() => {
-          handleArchive()
+          handleUnArchive()
         }}
       />
     </Box>
