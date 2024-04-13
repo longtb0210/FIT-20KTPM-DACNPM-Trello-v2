@@ -43,7 +43,12 @@ export default function CardDetailWindow({
   isOpenCDW,
   handleCloseCDW
 }: CardDetailWindowProps) {
-  const myEmail = 'vu@gmail.com'
+  const [profile, setProfile] = useState({ email: '', name: '' })
+  const storedProfile = localStorage.getItem('profile')
+  useEffect(() => {
+    const profileSave = storedProfile ? JSON.parse(storedProfile) : { email: '', name: '' }
+    setProfile({ ...profileSave })
+  }, [storedProfile])
   const { colors } = useTheme()
 
   // Card states
@@ -103,7 +108,7 @@ export default function CardDetailWindow({
       .then((response) => {
         setCurrentCardState(response.data)
         console.log(response.data)
-        const tempIsWatching: boolean = response.data?.watcher_email.includes(myEmail) ?? false
+        const tempIsWatching: boolean = response.data?.watcher_email.includes(profile.email) ?? false
         console.log(tempIsWatching)
         setIsWatching(tempIsWatching)
       })
@@ -164,12 +169,12 @@ export default function CardDetailWindow({
       addCardWatcherAPI({
         cardlist_id: cardlistId,
         card_id: cardId,
-        watcher_email: myEmail
+        watcher_email: profile.email
       })
         .then(() => {
           const updatedCard: Card = {
             ...currentCardState,
-            watcher_email: [...(currentCardState?.watcher_email || []), myEmail]
+            watcher_email: [...(currentCardState?.watcher_email || []), profile.email]
           }
           setCurrentCardState(updatedCard)
           setIsWatching((prevState) => !prevState)
@@ -181,12 +186,12 @@ export default function CardDetailWindow({
       deleteCardWatcherAPI({
         cardlist_id: cardlistId,
         card_id: cardId,
-        watcher_email: myEmail
+        watcher_email: profile.email
       })
         .then(() => {
           const updatedCard: Card = {
             ...currentCardState,
-            watcher_email: currentCardState?.watcher_email.filter((email) => email !== myEmail) || []
+            watcher_email: currentCardState?.watcher_email.filter((email) => email !== profile.email) || []
           }
           setCurrentCardState(updatedCard)
           setIsWatching((prevState) => !prevState)

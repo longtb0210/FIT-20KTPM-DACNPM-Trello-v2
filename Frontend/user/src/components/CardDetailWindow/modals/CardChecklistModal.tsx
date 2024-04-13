@@ -1,7 +1,7 @@
 import { faXmark } from '@fortawesome/free-solid-svg-icons'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { Box, Grid, Popover } from '@mui/material'
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 // import moment from 'moment'
 import { useTheme } from '~/components/Theme/themeContext'
 import { Card } from '@trello-v2/shared/src/schemas/CardList'
@@ -25,6 +25,12 @@ export function CreateCardChecklistModal({
   setCurrentCard,
   handleClose
 }: CreateCardChecklistModalProps) {
+  const [profile, setProfile] = useState({ email: '', name: '' })
+  const storedProfile = localStorage.getItem('profile')
+  useEffect(() => {
+    const profileSave = storedProfile ? JSON.parse(storedProfile) : { email: '', name: '' }
+    setProfile({ ...profileSave })
+  }, [storedProfile])
   const { colors } = useTheme()
   const [textFieldValue, setTextFieldValue] = useState('')
 
@@ -54,9 +60,9 @@ export function CreateCardChecklistModal({
             board_id: '0',
             cardlist_id: cardlistId,
             card_id: cardId,
-            content: `vu@gmail.com added ${trimmedValue} to this card`,
+            content: `<b>${profile.email}</b> added ${trimmedValue} to this card`,
             create_time: new Date(),
-            creator_email: 'vu@gmail.com'
+            creator_email: profile.email
           }
           const updatedCard: Card = {
             ...currentCard,
