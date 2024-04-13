@@ -4,6 +4,7 @@ import { BoardsPageCardAdd } from './BoardsPageCardAdd'
 import { Board } from '@trello-v2/shared/src/schemas/Board'
 
 interface BoardsPageRowProps {
+  workspaceId: string
   workspaceBoards: Board[]
   setWorkspaceBoards: (newState: Board[]) => void
   allBoards: Board[]
@@ -12,6 +13,7 @@ interface BoardsPageRowProps {
 }
 
 export default function BoardsPageRow({
+  workspaceId,
   workspaceBoards,
   setWorkspaceBoards,
   allBoards,
@@ -23,6 +25,7 @@ export default function BoardsPageRow({
       {workspaceBoards.map((board: Board, index: number) => (
         <Grid item xs={3} key={index}>
           <BoardsPageCard
+            workspaceId={workspaceId}
             currentBoard={board}
             workspaceBoards={workspaceBoards}
             setWorkspaceBoards={setWorkspaceBoards}
@@ -33,7 +36,7 @@ export default function BoardsPageRow({
       ))}
       {enableAddBoard ? (
         <Grid item xs={3}>
-          <BoardsPageCardAdd />
+          <BoardsPageCardAdd workspaceId={workspaceId} />
         </Grid>
       ) : null}
     </Grid>

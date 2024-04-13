@@ -7,17 +7,20 @@ import React from 'react'
 import { useTheme } from '../Theme/themeContext'
 import { BoardApiRTQ, WorkspaceApiRTQ } from '~/api'
 import { Workspace } from '@trello-v2/shared/src/schemas/Workspace'
+import { useNavigate } from 'react-router-dom'
 
 const visibilityOptions = ['Private', 'Workspace', 'Public']
 type VisibilityType = 'private' | 'public' | 'workspace'
 
 interface CreateBoardModalProps {
   anchorEl: HTMLDivElement | null
+  workspaceId: string
   isOpen: boolean
   handleCloseDialog: () => void
 }
 
-export default function CreateBoardModal({ anchorEl, isOpen, handleCloseDialog }: CreateBoardModalProps) {
+export default function CreateBoardModal({ anchorEl, workspaceId, isOpen, handleCloseDialog }: CreateBoardModalProps) {
+  const navigate = useNavigate()
   const { colors } = useTheme()
   const anchorRef = React.useRef<HTMLButtonElement>(null)
   const inputRef = useRef<HTMLInputElement>(null)
@@ -53,11 +56,15 @@ export default function CreateBoardModal({ anchorEl, isOpen, handleCloseDialog }
       createBoardAPI({
         name: textFieldValue.trim(),
         workspace_id: selectedWorkspace,
-        visibility: selectedVisibility
+        visibility: selectedVisibility,
+        background: ''
       })
-      handleCloseDialog()
-      setTextFieldValue('')
-      window.location.reload()
+        .unwrap()
+        .then((response) => {
+          handleCloseDialog()
+          setTextFieldValue('')
+          navigate(`/workspace/${workspaceId}/board/${response.data._id}`)
+        })
     }
   }
 
@@ -72,7 +79,7 @@ export default function CreateBoardModal({ anchorEl, isOpen, handleCloseDialog }
   }
 
   function handleSelectVisibility(event: SelectChangeEvent) {
-    setSelectedVisibility(event.target.value as string)
+    setSelectedVisibility(event.target.value as VisibilityType)
   }
 
   return (

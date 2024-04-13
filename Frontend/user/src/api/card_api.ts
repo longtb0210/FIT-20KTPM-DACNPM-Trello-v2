@@ -161,13 +161,15 @@ export const CardApiSlice = createApi({
         body: data
       })
     }),
-    restoreCartToBoard: build.mutation<TrelloApi.CardApi.UnArchiveCardResponse, TrelloApi.CardApi.UnArchiveCardRequest>({
-      query: (data) => ({
-        url: '/api/card/archive',
-        method: 'POST',
-        body: data
-      })
-    }),
+    restoreCartToBoard: build.mutation<TrelloApi.CardApi.UnArchiveCardResponse, TrelloApi.CardApi.UnArchiveCardRequest>(
+      {
+        query: (data) => ({
+          url: '/api/card/archive',
+          method: 'POST',
+          body: data
+        })
+      }
+    ),
     deleteCardArchive: build.mutation<TrelloApi.CardApi.UnArchiveCardResponse, TrelloApi.CardApi.UnArchiveCardRequest>({
       query: (data) => ({
         url: '/api/card/archive',
@@ -175,5 +177,19 @@ export const CardApiSlice = createApi({
         body: data
       })
     }),
+    addComment: build.mutation<
+      TrelloApi.CardApi.UpdateCardDetailResponse,
+      { card_id: string; cardlist_id: string; content: string }
+    >({
+      query: ({ card_id, cardlist_id, content }) => ({
+        url: '/api/card/comment',
+        method: 'POST',
+        body: {
+          card_id: card_id,
+          cardlist_id: cardlist_id,
+          content: content
+        }
+      })
+    })
   })
 })

@@ -1,7 +1,7 @@
 import { faXmark } from '@fortawesome/free-solid-svg-icons'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { Box, Grid, Popover, styled } from '@mui/material'
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import { useTheme } from '~/components/Theme/themeContext'
 import { Card } from '@trello-v2/shared/src/schemas/CardList'
 import { Activity } from '@trello-v2/shared/src/schemas/Activity'
@@ -37,6 +37,12 @@ export function CardAttachmentModal({
   setCurrentCard,
   handleClose
 }: CardAttachmentModalProps) {
+  const [profile, setProfile] = useState({ email: '', name: '' })
+  const storedProfile = localStorage.getItem('profile')
+  useEffect(() => {
+    const profileSave = storedProfile ? JSON.parse(storedProfile) : { email: '', name: '' }
+    setProfile({ ...profileSave })
+  }, [storedProfile])
   const { colors } = useTheme()
   const [attachmentLinkValue, setAttachmentLinkValue] = useState<string>('')
   const [attachmentTitleValue, setAttachmentTitleValue] = useState<string>('')
@@ -69,9 +75,9 @@ export function CardAttachmentModal({
             board_id: '0',
             cardlist_id: cardlistId,
             card_id: cardId,
-            content: `vu@gmail.com attached ${attachmentLinkValue} to this card`,
+            content: `<b>${profile.email}</b> attached ${attachmentLinkValue} to this card`,
             create_time: new Date(),
-            creator_email: 'vu@gmail.com'
+            creator_email: profile.email
           }
           const updatedCard: Card = {
             ...currentCard,

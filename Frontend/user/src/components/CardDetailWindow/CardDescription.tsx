@@ -108,7 +108,7 @@ export default function CardDescription({ cardlistId, cardId, currentCard, setCu
           <h2 className='font-semibold'>Description</h2>
         </div>
         {/* Edit button */}
-        <EditButton onClick={handleOpen} />
+        {textAreaValue.trim() !== '' && !isOpenTextArea && <EditButton onClick={handleOpen} />}
       </div>
       {/* END: Header */}
       <TextareaAutosize

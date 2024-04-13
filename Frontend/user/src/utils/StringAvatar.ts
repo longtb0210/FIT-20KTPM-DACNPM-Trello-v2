@@ -1,6 +1,6 @@
 import { stringToColor } from './StringToColor'
 
-export function stringAvatar(name: string) {
+export function stringAvatar(name: string, fontSizeProp?: string, widthProp?: number, heightProp?: number) {
   let abbreviation = ''
   if (name.includes(' ')) {
     // Nếu tên có ít nhất một khoảng trắng, lấy hai chữ cái đầu tiên từ các từ
@@ -15,9 +15,9 @@ export function stringAvatar(name: string) {
 
   return {
     sx: {
-      width: 24,
-      height: 24,
-      fontSize: '14px',
+      width: widthProp ? widthProp : 24,
+      height: heightProp ? heightProp : 24,
+      fontSize: fontSizeProp ? fontSizeProp : '14px',
       '&:hover': {
         bgcolor: 'primary.90',
         cursor: 'pointer'

@@ -100,14 +100,9 @@ export function CardLabelListModal({
 }: CardLabelListModalProps) {
   const { colors } = useTheme()
   const [searchValue, setSearchValue] = useState<string>('')
-  const [boardLabelState, setBoardLabelState] = useState<BoardLabel[]>(boardLabels)
 
   function filterLabelList(event: React.ChangeEvent<HTMLInputElement>) {
     setSearchValue(event.currentTarget.value)
-    // Filter board label list
-    setBoardLabelState(
-      boardLabels.filter((label) => label.name.toLowerCase().includes(event.currentTarget.value.toLowerCase()))
-    )
   }
 
   function handleClose() {
@@ -194,7 +189,7 @@ export function CardLabelListModal({
         <p style={{ margin: '10px 0', color: colors.text }} className='text-xs font-semibold'>
           Labels
         </p>
-        {boardLabelState.map((label, index) => (
+        {boardLabels.map((label, index) => (
           <CardLabelListTile
             key={index}
             currentLabel={label}
@@ -370,7 +365,7 @@ export function CreateCardLabelModal({ anchorEl, setModalState, addBoardLabel }:
               width: '100%',
               height: 32,
               padding: '0 12px',
-              color: getContrastColor(selectedColor)
+              color: getContrastColor(selectedColor || '#ffffff')
             }}
             className='flex items-center rounded text-sm font-semibold'
           >

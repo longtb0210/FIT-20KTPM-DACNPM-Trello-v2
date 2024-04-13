@@ -65,6 +65,7 @@ export default function BoardsPagegWorkspaceSection({
         </Grid>
       </Grid>
       <BoardsPageRow
+        workspaceId={currentWorkspace._id!}
         workspaceBoards={workspaceBoards}
         setWorkspaceBoards={setWorkspaceBoards}
         allBoards={allBoards}
