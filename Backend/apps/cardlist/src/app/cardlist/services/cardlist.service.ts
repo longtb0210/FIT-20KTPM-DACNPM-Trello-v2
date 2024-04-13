@@ -29,6 +29,7 @@ export abstract class ICardlistService {
   abstract archiveCardlist(cardlist_id: string): Promise<DbSchemas.CardlistSchema.CardList>
 
   abstract addWatcher(data: TrelloApi.CardlistApi.AddWatcherRequest): Promise<DbSchemas.CardlistSchema.CardList>
+  abstract removeWatcher(data: TrelloApi.CardlistApi.RemoveWatcherRequest): Promise<DbSchemas.CardlistSchema.CardList>
 
   abstract addCardToList(data: TrelloApi.CardlistApi.AddCardToListRequest): Promise<DbSchemas.CardlistSchema.CardList>
   abstract cloneCardlistsToNewBoard(board_id_input: string, board_id_output: string): Promise<DbSchemas.CardlistSchema.CardList[]>
@@ -375,6 +376,19 @@ export class CardlistService implements ICardlistService {
     }
     return cardlist.save()
   }
+  async removeWatcher(data: TrelloApi.CardlistApi.RemoveWatcherRequest) {
+    const cardlist = await this.CardlistMModel.findById(data._id)
+    if (!cardlist) {
+      return { status: 'Not Found', msg: "Can't find any cardlist" } as any
+    }
+    const index = cardlist.watcher_email.indexOf(data.watcher)
+    if (index > -1) {
+      cardlist.watcher_email.splice(index, 1)
+    } else {
+      return { status: 'Not Found', msg: "Can't find any watcher" } as any
+    }
+    return cardlist.save()
+  }
   async addCardToList(data: TrelloApi.CardlistApi.AddCardToListRequest) {
     const cardlist = await this.CardlistMModel.findById(data.cardlist_id)
     if (!cardlist) {
@@ -698,6 +712,17 @@ export class CardlistServiceMock implements ICardlistService {
         ...data,
         board_id: 'Mock-id',
         watcher_email: [data.email],
+        cards: [],
+        name: 'Mock-name',
+      })
+    })
+  }
+  removeWatcher(data: TrelloApi.CardlistApi.RemoveWatcherRequest): Promise<DbSchemas.CardlistSchema.CardList> {
+    return new Promise<DbSchemas.CardlistSchema.CardList>((res) => {
+      res({
+        ...data,
+        board_id: 'Mock-id',
+        watcher_email: [data.watcher],
         cards: [],
         name: 'Mock-name',
       })

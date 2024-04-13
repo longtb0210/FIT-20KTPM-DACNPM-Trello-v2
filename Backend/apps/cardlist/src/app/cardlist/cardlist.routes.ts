@@ -341,6 +341,20 @@ export const CardlistRoutes = {
     },
     // jwtSecure: false,
   } as IRouteParams,
+  removeWatcher: {
+    path: '/remove_watcher',
+    method: RequestMethod.PATCH,
+    swaggerInfo: {
+      body: { schema: { $ref: getSchemaPath('RemoveWatcherRequestSchema') } },
+      responses: [
+        {
+          status: 200,
+          schema: { $ref: getSchemaPath('RemoveWatcherResponseSchema') },
+        },
+      ],
+    },
+    // jwtSecure: false,
+  } as IRouteParams,
   addCardTolist: {
     path: '/add_card',
     method: RequestMethod.POST,
