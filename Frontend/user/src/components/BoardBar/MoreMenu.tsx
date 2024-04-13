@@ -50,10 +50,17 @@ const MoreMenu: React.FC<Props> = ({ open, handleDrawerClose }) => {
 
   const storedProfile = localStorage.getItem('profile')
   const [profile, setProFile] = React.useState({ email: '', name: '' })
+
   React.useEffect(() => {
     const profileSave = storedProfile ? JSON.parse(storedProfile) : { email: '', name: '' }
     setProFile({ ...profileSave })
-  })
+    getBoardById(boardId).then((a) => {
+      console.log(boardData)
+      // if (boardData?.data?.watcher_email.includes(profile.email)) {
+      //   setWatch(true)
+      // }
+    })
+  }, [boardData, boardId, getBoardById])
 
   const handleSetWatching = () => {
     setWatch(!isWatching)
@@ -83,15 +90,6 @@ const MoreMenu: React.FC<Props> = ({ open, handleDrawerClose }) => {
         })
     }
   }
-
-  React.useEffect(() => {
-    getBoardById(boardId).then((a) => {
-      console.log(boardData)
-      // if (boardData?.data?.watcher_email.includes(profile.email)) {
-      //   setWatch(true)
-      // }
-    })
-  }, [boardData, boardId, getBoardById])
 
   // const [activeItem, setActiveItem] = useState<string | null>(null)
 

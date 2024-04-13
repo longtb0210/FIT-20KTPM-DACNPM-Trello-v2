@@ -26,15 +26,21 @@ const isValidEmail = (email: string) => {
 function stringAvatar(name: string) {
   let abbreviation = ''
 
-  if (name.includes(' ')) {
-    // Nếu tên có ít nhất một khoảng trắng, lấy hai chữ cái đầu tiên từ các từ
-    abbreviation = name
-      .split(' ')
-      .map((word) => word[0])
-      .join('')
+  // Kiểm tra xem tham số name có tồn tại không
+  if (name) {
+    if (name.includes(' ')) {
+      // Nếu tên có ít nhất một khoảng trắng, lấy hai chữ cái đầu tiên từ các từ
+      abbreviation = name
+        .split(' ')
+        .map((word) => word[0])
+        .join('')
+    } else {
+      // Nếu tên chỉ có một từ, lấy chữ cái đầu tiên của từ đó
+      abbreviation = name[0].toUpperCase()
+    }
   } else {
-    // Nếu tên chỉ có một từ, lấy chữ cái đầu tiên của từ đó
-    abbreviation = name[0].toUpperCase()
+    // Xử lý trường hợp name không tồn tại (undefined hoặc null)
+    abbreviation = 'N/A'
   }
 
   return {

@@ -443,11 +443,11 @@ function BoardBar() {
         {popupContent}
       </BasePopup>
       <More open={openMore} handleDrawerClose={handleDrawerClose} />
-      {boardId !== undefined ? (
+      {/* {boardId !== undefined ? (
         <ShareDialog open={openShare} handleCloseShare={handleCloseShare} boardID={boardId} />
       ) : (
         ''
-      )}
+      )} */}
       {/* <ShareDialog open={openShare} handleCloseShare={handleCloseShare} boardID={boardId} /> */}
     </>
   )
