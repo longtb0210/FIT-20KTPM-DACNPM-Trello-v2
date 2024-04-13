@@ -25,10 +25,9 @@ const ArchiveCard: React.FC<ArchiveCardProps> = ({ card, switchToLists, boardId,
   //   const [deleteCardArchive] = CardApiRTQ.CardApiSlice.useDeleteCardArchiveMutation()
   const handleSendListCardToBoard = () => {
     // Gọi hàm xử lý sự kiện Send to board từ component cha
-    restoreCartListByBoard(boardId)
-      .then(() => {
-        getCardListByBoardId({ id: boardId })
-      })
+    restoreCartListByBoard(boardId).then(() => {
+      getCardListByBoardId({ id: boardId })
+    })
     // onSendToBoard();
   }
 

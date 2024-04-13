@@ -19,6 +19,7 @@ import { Link, useParams, useLocation } from 'react-router-dom'
 import { WorkspaceApiRTQ } from '~/api'
 import { BoardApiRTQ } from '~/api'
 import FileUploadIcon from '@mui/icons-material/FileUpload'
+import { Board } from '@trello-v2/shared/src/schemas/Board'
 
 const drawerWidth = 250
 
@@ -40,10 +41,13 @@ const SidebarCateWorkSpace: React.FC<Props> = ({ open, handleDrawerClose }) => {
   const theme = useMuiTheme()
   const { colors } = useCustomTheme()
   const [getWorkspace, { data: workspaceData }] = WorkspaceApiRTQ.WorkspaceApiSlice.useLazyGetWorkspaceInfoQuery()
-  const [getAllBoard, { data: boardData }] = BoardApiRTQ.BoardApiSlice.useLazyGetBoardByWorkspaceIdQuery()
+  const [getAllBoard, { data: boardRes }] = BoardApiRTQ.BoardApiSlice.useLazyGetBoardByWorkspaceIdQuery()
+  const [boardData, setBoardData] = useState<Board[]>()
   const [activeItem, setActiveItem] = useState<string | null>(null)
   const [hoveredItem, setHoveredItem] = useState<string | null>(null)
-
+  useEffect(() => {
+    setBoardData(boardRes?.data)
+  }, [boardRes])
   const handleMouseEnter = (itemKey: string) => {
     setHoveredItem(itemKey)
   }
@@ -266,7 +270,7 @@ const SidebarCateWorkSpace: React.FC<Props> = ({ open, handleDrawerClose }) => {
           <Sidebar className='workspaces mb-10 text-sm'>
             <div>
               <Menu>
-                {boardData?.data?.map((board, index) => (
+                {boardData?.map((board, index) => (
                   <Link key={index} to={`/workspace/${workspaceId}/board/${board._id}`}>
                     <MenuItem
                       className='menu-item'
