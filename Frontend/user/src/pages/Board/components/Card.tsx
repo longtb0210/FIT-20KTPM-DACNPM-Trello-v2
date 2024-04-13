@@ -8,11 +8,21 @@ import { MdOutlineRemoveRedEye } from 'react-icons/md'
 import { useTheme } from '~/components/Theme/themeContext'
 import randomColor from 'randomcolor'
 import { CardApiRTQ } from '~/api'
+import { Avatar, Typography } from '@mui/material'
+import { stringAvatar } from '~/utils/StringAvatar'
 export default function CardComponent({ card, cardSelected, setOpenCardSetting }: CardComponentProps) {
   const { colors, darkMode } = useTheme()
   const [bgColorEmailWatcher, setBgColorEmailWatcher] = useState<Array<string>>([])
   const [updateCard] = CardApiRTQ.CardApiSlice.useUpdateCardMutation()
   const [editedName, setEditedName] = useState<string>() // State to track edited name
+  const [profile, setProfile] = useState({ email: '', name: '' })
+
+  const storedProfile = localStorage.getItem('profile')
+
+  useEffect(() => {
+    const profileSave = storedProfile ? JSON.parse(storedProfile) : { email: '', name: '' }
+    setProfile({ ...profileSave })
+  }, [profile.email, storedProfile])
   useEffect(() => {
     const bgColorCode = []
     setEditedName(card.name)
@@ -130,30 +140,31 @@ export default function CardComponent({ card, cardSelected, setOpenCardSetting }
                     />
                   )}
                 </div>
-                {card.watcher_email && card.watcher_email.length > 0 && (
-                  <div className={`flex flex-row items-center justify-between`}>
-                    <div className='flex-grow'>
-                      <MdOutlineRemoveRedEye className={`ml-2`} />
-                    </div>
-                    {card.watcher_email.map((watcher, index) => (
-                      <div key={index} className={`relative z-10 flex flex-row items-center justify-center`}>
-                        <div onMouseEnter={() => handleMouseOver(watcher)} onMouseLeave={handleMouseLeave}>
-                          <div
-                            style={{ backgroundColor: bgColorEmailWatcher[index] }}
-                            className={`mx-1 h-[22px] w-[23px] rounded-full pt-[3px] text-center  text-[10px]  font-semibold text-white hover:opacity-50`}
-                          >
-                            HM
-                          </div>
-                          {isHoveredWatcher && isHoveredWatcher === watcher && (
-                            <div className='absolute -bottom-10 left-2 z-20 ml-6 bg-yellow-200 p-1 text-black hover:bg-gray-100'>
-                              {watcher}
-                            </div>
-                          )}
-                        </div>
+                {card &&
+                  ((card.watcher_email &&
+                    card.watcher_email.length > 0 &&
+                    card.watcher_email.includes(profile.email)) ||
+                    (card.member_email && card.member_email.length > 0)) && (
+                    <div className={`flex flex-row items-center justify-between`}>
+                      <div className='flex-grow'>
+                        {card.watcher_email.includes(profile.email) && <MdOutlineRemoveRedEye className={`ml-2`} />}
                       </div>
-                    ))}
-                  </div>
-                )}
+                      {card.member_email.map((member, index) => (
+                        <div key={index} className={`relative z-10 flex flex-row items-center justify-center`}>
+                          <div onMouseEnter={() => handleMouseOver(member)} onMouseLeave={handleMouseLeave}>
+                            <Typography variant='h4' className='text-center'>
+                              <Avatar {...stringAvatar(member)} className={`font-bold`} />
+                            </Typography>
+                            {isHoveredWatcher && isHoveredWatcher === member && (
+                              <div className='absolute -bottom-10 left-2 z-20 ml-6 bg-yellow-200 p-1 text-black hover:bg-gray-100'>
+                                {member}
+                              </div>
+                            )}
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                  )}
               </div>
             </div>
           )}
