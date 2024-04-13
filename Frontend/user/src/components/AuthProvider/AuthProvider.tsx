@@ -65,7 +65,6 @@ export function AuthProvider({ children }: { children?: React.ReactNode }) {
 
   const logout = () => {
     if (keycloak.current) {
-      localStorage.clear()
       keycloak.current.logout({ redirectUri: 'http://localhost:3000/login' })
     }
   }

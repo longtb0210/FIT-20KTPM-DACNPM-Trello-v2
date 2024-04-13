@@ -5,6 +5,7 @@ import { faChevronDown, faStar as starFull } from '@fortawesome/free-solid-svg-i
 import noneStar from '~/assets/noneStar.svg'
 import { useTheme } from './../../Theme/themeContext'
 import { BoardApiRTQ, WorkspaceApiRTQ } from '~/api'
+import { Link } from 'react-router-dom'
 
 interface Board {
   name: string
@@ -213,61 +214,65 @@ export default function Starred() {
                       </Box>
                     ) : (
                       listBoard?.map((board, index) => (
-                        <Box
-                          key={index}
-                          sx={{
-                            display: 'flex',
-                            alignItems: 'center',
-                            justifyContent: 'space-between',
-                            padding: '4px',
-                            cursor: 'pointer',
-                            '&:hover': {
-                              backgroundColor:
-                                colors.background === '#ffffff' ? `rgba(0,0,0,0.1)` : `rgba(255,255,255,0.1)`,
-                              borderRadius: '4px'
-                            }
-                          }}
-                        >
-                          <Box sx={{ display: 'flex', alignItems: 'center' }}>
-                            <Box
-                              sx={{
-                                backgroundImage:
-                                  'url("https://trello-backgrounds.s3.amazonaws.com/SharedBackground/480x320/69360d5ef9e7535cda824ab868bb1628/photo-1708058885492-09ef26cd4af8.jpg")',
-                                backgroundSize: 'cover',
-                                backgroundPosition: 'center',
-                                width: '40px',
-                                height: '32px',
+                        <Link to={`/workspace/${board._id}`}>
+                          <Box
+                            key={index}
+                            sx={{
+                              display: 'flex',
+                              alignItems: 'center',
+                              justifyContent: 'space-between',
+                              padding: '4px',
+                              cursor: 'pointer',
+                              '&:hover': {
+                                backgroundColor:
+                                  colors.background === '#ffffff' ? `rgba(0,0,0,0.1)` : `rgba(255,255,255,0.1)`,
                                 borderRadius: '4px'
-                              }}
-                            ></Box>
-
-                            <Box sx={{ display: 'flex', flexDirection: 'column' }}>
-                              <Typography
-                                variant='body1'
-                                sx={{ fontSize: '14px', fontWeight: 600, color: colors.text, marginLeft: '12px' }}
-                              >
-                                {board.name}
-                              </Typography>
-                              <Typography
-                                variant='body1'
-                                sx={{ fontSize: '12px', color: colors.text, marginLeft: '12px' }}
-                              >
-                                {board.workspace_name}
-                              </Typography>
-                            </Box>
-                          </Box>
-
-                          <FontAwesomeIcon
-                            onClick={() => updateStar(index, board)}
-                            icon={starFull}
-                            style={{
-                              color: 'orange',
-                              marginRight: '8px',
-                              fontSize: '16px',
-                              transition: 'all 0.1s ease-in'
+                              }
                             }}
-                          />
-                        </Box>
+                          >
+                            <Box sx={{ display: 'flex', alignItems: 'center' }}>
+                              <Box
+                                sx={{
+                                  backgroundImage:
+                                    board.background.charAt(0) === 'h'
+                                      ? `url("${board.background}")`
+                                      : board.background,
+                                  backgroundSize: 'cover',
+                                  backgroundPosition: 'center',
+                                  width: '40px',
+                                  height: '32px',
+                                  borderRadius: '4px'
+                                }}
+                              ></Box>
+
+                              <Box sx={{ display: 'flex', flexDirection: 'column' }}>
+                                <Typography
+                                  variant='body1'
+                                  sx={{ fontSize: '14px', fontWeight: 600, color: colors.text, marginLeft: '12px' }}
+                                >
+                                  {board.name}
+                                </Typography>
+                                <Typography
+                                  variant='body1'
+                                  sx={{ fontSize: '12px', color: colors.text, marginLeft: '12px' }}
+                                >
+                                  {board.workspace_name}
+                                </Typography>
+                              </Box>
+                            </Box>
+
+                            <FontAwesomeIcon
+                              onClick={() => updateStar(index, board)}
+                              icon={starFull}
+                              style={{
+                                color: 'orange',
+                                marginRight: '8px',
+                                fontSize: '16px',
+                                transition: 'all 0.1s ease-in'
+                              }}
+                            />
+                          </Box>
+                        </Link>
                       ))
                     )}
                   </MenuList>
