@@ -27,6 +27,7 @@ export default function ListComponent({
   const params = useParams()
   const boardId = params.boardId
   const [profile, setProfile] = useState({ email: '' })
+  const [maxH, setMaxH] = useState<number>(0)
   const storedProfile = localStorage.getItem('profile')
   useEffect(() => {
     const profileSave = storedProfile ? JSON.parse(storedProfile) : { email: '' }
@@ -46,6 +47,9 @@ export default function ListComponent({
   const [addCardOnTop, setAddCardOnTop] = useState<string>('')
   const componentRef_AddCard = useRef<HTMLDivElement>(null)
   const componentRef_ListSetting = useRef<HTMLDivElement>(null)
+  useEffect(() => {
+    setMaxH(maxHeight)
+  }, [maxHeight])
   useEffect(() => {
     setCardsData(list.cards.sort((a, b) => (a.index ?? Infinity) - (b.index ?? Infinity)))
   }, [list])
@@ -186,12 +190,12 @@ export default function ListComponent({
     height: '100%',
     backgroundColor: darkMode ? 'black' : '#f1f2f6',
     color: colors.text,
-    minHeight: `${maxHeight}px`
+    minHeight: `${maxH + 120}px`
     // maxHeight: `${maxHeight > 590 ? 590 : maxHeight}px`
   }
   const renderCards = (list: List) => {
     return (
-      <div className={`space-y-[10px] `}>
+      <div className={`list-component space-y-[10px]`}>
         {list.cards &&
           list.cards.map((card, index) => (
             <CardComponent

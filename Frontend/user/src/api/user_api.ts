@@ -37,7 +37,7 @@ const UserApiSlice = createApi({
     }),
     getActivities: builder.query<TrelloApi.UserApi.GetallActivitiesResponse, { email: string }>({
       query: ({ email }) => ({
-        url: `/api/user/${email}`,
+        url: `/api/activity/${email}`,
         method: 'GET'
       })
     }),

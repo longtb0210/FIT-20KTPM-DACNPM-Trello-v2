@@ -222,9 +222,12 @@ export default function CardActivity({ cardlistId, cardId, currentCard, setCurre
         sx={{ width: '100%', height: 'fit-content', margin: '10px 0 0 0', paddingLeft: '0' }}
         className='flex flex-col items-start'
       >
-        {currentCard.activities.map((activity, index) => (
-          <CardActivityTile key={index} activity={activity} />
-        ))}
+        {currentCard.activities
+          .slice()
+          .reverse()
+          .map((activity, index) => (
+            <CardActivityTile key={index} activity={activity} />
+          ))}
       </Box>
       {/* END: Body */}
     </div>

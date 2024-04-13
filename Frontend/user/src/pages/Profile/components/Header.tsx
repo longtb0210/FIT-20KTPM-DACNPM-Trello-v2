@@ -27,7 +27,7 @@ export const Header: React.FC<HeaderProps> = ({ currentTab, userInfo, onSelectTa
   useEffect(() => {
     const profileSave = storedProfile ? JSON.parse(storedProfile) : { email: '', name: '' }
     const userIn4 = { email: userInfo?.email, name: userInfo?.username }
-    console.log('userInfo: ', profileSave)
+    // console.log('userInfo: ', profileSave)
     setProfile(!userIn4.name ? { ...profileSave } : { ...userIn4 })
   }, [userInfo, storedProfile])
   useEffect(() => {

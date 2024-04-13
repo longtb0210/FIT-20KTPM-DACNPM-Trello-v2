@@ -9,31 +9,47 @@ import { BoardApiRTQ, WorkspaceApiRTQ } from '~/api'
 import React, { useState } from 'react'
 
 export default function HomePage() {
-  const storedProfile = localStorage.getItem('profile')
-  const [profile, setProFile] = React.useState({ email: '', name: '' })
   const { darkMode, colors } = useTheme()
 
-  const [getALlBoard, { data: boardData }] = BoardApiRTQ.BoardApiSlice.useLazyGetAllBoardQuery()
   const [getAllWorkspaceByEmail, { data: WorkspaceData }] =
     WorkspaceApiRTQ.WorkspaceApiSlice.useLazyGetAllWorkspaceQuery()
 
+  const storedProfile = localStorage.getItem('profile')
+  const [profile, setProFile] = React.useState({ email: '', name: '' })
+
   React.useEffect(() => {
+    getAllWorkspaceByEmail().then((a) => console.log(a))
     const profileSave = storedProfile ? JSON.parse(storedProfile) : { email: '', name: '' }
     setProFile({ ...profileSave })
-    getALlBoard().then((a) => console.log(a))
-  }, [getALlBoard])
-  console.log(boardData?.data)
+  }, [getAllWorkspaceByEmail])
+  // console.log(boardData?.data)
 
-  //lấy danh sách email từ workspace
-  const [ListEmail, setListEmail] = useState<string[]>([])
+  //lấy danh sách workspaceId từ getAllWorkspaceByEmail
+  //sau đó get board by workspace id và lưu lại danh sách board
 
-  // React.useEffect(() => {
-  //   getAllWorkspaceByEmail().then((response) => {
-  //     const listEmail: string[] = []
-  //     if(response.data?.data)
-  //   })
-  // }, [getAllWorkspaceByEmail])
-  // console.log(WorkspaceData)
+  const [getboardsByWorspaceId] = BoardApiRTQ.BoardApiSlice.useLazyGetBoardByWorkspaceIdQuery()
+  const [allBoards, setAllBoards] = useState<any[]>([])
+
+  React.useEffect(() => {
+    // Kiểm tra xem có dữ liệu từ API getAllWorkspaceByEmail hay không
+    if (WorkspaceData?.data) {
+      // Duyệt qua mỗi workspace trong dữ liệu
+      WorkspaceData.data.owner.forEach(async (workspace) => {
+        // Gọi hàm API để lấy danh sách boards của từng workspace và đợi kết quả trả về
+        const boardsResponse = await getboardsByWorspaceId({ workspaceId: workspace._id })
+        console.log(boardsResponse.data)
+        // Kiểm tra xem boardsResponse có dữ liệu hay không
+        if (boardsResponse?.data?.data) {
+          // Lấy danh sách boards từ kết quả trả về và chuyển đổi thành một mảng
+          const boards = Object.values(boardsResponse.data.data)
+          // Cập nhật danh sách boards của tất cả các workspace
+          setAllBoards((prevBoards) => [...prevBoards, ...boards])
+        }
+      })
+    }
+  }, [WorkspaceData, getboardsByWorspaceId])
+
+  console.log(allBoards)
 
   const [starred, setStarred] = useState(false)
 
@@ -107,13 +123,13 @@ export default function HomePage() {
                 <ul data-testid='home-highlights-list'>
                   {/* Add card highlight items here */}
                   <div className='container mx-auto w-[450px] pl-5'>
-                    {boardData &&
-                      boardData.data &&
-                      boardData.data.map(
-                        (
-                          owner // Mapping qua mảng các chủ sở hữu
-                        ) => <CardContent key={owner._id} boardData={owner} />
-                      )}
+                    {allBoards.map(
+                      (
+                        owner // Mapping qua mảng các chủ sở hữu
+                      ) => (
+                        <CardContent key={owner._id} boardData={owner} />
+                      )
+                    )}
                   </div>
                   {/* end add highlight */}
                 </ul>
@@ -141,15 +157,13 @@ export default function HomePage() {
               {/* card home tile */}
               <div className='mt-5'>
                 {/* Kiểm tra xem workspaceData có tồn tại và có phần tử data không trước khi sử dụng */}
-                {boardData &&
-                  boardData.data &&
-                  boardData.data.map(
-                    (
-                      owner // Mapping qua mảng các chủ sở hữu
-                    ) => (
-                      <ProjectTile key={owner._id} boardData={owner} /> // Truyền dữ liệu từng chủ sở hữu vào ProjectTile
-                    )
-                  )}
+                {allBoards.map(
+                  (
+                    owner // Mapping qua mảng các chủ sở hữu
+                  ) => (
+                    <ProjectTile key={owner._id} boardData={owner} /> // Truyền dữ liệu từng chủ sở hữu vào ProjectTile
+                  )
+                )}
               </div>
               {/* end home tile */}
             </div>

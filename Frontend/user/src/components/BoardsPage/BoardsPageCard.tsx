@@ -71,7 +71,7 @@ export function BoardsPageCard({
           padding: '8px',
           backgroundColor: currentBoard.background ? undefined : colors.button_hover,
           backgroundImage: currentBoard.background,
-          '&:hover': { filter: 'brightness(90%)' }
+          '&:hover': { filter: 'brightness(80%)' }
         }}
         className='flex cursor-pointer flex-col justify-between rounded'
         onMouseEnter={() => setIsHovered(true)}
@@ -97,7 +97,9 @@ export function BoardsPageCard({
           {(isHovered || currentBoard.is_star) && (
             <Box
               sx={{ marginRight: '4px' }}
-              onClick={handleToggleStar}
+              onMouseDown={() => {
+                handleToggleStar()
+              }}
               color={currentBoard.is_star ? 'primary' : 'default'}
             >
               {currentBoard.is_star ? (

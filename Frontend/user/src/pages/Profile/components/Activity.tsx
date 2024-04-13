@@ -46,16 +46,16 @@ export const ActivityComponent: React.FC<ActivityProps> = ({ userInfo }) => {
   function addWorkSpaceName() {
     if (activityData && activityData.data) {
       const newData = getActivity(activityData?.data, activityCount)
-      const activityDataWithWorkspaceName = newData.map((activityItem) => {
-        const workspaceItem = workspace?.find((workspace) => workspace._id === activityItem.workspace_id)
-        const workspaceName = workspaceItem ? workspaceItem.name : 'Unknown Workspace'
+      // const activityDataWithWorkspaceName = newData.map((activityItem) => {
+      //   const workspaceItem = workspace?.find((workspace) => workspace._id === activityItem.workspace_id)
+      //   const workspaceName = workspaceItem ? workspaceItem.name : 'Unknown Workspace'
 
-        return {
-          ...activityItem,
-          workspace_name: workspaceName
-        }
-      })
-      setActivity(activityDataWithWorkspaceName)
+      //   return {
+      //     ...activityItem,
+      //     workspace_name: workspaceName
+      //   }
+      // })
+      setActivity(newData)
     }
   }
   return (
@@ -95,18 +95,19 @@ export const ActivityComponent: React.FC<ActivityProps> = ({ userInfo }) => {
           </p>
           <div className={`flex-grow border-b-2 ${!darkMode ? 'border-gray-300' : 'border-gray-700'} pb-2`}></div>
         </div>
-        {activity?.map((a, index) => (
-          <div key={index} className='my-2 pb-2'>
-            <div className={`flex flex-row items-center space-x-2`}>
-              {/* <img
+        {activity ? (
+          activity?.map((a, index) => (
+            <div key={index} className='my-2 pb-2'>
+              <div className={`flex flex-row items-center space-x-2`}>
+                {/* <img
                 src={avtPath} // Replace with your avatar image source
                 alt='Avatar'
                 className='-ml-2 mr-1 h-9 w-9 cursor-pointer rounded-full border hover:opacity-60'
               /> */}
-              <RxAvatar className={`-ml-2 mr-1 h-9 w-9 cursor-pointer rounded-full  hover:opacity-60`} />
-              <div>
-                <p>{a.content}</p>
-                <div className={`flex flex-row items-center space-x-2`}>
+                <RxAvatar className={`-ml-2 mr-1 h-9 w-9 cursor-pointer rounded-full  hover:opacity-60`} />
+                <div>
+                  {a.content}
+                  {/* <div className={`flex flex-row items-center space-x-2`}>
                   <p className={`text-sm font-light  `}>Jan 29 at 9.00 AM. On board </p>
                   <p className={`flex cursor-pointer flex-row items-center font-semibold`}>
                     <span
@@ -120,11 +121,14 @@ export const ActivityComponent: React.FC<ActivityProps> = ({ userInfo }) => {
                     </span>{' '}
                     <MdOutlineLock className='ml-2 text-red-500' size={'15px'} />
                   </p>
+                </div> */}
                 </div>
               </div>
             </div>
-          </div>
-        ))}
+          ))
+        ) : (
+          <p className='ml-10'> No activity</p>
+        )}
         {activityCount && activityData && activityData.data && activityCount < activityData.data.length && (
           <div className='my-5 ml-16'>
             <button

@@ -43,22 +43,20 @@ export default function ListsComponent({
     }
   }
   const [biggestHeight, setBiggestHeight] = useState<number>(0)
+  const updateBiggestHeight = () => {
+    const listComponent = document.querySelectorAll('.list-component') as NodeListOf<HTMLElement>
+    let maxHeight = 0
 
+    listComponent.forEach((card) => {
+      const height = card.clientHeight
+      if (height > maxHeight) {
+        maxHeight = height
+      }
+    })
+    console.log('maxHeight: ', maxHeight)
+    setBiggestHeight(maxHeight)
+  }
   useEffect(() => {
-    const updateBiggestHeight = () => {
-      const listComponent = document.querySelectorAll('#list-component') as NodeListOf<HTMLElement>
-      let maxHeight = 0
-
-      listComponent.forEach((card) => {
-        const height = card.clientHeight
-        if (height > maxHeight) {
-          maxHeight = height
-        }
-      })
-
-      setBiggestHeight(maxHeight)
-    }
-
     // Calculate the biggest height whenever list.cards changes
     updateBiggestHeight()
 
@@ -106,7 +104,7 @@ export default function ListsComponent({
           >
             <div className='relative flex flex-row items-start p-4 '>
               {listsData?.map((list, index) => (
-                <div key={index} id='list-component'>
+                <div key={index}>
                   <ListComponent
                     cardSelected={cardSelected}
                     maxHeight={biggestHeight}
