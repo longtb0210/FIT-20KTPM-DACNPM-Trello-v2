@@ -13,6 +13,14 @@ export default function Recent() {
   const anchorRef = React.useRef<HTMLButtonElement>(null)
   const { colors } = useTheme()
 
+  const savedValuesString = localStorage.getItem('savedValues')
+  if (savedValuesString) {
+    const savedValues = JSON.parse(savedValuesString)
+    console.log(savedValues)
+  } else {
+    console.log('cc')
+  }
+
   const handleToggle = () => {
     setOpen((prevOpen) => !prevOpen)
   }

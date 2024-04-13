@@ -1,6 +1,6 @@
 import { Routes, Route } from 'react-router-dom'
 import HomePage from '~/pages/Home'
-import { Templates } from './../pages/Templates/index'
+import CardTemplate from '~/pages/Templates/component/CardTemplate'
 import { AccountManagement, Board, BoardsPage, ErrorPage } from '~/pages'
 import { CategoryWorkspace } from '~/pages/CategoryWorkspace'
 import PageMembers from '~/pages/Members'
@@ -30,15 +30,11 @@ export const Navigation = () => {
             <Route path='/' element={<HomePage />} />
             <Route path='/profile' element={<AccountManagement page={`profile`} />} />
             <Route path='/template' element={<Templates />} />
-
             <Route path='/workspace/:workspaceId/board/:boardId' element={<CategoryWorkspace />} />
             <Route path='/boards/:id?' element={<BoardsPage />} />
-
             <Route path='/activity' element={<AccountManagement page={`activity`} />} />
-            {/* <Route path='/cardlist' element={<Board />} /> */}
-            {/* <Route path='/carddetail' element={<CardDetailWindow />} /> */}
             <Route path='/workspace/:workspaceId/members' element={<PageMembers />} />
-            <Route path='/workspaceSetting/:workspaceId' element={<WorkspaceSetting />} />
+            <Route path='/workspaceSetting/:workspaceId' element={<WorkspaceSetting />} />       
             <Route path='/workspaceboard/:workspaceId' element={<WorkspaceBoardsPage />} />
           </Route>
         </Route>

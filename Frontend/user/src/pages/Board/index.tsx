@@ -82,8 +82,24 @@ export function Board() {
   const params = useParams()
   const boardId = params.boardId
   useEffect(() => {
-    console.log('boardspaceId: ', boardId)
-  })
+    if (boardId) {
+      if (boardId) {
+        const exists = savedValues.includes(boardId)
+        if (exists) {
+          const filteredValues = savedValues.filter((value) => value !== boardId)
+          setSavedValues([boardId, ...filteredValues])
+        } else {
+          setSavedValues([boardId, ...savedValues])
+        }
+      }
+    }
+  }, [boardId, params, savedValues])
+
+  // Lưu savedValues vào localStorage mỗi khi nó thay đổi
+  useEffect(() => {
+    localStorage.setItem('savedValues', JSON.stringify(savedValues))
+  }, [savedValues])
+
   const [action, setAction] = useState<boolean>(false)
   useEffect(() => {
     console.log('My list: ', listsData)

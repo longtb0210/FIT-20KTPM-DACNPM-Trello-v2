@@ -1,20 +1,26 @@
+import React from 'react'
 import SidebarTemplate from '../../components/SidebarTemplate'
-import CardTemplate from '../Templates/component/CardTemplate'
 import { useTheme } from '../../components/Theme/themeContext'
 import { Box, Grid } from '@mui/material'
 
-export function Templates() {
-  const { darkMode, colors } = useTheme();
+interface PageWithSidebarProps {
+  children: React.ReactNode;
+}
+
+const PageWithSidebar: React.FC<PageWithSidebarProps> = ({ children }) => {
+  const { darkMode, colors } = useTheme()
   return (
     <Box sx={{ bgcolor: colors.background }} className='flex items-center justify-center'>
-      <Grid container sx={{ maxWidth: 1152 }}>
-        <Grid xs={3} sx={{ paddingLeft: '28px' }}>
+      <Grid container>
+        <Grid item xs={3} style={{ paddingLeft: '15vw' }}>
           <SidebarTemplate />
         </Grid>
-        <Grid xs={9} sx={{ paddingLeft: '25px' }}>
-          <CardTemplate />
+        <Grid item xs={9} style={{ overflowY: 'auto', paddingLeft: '5vw' }}>
+          {children}
         </Grid>
       </Grid>
     </Box>
   )
 }
+
+export default PageWithSidebar
