@@ -1,7 +1,7 @@
-import { createContext, useEffect, useRef, useState } from 'react'
 import Keycloak from 'keycloak-js'
-import { TokenSlice } from '~/store/reducers'
+import { createContext, useEffect, useRef, useState } from 'react'
 import { useDispatch } from 'react-redux'
+import { TokenSlice } from '~/store/reducers'
 
 type AuthContext = {
   keycloak: Keycloak | undefined
