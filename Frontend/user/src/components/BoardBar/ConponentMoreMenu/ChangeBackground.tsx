@@ -106,7 +106,7 @@ const ChangeBackground: React.FC<Props> = ({ open, handleDrawerClose }) => {
 
   const [addBackgroundById] = BoardApiRTQ.BoardApiSlice.useAddBackgroundBoardMutation()
   const [getBoardById, { data: boardData }] = BoardApiRTQ.BoardApiSlice.useLazyGetBoardByIdQuery()
-
+  const [getAllBoard, { data: boardRes }] = BoardApiRTQ.BoardApiSlice.useLazyGetBoardByWorkspaceIdQuery()
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const [selectedFile, setSelectedFile] = useState<any | null>(null)
 
@@ -141,10 +141,12 @@ const ChangeBackground: React.FC<Props> = ({ open, handleDrawerClose }) => {
         setSelectedFile(file)
         // console.log('File đã được chọn:', file)
         //lưu file vào local
-        if (boardId !== undefined) {
+        if (boardId !== undefined && workspaceId !== undefined) {
           addBackgroundById({ id: boardId, background: file }).then((response) => {
             // Xử lý response ở đây nếu cần
             console.log(response)
+            getBoardById(boardId)
+            getAllBoard({ workspaceId: workspaceId })
           })
         }
         // .catch((error) => {
@@ -264,7 +266,7 @@ const ChangeBackground: React.FC<Props> = ({ open, handleDrawerClose }) => {
                 <ImageBackdrop className='MuiImageBackdrop-root' />
               </ImageButton>
             ))}
-          {inputExists && (
+          {/* {inputExists && (
             <ImageButton
               focusRipple
               key='hello'
@@ -281,7 +283,7 @@ const ChangeBackground: React.FC<Props> = ({ open, handleDrawerClose }) => {
               {showCloseIcon && <IoClose onClick={handleDeleteBackGround} />}
               <ImageBackdrop className='MuiImageBackdrop-root' />
             </ImageButton>
-          )}
+          )} */}
         </Box>
       </Drawer>
     </div>

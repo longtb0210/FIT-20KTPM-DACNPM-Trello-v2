@@ -15,7 +15,7 @@ export const BoardLayout: React.FC<LayoutProps> = ({ children, openCardSetting }
   useEffect(() => {
     console.log('boardId BG: ', boardId)
     getBoardById(boardId)
-  }, [])
+  }, [boardRes])
   useEffect(() => {
     console.log('boardData BG: ', boardRes)
     setBoardData(boardRes?.data)
