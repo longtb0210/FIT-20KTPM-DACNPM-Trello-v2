@@ -9,6 +9,7 @@ import { faChessBoard, faGear, faTableCells, faUserGroup, faHome } from '@fortaw
 import { faHeart } from '@fortawesome/free-regular-svg-icons'
 import { useTheme } from './Theme/themeContext'
 import { handleWorkspaceName } from '../utils/handleWorkspaceName'
+import { stringToColor } from '~/utils/StringToColor'
 
 const menuItems = [
   'Business',
@@ -176,10 +177,11 @@ const SidebarTemplate = () => {
                             fontWeight: 700,
                             padding: '8px 14px',
                             borderRadius: '6px',
-                            backgroundImage: 'linear-gradient(to bottom, #E774BB, #943D73)',
+                            backgroundColor: stringToColor(w.name),
                             width: '40px',
                             height: '40px',
-                            textAlign: 'center'
+                            textAlign: 'center',
+                            color: colors.foreColor
                           }}
                         >
                           {w.name.charAt(0).toLocaleUpperCase()}

@@ -1,11 +1,7 @@
 import * as React from 'react'
 import { Box, Button, ClickAwayListener, Grow, Paper, Popper, MenuList, Stack, Typography } from '@mui/material'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
-import {
-  faChevronDown
-  // faStar as starFull
-} from '@fortawesome/free-solid-svg-icons'
-// import { faStar } from '@fortawesome/free-regular-svg-icons'
+import { faChevronDown } from '@fortawesome/free-solid-svg-icons'
 import { useTheme } from './../../Theme/themeContext'
 import { BoardApiRTQ, WorkspaceApiRTQ } from '~/api'
 import noWorkspace from '~/assets/no_workspace.svg'
@@ -44,9 +40,6 @@ interface Board {
 
 export default function Recent() {
   const [open, setOpen] = React.useState(false)
-  // const [isHovered, setIsHovered] = React.useState(false)
-  // const [isHoveredStar, setIsHoveredStar] = React.useState(false)
-  // const [star, setStar] = React.useState(false)
   const anchorRef = React.useRef<HTMLButtonElement>(null)
   const { colors } = useTheme()
   const [getBoardById] = BoardApiRTQ.BoardApiSlice.useLazyGetBoardByIdQuery()
@@ -57,13 +50,22 @@ export default function Recent() {
   const savedValuesString = localStorage.getItem('savedValues')
 
   React.useEffect(() => {
-    if (savedValuesString) {
-      const savedValues = JSON.parse(savedValuesString)
+    if (dataWorkspace) {
+      const workspaceName = dataWorkspace.data?.name || ''
 
-      setListBoard([])
+      setListNameWorkspace((prev) => [...prev, workspaceName])
+    }
+  }, [dataWorkspace])
 
-      savedValues.map((recent: string) => {
-        getBoardById(recent).then((res) => {
+  React.useEffect(() => {
+    const fetchData = async () => {
+      if (savedValuesString) {
+        const savedValues = JSON.parse(savedValuesString)
+        setListBoard([])
+
+        for (const recent of savedValues) {
+          const res = await getBoardById(recent)
+
           if (res.data && res.data.data) {
             const newBoard: Board = {
               name: res.data.data.name || '',
@@ -78,25 +80,25 @@ export default function Recent() {
               watcher_email: res.data.data.watcher_email || [],
               _id: res.data.data._id || ''
             }
+
             setListBoard((prev) => [...prev, newBoard])
           }
-        })
-      })
+        }
+      }
     }
-  }, [getBoardById, savedValuesString])
+
+    fetchData()
+  }, [getBoardById, getWorkspaceByID, savedValuesString])
 
   React.useEffect(() => {
-    if (listBoard) {
-      listBoard.map((board) => {
-        getWorkspaceByID({ workspace_id: board.workspace_id }).then(() => {
-          if (dataWorkspace) {
-            const workspaceName = dataWorkspace.data?.name || ''
-            setListNameWorkspace((prev) => [workspaceName, ...prev])
-          }
-        })
-      })
+    const fetchWorkspace = async (workspaceId: string) => {
+      await getWorkspaceByID({ workspace_id: workspaceId })
     }
-  }, [dataWorkspace, getWorkspaceByID, listBoard])
+
+    listBoard.map((board) => {
+      fetchWorkspace(board.workspace_id)
+    })
+  }, [getWorkspaceByID, listBoard])
 
   const handleToggle = () => {
     setOpen((prevOpen) => !prevOpen)
@@ -204,8 +206,6 @@ export default function Recent() {
                                 borderRadius: '4px'
                               }
                             }}
-                            // onMouseEnter={() => setIsHovered(true)}
-                            // onMouseLeave={() => setIsHovered(false)}
                           >
                             <Box sx={{ display: 'flex', alignItems: 'center' }}>
                               <Box
@@ -237,36 +237,6 @@ export default function Recent() {
                                 </Typography>
                               </Box>
                             </Box>
-
-                            {/* {isHovered && (
-                              <FontAwesomeIcon
-                                icon={faStar}
-                                style={{
-                                  color: isHoveredStar ? 'yellow' : colors.text,
-                                  marginRight: '8px',
-                                  display: star ? 'none' : 'block',
-                                  fontSize: isHoveredStar ? '16px' : '14px',
-                                  transition: 'all 0.1s ease-in'
-                                }}
-                                onMouseEnter={() => setIsHoveredStar(true)}
-                                onMouseLeave={() => setIsHoveredStar(false)}
-                                onClick={() => setStar(true)}
-                              />
-                            )}
-                            {star && (
-                              <FontAwesomeIcon
-                                icon={starFull}
-                                style={{
-                                  color: 'yellow',
-                                  marginRight: '8px',
-                                  fontSize: isHoveredStar ? '16px' : '14px',
-                                  transition: 'all 0.1s ease-in'
-                                }}
-                                onMouseEnter={() => setIsHoveredStar(true)}
-                                onMouseLeave={() => setIsHoveredStar(false)}
-                                onClick={() => setStar(false)}
-                              />
-                            )} */}
                           </Box>
                         </Link>
                       ))

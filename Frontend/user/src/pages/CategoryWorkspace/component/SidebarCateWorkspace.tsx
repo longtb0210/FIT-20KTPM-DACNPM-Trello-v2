@@ -4,13 +4,7 @@ import IconButton from '@mui/material/IconButton'
 import ChevronLeftIcon from '@mui/icons-material/ChevronLeft'
 import ChevronRightIcon from '@mui/icons-material/ChevronRight'
 import { Box, Button, Typography, Divider, Drawer } from '@mui/material'
-import {
-  faGear,
-  faUserGroup,
-  faTableCellsLarge,
-  faTableColumns,
-  faCalendarDays
-} from '@fortawesome/free-solid-svg-icons'
+import { faGear, faUserGroup, faTableCellsLarge, faCalendarDays } from '@fortawesome/free-solid-svg-icons'
 import { faTrello } from '@fortawesome/free-brands-svg-icons'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { Sidebar, Menu, MenuItem } from 'react-pro-sidebar'
@@ -19,6 +13,7 @@ import { Link, useParams, useLocation } from 'react-router-dom'
 import { WorkspaceApiRTQ } from '~/api'
 import { BoardApiRTQ } from '~/api'
 import FileUploadIcon from '@mui/icons-material/FileUpload'
+import { stringToColor } from '~/utils/StringToColor'
 
 const drawerWidth = 250
 
@@ -113,13 +108,14 @@ const SidebarCateWorkSpace: React.FC<Props> = ({ open, handleDrawerClose }) => {
                     fontWeight: 700,
                     padding: '8px 14px',
                     borderRadius: '6px',
-                    backgroundImage: 'linear-gradient(to bottom, #E774BB, #943D73)',
+                    background: stringToColor(workspaceData?.data.name || ''),
                     width: '40px',
                     height: '40px',
-                    textAlign: 'center'
+                    textAlign: 'center',
+                    color: colors.foreColor
                   }}
                 >
-                  {workspaceData?.data.name.charAt(0)}
+                  {workspaceData?.data.name.charAt(0).toUpperCase()}
                 </Typography>
               </Box>
               <div className='ml-2 cursor-pointer font-bold'>

@@ -114,8 +114,6 @@ export default function Starred() {
           const responseData = res.data
           const workspaceName = item.name
 
-          console.log(responseData)
-
           if (responseData && responseData.data) {
             const boardsWithWorkspaceName = responseData.data.map((board) => ({
               ...board,
@@ -143,8 +141,6 @@ export default function Starred() {
 
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [dataWorkspace, getAllBoardById, getAllWorkspace])
-
-  console.log(listBoard)
 
   const updateStar = (index: number) => {
     const boardId = listBoard && listBoard[index] ? listBoard[index]._id : undefined

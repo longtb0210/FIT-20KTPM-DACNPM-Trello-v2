@@ -111,7 +111,7 @@ export default function CreateBoard(props: AutocompleteContainerProps) {
   useEffect(() => {
     if (workspace) {
       props.onClose()
-      navigator(`/workspace/${workspace.data._id}`)
+      navigator(`/workspace/${idWorkspace}/board/${workspace.data._id}`)
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [workspace])

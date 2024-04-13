@@ -3,7 +3,6 @@ import { Box, ClickAwayListener, Grow, Paper, Popper, MenuList, Stack, Typograph
 import { Link } from 'react-router-dom'
 import { useTheme } from './../../Theme/themeContext'
 import { AuthContext } from '~/components/AuthProvider/AuthProvider'
-import { stringToColor } from '~/utils/StringToColor'
 import { stringAvatar } from '~/utils/StringAvatar'
 
 export default function Account() {
@@ -53,29 +52,6 @@ export default function Account() {
   const handleLogout = () => {
     if (authContext) {
       authContext.logout()
-    }
-  }
-
-  const getFirstTwoCharsOfLastWord = (inputString: string) => {
-    if (inputString) {
-      const words = inputString.split(' ')
-
-      if (words.length >= 2) {
-        const secondToLastWord = words[words.length - 2]
-        const lastWord = words[words.length - 1]
-
-        let firstLetters = `${secondToLastWord.charAt(0)}${lastWord.charAt(0)}`
-
-        if (!firstLetters.match(/[A-Z]/)) {
-          firstLetters = firstLetters.toUpperCase()
-        }
-
-        return firstLetters
-      } else {
-        return null
-      }
-    } else {
-      return null
     }
   }
 
