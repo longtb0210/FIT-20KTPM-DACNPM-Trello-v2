@@ -209,6 +209,17 @@ export class CardlistController {
       data: data,
     }
   }
+
+  @InjectRoute(CardlistRoutes.removeWatcher)
+  async removeWatcher(
+    @Body(new ZodValidationPipe(TrelloApi.CardlistApi.RemoveWatcherRequestSchema))
+    body: TrelloApi.CardlistApi.RemoveWatcherRequest,
+  ): Promise<TrelloApi.CardlistApi.RemoveWatcherResponse> {
+    const data = await this.cardlistService.removeWatcher(body)
+    return {
+      data: data,
+    }
+  }
   @InjectRoute(CardlistRoutes.addCardTolist)
   async addCardToList(
     @Body(new ZodValidationPipe(TrelloApi.CardlistApi.AddCardToListRequestSchema))
