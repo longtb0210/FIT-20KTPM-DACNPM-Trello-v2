@@ -81,24 +81,24 @@ export function Board() {
   const [selectedCard, setSelectedCard] = useState<Card>()
   const params = useParams()
   const boardId = params.boardId
-  useEffect(() => {
-    if (boardId) {
-      if (boardId) {
-        const exists = savedValues.includes(boardId)
-        if (exists) {
-          const filteredValues = savedValues.filter((value) => value !== boardId)
-          setSavedValues([boardId, ...filteredValues])
-        } else {
-          setSavedValues([boardId, ...savedValues])
-        }
-      }
-    }
-  }, [boardId, params, savedValues])
+  // useEffect(() => {
+  //   if (boardId) {
+  //     if (boardId) {
+  //       const exists = savedValues.includes(boardId)
+  //       if (exists) {
+  //         const filteredValues = savedValues.filter((value) => value !== boardId)
+  //         setSavedValues([boardId, ...filteredValues])
+  //       } else {
+  //         setSavedValues([boardId, ...savedValues])
+  //       }
+  //     }
+  //   }
+  // }, [boardId, params, savedValues])
 
   // Lưu savedValues vào localStorage mỗi khi nó thay đổi
-  useEffect(() => {
-    localStorage.setItem('savedValues', JSON.stringify(savedValues))
-  }, [savedValues])
+  // useEffect(() => {
+  //   localStorage.setItem('savedValues', JSON.stringify(savedValues))
+  // }, [savedValues])
 
   const [action, setAction] = useState<boolean>(false)
   useEffect(() => {
@@ -386,15 +386,14 @@ export function Board() {
         const newIndex = listsData?.findIndex((data) => data._id === over.id)
         console.log('old: ', oldIndex)
         console.log('new: ', newIndex)
+        const newListsData = arrayMove(listsData, oldIndex, newIndex)
+        setListsData(newListsData)
+
         if (boardId)
           moveListAPI({
             index: newIndex,
             _id: active.id as string
           }).then(() => {
-            const newListsData = arrayMove(listsData, oldIndex, newIndex)
-            const newList = newListsData.map((data, index) => ({ ...data, index }))
-            setListsData(newList)
-
             setAction(!action)
             getCardListByBoardId({ id: boardId })
           })
