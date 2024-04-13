@@ -182,7 +182,7 @@ const SidebarTemplate = () => {
                             textAlign: 'center'
                           }}
                         >
-                          {w.name.charAt(0)}
+                          {w.name.charAt(0).toLocaleUpperCase()}
                         </Typography>
                       </Box>
                       {handleWorkspaceName(w.name)}

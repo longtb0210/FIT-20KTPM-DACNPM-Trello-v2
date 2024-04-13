@@ -8,7 +8,7 @@ import { Card } from '@trello-v2/shared/src/schemas/CardList'
 import { Feature_CardLabel } from '@trello-v2/shared/src/schemas/Feature'
 import React from 'react'
 import { BoardLabel } from '@trello-v2/shared/src/schemas/Board'
-import { BoardApiRTQ, CardApiRTQ } from '~/api'
+import { BoardApiRTQ, CardApiRTQ, CardlistApiRTQ } from '~/api'
 
 // eslint-disable-next-line react-refresh/only-export-components
 export const labelColors: string[] = [
@@ -148,6 +148,7 @@ export default function CardLabelList({
   const [removeBoardLabelAPI] = BoardApiRTQ.BoardApiSlice.useRemoveBoardLabelMutation()
   const [addCardFeatureAPI] = CardApiRTQ.CardApiSlice.useAddCardFeatureMutation()
   const [deleteCardFeatureAPI] = CardApiRTQ.CardApiSlice.useDeleteCardFeatureMutation()
+  const [getCardlistByBoardIdAPI] = CardlistApiRTQ.CardListApiSlice.useLazyGetCardlistByBoardIdQuery()
 
   function openModal(modalIndex: number) {
     const updatedOpenModal = modalState.map((state, index) => (index === modalIndex ? true : state))
@@ -163,7 +164,7 @@ export default function CardLabelList({
       .unwrap()
       .then((response) => {
         const newBoardLabel: BoardLabel = {
-          _id: response._id,
+          _id: response.data._id,
           color: color,
           name: name
         }
@@ -213,6 +214,9 @@ export default function CardLabelList({
           features: [...currentCard.features, response.data]
         }
         setCurrentCard(updatedCard)
+        getCardlistByBoardIdAPI({
+          id: boardId
+        })
       })
       .catch((error) => {
         console.log('ERROR: add label to card - ', error)
@@ -231,6 +235,9 @@ export default function CardLabelList({
       .unwrap()
       .then((response) => {
         setCurrentCard(response.data)
+        getCardlistByBoardIdAPI({
+          id: boardId
+        })
       })
       .catch((error) => {
         console.log('ERROR: remove card from label - ', error)

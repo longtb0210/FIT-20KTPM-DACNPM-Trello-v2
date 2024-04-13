@@ -58,11 +58,15 @@ const BoardApiSlice = createApi({
       })
     }),
     addBackgroundBoard: builder.mutation<TrelloApi.BoardApi.UpdateBoardResponse, { id: string; background: File }>({
-      query: (data) => ({
-        url: `/api/board/${data.id}/background_list/add`,
-        body: data,
-        method: 'POST'
-      })
+      query: (data) => {
+        const body = new FormData()
+        body.append('background', data.background)
+        return {
+          url: `/api/board/${data.id}/background_list/add`,
+          body: body,
+          method: 'POST'
+        }
+      }
     }),
     addWatcherMember: builder.mutation<TrelloApi.BoardApi.AddMemberResponse, TrelloApi.BoardApi.AddWatcherRequest>({
       query: (data) => ({

@@ -63,14 +63,33 @@ export default function CreateBoard(props: AutocompleteContainerProps) {
   const [inputValueVisibility, setInputValueVisibility] = useState('')
   const [idWorkspace, setIdWorkspace] = useState(workspaceData?.data.owner[0]?._id || '')
   const [boardTitle, setBoardTitle] = useState('')
+  const [height, setHeight] = useState(0)
   const [activeBg, setActiveBg] = useState({ check: true, index: 0, type: 'color', data: bg_color[0].color })
   const anchorRef = useRef<HTMLButtonElement>(null)
   const { darkMode, colors } = useTheme()
   const navigator = useNavigate()
+  const heightRef = useRef<HTMLDivElement>(null)
 
   useEffect(() => {
     getALlWorkspace()
   }, [getALlWorkspace])
+
+  useEffect(() => {
+    const handleResize = () => {
+      const newHeight = heightRef.current?.offsetHeight || 0
+      setHeight(newHeight)
+    }
+
+    const resizeObserver = new ResizeObserver(handleResize)
+
+    if (heightRef.current) {
+      resizeObserver.observe(heightRef.current)
+    }
+
+    return () => {
+      resizeObserver.disconnect()
+    }
+  }, [])
 
   const handleTitleBoard = (event: React.ChangeEvent<HTMLInputElement>) => {
     setBoardTitle(event.target.value)
@@ -98,7 +117,7 @@ export default function CreateBoard(props: AutocompleteContainerProps) {
   }, [workspace])
 
   return (
-    <Box sx={{ padding: '0 12px', overflowY: 'scroll' }}>
+    <Box sx={{ padding: '0 12px', overflowY: height < 552 ? 'scroll' : 'none' }} id='height' ref={heightRef}>
       <Box
         onClick={props.onBack}
         sx={{

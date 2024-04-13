@@ -10,7 +10,7 @@ import { DateTimePicker, LocalizationProvider } from '@mui/x-date-pickers'
 import { useTheme } from '~/components/Theme/themeContext'
 import { Card } from '@trello-v2/shared/src/schemas/CardList'
 import { Feature_Date } from '@trello-v2/shared/src/schemas/Feature'
-import { CardApiRTQ } from '~/api'
+import { CardApiRTQ, CardlistApiRTQ } from '~/api'
 
 const reminderDateChoices: string[] = [
   'None',
@@ -53,6 +53,7 @@ export function SelectCardDatesModal({
   const [addCardFeatureAPI] = CardApiRTQ.CardApiSlice.useAddCardFeatureMutation()
   const [updateCardFeatureAPI] = CardApiRTQ.CardApiSlice.useUpdateCardFeatureMutation()
   const [deleteCardFeatureAPI] = CardApiRTQ.CardApiSlice.useDeleteCardFeatureMutation()
+  const [getCardlistByBoardIdAPI] = CardlistApiRTQ.CardListApiSlice.useLazyGetCardlistByBoardIdQuery()
 
   useEffect(() => {
     const featureDate = currentCard.features.find((feature) => feature.type === 'date') as Feature_Date
@@ -103,6 +104,9 @@ export function SelectCardDatesModal({
             features: [...currentCard.features, response.data]
           }
           setCurrentCard(updatedCard)
+          getCardlistByBoardIdAPI({
+            id: boardId
+          })
         })
         .catch((error) => {
           console.log('ERROR: add card dates - ', error)
@@ -132,6 +136,9 @@ export function SelectCardDatesModal({
         )
       }
       setCurrentCard(updatedCard)
+      getCardlistByBoardIdAPI({
+        id: boardId
+      })
     }
   }
 

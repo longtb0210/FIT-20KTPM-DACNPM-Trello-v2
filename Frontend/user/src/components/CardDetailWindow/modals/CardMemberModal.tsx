@@ -6,7 +6,7 @@ import { faXmark } from '@fortawesome/free-solid-svg-icons'
 import { useTheme } from '~/components/Theme/themeContext'
 import { Card } from '@trello-v2/shared/src/schemas/CardList'
 import { Activity } from '@trello-v2/shared/src/schemas/Activity'
-import { BoardApiRTQ, CardApiRTQ, WorkspaceApiRTQ } from '~/api'
+import { BoardApiRTQ, CardApiRTQ, CardlistApiRTQ, WorkspaceApiRTQ } from '~/api'
 import { useParams } from 'react-router-dom'
 
 interface MemberAvatarAndNameProps {
@@ -77,6 +77,7 @@ export function CardMemberModal({
   const [getBoardByIdAPI] = BoardApiRTQ.BoardApiSlice.useLazyGetBoardByIdQuery()
   const [addBoardMemberAPI] = BoardApiRTQ.BoardApiSlice.useAddMemberToBoardMutation()
   const [getWorkspaceByIdAPI] = WorkspaceApiRTQ.WorkspaceApiSlice.useLazyGetWorkspaceInfoQuery()
+  const [getCardlistByBoardIdAPI] = CardlistApiRTQ.CardListApiSlice.useLazyGetCardlistByBoardIdQuery()
 
   function filterMemberLists(event: React.ChangeEvent<HTMLInputElement>) {
     setSearchValue(event.currentTarget.value)
@@ -131,6 +132,10 @@ export function CardMemberModal({
       cardlist_id: cardlistId,
       card_id: cardId,
       member_email: member
+    }).then(() => {
+      getCardlistByBoardIdAPI({
+        id: boardId
+      })
     })
   }
 

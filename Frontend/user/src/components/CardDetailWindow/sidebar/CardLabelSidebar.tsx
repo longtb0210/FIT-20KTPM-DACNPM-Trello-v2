@@ -5,7 +5,7 @@ import { Box } from '@mui/material'
 import { Card } from '@trello-v2/shared/src/schemas/CardList'
 import { Feature_CardLabel } from '@trello-v2/shared/src/schemas/Feature'
 import { BoardLabel } from '@trello-v2/shared/src/schemas/Board'
-import { BoardApiRTQ, CardApiRTQ } from '~/api'
+import { BoardApiRTQ, CardApiRTQ, CardlistApiRTQ } from '~/api'
 
 interface SidebarButtonLabelsProps {
   type: ButtonType
@@ -38,6 +38,7 @@ export function SidebarButtonLabels({
   const [removeBoardLabelAPI] = BoardApiRTQ.BoardApiSlice.useRemoveBoardLabelMutation()
   const [addCardFeatureAPI] = CardApiRTQ.CardApiSlice.useAddCardFeatureMutation()
   const [deleteCardFeatureAPI] = CardApiRTQ.CardApiSlice.useDeleteCardFeatureMutation()
+  const [getCardlistByBoardIdAPI] = CardlistApiRTQ.CardListApiSlice.useLazyGetCardlistByBoardIdQuery()
 
   function openModal(modalIndex: number) {
     const updatedOpenModal = modalState.map((state, index) => (index === modalIndex ? true : state))
@@ -53,7 +54,7 @@ export function SidebarButtonLabels({
       .unwrap()
       .then((response) => {
         const newBoardLabel: BoardLabel = {
-          _id: response._id,
+          _id: response.data._id,
           color: color,
           name: name
         }
@@ -103,6 +104,9 @@ export function SidebarButtonLabels({
           features: [...currentCard.features, response.data]
         }
         setCurrentCard(updatedCard)
+        getCardlistByBoardIdAPI({
+          id: boardId
+        })
       })
       .catch((error) => {
         console.log('ERROR: add label to card - ', error)
@@ -121,6 +125,9 @@ export function SidebarButtonLabels({
       .unwrap()
       .then((response) => {
         setCurrentCard(response.data)
+        getCardlistByBoardIdAPI({
+          id: boardId
+        })
       })
       .catch((error) => {
         console.log('ERROR: remove card from label - ', error)

@@ -81,7 +81,8 @@ export default function CreateWorkspace(props: AutocompleteContainerProps) {
           display: 'flex',
           alignItems: 'stretch',
           borderRadius: '4px',
-          position: 'relative'
+          position: 'relative',
+          boxShadow: 'rgba(100, 100, 111, 0.2) 0px 7px 29px 0px'
         }}
       >
         <Box
@@ -269,7 +270,9 @@ export default function CreateWorkspace(props: AutocompleteContainerProps) {
             justifyContent: 'center',
             padding: '0 120px',
             paddingTop: '112px',
-            backgroundImage: `url(${'https://trello.com/assets/df0d81969c6394b61c0d.svg'})` // Thay đổi đường dẫn ở đây
+            backgroundImage: `url(${'https://trello.com/assets/df0d81969c6394b61c0d.svg'})`,
+            borderTopRightRadius: '4px',
+            borderBottomRightRadius: '4px'
           }}
         >
           <Box sx={{}}>

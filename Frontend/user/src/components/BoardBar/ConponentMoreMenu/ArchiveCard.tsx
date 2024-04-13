@@ -114,14 +114,14 @@ const ArchivedItems: React.FC<Props> = ({ open, handleDrawerClose }) => {
           {CardData &&
             CardData.data &&
             (switchToLists ? (
-              CardData.data.map((cardList, index) => (
+              CardData.data.map((cardList: any, index: number) => (
                 <div key={index}>
                   {cardList.cards && cardList.cards.length > 0 ? (
-                    cardList.cards.map((card) => (
+                    cardList.cards.map((card: any) => (
                       <ArCard
                         card={card}
                         switchToLists={switchToLists}
-                        boardId={boardId}
+                        boardId={boardId !== undefined ? boardId : ''}
                         cardListId={cardList.id}
                         key={card._id}
                       />
@@ -134,10 +134,15 @@ const ArchivedItems: React.FC<Props> = ({ open, handleDrawerClose }) => {
             ) : (
               <div>
                 {/* Render cardlists here */}
-                {CardData.data.map((cardList, index) => (
+                {CardData.data.map((cardList: any, index: number) => (
                   <div key={index}>
                     {cardList ? (
-                      <ArCard card={cardList} switchToLists={switchToLists} boardId={boardId} key={cardList.id} />
+                      <ArCard
+                        card={cardList}
+                        switchToLists={switchToLists}
+                        boardId={boardId !== undefined ? boardId : ''}
+                        key={cardList.id}
+                      />
                     ) : (
                       <div>No cards list found</div>
                     )}
