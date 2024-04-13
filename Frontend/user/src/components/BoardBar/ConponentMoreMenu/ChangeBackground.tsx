@@ -145,6 +145,7 @@ const ChangeBackground: React.FC<Props> = ({ open, handleDrawerClose }) => {
           addBackgroundById({ id: boardId, background: file }).then((response) => {
             // Xử lý response ở đây nếu cần
             console.log(response)
+            getBoardById(boardId)
           })
         }
         // .catch((error) => {

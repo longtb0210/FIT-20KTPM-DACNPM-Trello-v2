@@ -2,6 +2,10 @@ import React, { ChangeEvent, useEffect, useRef, useState } from 'react'
 import { IoMdClose } from 'react-icons/io'
 import { SlPeople } from 'react-icons/sl'
 import { useTheme } from '../Theme/themeContext'
+// import { BoardApiRTQ } from '~/api'
+// import { useParams } from 'react-router-dom'
+// import { Board } from '@trello-v2/shared/src/schemas/Board'
+import { stringToColor } from '~/utils/StringToColor'
 interface LogoProps {
   name: string | undefined
 }
@@ -11,6 +15,18 @@ const LogoSection: React.FC<LogoProps> = ({ name }) => {
   const [workspaceName, setWorkspacename] = useState<string>()
   const [logo, setLogo] = useState(false)
   const { darkMode, colors } = useTheme()
+  // const [getBoardById, { data: boardRes }] = BoardApiRTQ.BoardApiSlice.useLazyGetBoardByIdQuery()
+  // const [boardData, setBoardData] = useState<Board | null>()
+  // const params = useParams()
+  // const boardId = params.boardId
+  // useEffect(() => {
+  //   console.log('boardId BG: ', boardId)
+  //   getBoardById(boardId)
+  // }, [boardRes])
+  // useEffect(() => {
+  //   console.log('boardData BG: ', boardRes)
+  //   setBoardData(boardRes?.data)
+  // }, [boardRes])
   const fileInputRef = useRef<HTMLInputElement>(null)
   useEffect(() => {
     setWorkspacename(name)
@@ -41,8 +57,11 @@ const LogoSection: React.FC<LogoProps> = ({ name }) => {
           className={`${isHoverLogo ? 'cursor-pointer' : ''} relative flex h-[65px] w-[65px] items-center justify-center rounded-md          
            shadow-sm`}
           style={{
-            // background: `linear-gradient(to bottom, ${stringToColor(workspaceName)}, ${stringToColor(workspaceName + '1')})`
-            background: `linear-gradient(to bottom,  #E774BB, #943D73)`
+            backgroundColor: ` ${stringToColor(workspaceName)}`,
+            // background: `linear-gradient(to bottom,  #E774BB, #943D73)`,
+            // backgroundImage:
+            //   boardData.background.charAt(0) === 'h' ? `url("${boardData.background}")` : boardData.background,
+            color: colors.foreColor
           }}
         >
           <h1
