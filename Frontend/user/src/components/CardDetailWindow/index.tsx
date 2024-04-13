@@ -25,6 +25,7 @@ import { Feature_Checklist } from '@trello-v2/shared/src/schemas/Feature'
 import { BoardLabel } from '@trello-v2/shared/src/schemas/Board'
 import { BoardApiRTQ, CardApiRTQ, CardlistApiRTQ } from '~/api'
 import { SidebarButtonUnArchive } from './sidebar/CardUnArchiveSidebar'
+import { SidebarButtonJoin } from './sidebar/CardJoinSidebar'
 
 const focusInputColor = '#0ff'
 
@@ -44,17 +45,18 @@ export default function CardDetailWindow({
   handleCloseCDW
 }: CardDetailWindowProps) {
   const [profile, setProfile] = useState({ email: '', name: '' })
-  const storedProfile = localStorage.getItem('profile')
   useEffect(() => {
+    const storedProfile = localStorage.getItem('profile')
     const profileSave = storedProfile ? JSON.parse(storedProfile) : { email: '', name: '' }
     setProfile({ ...profileSave })
-  }, [storedProfile])
+  }, [])
   const { colors } = useTheme()
 
   // Card states
   const [currentCardState, setCurrentCardState] = useState<Card | null>()
   const [cardNameFieldValue, setCardNameFieldValue] = useState<string>('')
   const [initialCardNameFieldValue, setInitialCardNameFieldValue] = useState<string>('')
+  const [haveJoinedCard, setHaveJoinedCard] = useState<boolean>(false)
   const [isWatching, setIsWatching] = useState<boolean>(false)
   const [isArchived, setIsArchived] = useState<boolean>(false)
 
@@ -65,6 +67,7 @@ export default function CardDetailWindow({
   const [boardLabelState, setBoardLabelState] = useState<BoardLabel[]>([])
 
   // API
+  const [addCardMemberAPI] = CardApiRTQ.CardApiSlice.useAddCardMemberMutation()
   const [getBoardLabelAPI] = BoardApiRTQ.BoardApiSlice.useLazyGetBoardLabelQuery()
   const [getAllCardlistAPI] = CardlistApiRTQ.CardListApiSlice.useLazyGetAllCardlistQuery()
   const [getCardDetailAPI] = CardApiRTQ.CardApiSlice.useLazyGetCardDetailQuery()
@@ -107,10 +110,11 @@ export default function CardDetailWindow({
       .unwrap()
       .then((response) => {
         setCurrentCardState(response.data)
-        console.log(response.data)
+        console.log(profile.email)
         const tempIsWatching: boolean = response.data?.watcher_email.includes(profile.email) ?? false
         console.log(tempIsWatching)
         setIsWatching(tempIsWatching)
+        setHaveJoinedCard(response.data?.member_email.includes(profile.email) ?? false)
       })
       .catch((error) => {
         console.log('ERROR: fetch card data - ', error)
@@ -123,7 +127,7 @@ export default function CardDetailWindow({
     fetchCardData()
     fetchCardlistName()
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [])
+  }, [profile])
 
   // Update other states after fetch data
   useEffect(() => {
@@ -132,6 +136,19 @@ export default function CardDetailWindow({
       setInitialCardNameFieldValue(currentCardState!.name)
     }
   }, [currentCardState])
+
+  function handleJoinCard() {
+    const updatedCard: Card = {
+      ...currentCardState!,
+      member_email: [...currentCardState!.member_email, profile.email]
+    }
+    setCurrentCardState(updatedCard)
+    addCardMemberAPI({
+      cardlist_id: cardlistId,
+      card_id: cardId,
+      member_email: profile.email
+    })
+  }
 
   function handleCardNameChange(event: React.ChangeEvent<HTMLInputElement>) {
     setCardNameFieldValue(event.target.value)
@@ -368,6 +385,21 @@ export default function CardDetailWindow({
                   </Grid>
                   <Grid item xs={3} sx={{ padding: '0 16px 8px 8px' }}>
                     <Stack sx={{ padding: '10px 0 0 0' }}>
+                      {!haveJoinedCard && (
+                        <>
+                          <h2 style={{ color: colors.text }} className='mb-2 text-xs font-bold'>
+                            Suggested
+                          </h2>
+                          <SidebarButtonJoin
+                            type={ButtonType.Join}
+                            handleJoinCard={() => {
+                              handleJoinCard()
+                              setHaveJoinedCard(true)
+                            }}
+                          />
+                          <div className='mb-3'></div>
+                        </>
+                      )}
                       <h2 style={{ color: colors.text }} className='mb-2 text-xs font-bold'>
                         Add to card
                       </h2>
