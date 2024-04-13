@@ -11,6 +11,7 @@ import ChangeBackground from './ConponentMoreMenu/ChangeBackground'
 import { BoardApiRTQ } from '~/api'
 import ArchivedItems from './ConponentMoreMenu/ArchiveCard'
 import Activity from './ConponentMoreMenu/Activity'
+import { useParams } from 'react-router-dom'
 const drawerWidth = 320
 
 const DrawerHeader = styled('div')(({ theme }) => ({
@@ -28,10 +29,8 @@ interface Props {
 }
 
 const MoreMenu: React.FC<Props> = ({ open, handleDrawerClose }) => {
-  const url = window.location.href
-  const workspaceIndex = url.indexOf('workspace/')
-  const idsPart = url.substring(workspaceIndex + 'workspace/'.length)
-  const [workspaceId, boardId] = idsPart.split('&')
+  const { workspaceId, boardId } = useParams()
+
   const { colors, darkMode } = useTheme()
   const [isWatching, setWatch] = React.useState<boolean>(true)
   const [getBoardById, { data: boardData }] = BoardApiRTQ.BoardApiSlice.useLazyGetBoardByIdQuery()
@@ -51,27 +50,31 @@ const MoreMenu: React.FC<Props> = ({ open, handleDrawerClose }) => {
 
   const handleSetWatching = () => {
     setWatch(!isWatching)
-    if (isWatching) {
-      addWatcherToBoard({ _id: boardId, email: 'nguyeenkieen141@gmail.com' }).then((a) => console.log(a))
-    } else removeWatcherFromBoard({ _id: boardId, email: 'nguyeenkieen141@gmail.com' })
+    if (boardId !== undefined) {
+      if (isWatching) {
+        addWatcherToBoard({ _id: boardId, email: 'nguyeenkieen141@gmail.com' }).then((a) => console.log(a))
+      } else removeWatcherFromBoard({ _id: boardId, email: 'nguyeenkieen141@gmail.com' })
+    }
   }
 
   const handleLeaveBoard = () => {
-    removeMemberInBoardByEmail({ _id: boardId, email: 'nguyeenkieen141@gmail.com' })
-      .then((response) => {
-        // Kiểm tra nếu response trả về là đúng
-        if (response) {
-          // Điều hướng đến trang chủ
-          window.location.href = 'http://localhost:3000/'
-        } else {
-          // Xử lý lỗi ở đây, ví dụ thông báo cho người dùng
-          console.error('Có lỗi xảy ra:', response)
-        }
-      })
-      .catch((error) => {
-        // Xử lý lỗi nếu có
-        console.error('Có lỗi xảy ra khi gọi API:', error)
-      })
+    if (boardId !== undefined) {
+      removeMemberInBoardByEmail({ _id: boardId, email: 'nguyeenkieen141@gmail.com' })
+        .then((response) => {
+          // Kiểm tra nếu response trả về là đúng
+          if (response) {
+            // Điều hướng đến trang chủ
+            window.location.href = 'http://localhost:3000/'
+          } else {
+            // Xử lý lỗi ở đây, ví dụ thông báo cho người dùng
+            console.error('Có lỗi xảy ra:', response)
+          }
+        })
+        .catch((error) => {
+          // Xử lý lỗi nếu có
+          console.error('Có lỗi xảy ra khi gọi API:', error)
+        })
+    }
   }
 
   React.useEffect(() => {

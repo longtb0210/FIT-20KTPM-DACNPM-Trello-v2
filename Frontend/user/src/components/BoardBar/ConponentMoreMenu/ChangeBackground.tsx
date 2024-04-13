@@ -7,6 +7,7 @@ import Button from '@mui/material/Button'
 import { LuPlus } from 'react-icons/lu'
 import { BoardApiRTQ } from '~/api'
 import { IoClose } from 'react-icons/io5'
+import { useParams } from 'react-router-dom'
 
 const drawerWidth = 320
 
@@ -93,11 +94,7 @@ const VisuallyHiddenInput = styled('input')({
 })
 
 const ChangeBackground: React.FC<Props> = ({ open, handleDrawerClose }) => {
-  const url = window.location.href
-  const workspaceIndex = url.indexOf('workspace/')
-  const idsPart = url.substring(workspaceIndex + 'workspace/'.length)
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  const [workspaceId, boardId] = idsPart.split('&')
+  const { workspaceId, boardId } = useParams()
 
   const { colors } = useTheme()
 
@@ -144,10 +141,12 @@ const ChangeBackground: React.FC<Props> = ({ open, handleDrawerClose }) => {
         setSelectedFile(file)
         // console.log('File đã được chọn:', file)
         //lưu file vào local
-        addBackgroundById({ id: boardId, background: file }).then((response) => {
-          // Xử lý response ở đây nếu cần
-          console.log(response)
-        })
+        if (boardId !== undefined) {
+          addBackgroundById({ id: boardId, background: file }).then((response) => {
+            // Xử lý response ở đây nếu cần
+            console.log(response)
+          })
+        }
         // .catch((error) => {
         //   // Kiểm tra nếu có lỗi và hiển thị thông báo
         //   if (error.response) {

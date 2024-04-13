@@ -20,13 +20,11 @@ import { BoardApiRTQ, UserApiRTQ } from '~/api'
 import ChangeVisibility from './ChangeVisibility'
 import { stringAvatar } from '~/utils/StringAvatar'
 import ShareDialog from './ShareDialog'
+import { useParams } from 'react-router-dom'
 
 function BoardBar() {
   //get id
-  const url = window.location.href
-  const workspaceIndex = url.indexOf('workspace/')
-  const idsPart = url.substring(workspaceIndex + 'workspace/'.length)
-  const [workspaceId, boardId] = idsPart.split('&')
+  const { workspaceId, boardId } = useParams()
 
   // console.log('Workspace ID:', workspaceId)
   // console.log('Board ID:', boardId)
@@ -92,9 +90,11 @@ function BoardBar() {
     if (newVisibility === 'private' || newVisibility === 'workspace' || newVisibility === 'public') {
       // console.log('newVisibility: ' + newVisibility)
       setVisibility(newVisibility)
-      ChangeVisibilityApi({ visibility: newVisibility as 'private' | 'workspace' | 'public', _id: boardId }).then(() =>
-        console.log('Updated Visibility')
-      )
+      if (boardId !== undefined) {
+        ChangeVisibilityApi({ visibility: newVisibility as 'private' | 'workspace' | 'public', _id: boardId }).then(
+          () => console.log('Updated Visibility')
+        )
+      }
       setAnchor(null)
     } else {
       // Xử lý trường hợp `newVisibility` không hợp lệ tại đây
@@ -131,7 +131,7 @@ function BoardBar() {
       event.preventDefault()
       const updatedName = inputRef.current?.value
       // console.log(updatedName)
-      if (updatedName) {
+      if (updatedName && boardId !== undefined) {
         editBoardById({
           _id: boardId,
           name: updatedName
@@ -152,7 +152,7 @@ function BoardBar() {
 
   async function handleClickToStar() {
     await editBoardById({
-      _id: boardId,
+      _id: boardId !== undefined ? boardId : '',
       is_star: !starred
     }).then((response) => {
       // console.log(response)
@@ -442,7 +442,12 @@ function BoardBar() {
         {popupContent}
       </BasePopup>
       <More open={openMore} handleDrawerClose={handleDrawerClose} />
-      <ShareDialog open={openShare} handleCloseShare={handleCloseShare} boardID={boardId} />
+      {boardId !== undefined ? (
+        <ShareDialog open={openShare} handleCloseShare={handleCloseShare} boardID={boardId} />
+      ) : (
+        ''
+      )}
+      {/* <ShareDialog open={openShare} handleCloseShare={handleCloseShare} boardID={boardId} /> */}
     </>
   )
 }

@@ -6,6 +6,7 @@ import { useTheme } from '~/components/Theme/themeContext'
 import Button from '@mui/material/Button'
 import { CardlistApiRTQ } from '~/api'
 import ArCard from './ArchiveCardUI'
+import { useParams } from 'react-router-dom'
 
 const drawerWidth = 330
 
@@ -24,9 +25,7 @@ interface Props {
 }
 
 const ArchivedItems: React.FC<Props> = ({ open, handleDrawerClose }) => {
-  const url = new URL(window.location.href)
-  const workspaceId = url.pathname.split('/')[2]
-  const boardId = url.pathname.split('/')[3]
+  const { workspaceId, boardId } = useParams()
 
   const { colors } = useTheme()
   const [getCardListArchiveByBoardId, { data: CardData }] =
@@ -35,9 +34,11 @@ const ArchivedItems: React.FC<Props> = ({ open, handleDrawerClose }) => {
   const [switchToLists, setSwitchToLists] = useState(true)
 
   React.useEffect(() => {
-    getCardListArchiveByBoardId(boardId).then((a) => {
-      console.log(a)
-    })
+    if (boardId !== undefined) {
+      getCardListArchiveByBoardId(boardId).then((a) => {
+        console.log(a)
+      })
+    }
   }, [boardId, getCardListArchiveByBoardId])
 
   const handleSwitchButtonClick = () => {

@@ -119,7 +119,7 @@ const CardContent: React.FC<CarContent> = ({ boardData }) => {
                   backgroundImage: `linear-gradient(0deg, rgba(33, 36, 37, 0.7) 50%, rgba(33, 36, 37, 0.7) 0%), url(${boardData.background || 'https://trello-backgrounds.s3.amazonaws.com/SharedBackground/480x270/09b457ee43a8833c515e9d3d5796f59f/photo-1698859858637-9aa64302f629.jpg'})`
                 }}
               >
-                <Link to={`/workspace/${boardData.workspace_id}/${boardData._id}`}>
+                <Link to={`/workspace/${boardData.workspace_id}/board/${boardData._id}`}>
                   <div
                     className={`mt-3 h-[70px] w-[404px] cursor-pointer rounded-lg bg-white px-3 py-[10px]   hover:bg-slate-200 ${darkMode ? 'hover:bg-gray-700 dark:bg-[#23262A]' : ''}`}
                   >

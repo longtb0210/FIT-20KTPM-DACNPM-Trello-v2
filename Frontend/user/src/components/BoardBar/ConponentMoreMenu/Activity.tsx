@@ -7,6 +7,7 @@ import { CardlistApiRTQ } from '~/api'
 import { Tab, Tabs, TabList, TabPanel } from 'react-tabs'
 import 'react-tabs/style/react-tabs.css'
 import { stringToColor } from '~/utils/StringToColor'
+import { useParams } from 'react-router-dom'
 
 const drawerWidth = 320
 
@@ -60,9 +61,7 @@ function stringAvatar(name: string) {
 }
 
 const Activity: React.FC<Props> = ({ open, handleDrawerClose }) => {
-  const url = new URL(window.location.href)
-  const workspaceId = url.pathname.split('/')[2]
-  const boardId = url.pathname.split('/')[3]
+  const { workspaceId, boardId } = useParams()
 
   const { colors } = useTheme()
 
