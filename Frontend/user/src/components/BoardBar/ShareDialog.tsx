@@ -90,8 +90,15 @@ export default function ShareDialog({ open, handleCloseShare, boardID }: Props) 
     setEmailInput(event.target.value)
   }
 
+  const storedProfile = localStorage.getItem('profile')
+  const [profile, setProFile] = React.useState({ email: '', name: '' })
   React.useEffect(() => {
-    getUserByEmail({ email: 'nguyeenkieen141@gmail.com' }).then((a) => console.log(a))
+    const profileSave = storedProfile ? JSON.parse(storedProfile) : { email: '', name: '' }
+    setProFile({ ...profileSave })
+  })
+
+  React.useEffect(() => {
+    getUserByEmail({ email: profile.email }).then((a) => console.log(a))
   }, [getUserByEmail])
   return (
     <Dialog open={open} onClose={handleCloseShare} aria-labelledby='alert-dialog-title' className='rounded-[10px]'>

@@ -48,18 +48,25 @@ const MoreMenu: React.FC<Props> = ({ open, handleDrawerClose }) => {
     setOpenDrawerIndex(null)
   }
 
+  const storedProfile = localStorage.getItem('profile')
+  const [profile, setProFile] = React.useState({ email: '', name: '' })
+  React.useEffect(() => {
+    const profileSave = storedProfile ? JSON.parse(storedProfile) : { email: '', name: '' }
+    setProFile({ ...profileSave })
+  })
+
   const handleSetWatching = () => {
     setWatch(!isWatching)
     if (boardId !== undefined) {
       if (isWatching) {
-        addWatcherToBoard({ _id: boardId, email: 'nguyeenkieen141@gmail.com' }).then((a) => console.log(a))
-      } else removeWatcherFromBoard({ _id: boardId, email: 'nguyeenkieen141@gmail.com' })
+        addWatcherToBoard({ _id: boardId, email: profile.email }).then((a) => console.log(a))
+      } else removeWatcherFromBoard({ _id: boardId, email: profile.email })
     }
   }
 
   const handleLeaveBoard = () => {
     if (boardId !== undefined) {
-      removeMemberInBoardByEmail({ _id: boardId, email: 'nguyeenkieen141@gmail.com' })
+      removeMemberInBoardByEmail({ _id: boardId, email: profile.email })
         .then((response) => {
           // Kiểm tra nếu response trả về là đúng
           if (response) {
@@ -80,7 +87,7 @@ const MoreMenu: React.FC<Props> = ({ open, handleDrawerClose }) => {
   React.useEffect(() => {
     getBoardById(boardId).then((a) => {
       console.log(boardData)
-      // if (boardData?.data?.watcher_email.includes('nguyeenkieen141@gmail.com')) {
+      // if (boardData?.data?.watcher_email.includes(profile.email)) {
       //   setWatch(true)
       // }
     })
