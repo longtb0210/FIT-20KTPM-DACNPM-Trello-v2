@@ -283,7 +283,18 @@ const SidebarCateWorkSpace: React.FC<Props> = ({ open, handleDrawerClose }) => {
                       onMouseLeave={() => handleMouseLeave()}
                     >
                       <div className='flex items-center'>
-                        <FontAwesomeIcon icon={faTableColumns} fontSize='small' className='mr-2' />
+                        <Box
+                          sx={{
+                            backgroundImage:
+                              board.background.charAt(0) === 'h' ? `url("${board.background}")` : board.background,
+                            backgroundSize: 'cover',
+                            backgroundPosition: 'center',
+                            width: '32px',
+                            height: '24px',
+                            borderRadius: '4px',
+                            marginRight: '8px'
+                          }}
+                        ></Box>
                         {board.name}
                       </div>
                     </MenuItem>
