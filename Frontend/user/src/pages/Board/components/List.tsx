@@ -13,6 +13,7 @@ import { useTheme } from '~/components/Theme/themeContext'
 import { CardApiRTQ, CardlistApiRTQ } from '~/api'
 import { TrelloApi } from '@trello-v2/shared'
 import { board_id } from '~/api/getInfo'
+import { useParams } from 'react-router-dom'
 export default function ListComponent({
   list,
   index,
@@ -22,13 +23,16 @@ export default function ListComponent({
   setResetManually,
   resetManually
 }: ListComponentProps) {
+  const params = useParams()
+  const boardId = params.boardId
   const [cardsData, setCardsData] = useState<Card[]>([])
   const [createCard] = CardApiRTQ.CardApiSlice.useCreateCardMutation()
-  const [createCardOnTop] = CardlistApiRTQ.CardListApiSlice.useAddCardOnTopMutation()
+  const [createCardOnTop, { data: createCardRes }] = CardApiRTQ.CardApiSlice.useCreateCardMutation()
   const [updateCardList] = CardlistApiRTQ.CardListApiSlice.useUpdateCardListMutation()
   // const [getAllCardlist] = CardlistApiRTQ.CardListApiSlice.useLazyGetAllCardlistQuery()
   const [getCardListByBoardId, { data: cardlistDataByBoardId }] =
     CardlistApiRTQ.CardListApiSlice.useLazyGetCardlistByBoardIdQuery()
+  const [moveCardAPI, { data: moveCardAPIRes }] = CardApiRTQ.CardApiSlice.useMoveCardMutation()
   const { colors, darkMode } = useTheme()
   const [listSettingOpen, setListSettingOpen] = useState<string>()
   const [addCardOpenAt, setAddCardOpenAt] = useState<string>('')
@@ -74,6 +78,32 @@ export default function ListComponent({
   useEffect(() => {
     setInputValue(list.name)
   }, [list])
+
+  useEffect(() => {
+    if (createCardRes) {
+      const listIdArray = list.cards.map((card) => card._id)
+      const listIdArraySrc = [createCardRes.data._id,...listIdArray]
+      const listIdArrayDes = [createCardRes.data._id, ...listIdArray]
+      console.log('listsrc ', listIdArraySrc)
+      console.log('listdes ', listIdArrayDes)
+      moveCardAPI({
+        data: {
+          source_list: {
+            cardlist_id: list._id,
+            target_card_id: createCardRes?.data._id,
+            cards_id_index: listIdArraySrc
+          },
+          destination_new_list: {
+            cardlist_id: list._id,
+            cards_id_index: listIdArrayDes
+          }
+        }
+      }).then(() => {
+        getCardListByBoardId({ id: boardId })
+      })
+    }
+  }, [createCardRes])
+
   const handleInputChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     setInputValue(event.target.value)
   }
@@ -83,17 +113,19 @@ export default function ListComponent({
     if (!inputValue.trim() || inputValue === list.name) {
       setInputValue(list.name)
     }
-    updateCardList({
-      _id: list._id,
-      index: list.index || undefined,
-      name: inputValue,
-      archive_at: new Date()
-    }).then(() => {
-      getCardListByBoardId({ id: board_id })
-    })
-    setResetManually(!resetManually)
-    setEditName(false)
-    setIsInputFocused(false)
+    if (boardId) {
+      updateCardList({
+        _id: list._id,
+        index: list.index || undefined,
+        name: inputValue,
+        archive_at: new Date()
+      }).then(() => {
+        getCardListByBoardId({ id: boardId })
+      })
+      setResetManually(!resetManually)
+      setEditName(false)
+      setIsInputFocused(false)
+    }
   }
 
   const handleInputFocus = () => {
@@ -103,36 +135,39 @@ export default function ListComponent({
   async function handleAddCard() {
     const index = list.cards.length == 1 && list.cards[0].placeHolder ? 0 : list.cards.length
     console.log(list.cards.length)
-    createCard({
-      name: newCardName,
-      cardlist_id: list._id,
-      index: index,
-      created_at: new Date()
-    }).then(() => {
-      setAddCardOpenAt('')
-      setNewCardName('')
-      getCardListByBoardId({ id: board_id })
-    })
+    if (boardId)
+      createCard({
+        name: newCardName,
+        cardlist_id: list._id,
+        member_email: [],
+        index: index,
+        created_at: new Date()
+      }).then(() => {
+        setAddCardOpenAt('')
+        setNewCardName('')
+        getCardListByBoardId({ id: boardId })
+      })
   }
   async function handleAddCardOnTop() {
-    const index =
-      list.cards.length == 1 && list.cards[0].placeHolder
-        ? 0
-        : typeof list.cards[0].index === 'number'
-          ? list.cards[0].index - 1
-          : 0
-    createCard({
-      name: newCardName,
-      cardlist_id: list._id,
-      index: index,
-      description: '',
-      created_at: new Date(),
-      cover: ''
-    }).then(() => {
-      setAddCardOnTop('')
-      setNewCardName('')
-      getCardListByBoardId({ id: board_id })
-    })
+    if (list.cards.length == 1 && list.cards[0].placeHolder) {
+      handleAddCard()
+      return
+    }
+    const index = list.cards.length
+    if (boardId)
+      createCardOnTop({
+        name: newCardName,
+        cardlist_id: list._id,
+        index: index,
+        description: '',
+        member_email: [],
+        created_at: new Date(),
+        cover: ''
+      }).then(() => {
+        setAddCardOnTop('')
+        setNewCardName('')
+        // getCardListByBoardId({ id: boardId })
+      })
   }
   const { attributes, listeners, setNodeRef, transform, isDragging } = useSortable({
     id: list._id,

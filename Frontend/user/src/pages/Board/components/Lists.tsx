@@ -8,6 +8,7 @@ import { useEffect, useRef, useState } from 'react'
 import { UniqueIdentifier } from '@dnd-kit/core'
 import { CardlistApiRTQ } from '~/api'
 import { board_id } from '~/api/getInfo'
+import { useParams } from 'react-router-dom'
 
 export default function ListsComponent({
   lists,
@@ -23,6 +24,8 @@ export default function ListsComponent({
   const { colors, darkMode } = useTheme()
   const [showAddListForm, setShowAddListForm] = useState(false)
   const [newListName, setNewListName] = useState<string>('')
+  const params = useParams()
+  const boardId = params.boardId
   const handleAddListClick = () => {
     setShowAddListForm(true)
   }
@@ -62,7 +65,7 @@ export default function ListsComponent({
     }
   }, [lists])
   useEffect(() => {
-    if (!cardlistDataByBoardId) getCardListByBoardId({ id: board_id })
+    if (!cardlistDataByBoardId) getCardListByBoardId({ id: boardId })
     document.addEventListener('mousedown', handleClickOutside)
     return () => {
       document.removeEventListener('mousedown', handleClickOutside)
@@ -75,14 +78,15 @@ export default function ListsComponent({
     setNewListName('')
   }
   async function createList() {
-    createCardlist({
-      name: newListName,
-      board_id: board_id,
-      index: cardlistDataByBoardId?.data.length || 0,
-      watcher_email: [],
-      archive_at: undefined,
-      created_at: new Date()
-    }).then(() => getCardListByBoardId({ id: board_id }))
+    if (boardId)
+      createCardlist({
+        name: newListName,
+        board_id: boardId,
+        index: cardlistDataByBoardId?.data.length || 0,
+        watcher_email: [],
+        archive_at: undefined,
+        created_at: new Date()
+      }).then(() => getCardListByBoardId({ id: boardId }))
     // const res = await createListAPI(data)
     // console.log(res)
   }

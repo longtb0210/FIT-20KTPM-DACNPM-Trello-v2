@@ -161,7 +161,7 @@ export default function Account() {
                         >
                           TRELLO
                         </Typography>
-                        <Link to={'/profile/123'}>
+                        <Link to={'/profile'}>
                           <Typography
                             variant='body1'
                             sx={{

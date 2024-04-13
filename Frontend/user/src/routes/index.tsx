@@ -29,7 +29,7 @@ export const Navigation = () => {
             <Route path='/' element={<HomePage />} />
             <Route path='/profile/:id' element={<AccountManagement page={`profile`} />} />
             <Route path='/template' element={<Templates />} />
-            <Route path='/workspace/:workspaceId' element={<CategoryWorkspace />} />
+            <Route path='/workspace/:workspaceId//board/:boardId' element={<CategoryWorkspace />} />
             <Route path='/boards/:id?' element={<BoardsPage />} />
             <Route path='/activity/:id' element={<AccountManagement page={`activity`} />} />
             <Route path='/cardlist' element={<Board />} />
