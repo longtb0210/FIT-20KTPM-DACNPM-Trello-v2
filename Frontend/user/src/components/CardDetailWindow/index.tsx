@@ -76,6 +76,7 @@ export default function CardDetailWindow({
   const [unArchiveCardAPI] = CardApiRTQ.CardApiSlice.useUnArchiveCardMutation()
   const [addCardWatcherAPI] = CardApiRTQ.CardApiSlice.useAddCardWatcherMutation()
   const [deleteCardWatcherAPI] = CardApiRTQ.CardApiSlice.useDeleteCardWatcherMutation()
+  const [getCardlistByBoardIdAPI] = CardlistApiRTQ.CardListApiSlice.useLazyGetCardlistByBoardIdQuery()
 
   function fetchBoardLabel() {
     getBoardLabelAPI({
@@ -164,6 +165,9 @@ export default function CardDetailWindow({
         name: trimmedValue
       })
       setInitialCardNameFieldValue(trimmedValue)
+      getCardlistByBoardIdAPI({
+        id: boardId
+      })
     }
   }
 
@@ -195,6 +199,9 @@ export default function CardDetailWindow({
           }
           setCurrentCardState(updatedCard)
           setIsWatching((prevState) => !prevState)
+          getCardlistByBoardIdAPI({
+            id: boardId
+          })
         })
         .catch((error) => {
           console.log('ERROR: add card watcher - ', error)
@@ -212,6 +219,9 @@ export default function CardDetailWindow({
           }
           setCurrentCardState(updatedCard)
           setIsWatching((prevState) => !prevState)
+          getCardlistByBoardIdAPI({
+            id: boardId
+          })
         })
         .catch((error) => {
           console.log('ERROR: delete card watcher - ', error)

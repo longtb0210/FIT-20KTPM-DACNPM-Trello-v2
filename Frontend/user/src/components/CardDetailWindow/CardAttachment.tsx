@@ -124,26 +124,6 @@ function CardAttachmentTile({
   const boxRef = useRef(null)
   const [anchorEl, setAnchorEl] = useState<null | HTMLDivElement>(null)
   const [isOpenModal, setIsOpenModal] = useState<boolean[]>([false, false])
-  const [faviconUrl, setFaviconUrl] = useState<string | null>(null)
-
-  // async function fetchFaviconUrl(url: string) {
-  //   try {
-  //     let link = url
-  //     if (!link.startsWith('http://') && !link.startsWith('https://')) {
-  //       link = 'https://' + link
-  //     }
-  //     const response = await fetch(`https://s2.googleusercontent.com/s2/favicons?domain_url=${link}`)
-  //     if (response) {
-  //       console.log(response)
-  //       setFaviconUrl(response.data)
-  //     }
-  //   } catch (error) {
-  //     console.error('Error fetching favicon:', error)
-  //   }
-  // }
-  // useEffect(() => {
-  //   fetchFaviconUrl(attachment.link)
-  // }, [])
 
   function getWebsiteName(url: string): string {
     let link = url
@@ -208,11 +188,7 @@ function CardAttachmentTile({
             <h1 className='text-lg font-bold'>exe</h1>
           ) : (
             <div>
-              {faviconUrl ? (
-                <img src={faviconUrl} alt='Favicon' style={{ width: 36, marginRight: '6px' }} />
-              ) : (
-                <FontAwesomeIcon icon={faPaperclip} style={{ width: 36, marginRight: '6px' }} className='text-xl' />
-              )}
+              <FontAwesomeIcon icon={faPaperclip} style={{ width: 36, marginRight: '6px' }} className='text-xl' />
             </div>
           )}
         </Box>
