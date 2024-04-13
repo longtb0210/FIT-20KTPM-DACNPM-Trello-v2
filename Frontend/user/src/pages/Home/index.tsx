@@ -29,7 +29,7 @@ export default function HomePage() {
     <>
     <PageWithSidebar>
       <Box
-        className='flex flex-row items-start justify-center'
+        className='flex flex-row items-start'
         sx={{
           color: colors.text,
           backgroundColor: colors.background,
@@ -44,13 +44,13 @@ export default function HomePage() {
           }
         }}
       >
-        <div className='flex flex-row items-start justify-center'>
+        <div className='flex flex-row items-start'>
           {/* <nav className='sticky top-10 mr-20 w-64'>
             <SidebarTemplate />
           </nav> */}
 
           {/* highlight main content */}
-          <div className='ml-24 mt-3 pl-12'>
+          <div>
             <div className='relative z-0'>
               <div className='pb-5'>
                 {/* content: Icon + HighLight */}
