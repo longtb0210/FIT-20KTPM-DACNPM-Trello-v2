@@ -1,6 +1,5 @@
 import { Routes, Route } from 'react-router-dom'
 import HomePage from '~/pages/Home'
-import CardTemplate from '~/pages/Templates/component/CardTemplate'
 import { AccountManagement, Board, BoardsPage, ErrorPage } from '~/pages'
 import { CategoryWorkspace } from '~/pages/CategoryWorkspace'
 import PageMembers from '~/pages/Members'
@@ -11,7 +10,7 @@ import Layout from '~/layouts/Layout/layout'
 import PrivateRoute from './privateRoute'
 import { useContext } from 'react'
 import { AuthContext } from '~/components/AuthProvider/AuthProvider'
-import CardDetailWindow from '~/components/CardDetailWindow'
+import Templates from '~/components/Header/menu/template'
 
 export const Navigation = () => {
   const authContext = useContext(AuthContext)
