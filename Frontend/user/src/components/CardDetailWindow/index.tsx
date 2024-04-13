@@ -111,9 +111,7 @@ export default function CardDetailWindow({
       .unwrap()
       .then((response) => {
         setCurrentCardState(response.data)
-        console.log(profile.email)
         const tempIsWatching: boolean = response.data?.watcher_email.includes(profile.email) ?? false
-        console.log(tempIsWatching)
         setIsWatching(tempIsWatching)
         setHaveJoinedCard(response.data?.member_email.includes(profile.email) ?? false)
       })
