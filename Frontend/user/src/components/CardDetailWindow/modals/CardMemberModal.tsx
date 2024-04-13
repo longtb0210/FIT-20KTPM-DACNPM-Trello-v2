@@ -176,6 +176,11 @@ export function CardMemberModal({
       .unwrap()
       .then((response) => {
         setWorkspaceMemberListState(response.data.members.map((member) => member.email!))
+        setFilteredWorkspaceMemberListState(
+          response.data.members
+            .map((member) => member.email!)
+            .filter((member) => !currentCard.member_email.includes(member) && !boardMemberListState?.includes(member))
+        )
       })
       .catch((error) => {
         console.log('ERROR: fetch workspace members - ', error)
@@ -185,7 +190,8 @@ export function CardMemberModal({
   useEffect(() => {
     fetchBoardMembers()
     fetchWorkspaceMembers()
-  })
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [])
 
   useEffect(() => {
     setCardMemberListState(currentCard.member_email)
