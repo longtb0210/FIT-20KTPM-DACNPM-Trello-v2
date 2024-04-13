@@ -31,7 +31,7 @@ export const defaultCard = {
   cover: '',
   description: '',
   watcher_email: ['email1', 'email2'],
-  archive_at: generateRandomDateOrNull(),
+  archive_at: null,
   activities: [
     {
       workspace_id: 'workspace1',

@@ -387,12 +387,17 @@ export function Board() {
         console.log('old: ', oldIndex)
         console.log('new: ', newIndex)
         const newListsData = arrayMove(listsData, oldIndex, newIndex)
-        setListsData(newListsData)
-
+        const sortList = newListsData.map((list, index) => ({ ...list, index }))
+        setListsData(sortList)
+        const activeCardIdArray = sortList.map((list) => ({
+          cardlist_id: list._id,
+          index: list.index ?? 0 // Use 0 as the default index if it's nullish
+        }))
+        console.log('move List Index ', activeCardIdArray)
         if (boardId)
           moveListAPI({
-            index: newIndex,
-            _id: active.id as string
+            board_id: boardId,
+            cardlist_id_idx: activeCardIdArray
           }).then(() => {
             setAction(!action)
             getCardListByBoardId({ id: boardId })

@@ -1,12 +1,27 @@
-import { ReactNode } from 'react'
+import { ReactNode, useEffect, useState } from 'react'
 import backgroundImage from '../../assets/Board/bg_2.jpg'
+import { BoardApiRTQ } from '~/api'
+import { Board } from '@trello-v2/shared/src/schemas/Board'
+import { useParams } from 'react-router-dom'
 interface LayoutProps {
   children: ReactNode
   openCardSetting: string
 }
 export const BoardLayout: React.FC<LayoutProps> = ({ children, openCardSetting }) => {
+  const [getBoardById, { data: boardRes }] = BoardApiRTQ.BoardApiSlice.useLazyGetBoardByIdQuery()
+  const [boardData, setBoardData] = useState<Board | null>()
+  const params = useParams()
+  const boardId = params.boardId
+  useEffect(() => {
+    console.log('boardId BG: ', boardId)
+    getBoardById(boardId)
+  }, [])
+  useEffect(() => {
+    console.log('boardData BG: ', boardRes)
+    setBoardData(boardRes?.data)
+  }, [boardRes])
   const backgroundStyle = {
-    backgroundImage: `url(${backgroundImage})`,
+    backgroundImage: `url(${boardData?.background ? boardData?.background : backgroundImage})`,
     backgroundSize: 'cover',
     backgroundPosition: 'center',
     opacity: 0.7

@@ -1,10 +1,11 @@
 // components/Header.tsx
-import { Box, Typography } from '@mui/material'
+import { Avatar, Box, Typography } from '@mui/material'
 import { User } from '@trello-v2/shared/src/schemas/User'
 import React, { useEffect, useState } from 'react'
 
 import { RxAvatar } from 'react-icons/rx'
 import { useTheme } from '~/components/Theme/themeContext'
+import { stringAvatar } from '~/utils/StringAvatar'
 import { stringToColor } from '~/utils/StringToColor'
 
 interface HeaderProps {
@@ -79,21 +80,21 @@ export const Header: React.FC<HeaderProps> = ({ currentTab, userInfo, onSelectTa
         >
           <Typography
             variant='h4'
-            sx={{
-              display: 'inline-block',
-              fontSize: '20px',
-              lineHeight: '24px',
-              color: '#fff',
-              fontWeight: 700,
-              padding: '22px',
-              borderRadius: '50%', // Set border radius to 50% to create a circle
-              backgroundColor: stringToColor(profile.name),
-              width: '68px', // Adjust width based on content length
-              height: 'fit-content' // Adjust height based on content length
-            }}
+            // sx={{
+            //   display: 'inline-block',
+            //   fontSize: '20px',
+            //   lineHeight: '24px',
+            //   color: '#fff',
+            //   fontWeight: 700,
+            //   padding: '22px',
+            //   borderRadius: '50%', // Set border radius to 50% to create a circle
+            //   backgroundColor: stringToColor(profile.name)
+            //   // width: '68px', // Adjust width based on content length
+            //   // height: 'fit-content' // Adjust height based on content length
+            // }}
             className='text-center'
           >
-            {getFirstTwoCharsOfLastWord(profile.name)}
+            <Avatar {...stringAvatar(profile.name, '20px', 68, 68)} className={`font-bold`} />
           </Typography>
 
           <Box sx={{ display: 'flex', flexDirection: 'column' }}>
