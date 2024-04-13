@@ -28,11 +28,7 @@ const menuItems = [
   'Team management'
 ]
 
-interface ProfileProps {
-  userInfo: User | undefined
-}
-
-const SidebarTemplate: React.FC<ProfileProps> = ({ userInfo }) => {
+const SidebarTemplate = () => {
   const [getAllWorkspace, {data:workspaceData}] = WorkspaceApiRTQ.WorkspaceApiSlice.useLazyGetAllUserWorkspaceQuery()
   const [activeItem, setActiveItem] = useState<string | null>(null)
   const [hoveredItem, setHoveredItem] = useState<string | null>(null)
@@ -211,7 +207,7 @@ const SidebarTemplate: React.FC<ProfileProps> = ({ userInfo }) => {
                 onMouseEnter={() => handleMouseEnter('workspace')}
                 onMouseLeave={() => handleMouseLeave()}
               >
-                <Link to={`/workspace/${w._id}`}>
+                <Link to={`/workspaceboard/${w._id}`}>
                   <MenuItem
                     style={{
                       height: '32px',
@@ -631,3 +627,4 @@ const SidebarTemplate: React.FC<ProfileProps> = ({ userInfo }) => {
 }
 
 export default SidebarTemplate
+

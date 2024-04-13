@@ -11,6 +11,7 @@ import BoardsPagegWorkspaceSection from '~/components/BoardsPage/BoardsPageWorks
 import { useTheme } from '~/components/Theme/themeContext'
 import { Board } from '@trello-v2/shared/src/schemas/Board'
 import { BoardsPageCard } from '~/components/BoardsPage/BoardsPageCard'
+import SidebarTemplate from '~/components/SidebarTemplate'
 
 export type BoardTemplate = {
   [x: string]: unknown
@@ -96,13 +97,13 @@ export function BoardsPage() {
 
   return (
     <Box sx={{ bgcolor: colors.background }} className='flex items-center justify-center'>
-      <Grid container sx={{ maxWidth: 1152 }}>
+      <Grid container>
         {/* (reserved) Left panel */}
-        <Grid item xs={3}>
-          <Container></Container>
+        <Grid item xs={3} style={{ paddingLeft: '15vw' }}>
+          <SidebarTemplate></SidebarTemplate>
         </Grid>
         {/* Boards Page */}
-        <Grid item xs={9} sx={{ padding: '40px 16px' }}>
+        <Grid item xs={9} style={{ overflowY: 'auto', paddingLeft: '7vw' }}>
           {/* START: Board Templates section */}
           {/* Title */}
           <Box style={{ color: colors.text }} className='mb-1 mt-3 flex items-center'>

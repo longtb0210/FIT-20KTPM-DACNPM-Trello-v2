@@ -257,7 +257,7 @@ const SidebarCateWorkSpace: React.FC<Props> = ({ open, handleDrawerClose }) => {
           <div>
             <Menu>
               {boardData?.data?.map((board) => (
-                <Link to={'/'}>
+                <Link to={`/workspace/${workspaceId}`}>
                   <MenuItem
                     key={board._id}
                     className='menu-item'
