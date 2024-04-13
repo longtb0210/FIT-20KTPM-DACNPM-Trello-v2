@@ -266,10 +266,9 @@ const SidebarCateWorkSpace: React.FC<Props> = ({ open, handleDrawerClose }) => {
           <Sidebar className='workspaces mb-10 text-sm'>
             <div>
               <Menu>
-                {boardData?.data?.map((board) => (
-                  <Link to={`/workspace/${workspaceId}/board/${board._id}`}>
+                {boardData?.data?.map((board, index) => (
+                  <Link key={index} to={`/workspace/${workspaceId}/board/${board._id}`}>
                     <MenuItem
-                      key={board._id}
                       className='menu-item'
                       style={{
                         height: '40px',

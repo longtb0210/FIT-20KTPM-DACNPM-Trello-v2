@@ -13,26 +13,6 @@ interface AutocompleteContainerProps {
   onClose: () => void
 }
 
-interface Workspace {
-  data: {
-    data: {
-      name: string
-      members: {
-        email: string | null
-        role: string
-        _id?: string | undefined
-        status?: string | undefined
-      }[]
-      visibility: string
-      short_name: string
-      logo: string
-      _id?: string | undefined
-      description?: string | undefined // Make description optional
-      website?: string | undefined
-    }
-  }
-}
-
 const type = [
   'Choose...',
   'Marketing',

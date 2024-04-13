@@ -82,16 +82,11 @@ export function Board() {
   const params = useParams()
   const boardId = params.boardId
 
-  // const [savedValues, setSavedValues] = useState<string[]>([])
-  const savedValuesString = localStorage.getItem('savedValues')
-
-  console.log(savedValuesString)
+  const savedValuesString = localStorage.getItem('savedValues') ? localStorage.getItem('savedValues') : '[]'
 
   useEffect(() => {
     if (savedValuesString) {
       const savedValues: string[] = JSON.parse(savedValuesString)
-
-      console.log(savedValues)
 
       if (boardId) {
         const index = savedValues.indexOf(boardId)
