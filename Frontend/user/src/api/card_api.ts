@@ -23,6 +23,16 @@ export const CardApiSlice = createApi({
         body: data
       })
     }),
+    getCardsOfCardlist: build.query<
+      TrelloApi.CardApi.GetAllCardsOfCardlistResponse,
+      TrelloApi.CardApi.GetCardsOfCardlistRequest
+    >({
+      query: (params) => ({
+        url: '/api/card',
+        method: 'GET',
+        params: params
+      })
+    }),
     getCardDetail: build.query<TrelloApi.CardApi.GetCardDetailResponse, TrelloApi.CardApi.GetCardDetailRequest>({
       query: (params) => ({
         url: '/api/card/detail',
@@ -116,6 +126,39 @@ export const CardApiSlice = createApi({
         body: {
           ...data
         }
+      })
+    }),
+    addCardMember: build.mutation<TrelloApi.CardApi.AddCardMemberResponse, TrelloApi.CardApi.AddCardMemberRequest>({
+      query: (data) => ({
+        url: '/api/card/member',
+        method: 'POST',
+        body: data
+      })
+    }),
+    deleteCardMember: build.mutation<
+      TrelloApi.CardApi.DeleteCardMemberResponse,
+      TrelloApi.CardApi.DeleteCardMemberRequest
+    >({
+      query: (data) => ({
+        url: '/api/card/member',
+        method: 'DELETE',
+        body: {
+          ...data
+        }
+      })
+    }),
+    archiveCard: build.mutation<TrelloApi.CardApi.ArchiveCardResponse, TrelloApi.CardApi.ArchiveCardRequest>({
+      query: (data) => ({
+        url: '/api/card/archive',
+        method: 'POST',
+        body: data
+      })
+    }),
+    unArchiveCard: build.mutation<TrelloApi.CardApi.UnArchiveCardResponse, TrelloApi.CardApi.UnArchiveCardRequest>({
+      query: (data) => ({
+        url: '/api/card/archive',
+        method: 'DELETE',
+        body: data
       })
     })
   })

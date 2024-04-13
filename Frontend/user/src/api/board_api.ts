@@ -87,6 +87,36 @@ const BoardApiSlice = createApi({
         body: data,
         method: 'POST'
       })
+    }),
+    getBoardLabel: builder.query<TrelloApi.BoardApi.GetLabelsResponse, { boardId: string }>({
+      query: ({ boardId }) => ({
+        url: `/api/board/${boardId}/label`,
+        method: 'GET'
+      })
+    }),
+    addBoardLabel: builder.mutation<TrelloApi.BoardApi.UpdateLabel, { boardId: string; color: string; name: string }>({
+      query: ({ boardId, color, name }) => ({
+        url: `/api/board/${boardId}/label/add`,
+        body: { color, name },
+        method: 'POST'
+      })
+    }),
+    editBoardLabel: builder.mutation<
+      TrelloApi.BoardApi.UpdateBoardResponse,
+      { boardId: string; _id: string; color: string; name: string }
+    >({
+      query: ({ boardId, _id, color, name }) => ({
+        url: `/api/board/${boardId}/label`,
+        body: { _id, color, name },
+        method: 'PATCH'
+      })
+    }),
+    removeBoardLabel: builder.mutation<TrelloApi.BoardApi.UpdateBoardResponse, { boardId: string; _id: string }>({
+      query: ({ boardId, _id }) => ({
+        url: `/api/board/${boardId}/label/remove`,
+        body: { _id },
+        method: 'POST'
+      })
     })
   })
 })

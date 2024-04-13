@@ -36,6 +36,22 @@ export function AuthProvider({ children }: { children?: React.ReactNode }) {
       .then((success) => {
         setIsLoggedIn(success)
         if (success) {
+          if (keycloak.current) {
+            keycloak.current
+              .loadUserProfile()
+              .then((profile) => {
+                // Trích xuất email và tên từ thông tin hồ sơ
+                const email = profile.email
+                const name = profile.firstName + ' ' + profile.lastName
+
+                localStorage.setItem('profile', JSON.stringify({ email, name }))
+              })
+              .catch((error) => {
+                // Xử lý lỗi nếu có
+                console.error('Error loading user profile:', error)
+              })
+          }
+
           console.log('Redirect to normal page')
         }
       })

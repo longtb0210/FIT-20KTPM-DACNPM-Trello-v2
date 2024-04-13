@@ -6,7 +6,7 @@ import { faXmark } from '@fortawesome/free-solid-svg-icons'
 import { useTheme } from '~/components/Theme/themeContext'
 import { Card } from '@trello-v2/shared/src/schemas/CardList'
 import { Activity } from '@trello-v2/shared/src/schemas/Activity'
-import { CardApiRTQ } from '~/api'
+import { BoardApiRTQ, CardApiRTQ } from '~/api'
 
 interface MemberAvatarAndNameProps {
   email: string
@@ -35,46 +35,46 @@ function MemberAvatarAndName({ email, bgColor, onClick }: MemberAvatarAndNamePro
 
 interface CardMemberModalProps {
   anchorEl: (EventTarget & HTMLDivElement) | null
+  boardId: string
   cardlistId: string
   cardId: string
   currentCard: Card
   setCurrentCard: (newState: Card) => void
-  boardMembers: string[]
   handleClose: () => void
 }
 
 export function CardMemberModal({
   anchorEl,
+  boardId,
   cardlistId,
   cardId,
   currentCard,
   setCurrentCard,
-  boardMembers,
   handleClose
 }: CardMemberModalProps) {
   const { colors } = useTheme()
   const [searchValue, setSearchValue] = useState('')
   // Card member emails
-  const [cardMemberListState, setCardMemberListState] = useState(currentCard.watcher_email)
+  const [cardMemberListState, setCardMemberListState] = useState(currentCard.member_email)
   // Board member emails
-  const [boardMemberListState, setBoardMemberListState] = useState(
-    boardMembers.filter((member) => !currentCard.watcher_email.includes(member))
-  )
+  const [boardMemberListState, setBoardMemberListState] = useState<string[] | undefined>([])
+  const [filteredBoardMemberListState, setFilteredBoardMemberListState] = useState<string[] | undefined>([])
 
   // API
-  const [addCardWatcherAPI] = CardApiRTQ.CardApiSlice.useAddCardWatcherMutation()
-  const [deleteCardWatcherAPI] = CardApiRTQ.CardApiSlice.useDeleteCardWatcherMutation()
+  const [addCardMemberAPI] = CardApiRTQ.CardApiSlice.useAddCardMemberMutation()
+  const [deleteCardMemberAPI] = CardApiRTQ.CardApiSlice.useDeleteCardMemberMutation()
+  const [getBoardByIdAPI] = BoardApiRTQ.BoardApiSlice.useLazyGetBoardByIdQuery()
 
   function filterMemberLists(event: React.ChangeEvent<HTMLInputElement>) {
     setSearchValue(event.currentTarget.value)
     // Filter card member list
     setCardMemberListState(
-      currentCard.watcher_email.filter((email) => email.toLowerCase().includes(event.currentTarget.value.toLowerCase()))
+      currentCard.member_email.filter((email) => email.toLowerCase().includes(event.currentTarget.value.toLowerCase()))
     )
     // Filter board member list
-    setBoardMemberListState(
-      boardMembers
-        .filter((member) => !currentCard.watcher_email.includes(member))
+    setFilteredBoardMemberListState(
+      boardMemberListState!
+        .filter((member) => !currentCard.member_email.includes(member))
         .filter((email) => email.toLowerCase().includes(event.currentTarget.value.toLowerCase()))
     )
   }
@@ -83,21 +83,22 @@ export function CardMemberModal({
     const newActivity: Activity = {
       workspace_id: '0',
       board_id: '0',
-      cardlist_id: '0',
-      card_id: '0',
-      content: `TrelloUser added ${member} to this card`
-      //time: moment().format()
+      cardlist_id: cardlistId,
+      card_id: cardId,
+      content: `vu@gmail.com added ${member} to this card`,
+      create_time: new Date(),
+      creator_email: 'vu@gmail.com'
     }
     const updatedCard: Card = {
       ...currentCard,
-      watcher_email: [...currentCard.watcher_email, member],
+      member_email: [...currentCard.member_email, member],
       activities: [...currentCard.activities, newActivity]
     }
     setCurrentCard(updatedCard)
-    addCardWatcherAPI({
+    addCardMemberAPI({
       cardlist_id: cardlistId,
       card_id: cardId,
-      watcher_email: member
+      member_email: member
     })
   }
 
@@ -105,28 +106,47 @@ export function CardMemberModal({
     const newActivity: Activity = {
       workspace_id: '0',
       board_id: '0',
-      cardlist_id: '0',
-      card_id: '0',
-      content: `TrelloUser removed ${member} from this card`
-      //time: moment().format()
+      cardlist_id: cardlistId,
+      card_id: cardId,
+      content: `vu@gmail.com removed ${member} from this card`,
+      create_time: new Date(),
+      creator_email: 'vu@gmail.com'
     }
     const updatedCard = {
       ...currentCard,
-      watcher_email: currentCard.watcher_email.filter((email) => email !== member),
+      member_email: currentCard.member_email.filter((email) => email !== member),
       activities: [...currentCard.activities, newActivity]
     }
     setCurrentCard(updatedCard)
-    deleteCardWatcherAPI({
+    deleteCardMemberAPI({
       cardlist_id: cardlistId,
       card_id: cardId,
-      watcher_email: member
+      member_email: member
     })
   }
 
+  function fetchBoardMembers() {
+    getBoardByIdAPI(boardId)
+      .unwrap()
+      .then((response) => {
+        setBoardMemberListState(response.data?.members_email)
+        setFilteredBoardMemberListState(
+          response.data?.members_email.filter((member) => !currentCard.member_email.includes(member))
+        )
+      })
+  }
+
   useEffect(() => {
-    setCardMemberListState(currentCard.watcher_email)
-    setBoardMemberListState(boardMembers.filter((member) => !currentCard.watcher_email.includes(member)))
-  }, [boardMembers, currentCard])
+    fetchBoardMembers()
+  })
+
+  useEffect(() => {
+    setCardMemberListState(currentCard.member_email)
+    setFilteredBoardMemberListState(
+      boardMemberListState!.filter((member) => !currentCard.member_email.includes(member))
+    )
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [boardMemberListState, currentCard])
 
   return (
     <Popover
@@ -205,13 +225,13 @@ export function CardMemberModal({
           </div>
         )}
         {/* Board member list */}
-        {boardMemberListState.length != 0 && (
+        {filteredBoardMemberListState!.length != 0 && (
           <div>
             <p style={{ margin: '20px 0 10px 0', color: colors.text }} className='text-xs font-semibold'>
               Board members
             </p>
             <Box className='flex flex-col'>
-              {boardMemberListState.map((email, index) => (
+              {filteredBoardMemberListState!.map((email, index) => (
                 <MemberAvatarAndName
                   key={index}
                   email={email}

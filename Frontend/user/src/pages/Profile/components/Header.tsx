@@ -1,9 +1,11 @@
 // components/Header.tsx
+import { Box, Typography } from '@mui/material'
 import { User } from '@trello-v2/shared/src/schemas/User'
 import React, { useEffect, useState } from 'react'
 
 import { RxAvatar } from 'react-icons/rx'
 import { useTheme } from '~/components/Theme/themeContext'
+import { stringToColor } from '~/utils/StringToColor'
 
 interface HeaderProps {
   currentTab: string
@@ -14,12 +16,43 @@ interface HeaderProps {
 export const Header: React.FC<HeaderProps> = ({ currentTab, userInfo, onSelectTab }) => {
   const { colors, darkMode } = useTheme()
   const [selectedTab, setSelectedTab] = useState<string>('')
+  const [profile, setProfile] = React.useState({ email: '', name: '' })
+
+  const storedProfile = localStorage.getItem('profile')
+  React.useEffect(() => {
+    const profileSave = storedProfile ? JSON.parse(storedProfile) : { email: '', name: '' }
+    setProfile({ ...profileSave })
+  }, [storedProfile])
+
   useEffect(() => {
     setSelectedTab(currentTab)
   }, [currentTab])
   const handleTabClick = (tab: string) => {
     setSelectedTab(tab)
     onSelectTab(tab)
+  }
+
+  const getFirstTwoCharsOfLastWord = (inputString: string) => {
+    if (inputString) {
+      const words = inputString.split(' ')
+
+      if (words.length >= 2) {
+        const secondToLastWord = words[words.length - 2]
+        const lastWord = words[words.length - 1]
+
+        let firstLetters = `${secondToLastWord.charAt(0)}${lastWord.charAt(0)}`
+
+        if (!firstLetters.match(/[A-Z]/)) {
+          firstLetters = firstLetters.toUpperCase()
+        }
+
+        return firstLetters
+      } else {
+        return null
+      }
+    } else {
+      return null
+    }
   }
 
   return (
@@ -31,11 +64,43 @@ export const Header: React.FC<HeaderProps> = ({ currentTab, userInfo, onSelectTa
           alt='Avatar'
           className=' h-[65px] w-[65px] rounded-full border'
         /> */}
-        <RxAvatar size={`70px`} />
-        <div>
-          <h1 className='text-xl font-bold'>{userInfo?.username ? userInfo.username : 'No Name is set'}</h1>
-          <p className='text-sm font-light '>{userInfo?.username ? `@${userInfo.username}` : '@name123'}</p>
-        </div>
+        {/* <RxAvatar size={`70px`} /> */}
+        <Box
+          sx={{
+            display: 'flex',
+            alignItems: 'center',
+            marginBottom: '10px',
+            padding: '0 20px'
+          }}
+        >
+          <Typography
+            variant='h4'
+            sx={{
+              display: 'inline-block',
+              fontSize: '20px',
+              lineHeight: '24px',
+              color: '#fff',
+              fontWeight: 700,
+              padding: '22px',
+              borderRadius: '50%',
+              backgroundColor: stringToColor(profile.name)
+            }}
+          >
+            {getFirstTwoCharsOfLastWord(profile.name)}
+          </Typography>
+
+          <Box sx={{ display: 'flex', flexDirection: 'column' }}>
+            <Typography
+              variant='body1'
+              sx={{ fontSize: '18px', fontWeight: 500, color: colors.text, marginLeft: '12px' }}
+            >
+              {profile.name}
+            </Typography>
+            <Typography variant='body1' sx={{ fontSize: '12px', color: colors.text, marginLeft: '12px' }}>
+              {profile.email}
+            </Typography>
+          </Box>
+        </Box>
       </div>
       <div className='mt-9 flex'>
         <p

@@ -11,6 +11,7 @@ import Layout from '~/layouts/Layout/layout'
 import PrivateRoute from './privateRoute'
 import { useContext } from 'react'
 import { AuthContext } from '~/components/AuthProvider/AuthProvider'
+import CardDetailWindow from '~/components/CardDetailWindow'
 
 export const Navigation = () => {
   const authContext = useContext(AuthContext)
@@ -27,14 +28,17 @@ export const Navigation = () => {
         <Route element={<PrivateRoute isAllowed={isLoggedIn} redirectPath='/login' />}>
           <Route element={<Layout />}>
             <Route path='/' element={<HomePage />} />
-            <Route path='/profile/:id' element={<AccountManagement page={`profile`} />} />
+            <Route path='/profile' element={<AccountManagement page={`profile`} />} />
             <Route path='/template' element={<Templates />} />
-            <Route path='/workspace/:workspaceId//board/:boardId' element={<CategoryWorkspace />} />
+
+            <Route path='/workspace/:workspaceId/board/:boardId' element={<CategoryWorkspace />} />
             <Route path='/boards/:id?' element={<BoardsPage />} />
-            <Route path='/activity/:id' element={<AccountManagement page={`activity`} />} />
-            <Route path='/cardlist' element={<Board />} />
+
+            <Route path='/activity' element={<AccountManagement page={`activity`} />} />
+            {/* <Route path='/cardlist' element={<Board />} /> */}
+            {/* <Route path='/carddetail' element={<CardDetailWindow />} /> */}
             <Route path='/workspace/:workspaceId/members' element={<PageMembers />} />
-            <Route path='/workspaceSetting' element={<WorkspaceSetting />} />
+            <Route path='/workspaceSetting/:workspaceId' element={<WorkspaceSetting />} />
             <Route path='/workspaceboard/:workspaceId' element={<WorkspaceBoardsPage />} />
           </Route>
         </Route>

@@ -3,12 +3,21 @@ import { Box, ClickAwayListener, Grow, Paper, Popper, MenuList, Stack, Typograph
 import { Link } from 'react-router-dom'
 import { useTheme } from './../../Theme/themeContext'
 import { AuthContext } from '~/components/AuthProvider/AuthProvider'
+import { UserApiRTQ } from '~/api'
+import { stringToColor } from '~/utils/StringToColor'
 
 export default function Account() {
   const [open, setOpen] = React.useState(false)
+  const [profile, setProfile] = React.useState({ email: '', name: '' })
   const anchorRef = React.useRef<HTMLButtonElement>(null)
   const { darkMode, toggleDarkMode, colors } = useTheme()
   const authContext = React.useContext(AuthContext)
+
+  const storedProfile = localStorage.getItem('profile')
+  React.useEffect(() => {
+    const profileSave = storedProfile ? JSON.parse(storedProfile) : { email: '', name: '' }
+    setProfile({ ...profileSave })
+  }, [storedProfile])
 
   const handleToggle = () => {
     setOpen((prevOpen) => !prevOpen)
@@ -47,6 +56,29 @@ export default function Account() {
     }
   }
 
+  const getFirstTwoCharsOfLastWord = (inputString: string) => {
+    if (inputString) {
+      const words = inputString.split(' ')
+
+      if (words.length >= 2) {
+        const secondToLastWord = words[words.length - 2]
+        const lastWord = words[words.length - 1]
+
+        let firstLetters = `${secondToLastWord.charAt(0)}${lastWord.charAt(0)}`
+
+        if (!firstLetters.match(/[A-Z]/)) {
+          firstLetters = firstLetters.toUpperCase()
+        }
+
+        return firstLetters
+      } else {
+        return null
+      }
+    } else {
+      return null
+    }
+  }
+
   return (
     <Stack direction='row' spacing={2}>
       <Box>
@@ -74,11 +106,11 @@ export default function Account() {
               lineHeight: '13px',
               fontWeight: 600,
               color: '#fff',
-              backgroundColor: '#172b4d',
+              backgroundColor: stringToColor(profile.name),
               borderRadius: '50%'
             }}
           >
-            HT
+            {getFirstTwoCharsOfLastWord(profile.name)}
           </Box>
         </Box>
 
@@ -132,18 +164,18 @@ export default function Account() {
                             fontWeight: 700,
                             padding: '8px 10px',
                             borderRadius: '50%',
-                            backgroundImage: 'linear-gradient(to bottom, #E774BB, #943D73)'
+                            backgroundColor: stringToColor(profile.name)
                           }}
                         >
-                          HT
+                          {getFirstTwoCharsOfLastWord(profile.name)}
                         </Typography>
 
                         <Box sx={{ display: 'flex', flexDirection: 'column' }}>
                           <Typography variant='body1' sx={{ fontSize: '14px', color: colors.text, marginLeft: '12px' }}>
-                            Hữu Chính Trần
+                            {profile.name}
                           </Typography>
                           <Typography variant='body1' sx={{ fontSize: '12px', color: colors.text, marginLeft: '12px' }}>
-                            abc@gmail.com
+                            {profile.email}
                           </Typography>
                         </Box>
                       </Box>

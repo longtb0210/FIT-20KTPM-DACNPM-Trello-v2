@@ -6,53 +6,110 @@ import noneStar from '~/assets/noneStar.svg'
 import { useTheme } from './../../Theme/themeContext'
 import { BoardApiRTQ, WorkspaceApiRTQ } from '~/api'
 
+interface Board {
+  name: string
+  workspace_id: string
+  background: string
+  background_list: string[]
+  activities: {
+    workspace_id: string
+    content: string
+    create_time: Date
+    creator_email: string
+    _id?: string | undefined
+    board_id?: string | undefined
+    cardlist_id?: string | undefined
+    card_id?: string | undefined
+  }[]
+  _id?: string | undefined
+  workspace_name: string
+  is_star: boolean
+}
+
 export default function Starred() {
   const [open, setOpen] = React.useState(false)
   const anchorRef = React.useRef<HTMLButtonElement>(null)
   const { colors } = useTheme()
-  const [getAllBoard, { data: allBoardsData }] = BoardApiRTQ.BoardApiSlice.useLazyGetAllBoardQuery()
-  const [getALlWorkspace, { data: dataWorkspace }] = WorkspaceApiRTQ.WorkspaceApiSlice.useLazyGetAllWorkspaceQuery()
+  const [getAllBoardById] = BoardApiRTQ.BoardApiSlice.useLazyGetBoardsByWorkspaceIDQuery()
+  const [getAllWorkspace, { data: dataWorkspace }] = WorkspaceApiRTQ.WorkspaceApiSlice.useLazyGetAllWorkspaceQuery()
   const [editBoardByIdAPI] = BoardApiRTQ.BoardApiSlice.useEditBoardByIdMutation()
-  const [workspaceName, setWorkspaceName] = React.useState<string[]>([])
-
-  const listStarBoard = allBoardsData?.data.filter((board) => board?.is_star)
+  const [listBoard, setListBoard] = React.useState<Board[]>([])
 
   React.useEffect(() => {
-    getAllBoard()
-    getALlWorkspace()
-  }, [getALlWorkspace, getAllBoard])
-
-  const findWorkspaceById = (workspaceId: string): { name: string } | undefined => {
-    const workspace =
-      dataWorkspace?.data.owner.find((item) => item._id === workspaceId) ||
-      dataWorkspace?.data.member.find((item) => item._id === workspaceId) ||
-      dataWorkspace?.data.guest.find((item) => item._id === workspaceId) ||
-      dataWorkspace?.data.admin.find((item) => item._id === workspaceId)
-
-    return workspace
-  }
+    getAllWorkspace()
+  }, [getAllWorkspace])
 
   React.useEffect(() => {
-    const names: string[] = []
+    dataWorkspace?.data.owner.forEach(async (item) => {
+      try {
+        if (item?._id !== undefined) {
+          const res = await getAllBoardById({ workspace_id: item._id })
+          const responseData = res.data
+          const workspaceName = item.name
 
-    listStarBoard?.forEach((board: { workspace_id: string }) => {
-      const workspace = findWorkspaceById(board.workspace_id)
+          if (responseData && responseData.data) {
+            const boardsWithWorkspaceName = responseData.data.map((board) => ({
+              ...board,
+              workspace_name: workspaceName
+            })) as Partial<Board>[]
 
-      if (workspace && workspace.name) {
-        names.push(workspace.name)
+            const updatedBoards: Board[] = boardsWithWorkspaceName.map((board) => ({
+              name: board.name ?? '',
+              workspace_id: board.workspace_id ?? '',
+              background: board.background ?? '',
+              background_list: board.background_list ?? [],
+              activities: board.activities ?? [],
+              _id: board._id ?? '',
+              workspace_name: board.workspace_name ?? '',
+              is_star: board.is_star ?? false
+            }))
+
+            setListBoard((prevList) => [...prevList, ...updatedBoards.filter((board) => board?.is_star)])
+          }
+        }
+      } catch (error) {
+        console.error('Error fetching boards:', error)
       }
     })
-    setWorkspaceName(names)
-  }, [dataWorkspace, allBoardsData])
 
-  const updateStar = (index: number) => {
-    const boardId = listStarBoard && listStarBoard[index] ? listStarBoard[index]._id : undefined
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [dataWorkspace, getAllBoardById, getAllWorkspace])
+
+  const updateStar = (index: number, item: Board) => {
+    const boardId = listBoard && listBoard[index] ? listBoard[index]._id : undefined
 
     if (boardId) {
       editBoardByIdAPI({
         _id: boardId,
         is_star: false
-      }).then(() => getAllBoard())
+      })
+        .then(() => {
+          if (item?._id !== undefined) {
+            getAllBoardById({ workspace_id: item._id })
+              .then((res) => {
+                const responseData = res.data
+                if (responseData && responseData.data) {
+                  const updatedListBoard = responseData.data.map((board) => ({
+                    name: board.name ?? '',
+                    workspace_id: board.workspace_id ?? '',
+                    background: board.background ?? '',
+                    background_list: board.background_list ?? [],
+                    activities: board.activities ?? [],
+                    _id: board._id ?? '',
+                    workspace_name: item.name ?? '',
+                    is_star: board.is_star ?? false
+                  }))
+                  setListBoard(updatedListBoard as Board[])
+                }
+              })
+              .catch((error) => {
+                console.error('Error fetching boards:', error)
+              })
+          }
+        })
+        .catch((error) => {
+          console.error('Error updating board:', error)
+        })
     }
   }
 
@@ -143,7 +200,7 @@ export default function Starred() {
                       borderRadius: '4px'
                     }}
                   >
-                    {listStarBoard && listStarBoard?.length === 0 ? (
+                    {listBoard && listBoard?.length === 0 ? (
                       <Box>
                         <img src={noneStar} alt='' style={{ backgroundSize: 'cover', width: '100%' }} />
 
@@ -155,7 +212,7 @@ export default function Starred() {
                         </Typography>
                       </Box>
                     ) : (
-                      listStarBoard?.map((board, index) => (
+                      listBoard?.map((board, index) => (
                         <Box
                           key={index}
                           sx={{
@@ -195,13 +252,13 @@ export default function Starred() {
                                 variant='body1'
                                 sx={{ fontSize: '12px', color: colors.text, marginLeft: '12px' }}
                               >
-                                {workspaceName[index]}
+                                {board.workspace_name}
                               </Typography>
                             </Box>
                           </Box>
 
                           <FontAwesomeIcon
-                            onClick={() => updateStar(index)}
+                            onClick={() => updateStar(index, board)}
                             icon={starFull}
                             style={{
                               color: 'orange',

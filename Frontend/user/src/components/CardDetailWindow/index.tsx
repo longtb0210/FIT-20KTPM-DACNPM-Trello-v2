@@ -22,66 +22,97 @@ import { SidebarButtonArchive } from './sidebar/CardArchiveSidebar'
 import { useTheme } from '../Theme/themeContext'
 import { Card } from '@trello-v2/shared/src/schemas/CardList'
 import { Feature_Checklist } from '@trello-v2/shared/src/schemas/Feature'
-import { testBoardLabels, testBoardMembers, testCard } from './test_data'
 import { BoardLabel } from '@trello-v2/shared/src/schemas/Board'
-import { CardApiRTQ, CardlistApiRTQ } from '~/api'
+import { BoardApiRTQ, CardApiRTQ, CardlistApiRTQ } from '~/api'
+import { SidebarButtonUnArchive } from './sidebar/CardUnArchiveSidebar'
 
 const focusInputColor = '#0ff'
 
 interface CardDetailWindowProps {
+  boardId: string
   cardlistId: string
   cardId: string
   isOpenCDW: boolean
   handleCloseCDW: () => void
 }
 
-export default function CardDetailWindow({ cardlistId, cardId, isOpenCDW, handleCloseCDW }: CardDetailWindowProps) {
+export default function CardDetailWindow({
+  boardId,
+  cardlistId,
+  cardId,
+  isOpenCDW,
+  handleCloseCDW
+}: CardDetailWindowProps) {
+  const myEmail = 'vu@gmail.com'
   const { colors } = useTheme()
-
-  // Card data (MOCK UP)
-  const [_currentCardState, _setCurrentCardState] = useState<Card>(testCard)
 
   // Card states
   const [currentCardState, setCurrentCardState] = useState<Card | null>()
   const [cardNameFieldValue, setCardNameFieldValue] = useState<string>('')
   const [initialCardNameFieldValue, setInitialCardNameFieldValue] = useState<string>('')
   const [isWatching, setIsWatching] = useState<boolean>(false)
+  const [isArchived, setIsArchived] = useState<boolean>(false)
 
   // Cardlist states
   const [currentCardlistNameState, setCurrentCardlistNameState] = useState<string>('')
 
   // Board states
-  const [boardLabelState, setBoardLabelState] = useState<BoardLabel[]>(testBoardLabels)
+  const [boardLabelState, setBoardLabelState] = useState<BoardLabel[]>([])
 
   // API
+  const [getBoardLabelAPI] = BoardApiRTQ.BoardApiSlice.useLazyGetBoardLabelQuery()
   const [getAllCardlistAPI] = CardlistApiRTQ.CardListApiSlice.useLazyGetAllCardlistQuery()
   const [getCardDetailAPI] = CardApiRTQ.CardApiSlice.useLazyGetCardDetailQuery()
   const [updateCardDetailAPI] = CardApiRTQ.CardApiSlice.useUpdateCardDetailMutation()
+  const [archiveCardAPI] = CardApiRTQ.CardApiSlice.useArchiveCardMutation()
+  const [unArchiveCardAPI] = CardApiRTQ.CardApiSlice.useUnArchiveCardMutation()
+  const [addCardWatcherAPI] = CardApiRTQ.CardApiSlice.useAddCardWatcherMutation()
+  const [deleteCardWatcherAPI] = CardApiRTQ.CardApiSlice.useDeleteCardWatcherMutation()
 
-  const fetchCardlistName = async () => {
-    try {
-      const { data: allCardlistData } = await getAllCardlistAPI()
-      const currentCardlist = allCardlistData?.data.find((cardlist) => cardlist._id === cardlistId)
-      setCurrentCardlistNameState(currentCardlist!.name)
-    } catch (err) {
-      console.error('Error fetching card data:', err)
-    }
+  function fetchBoardLabel() {
+    getBoardLabelAPI({
+      boardId: boardId
+    })
+      .unwrap()
+      .then((response) => {
+        setBoardLabelState(response.data)
+      })
+      .catch((error) => {
+        console.log('ERROR: fetch board labels', error)
+      })
   }
 
-  const fetchCardData = async () => {
-    try {
-      const { data: cardData } = await getCardDetailAPI({
-        cardlist_id: cardlistId,
-        card_id: cardId
+  function fetchCardlistName() {
+    getAllCardlistAPI()
+      .unwrap()
+      .then((response) => {
+        const currentCardlist = response.data.find((cardlist) => cardlist._id === cardlistId)
+        setCurrentCardlistNameState(currentCardlist!.name)
       })
-      setCurrentCardState(cardData?.data)
-    } catch (err) {
-      console.error('Error fetching card data:', err)
-    }
+      .catch((error) => {
+        console.log('ERROR: fetch cardlist name - ', error)
+      })
+  }
+
+  function fetchCardData() {
+    getCardDetailAPI({
+      cardlist_id: cardlistId,
+      card_id: cardId
+    })
+      .unwrap()
+      .then((response) => {
+        setCurrentCardState(response.data)
+        const tempIsWatching: boolean = response.data?.watcher_email.includes(myEmail) ?? false
+        setIsWatching(tempIsWatching)
+      })
+      .catch((error) => {
+        console.log('ERROR: fetch card data - ', error)
+      })
   }
 
   // Fetch card data
   useEffect(() => {
+    fetchBoardLabel()
     fetchCardData()
     fetchCardlistName()
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -130,11 +161,63 @@ export default function CardDetailWindow({ cardlistId, cardId, isOpenCDW, handle
     setIsWatching(!isWatching)
   }
 
+  function handleWatching() {
+    // Add watcher
+    if (isWatching === false) {
+      addCardWatcherAPI({
+        cardlist_id: cardlistId,
+        card_id: cardId,
+        watcher_email: myEmail
+      })
+        .then(() => {
+          const updatedCard: Card = {
+            ...currentCardState,
+            watcher_email: [...(currentCardState?.watcher_email || []), myEmail]
+          }
+          setCurrentCardState(updatedCard)
+        })
+        .catch((error) => {
+          console.log('ERROR: add card watcher - ', error)
+        })
+    } else {
+      deleteCardWatcherAPI({
+        cardlist_id: cardlistId,
+        card_id: cardId,
+        watcher_email: myEmail
+      })
+        .then(() => {
+          const updatedCard: Card = {
+            ...currentCardState,
+            watcher_email: currentCardState?.watcher_email.filter((email) => email !== myEmail) || []
+          }
+          setCurrentCardState(updatedCard)
+        })
+        .catch((error) => {
+          console.log('ERROR: delete card watcher - ', error)
+        })
+    }
+  }
+
+  function handleArchive() {
+    archiveCardAPI({
+      cardlist_id: cardlistId,
+      card_id: cardId
+    }).then(() => {
+      setIsArchived(true)
+    })
+  }
+
+  function handleUnArchive() {
+    unArchiveCardAPI({
+      cardlist_id: cardlistId,
+      card_id: cardId
+    }).then(() => {
+      setIsArchived(false)
+    })
+  }
+
   return (
-    <Backdrop
-      sx={{ bgcolor: 'rgba(0, 0, 0, 0.64)', zIndex: (theme) => theme.zIndex.drawer + 1, marginTop: '55px' }}
-      open={isOpenCDW}
-    >
+    <Backdrop sx={{ bgcolor: 'rgba(0, 0, 0, 0.64)', zIndex: (theme) => theme.zIndex.drawer + 1 }} open={isOpenCDW}>
       <Box
         sx={{
           width: '100%',
@@ -214,13 +297,14 @@ export default function CardDetailWindow({ cardlistId, cardId, isOpenCDW, handle
                   {/* START: Hero */}
                   <div style={{ padding: '0 0 0 40px' }} className='flex flex-row flex-wrap gap-1'>
                     <CardMemberList
+                      boardId={boardId}
                       cardlistId={cardlistId}
                       cardId={cardId}
                       currentCard={currentCardState!}
                       setCurrentCard={setCurrentCardState!}
-                      boardMembers={testBoardMembers}
                     />
                     <CardLabelList
+                      boardId={boardId}
                       cardlistId={cardlistId}
                       cardId={cardId}
                       currentCard={currentCardState!}
@@ -228,7 +312,11 @@ export default function CardDetailWindow({ cardlistId, cardId, isOpenCDW, handle
                       boardLabelState={boardLabelState}
                       setBoardLabelState={setBoardLabelState}
                     />
-                    <CardNotification isWatching={isWatching} setIsWatching={handleNotification} />
+                    <CardNotification
+                      isWatching={isWatching}
+                      setIsWatching={handleNotification}
+                      handleWatching={handleWatching}
+                    />
                     <CardDate
                       cardlistId={cardlistId}
                       cardId={cardId}
@@ -270,7 +358,12 @@ export default function CardDetailWindow({ cardlistId, cardId, isOpenCDW, handle
                       )
                     })}
                   {/* END: Checklist */}
-                  <CardActivity currentCard={currentCardState!} setCurrentCard={setCurrentCardState} />
+                  <CardActivity
+                    cardlistId={cardlistId}
+                    cardId={cardId}
+                    currentCard={currentCardState!}
+                    setCurrentCard={setCurrentCardState}
+                  />
                 </Grid>
                 <Grid item xs={3} sx={{ padding: '0 16px 8px 8px' }}>
                   <Stack sx={{ padding: '10px 0 0 0' }}>
@@ -279,14 +372,15 @@ export default function CardDetailWindow({ cardlistId, cardId, isOpenCDW, handle
                     </h2>
                     <SidebarButtonMembers
                       type={ButtonType.Members}
+                      boardId={boardId}
                       cardlistId={cardlistId}
                       cardId={cardId}
                       currentCard={currentCardState}
                       setCurrentCard={setCurrentCardState}
-                      boardMembers={testBoardMembers}
                     />
                     <SidebarButtonLabels
                       type={ButtonType.Labels}
+                      boardId={boardId}
                       cardlistId={cardlistId}
                       cardId={cardId}
                       currentCard={currentCardState!}
@@ -320,22 +414,25 @@ export default function CardDetailWindow({ cardlistId, cardId, isOpenCDW, handle
                     </h2>
                     <SidebarButtonMove
                       type={ButtonType.Move}
-                      currentCard={_currentCardState}
-                      setCurrentCard={_setCurrentCardState}
+                      currentCard={currentCardState!}
+                      setCurrentCard={setCurrentCardState}
                     />
                     <SidebarButtonCopy
                       type={ButtonType.Copy}
-                      currentCard={_currentCardState}
-                      setCurrentCard={_setCurrentCardState}
+                      boardId={boardId}
+                      cardlistId={cardlistId}
+                      cardId={cardId}
+                      currentCard={currentCardState!}
+                      setCurrentCard={setCurrentCardState}
                     />
                     <Box sx={{ width: '100%', height: 2, padding: '0 0 10px 0' }}>
                       <Box sx={{ width: '100%', height: 2, bgcolor: colors.button }}></Box>
                     </Box>
-                    <SidebarButtonArchive
-                      type={ButtonType.Archive}
-                      currentCard={_currentCardState}
-                      setCurrentCard={_setCurrentCardState}
-                    />
+                    {!isArchived ? (
+                      <SidebarButtonArchive type={ButtonType.Archive} handleArchive={handleArchive} />
+                    ) : (
+                      <SidebarButtonUnArchive type={ButtonType.UnArchive} handleUnArchive={handleUnArchive} />
+                    )}
                   </Stack>
                 </Grid>
               </Grid>

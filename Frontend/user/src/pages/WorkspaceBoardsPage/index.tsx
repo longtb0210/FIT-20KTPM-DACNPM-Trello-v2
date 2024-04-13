@@ -16,6 +16,8 @@ import WorkspaceBoardsPageRow from '~/components/WorkspaceBoardsPage/WorkspaceBo
 import { useParams } from 'react-router-dom'
 import { BoardApiRTQ } from '~/api'
 import { Board } from '@trello-v2/shared/src/schemas/Board'
+import { WorkspaceApiSlice } from '~/api/workspace_api'
+import { stringToColor } from '~/utils/StringToColor'
 
 const sortMethods = ['Most recently active', 'Least recently active', 'Alphabetically A-Z', 'Alphabetically Z-A']
 
@@ -29,6 +31,7 @@ export function WorkspaceBoardsPage() {
 
   //API
   const [getBoardsByWorkspaceIdAPI] = BoardApiRTQ.BoardApiSlice.useLazyGetBoardsByWorkspaceIDQuery()
+  const [getWorkspaceById, { data: dataWorkspace }] = WorkspaceApiSlice.useGetWorkspaceByIDMutation()
 
   function fetchBoardsByWorkspaceId() {
     getBoardsByWorkspaceIdAPI({
@@ -36,6 +39,8 @@ export function WorkspaceBoardsPage() {
     })
       .unwrap()
       .then((response) => {
+        console.log(response)
+
         setBoardsState(response.data)
         setFilteredBoardsState(response.data)
       })
@@ -47,7 +52,12 @@ export function WorkspaceBoardsPage() {
   useEffect(() => {
     fetchBoardsByWorkspaceId()
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [])
+  }, [workspaceId])
+
+  useEffect(() => {
+    getWorkspaceById({ workspace_id: workspaceId || '' })
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [boardsState])
 
   function handleSelectSort(event: SelectChangeEvent) {
     setSelectedSort(event.target.value as string)
@@ -84,20 +94,19 @@ export function WorkspaceBoardsPage() {
                 height: 60,
                 marginRight: '10px',
                 color: 'rgb(29, 33, 37)',
-                background:
-                  'linear-gradient(var(--ds-background-accent-magenta-subtle, #cd5a91), var(--ds-background-accent-magenta-bolder, #b22865));'
+                backgroundColor: stringToColor(dataWorkspace?.data.name || '')
               }}
               className='flex items-center justify-center rounded-md'
             >
-              <span style={{ fontSize: 35 }} className='font-bold'>
-                Â
+              <span style={{ fontSize: 35, color: colors.foreColor }} className='font-bold'>
+                {dataWorkspace?.data.name.charAt(0).toLocaleUpperCase()}
               </span>
             </Box>
             {/* Workspace name */}
             <Box sx={{ color: colors.text }} className='flex flex-col items-start justify-center'>
               <Box className='flex flex-row items-center'>
                 <span style={{ fontSize: 20 }} className='font-bold'>
-                  Âu Hồng Minh's workspace
+                  {dataWorkspace?.data.name}
                 </span>
                 {/* Edit button */}
                 <Box

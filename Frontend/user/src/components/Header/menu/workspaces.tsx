@@ -6,7 +6,7 @@ import { Link } from 'react-router-dom'
 import { useTheme } from '../../Theme/themeContext'
 import { WorkspaceApiRTQ } from '~/api'
 import { stringToColor } from '~/utils/StringToColor'
-import noneStar from '~/assets/noneStar.svg'
+import noWorkspace from '~/assets/no_workspace.svg'
 
 export default function WorkSpaces() {
   const [open, setOpen] = React.useState(false)
@@ -135,7 +135,7 @@ export default function WorkSpaces() {
                             </Typography>
 
                             {listWorkspaceNotGuestData.map((workspace, index) => (
-                              <Link to={`/workspaceboard/${workspace._id}`} key={index}>
+                              <Link to={`/workspaceboard/${workspace._id}`} onClick={() => setOpen(false)} key={index}>
                                 <Box
                                   sx={{
                                     display: 'flex',
@@ -185,7 +185,7 @@ export default function WorkSpaces() {
                             </Typography>
 
                             {listWorkspaceGuestData.map((workspace, index) => (
-                              <Link to={`/workspaceboard/${workspace._id}`} key={index}>
+                              <Link to={`/workspaceboard/${workspace._id}`} onClick={() => setOpen(false)} key={index}>
                                 <Box
                                   sx={{
                                     display: 'flex',
@@ -227,7 +227,7 @@ export default function WorkSpaces() {
                       ]
                     ) : (
                       <Box>
-                        <img src={noneStar} alt='' style={{ backgroundSize: 'cover', width: '100%' }} />
+                        <img src={noWorkspace} alt='' style={{ backgroundSize: 'cover', width: '100%' }} />
 
                         <Typography
                           variant='body1'
