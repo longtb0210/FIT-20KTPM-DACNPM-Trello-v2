@@ -76,7 +76,7 @@ export default function HomePage() {
         }}
       >
         <div className='flex flex-row items-start justify-center'>
-          <nav className='sticky top-10 w-64'>
+          <nav className='sticky top-10 w-[220px]'>
             <SidebarTemplate />
           </nav>
 
