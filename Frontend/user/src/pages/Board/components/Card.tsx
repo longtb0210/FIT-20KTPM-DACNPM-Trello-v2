@@ -32,6 +32,7 @@ export default function CardComponent({ card, cardSelected, setOpenCardSetting }
   useEffect(() => {
     if (card.member_email && card.member_email.length > 0) {
       const arrayMembers = createMembersArray(card.member_email)
+      console.log(arrayMembers)
       setCardMembers(arrayMembers)
     }
   }, [card])
@@ -130,7 +131,7 @@ export default function CardComponent({ card, cardSelected, setOpenCardSetting }
                   border: '1px solid',
                   borderColor: isHovered ? colors.card_border : colors.background
                 }}
-                className={`mx-3  space-y-2 rounded-lg  p-2  ${darkMode ? `` : ' shadow-sm shadow-gray-300'} ${card.placeHolder ? 'invisible' : 'visible'}`}
+                className={`mx-3  space-y-2 rounded-lg  p-2  ${darkMode ? `` : ' shadow-sm shadow-gray-300'} ${card.placeHolder ? 'invisible h-[40px]' : 'visible'}`}
                 onMouseEnter={() => setIsHovered(true)}
                 onMouseLeave={() => setIsHovered(false)}
                 onClick={() => cardSelected(card)}
@@ -152,14 +153,14 @@ export default function CardComponent({ card, cardSelected, setOpenCardSetting }
                   ((card.watcher_email &&
                     card.watcher_email.length > 0 &&
                     card.watcher_email.includes(profile.email)) ||
-                    (cardMembers && cardMembers.length > 0)) && (
+                    (card.member_email && card.member_email.length > 0)) && (
                     <div className={`flex flex-row items-center justify-between`}>
                       <div className='flex-grow'>
                         {card.watcher_email.includes(profile.email) && <MdOutlineRemoveRedEye className={``} />}
                       </div>
                       <div className={`flex flex-row items-center justify-between space-x-1`}>
                         {cardMembers &&
-                          card.watcher_email.includes(profile.email) &&
+                          card.member_email.includes(profile.email) &&
                           cardMembers.map((member, index) => (
                             <div key={index} className={`relative z-10 flex flex-row items-center justify-center`}>
                               <div onMouseEnter={() => handleMouseOver(member)} onMouseLeave={handleMouseLeave}>
@@ -223,7 +224,7 @@ export default function CardComponent({ card, cardSelected, setOpenCardSetting }
                       ((card.watcher_email &&
                         card.watcher_email.length > 0 &&
                         card.watcher_email.includes(profile.email)) ||
-                        (cardMembers && cardMembers.length > 0)) && (
+                        (card.member_email && card.member_email.length > 0)) && (
                         <div className={`flex flex-row items-center justify-between`}>
                           <div className='flex-grow'>
                             {card.watcher_email.includes(profile.email) && <MdOutlineRemoveRedEye className={``} />}

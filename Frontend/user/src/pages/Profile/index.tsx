@@ -42,7 +42,8 @@ export const AccountManagement: React.FC<AccountManagementProps> = ({ page }) =>
   }
   const darkLightMode = {
     backgroundColor: colors.background,
-    color: colors.text
+    color: colors.text,
+    minHeight: 'calc(100vh - 50px)'
   }
   return (
     <div style={darkLightMode} className='font-sans'>

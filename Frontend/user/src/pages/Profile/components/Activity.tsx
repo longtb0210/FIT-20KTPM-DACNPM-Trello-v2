@@ -164,12 +164,15 @@ export const ActivityComponent: React.FC<ActivityProps> = ({ userInfo }) => {
         <div>
           {actData.length > 0 &&
             actData.map((activity, index) => (
-              <div key={index} className={`mb-2 ml-[35px]`}>
+              <div className='flex flex-row'>
+                <RxAvatar className={`-ml-2 mr-1 h-9 w-9 cursor-pointer rounded-full  hover:opacity-60`} />
+              <div key={index} className={`mb-2 ml-2`}>
                 <span dangerouslySetInnerHTML={{ __html: activity.content }} />
                 <div className={`flex flex-row items-center space-x-2`}>
                   <p className={`text-sm font-light  `}>At {formatDateTime(activity.create_time.toString())} </p>
                  
                 </div>
+              </div>
               </div>
             ))}
         </div>
