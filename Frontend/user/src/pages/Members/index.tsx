@@ -120,8 +120,8 @@ export default function PageMembers() {
     if (workspaceId !== undefined) {
       getWorkspaceById(workspaceId)
     }
-    // getWorkspaceById(workspaceData.workspace_id)
-  }, [getWorkspaceById])
+  }, [])
+
   console.log(workspaceData)
 
   return (
@@ -466,7 +466,11 @@ export default function PageMembers() {
             </Box>
           </Box>
         </Main>
-        <AddMemberDialog open={openShare} handleCloseShare={handleCloseShare} boardID={'661972bd0b338229249433c4'} />
+        <AddMemberDialog
+          open={openShare}
+          handleCloseShare={handleCloseShare}
+          workspaceId={workspaceId !== undefined ? workspaceId : ''}
+        />
         {/* end content */}
       </Box>
     </>

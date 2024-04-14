@@ -32,6 +32,7 @@ const ArchiveCard: React.FC<ArchiveCardProps> = ({ card, switchToLists, boardId,
   }
 
   const handleDelete = () => {
+    console.log('delete card ' + boardId)
     // Gọi hàm xử lý sự kiện Delete từ component cha
     deleteCardListByBoard({ board_id: boardId }).then(() => {
       getCardListByBoardId({ id: boardId })
