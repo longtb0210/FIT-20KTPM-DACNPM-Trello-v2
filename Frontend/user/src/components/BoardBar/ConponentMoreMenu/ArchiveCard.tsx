@@ -7,6 +7,7 @@ import Button from '@mui/material/Button'
 import { CardlistApiRTQ } from '~/api'
 import ArCard from './ArchiveCardUI'
 import { useParams } from 'react-router-dom'
+import { CardList } from '@trello-v2/shared/src/schemas/CardList'
 
 const drawerWidth = 330
 
@@ -29,19 +30,16 @@ const ArchivedItems: React.FC<Props> = ({ open, handleDrawerClose }) => {
 
   const { colors } = useTheme()
   const [getCardListArchiveByBoardId, { data: CardData }] =
-    CardlistApiRTQ.CardListApiSlice.useGetCardListArchiveByBoardIdMutation()
-
+    CardlistApiRTQ.CardListApiSlice.useLazyGetCardListArchiveByBoardIdQuery()
+  const [archiveItems, setArchiveItems] = useState<CardList[]>([])
   const [switchToLists, setSwitchToLists] = useState(true)
 
-  const [cardListIds, setCardListIds] = useState([])
-
+  React.useEffect(() => {
+    setArchiveItems(CardData?.data as unknown as CardList[])
+  }, [CardData])
   React.useEffect(() => {
     if (boardId !== undefined) {
-      getCardListArchiveByBoardId(boardId).then((response) => {
-        const cardList = response.data.data // Lấy mảng các thẻ từ response
-        const extractedCardIds = cardList.map((card) => card._id) // Lấy ra mảng các _id
-        setCardListIds(extractedCardIds) // Cập nhật state với danh sách _id
-      })
+      getCardListArchiveByBoardId(boardId)
     }
   }, [boardId])
 
@@ -115,10 +113,10 @@ const ArchivedItems: React.FC<Props> = ({ open, handleDrawerClose }) => {
         </div>
         {/* Content */}
         <Box sx={{ display: 'flex', flexDirection: 'column', marginTop: '10px' }}>
-          {CardData &&
-            CardData.data &&
+          {archiveItems &&
+            archiveItems &&
             (switchToLists ? (
-              CardData.data.map((cardList: any, index: number) => (
+              archiveItems.map((cardList: any, index: number) => (
                 <div key={index}>
                   {cardList.cards && cardList.cards.length > 0 ? (
                     cardList.cards.map((card: any) => (
@@ -142,7 +140,7 @@ const ArchivedItems: React.FC<Props> = ({ open, handleDrawerClose }) => {
             ) : (
               <div>
                 {/* Render cardlists here */}
-                {CardData.data.map((cardList: any, index: number) => (
+                {archiveItems.map((cardList: any, index: number) => (
                   <div key={index}>
                     {cardList.archive_at &&
                       cardList.archive_at.toString() !== '1970-01-01T00:00:00.000Z' &&

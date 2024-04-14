@@ -5,7 +5,9 @@ type CardlistIndex = {
   cardlist_id: string
   index: number
 }
-
+type ArchiveListRes = {
+  data: TrelloApi.CardlistApi.ArchiveCardlistResponse[]
+}
 type MoveListType = {
   board_id: string
   cardlist_id_idx: CardlistIndex[]
@@ -61,12 +63,13 @@ export const CardListApiSlice = createApi({
       })
     }),
     updateCardList: build.mutation<
-      TrelloApi.CardlistApi.UpdateCardlistResponse, {
-        _id?: string | undefined;
-        index?: number | undefined;
-        archive_at?: Date | null;
-        name?: string | undefined;
-    }
+      TrelloApi.CardlistApi.UpdateCardlistResponse,
+      {
+        _id?: string | undefined
+        index?: number | undefined
+        archive_at?: Date | null
+        name?: string | undefined
+      }
     >({
       query: (data) => ({
         method: 'PUT',
@@ -121,7 +124,7 @@ export const CardListApiSlice = createApi({
         url: `/api/cardlist/archive_card_list/${cardListId}`
       })
     }),
-    getCardListArchiveByBoardId: build.mutation<TrelloApi.CardlistApi.ArchiveCardlistResponse, string>({
+    getCardListArchiveByBoardId: build.query<ArchiveListRes, string>({
       query: (boardID) => ({
         url: `/api/cardlist/cardlist_archived_by_board/${boardID}`,
         method: 'GET'
@@ -154,7 +157,6 @@ export const CardListApiSlice = createApi({
       query: ({ id }) => ({
         method: 'GET',
         url: `/api/cardlist/sort_oldest_cards/${id}`
-
       })
     })
   })

@@ -11,12 +11,14 @@ import { BoardApiRTQ, CardlistApiRTQ, UserApiRTQ, WorkspaceApiRTQ } from '~/api'
 import { Activity } from '@trello-v2/shared/src/schemas/Activity'
 import { Workspace } from '@trello-v2/shared/src/schemas/Workspace'
 import { Board } from '@trello-v2/shared/src/schemas/Board'
-import {  TabPanel } from 'react-tabs'
+import { TabPanel } from 'react-tabs'
 import { Avatar, Box, ListItem } from '@mui/material'
 import { stringAvatar } from '~/utils/StringAvatar'
+import { formatDate, formatDateISO, formatDateTime } from '~/utils/fomatter'
 interface ActivityProps {
   userInfo: User | undefined
 }
+const options = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric', hour: 'numeric', minute: 'numeric', second: 'numeric', timeZoneName: 'short' };
 export const ActivityComponent: React.FC<ActivityProps> = ({ userInfo }) => {
   const { colors, darkMode } = useTheme()
   const [activity, setActivity] = useState<Activity[]>()
@@ -84,7 +86,6 @@ export const ActivityComponent: React.FC<ActivityProps> = ({ userInfo }) => {
     if (allBoardData) {
       allBoardData.forEach(async (boardId) => {
         getCardlistByBoardId({ id: boardId }).then((response) => {
-          
           const activities: Activity[] = []
           if (response.data !== undefined) {
             response.data.data.forEach((cardlist: { cards: any[] }) => {
@@ -95,12 +96,15 @@ export const ActivityComponent: React.FC<ActivityProps> = ({ userInfo }) => {
               })
             })
           }
-          console.log("act ", activities)
+          // console.log('act ', activities)
           setActivityData((prev) => [...prev, ...activities])
         })
       })
     }
   }, [getCardlistByBoardId, allBoardData])
+  useEffect(() => {
+    console.log('act Data: ', actData)
+  }, [actData])
   function getActivity(data: Activity[], count: number) {
     if (count < data.length) return data.slice(0, count)
     else return data
@@ -157,37 +161,18 @@ export const ActivityComponent: React.FC<ActivityProps> = ({ userInfo }) => {
           </p>
           <div className={`flex-grow border-b-2 ${!darkMode ? 'border-gray-300' : 'border-gray-700'} pb-2`}></div>
         </div>
-        <TabPanel className={`w-[100%]`}>
-          {actData.length > 0 ? (
-            actData.map((activity) => (
-              <ListItem key={activity._id} className='w-[100%]'>
-                <p>{activity.board_id}</p>
-                <Box sx={{ marginRight: '10px' }}>
-                  <Avatar {...stringAvatar(activity.creator_email)} />
-                </Box>
-                <Box>
-                  <Box sx={{ fontSize: '13px', fontWeight: '300x', display: 'flex' }}>
-                    <span dangerouslySetInnerHTML={{ __html: activity.content }} />
-                  </Box>
-                  <Box sx={{ fontSize: '12px', fontWeight: '300x' }}>{activity.create_time.toString()}</Box>
-                </Box>
-              </ListItem>
-            ))
-          ) : (
-            <ListItem className='w-[100%]'>
-              <Box sx={{ marginRight: '10px' }}>
-                <Avatar {...stringAvatar('kine')} />
-              </Box>
-              <Box>
-                <Box sx={{ fontSize: '13px', fontWeight: '300x', display: 'flex' }}>
-                  <h3 className='mr-1 font-bold'>Nguyeenkieen141 </h3>
-                  archive card list name
-                </Box>
-                <Box sx={{ fontSize: '12px', fontWeight: '300x' }}>yesterday</Box>
-              </Box>
-            </ListItem>
-          )}
-        </TabPanel>
+        <div>
+          {actData.length > 0 &&
+            actData.map((activity, index) => (
+              <div key={index} className={`mb-2 ml-[35px]`}>
+                <span dangerouslySetInnerHTML={{ __html: activity.content }} />
+                <div className={`flex flex-row items-center space-x-2`}>
+                  <p className={`text-sm font-light  `}>At {formatDateTime(activity.create_time.toString())} </p>
+                 
+                </div>
+              </div>
+            ))}
+        </div>
         {activityCount && activityData && activityData.data && activityCount < activityData.data.length && (
           <div className='my-5 ml-16'>
             <button

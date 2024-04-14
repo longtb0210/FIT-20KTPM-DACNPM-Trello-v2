@@ -38,7 +38,8 @@ export default function ListSetting({ closeListSetting, setAddCardOnTop, list }:
   const [getAllCardlistByBoardId] = CardlistApiRTQ.CardListApiSlice.useLazyGetCardlistByBoardIdQuery()
   const [addWatcherAPI] = CardlistApiRTQ.CardListApiSlice.useAddWatcherCardListMutation()
   const [profile, setProfile] = useState({ email: '' })
-
+  const [getCardListArchiveByBoardId, { data: CardData }] =
+    CardlistApiRTQ.CardListApiSlice.useLazyGetCardListArchiveByBoardIdQuery()
   const storedProfile = localStorage.getItem('profile')
   useEffect(() => {
     const profileSave = storedProfile ? JSON.parse(storedProfile) : { email: '' }
@@ -100,7 +101,10 @@ export default function ListSetting({ closeListSetting, setAddCardOnTop, list }:
     updateCardList({
       _id: list._id,
       archive_at: new Date()
-    }).then(() => getAllCardlistByBoardId({ id: list.board_id }))
+    }).then(() => {
+      getAllCardlistByBoardId({ id: list.board_id })
+      getCardListArchiveByBoardId(list.board_id)
+    })
   }
   const handleRemoveWatcher = () => {
     removeWatcherCardList({

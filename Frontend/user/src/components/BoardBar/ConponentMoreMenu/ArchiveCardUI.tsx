@@ -23,6 +23,8 @@ const ArchiveCard: React.FC<ArchiveCardProps> = ({ card, switchToLists, boardId,
   const [updateCardList] = CardlistApiRTQ.CardListApiSlice.useUpdateCardListMutation()
   const [deleteCardListByBoard] = CardlistApiRTQ.CardListApiSlice.useDeleteCardListByBoardMutation()
   const [getCardListByBoardId] = CardlistApiRTQ.CardListApiSlice.useLazyGetCardlistByBoardIdQuery()
+  const [getCardListArchiveByBoardId, { data: CardData }] =
+    CardlistApiRTQ.CardListApiSlice.useLazyGetCardListArchiveByBoardIdQuery()
   //   const [deleteCardArchive] = CardApiRTQ.CardApiSlice.useDeleteCardArchiveMutation()
   const handleSendListCardToBoard = () => {
     console.log(cardListId)
@@ -30,6 +32,7 @@ const ArchiveCard: React.FC<ArchiveCardProps> = ({ card, switchToLists, boardId,
     updateCardList({ _id: cardListId, archive_at: null }).then((a) => {
       console.log(a)
       getCardListByBoardId({ id: boardId })
+      getCardListArchiveByBoardId(boardId)
     })
     // onSendToBoard();
   }
