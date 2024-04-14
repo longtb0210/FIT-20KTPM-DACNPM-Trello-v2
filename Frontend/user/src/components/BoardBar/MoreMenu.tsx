@@ -55,7 +55,6 @@ const MoreMenu: React.FC<Props> = ({ open, handleDrawerClose }) => {
     const profileSave = storedProfile ? JSON.parse(storedProfile) : { email: '', name: '' }
     setProFile({ ...profileSave })
     getBoardById(boardId).then((a) => {
-      console.log(boardData)
       // if (boardData?.data?.watcher_email.includes(profile.email)) {
       //   setWatch(true)
       // }
@@ -66,7 +65,7 @@ const MoreMenu: React.FC<Props> = ({ open, handleDrawerClose }) => {
     setWatch(!isWatching)
     if (boardId !== undefined) {
       if (isWatching) {
-        addWatcherToBoard({ _id: boardId, email: profile.email }).then((a) => console.log(a))
+        addWatcherToBoard({ _id: boardId, email: profile.email })
       } else removeWatcherFromBoard({ _id: boardId, email: profile.email })
     }
   }
