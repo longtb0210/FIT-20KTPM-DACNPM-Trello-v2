@@ -240,7 +240,7 @@ export class WorkspaceService implements IWorkspaceService {
 
     for (const member of body.members) {
       if (member.status !== DbSchemas.WorkspaceSchema.STATUS_WORKSPACE.owner) {
-        this.inviteMember(member, workspace_id)
+        await this.inviteMember(member, workspace_id)
       }
     }
 
