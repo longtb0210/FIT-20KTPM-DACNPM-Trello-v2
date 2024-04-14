@@ -160,7 +160,7 @@ export default function Account() {
                             Account management
                           </Typography>
                         </Link>
-                        <Link to={'/activity/123'}>
+                        <Link to={'/activity'}>
                           <Typography
                             variant='body1'
                             sx={{
