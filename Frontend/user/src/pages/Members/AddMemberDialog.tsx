@@ -9,12 +9,13 @@ import ListItem from '@mui/material/ListItem'
 import Avatar from '@mui/material/Avatar'
 import { stringToColor } from '~/utils/StringToColor'
 import React from 'react'
-import { BoardApiRTQ, UserApiRTQ, WorkspaceApiRTQ } from '~/api'
+import { BoardApiRTQ, UserApiRTQ } from '~/api'
+import { board_id } from '~/api/getInfo'
 
 interface Props {
   open: boolean
   handleCloseShare: () => void
-  workspaceId: string
+  boardID: string
 }
 
 const isValidEmail = (email: string) => {
@@ -52,11 +53,11 @@ function stringAvatar(name: string) {
   }
 }
 
-export default function AddMemberDialog({ open, handleCloseShare, workspaceId }: Props) {
+export default function AddMemberDialog({ open, handleCloseShare, boardID }: Props) {
   const [emailInput, setEmailInput] = React.useState('')
   const { colors } = useTheme()
   const [getUserByEmail, { data: UserData }] = UserApiRTQ.UserApiSlice.useLazyGetUserByEmailQuery()
-  const [addMemberToWorkspace] = WorkspaceApiRTQ.WorkspaceApiSlice.useInviteMember2WorkspaceMutation()
+  const [addMemberToBoard] = BoardApiRTQ.BoardApiSlice.useAddMemberToBoardMutation()
   // eslint-disable-next-line react-hooks/rules-of-hooks
   const [selectedValue, setSelectedValue] = React.useState('')
   const options = ['Admin', 'Observer', 'Member']
@@ -64,27 +65,15 @@ export default function AddMemberDialog({ open, handleCloseShare, workspaceId }:
   const handleChange = (event: { target: { value: React.SetStateAction<string> } }) => {
     setSelectedValue(event.target.value)
   }
-
-  const [getWorkspaceById, { data: workspaceData }] = WorkspaceApiRTQ.WorkspaceApiSlice.useLazyGetWorkspaceInfoQuery()
   // Hàm xử lý khi nhấn nút Share
   const handleShare = () => {
     if (isValidEmail(emailInput)) {
-      console.log('email' + emailInput + ' wsp: ' + workspaceId)
       // Nếu là email hợp lệ, gọi hàm gọi API
-      addMemberToWorkspace({
-        id: workspaceId,
-        members: [
-          {
-            email: emailInput,
-            role: 'member'
-          }
-        ]
-      })
+      addMemberToBoard({ _id: boardID, email: emailInput })
         .then((response) => {
           // Xử lý kết quả trả về từ API ở đây
           console.log(response)
           alert('Thêm thành công')
-          getWorkspaceById(workspaceId)
         })
         .catch((error) => {
           // Xử lý lỗi nếu có
@@ -104,11 +93,10 @@ export default function AddMemberDialog({ open, handleCloseShare, workspaceId }:
   React.useEffect(() => {
     getUserByEmail({ email: 'nguyeenkieen141@gmail.com' }).then((a) => console.log(a))
   }, [getUserByEmail])
-
   return (
     <Dialog open={open} onClose={handleCloseShare} aria-labelledby='alert-dialog-title' className='rounded-[10px]'>
       <DialogTitle id='alert-dialog-title' sx={{ display: 'flex', justifyContent: 'space-between' }}>
-        {'Add member with email'}
+        {'Share board'}
         <IoMdClose className='cursor-pointer' onClick={handleCloseShare} />
       </DialogTitle>
       <DialogContent>

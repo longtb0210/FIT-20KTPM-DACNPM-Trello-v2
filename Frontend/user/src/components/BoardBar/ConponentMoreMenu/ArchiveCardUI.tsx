@@ -2,6 +2,7 @@ import React from 'react'
 import { Box, Paper } from '@mui/material'
 import { TiArchive } from 'react-icons/ti'
 import { CardApiRTQ, CardlistApiRTQ } from '~/api'
+import { useParams } from 'react-router-dom'
 
 interface Card {
   _id: string
@@ -18,25 +19,28 @@ interface ArchiveCardProps {
 const ArchiveCard: React.FC<ArchiveCardProps> = ({ card, switchToLists, boardId, cardListId }) => {
   //   const restoreCartToBoard = CardApiRTQ.CardApiSlice.useRestoreCartToBoardMutation()
   //   const deleteCardArchive = CardApiRTQ.CardApiSlice.useDeleteCardArchiveMutation()
-  const [getCardListByBoardId] = CardlistApiRTQ.CardListApiSlice.useLazyGetCardlistByBoardIdQuery()
-  const [restoreCartListByBoard] = CardlistApiRTQ.CardListApiSlice.useRestoreCartListByBoardMutation()
-  const [deleteCardListByBoard] = CardlistApiRTQ.CardListApiSlice.useDeleteCardListByBoardMutation()
   const [restoreCartToBoard] = CardApiRTQ.CardApiSlice.useRestoreCartToBoardMutation()
+  const [updateCardList] = CardlistApiRTQ.CardListApiSlice.useUpdateCardListMutation()
+  const [deleteCardListByBoard] = CardlistApiRTQ.CardListApiSlice.useDeleteCardListByBoardMutation()
+  const [getCardListByBoardId] = CardlistApiRTQ.CardListApiSlice.useLazyGetCardlistByBoardIdQuery()
   //   const [deleteCardArchive] = CardApiRTQ.CardApiSlice.useDeleteCardArchiveMutation()
   const handleSendListCardToBoard = () => {
+    console.log(cardListId)
     // Gọi hàm xử lý sự kiện Send to board từ component cha
-    restoreCartListByBoard(boardId).then(() => {
+    updateCardList({ _id: cardListId, archive_at: null }).then((a) => {
+      console.log(a)
       getCardListByBoardId({ id: boardId })
     })
     // onSendToBoard();
   }
 
   const handleDelete = () => {
-    console.log('delete card ' + boardId)
     // Gọi hàm xử lý sự kiện Delete từ component cha
-    deleteCardListByBoard({ board_id: boardId }).then(() => {
-      getCardListByBoardId({ id: boardId })
-    })
+    if (boardId !== undefined) {
+      deleteCardListByBoard({ board_id: boardId }).then((a) => {
+        getCardListByBoardId({ id: boardId })
+      })
+    }
     // onDelete();
   }
 
@@ -82,7 +86,7 @@ const ArchiveCard: React.FC<ArchiveCardProps> = ({ card, switchToLists, boardId,
             cursor: 'pointer',
             ':hover': { textDecorationLine: 'underline', color: 'blue' }
           }}
-          onClick={switchToLists ? handleSendListCardToBoard : handleRestoreCard}
+          onClick={switchToLists ? handleRestoreCard : handleSendListCardToBoard}
         >
           Send to board
         </Box>
@@ -94,7 +98,7 @@ const ArchiveCard: React.FC<ArchiveCardProps> = ({ card, switchToLists, boardId,
             ':hover': { textDecorationLine: 'underline', color: 'blue' },
             marginLeft: '10px'
           }}
-          onClick={switchToLists ? handleDelete : handleDeleteCard}
+          onClick={switchToLists ? handleDeleteCard : handleDelete}
         >
           Delete
         </Box>

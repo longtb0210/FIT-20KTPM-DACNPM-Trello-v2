@@ -33,13 +33,17 @@ const ArchivedItems: React.FC<Props> = ({ open, handleDrawerClose }) => {
 
   const [switchToLists, setSwitchToLists] = useState(true)
 
+  const [cardListIds, setCardListIds] = useState([])
+
   React.useEffect(() => {
     if (boardId !== undefined) {
-      getCardListArchiveByBoardId(boardId).then((a) => {
-        console.log(a)
+      getCardListArchiveByBoardId(boardId).then((response) => {
+        const cardList = response.data.data // Lấy mảng các thẻ từ response
+        const extractedCardIds = cardList.map((card) => card._id) // Lấy ra mảng các _id
+        setCardListIds(extractedCardIds) // Cập nhật state với danh sách _id
       })
     }
-  }, [boardId, getCardListArchiveByBoardId])
+  }, [boardId])
 
   const handleSwitchButtonClick = () => {
     setSwitchToLists((prev) => !prev)
@@ -142,6 +146,7 @@ const ArchivedItems: React.FC<Props> = ({ open, handleDrawerClose }) => {
                         switchToLists={switchToLists}
                         boardId={boardId !== undefined ? boardId : ''}
                         key={cardList.id}
+                        cardListId={cardList._id}
                       />
                     ) : (
                       <div>No cards list found</div>
