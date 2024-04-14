@@ -30,8 +30,10 @@ export default function CardComponent({ card, cardSelected, setOpenCardSetting }
     setProfile({ ...profileSave })
   }, [profile.email, storedProfile])
   useEffect(() => {
-    const arrayMembers = createMembersArray(card.member_email)
-    setCardMembers(arrayMembers)
+    if (card.member_email && card.member_email.length > 0) {
+      const arrayMembers = createMembersArray(card.member_email)
+      setCardMembers(arrayMembers)
+    }
   }, [card])
   useEffect(() => {
     const bgColorCode = []
@@ -150,26 +152,27 @@ export default function CardComponent({ card, cardSelected, setOpenCardSetting }
                   ((card.watcher_email &&
                     card.watcher_email.length > 0 &&
                     card.watcher_email.includes(profile.email)) ||
-                    (card.member_email && card.member_email.length > 0)) && (
+                    (cardMembers && cardMembers.length > 0)) && (
                     <div className={`flex flex-row items-center justify-between`}>
                       <div className='flex-grow'>
                         {card.watcher_email.includes(profile.email) && <MdOutlineRemoveRedEye className={``} />}
                       </div>
                       <div className={`flex flex-row items-center justify-between space-x-1`}>
-                        {cardMembers.map((member, index) => (
-                          <div key={index} className={`relative z-10 flex flex-row items-center justify-center`}>
-                            <div onMouseEnter={() => handleMouseOver(member)} onMouseLeave={handleMouseLeave}>
-                              <Typography variant='h4' className='text-center'>
-                                <Avatar {...stringAvatar(member)} className={`font-bold`} />
-                              </Typography>
-                              {isHoveredWatcher && isHoveredWatcher === member && isValidEmail(member) && (
-                                <div className='absolute -bottom-10 left-2 z-20 ml-6 bg-yellow-200 p-1 text-black hover:bg-gray-100'>
-                                  {member}
-                                </div>
-                              )}
+                        {cardMembers &&
+                          cardMembers.map((member, index) => (
+                            <div key={index} className={`relative z-10 flex flex-row items-center justify-center`}>
+                              <div onMouseEnter={() => handleMouseOver(member)} onMouseLeave={handleMouseLeave}>
+                                <Typography variant='h4' className='text-center'>
+                                  <Avatar {...stringAvatar(member)} className={`font-bold`} />
+                                </Typography>
+                                {isHoveredWatcher && isHoveredWatcher === member && isValidEmail(member) && (
+                                  <div className='absolute -bottom-10 left-2 z-20 ml-6 bg-yellow-200 p-1 text-black hover:bg-gray-100'>
+                                    {member}
+                                  </div>
+                                )}
+                              </div>
                             </div>
-                          </div>
-                        ))}
+                          ))}
                       </div>
                     </div>
                   )}
@@ -219,7 +222,7 @@ export default function CardComponent({ card, cardSelected, setOpenCardSetting }
                       ((card.watcher_email &&
                         card.watcher_email.length > 0 &&
                         card.watcher_email.includes(profile.email)) ||
-                        (card.member_email && card.member_email.length > 0)) && (
+                        (cardMembers && cardMembers.length > 0)) && (
                         <div className={`flex flex-row items-center justify-between`}>
                           <div className='flex-grow'>
                             {card.watcher_email.includes(profile.email) && <MdOutlineRemoveRedEye className={``} />}
