@@ -232,11 +232,11 @@ export class UserController {
     ],
   })
   async deleteActivity(@Param('email') email: string, @Param('id') id: string): Promise<TrelloApi.UserApi.DeleteActivityResponse> {
-    const activity = await this.userService.deleteActivity(email, id)
-    if (!activity) throw new NotFoundException("Can't find activity")
+    const user = await this.userService.deleteActivity(email, id)
+    if (!user) throw new NotFoundException("Can't find activity")
 
     return {
-      data: activity,
+      data: user,
     }
   }
 
