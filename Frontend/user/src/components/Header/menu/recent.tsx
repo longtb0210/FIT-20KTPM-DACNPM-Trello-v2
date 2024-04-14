@@ -3,7 +3,7 @@ import { Box, Button, ClickAwayListener, Grow, Paper, Popper, MenuList, Stack, T
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { faChevronDown } from '@fortawesome/free-solid-svg-icons'
 import { useTheme } from './../../Theme/themeContext'
-import { BoardApiRTQ, WorkspaceApiRTQ } from '~/api'
+import { BoardApiRTQ } from '~/api'
 import noWorkspace from '~/assets/no_workspace.svg'
 import { Link } from 'react-router-dom'
 
@@ -43,31 +43,22 @@ export default function Recent() {
   const anchorRef = React.useRef<HTMLButtonElement>(null)
   const { colors } = useTheme()
   const [getBoardById] = BoardApiRTQ.BoardApiSlice.useLazyGetBoardByIdQuery()
-  const [getWorkspaceByID, { data: dataWorkspace }] = WorkspaceApiRTQ.WorkspaceApiSlice.useGetWorkspaceByIDMutation()
+  // const [getWorkspaceByID] = WorkspaceApiRTQ.WorkspaceApiSlice.useGetWorkspaceByIDMutation()
   const [listBoard, setListBoard] = React.useState<Board[]>([])
-  const [listNameWorkspace, setListNameWorkspace] = React.useState<string[]>([])
 
   const savedValuesString = localStorage.getItem('savedValues')
-
-  React.useEffect(() => {
-    if (dataWorkspace) {
-      const workspaceName = dataWorkspace.data?.name || ''
-
-      setListNameWorkspace((prev) => [...prev, workspaceName])
-    }
-  }, [dataWorkspace])
 
   React.useEffect(() => {
     const fetchData = async () => {
       if (savedValuesString) {
         const savedValues = JSON.parse(savedValuesString)
-        setListBoard([])
+        const newBoards: Board[] = []
 
         for (const recent of savedValues) {
           const res = await getBoardById(recent)
 
           if (res.data && res.data.data) {
-            const newBoard: Board = {
+            const newBoard = {
               name: res.data.data.name || '',
               workspace_id: res.data.data.workspace_id || '',
               background: res.data.data.background || '',
@@ -80,25 +71,15 @@ export default function Recent() {
               watcher_email: res.data.data.watcher_email || [],
               _id: res.data.data._id || ''
             }
-
-            setListBoard((prev) => [...prev, newBoard])
+            newBoards.push(newBoard)
           }
         }
+        setListBoard((prev) => [...prev, ...newBoards])
       }
     }
 
     fetchData()
-  }, [getBoardById, getWorkspaceByID, savedValuesString])
-
-  React.useEffect(() => {
-    const fetchWorkspace = async (workspaceId: string) => {
-      await getWorkspaceByID({ workspace_id: workspaceId })
-    }
-
-    listBoard.map((board) => {
-      fetchWorkspace(board.workspace_id)
-    })
-  }, [getWorkspaceByID, listBoard])
+  }, [getBoardById, savedValuesString])
 
   const handleToggle = () => {
     setOpen((prevOpen) => !prevOpen)
@@ -229,12 +210,12 @@ export default function Recent() {
                                 >
                                   {board.name}
                                 </Typography>
-                                <Typography
+                                {/* <Typography
                                   variant='body1'
                                   sx={{ fontSize: '12px', color: colors.text, marginLeft: '12px' }}
                                 >
                                   {listNameWorkspace[index]}
-                                </Typography>
+                                </Typography> */}
                               </Box>
                             </Box>
                           </Box>

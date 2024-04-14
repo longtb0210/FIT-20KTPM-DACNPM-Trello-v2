@@ -77,7 +77,6 @@ const CardContent: React.FC<CarContent> = ({ boardData }) => {
         } else {
           // Nếu không có lỗi và status là 200, set isData thành true
           setIsData(true)
-          console.log('Data received successfully')
           const activities: Activity[] = []
           if (response.data !== undefined) {
             response.data.data.forEach((cardlist: { cards: any[] }) => {
@@ -99,9 +98,9 @@ const CardContent: React.FC<CarContent> = ({ boardData }) => {
   }, [getCardlistByBoardId])
 
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  function handleIconClick(): void {
-    setIsStar(!isStar)
-  }
+  // function handleIconClick(): void {
+  //   setIsStar(!isStar)
+  // }
 
   return (
     <>

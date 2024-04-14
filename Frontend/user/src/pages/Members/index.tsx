@@ -469,7 +469,7 @@ export default function PageMembers() {
         <AddMemberDialog
           open={openShare}
           handleCloseShare={handleCloseShare}
-          workspaceId={workspaceId !== undefined ? workspaceId : ''}
+          boardID={workspaceId !== undefined ? workspaceId : ''}
         />
         {/* end content */}
       </Box>
