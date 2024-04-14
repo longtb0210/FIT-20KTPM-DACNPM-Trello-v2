@@ -43,7 +43,7 @@ export class CardlistService implements ICardlistService {
     private CardlistMModel: Model<DbSchemas.CardlistSchema.CardList>,
     @InjectModel(DbSchemas.COLLECTION_NAMES[1])
     private BoardMModel: Model<DbSchemas.BoardSchema.Board>,
-    @InjectModel(DbSchemas.COLLECTION_NAMES[5])
+    @InjectModel(DbSchemas.COLLECTION_NAMES[6])
     private CardMModel: Model<DbSchemas.CardlistSchema.Card>,
   ) {}
 

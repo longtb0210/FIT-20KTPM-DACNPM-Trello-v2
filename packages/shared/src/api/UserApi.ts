@@ -81,7 +81,7 @@ export type GetallActivitiesResponse = z.infer<
 
 // delete activity
 export const DeleteActivityResponseSchema = z.object({
-  data: ActivitySchema,
+  data: UserSchema,
 });
 export type DeleteActivityResponse = z.infer<
   typeof DeleteActivityResponseSchema
