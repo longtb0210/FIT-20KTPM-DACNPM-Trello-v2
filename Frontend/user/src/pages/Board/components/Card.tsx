@@ -130,7 +130,7 @@ export default function CardComponent({ card, cardSelected, setOpenCardSetting }
                   border: '1px solid',
                   borderColor: isHovered ? colors.card_border : colors.background
                 }}
-                className={`mx-3  space-y-2 rounded-lg  p-2  ${darkMode ? `` : ' shadow-sm shadow-gray-300'} ${card.placeHolder ? 'invisible -mt-3 max-h-0  border-0 p-0' : 'visible'}`}
+                className={`mx-3  space-y-2 rounded-lg  p-2  ${darkMode ? `` : ' shadow-sm shadow-gray-300'} ${card.placeHolder ? 'invisible' : 'visible'}`}
                 onMouseEnter={() => setIsHovered(true)}
                 onMouseLeave={() => setIsHovered(false)}
                 onClick={() => cardSelected(card)}
@@ -159,6 +159,7 @@ export default function CardComponent({ card, cardSelected, setOpenCardSetting }
                       </div>
                       <div className={`flex flex-row items-center justify-between space-x-1`}>
                         {cardMembers &&
+                          card.watcher_email.includes(profile.email) &&
                           cardMembers.map((member, index) => (
                             <div key={index} className={`relative z-10 flex flex-row items-center justify-center`}>
                               <div onMouseEnter={() => handleMouseOver(member)} onMouseLeave={handleMouseLeave}>
@@ -228,7 +229,7 @@ export default function CardComponent({ card, cardSelected, setOpenCardSetting }
                             {card.watcher_email.includes(profile.email) && <MdOutlineRemoveRedEye className={``} />}
                           </div>
                           <div className={`flex flex-row items-center justify-between space-x-1`}>
-                            {cardMembers.map((member, index) => (
+                            {card.watcher_email.includes(profile.email) && cardMembers.map((member, index) => (
                               <div key={index} className={`relative z-10 flex flex-row items-center justify-center`}>
                                 <div onMouseEnter={() => handleMouseOver(member)} onMouseLeave={handleMouseLeave}>
                                   <Typography variant='h4' className='text-center'>

@@ -5,6 +5,7 @@ export function generatePlaceHolderCard(list: List) {
     ...defaultCard,
     _id: `${list._id}-placeHolderCard`,
     list_id: list._id,
+    member_email:["123"],
     placeHolder: true
   } as Card
   return cardPlaceHolder
