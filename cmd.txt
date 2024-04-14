@@ -1,4 +1,6 @@
 docker build -f Dockerfile.envoy -t lamlance/trello-envoy:latest .
+docker build -f Dockerfile.frontend -t lamlance/trello-frontend:user-latest .
+
 docker build -f Dockerfile.backend --build-arg SERVICE_NAME=${v} -t lamlance/trello-backend:${v}-latest .
 docker compose --env-file ./configs/.env -f docker-compose.backend.yml up
 

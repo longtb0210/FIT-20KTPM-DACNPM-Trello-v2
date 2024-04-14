@@ -1,8 +1,35 @@
 version: "3.8"
+name: "backend"
 services:
-  keycloak:
-    image: keycloak/keycloak:24.0
-    command: start-dev
-    volumes:
-      - ${WEBAPP_STORAGE_HOME}/data:/opt/keycloak/data
-    restart: always
+  envoy:
+    image: lamlance/trello-envoy:latest
+    ports:
+      - "80:10000"
+
+  backend-cardlist:
+    image: lamlance/trello-backend:cardlist-latest
+    environment:
+      - GRPC_HOST=0.0.0.0
+      - PORT=3000
+      - SERVICE_NAME=cardlist
+
+  backend-board:
+    image: lamlance/trello-backend:board-latest
+    environment:
+      - GRPC_HOST=0.0.0.0
+      - PORT=3000
+      - SERVICE_NAME=board
+
+  backend-workspace:
+    image: lamlance/trello-backend:workspace-latest
+    environment:
+      - GRPC_HOST=0.0.0.0
+      - PORT=3000
+      - SERVICE_NAME=workspace
+
+  backend-user:
+    image: lamlance/trello-backend:user-latest
+    environment:
+      - GRPC_HOST=0.0.0.0
+      - PORT=3000
+      - SERVICE_NAME=user

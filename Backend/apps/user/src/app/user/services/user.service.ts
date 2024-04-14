@@ -28,8 +28,14 @@ export class UserService implements IUserService {
   ) {}
 
   async createUser(data: TrelloApi.UserApi.CreateUserRequest) {
-    const model = new this.UserMModel(data)
-    return model.save()
+    const model = await this.UserMModel.findOneAndUpdate({email: data.email},{
+      $set:{
+        username: data.username,
+        bio: data.bio,
+        avatar: data.avatar
+      }
+    },{upsert:true,new:true});
+    return (await model.save()).toJSON()
   }
 
   async getAllUser() {

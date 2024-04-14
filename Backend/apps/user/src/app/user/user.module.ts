@@ -1,4 +1,4 @@
-import { ActivityMModule, UserMModule } from '@app/common/database/modules'
+import {  UserMModule } from '@app/common/database/modules'
 import { Module } from '@nestjs/common'
 
 import { UserController } from './controllers/user.controller'
@@ -18,7 +18,6 @@ console.log(grpcPaths)
 @Module({
   imports: [
     UserMModule,
-    ActivityMModule,
     ClientsModule.register([
       {
         name: 'ECHO_SERVICE',

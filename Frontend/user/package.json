@@ -25,6 +25,7 @@
     "@dnd-kit/utilities": "^3.2.2",
     "@emotion/react": "^11.11.3",
     "@emotion/styled": "^11.11.0",
+    "@floating-ui/react-dom": "^2.0.8",
     "@fontsource/roboto": "^5.0.8",
     "@fortawesome/fontawesome-svg-core": "^6.5.1",
     "@fortawesome/free-brands-svg-icons": "^6.5.1",

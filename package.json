@@ -17,7 +17,8 @@
     "Backend",
     "Frontend/admin",
     "Frontend/user",
-    "packages/shared"
+    "packages/shared",
+    "Frontend/react_server"
   ],
   "dependencies": {
     "keycloak-js": "^24.0.2"
