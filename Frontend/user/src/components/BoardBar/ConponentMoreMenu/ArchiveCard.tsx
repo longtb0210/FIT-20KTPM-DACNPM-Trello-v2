@@ -122,13 +122,17 @@ const ArchivedItems: React.FC<Props> = ({ open, handleDrawerClose }) => {
                 <div key={index}>
                   {cardList.cards && cardList.cards.length > 0 ? (
                     cardList.cards.map((card: any) => (
-                      <ArCard
-                        card={card}
-                        switchToLists={switchToLists}
-                        boardId={boardId !== undefined ? boardId : ''}
-                        cardListId={cardList.id}
-                        key={card._id}
-                      />
+                      <>
+                        {card.archive_at && card.archive_at.toString() !== '1970-01-01T00:00:00.000Z' && (
+                          <ArCard
+                            card={card}
+                            switchToLists={switchToLists}
+                            boardId={boardId !== undefined ? boardId : ''}
+                            cardListId={cardList.id}
+                            key={card._id}
+                          />
+                        )}
+                      </>
                     ))
                   ) : (
                     <div>No cards found in this list</div>
@@ -140,17 +144,17 @@ const ArchivedItems: React.FC<Props> = ({ open, handleDrawerClose }) => {
                 {/* Render cardlists here */}
                 {CardData.data.map((cardList: any, index: number) => (
                   <div key={index}>
-                    {cardList ? (
-                      <ArCard
-                        card={cardList}
-                        switchToLists={switchToLists}
-                        boardId={boardId !== undefined ? boardId : ''}
-                        key={cardList.id}
-                        cardListId={cardList._id}
-                      />
-                    ) : (
-                      <div>No cards list found</div>
-                    )}
+                    {cardList.archive_at &&
+                      cardList.archive_at.toString() !== '1970-01-01T00:00:00.000Z' &&
+                      cardList && (
+                        <ArCard
+                          card={cardList}
+                          switchToLists={switchToLists}
+                          boardId={boardId !== undefined ? boardId : ''}
+                          key={cardList.id}
+                          cardListId={cardList._id}
+                        />
+                      )}
                   </div>
                 ))}
               </div>
