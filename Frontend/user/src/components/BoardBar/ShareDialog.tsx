@@ -69,9 +69,8 @@ export default function ShareDialog({ open, handleCloseShare, boardID }: Props) 
     if (isValidEmail(emailInput)) {
       // Nếu là email hợp lệ, gọi hàm gọi API
       addMemberToBoard({ _id: boardID, email: emailInput })
-        .then((response) => {
+        .then(() => {
           // Xử lý kết quả trả về từ API ở đây
-          console.log(response)
           alert('Thêm thành công')
         })
         .catch((error) => {

@@ -18,7 +18,6 @@ const ProjectTile: React.FC<ProjectTileProps> = ({ boardData }) => {
   const [getWorkspaceById, { data: workspaceData }] = WorkspaceApiRTQ.WorkspaceApiSlice.useLazyGetWorkspaceInfoQuery()
 
   React.useEffect(() => {
-    console.log({ id: boardData.workspace_id })
     getWorkspaceById(boardData.workspace_id)
   }, [boardData.workspace_id, getWorkspaceById])
 

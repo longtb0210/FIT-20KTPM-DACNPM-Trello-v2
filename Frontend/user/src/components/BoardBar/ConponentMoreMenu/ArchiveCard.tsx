@@ -33,13 +33,17 @@ const ArchivedItems: React.FC<Props> = ({ open, handleDrawerClose }) => {
 
   const [switchToLists, setSwitchToLists] = useState(true)
 
+  const [cardListIds, setCardListIds] = useState([])
+
   React.useEffect(() => {
     if (boardId !== undefined) {
-      getCardListArchiveByBoardId(boardId).then((a) => {
-        console.log(a)
+      getCardListArchiveByBoardId(boardId).then((response) => {
+        const cardList = response.data.data // Lấy mảng các thẻ từ response
+        const extractedCardIds = cardList.map((card) => card._id) // Lấy ra mảng các _id
+        setCardListIds(extractedCardIds) // Cập nhật state với danh sách _id
       })
     }
-  }, [boardId, getCardListArchiveByBoardId])
+  }, [boardId])
 
   const handleSwitchButtonClick = () => {
     setSwitchToLists((prev) => !prev)
@@ -118,13 +122,17 @@ const ArchivedItems: React.FC<Props> = ({ open, handleDrawerClose }) => {
                 <div key={index}>
                   {cardList.cards && cardList.cards.length > 0 ? (
                     cardList.cards.map((card: any) => (
-                      <ArCard
-                        card={card}
-                        switchToLists={switchToLists}
-                        boardId={boardId !== undefined ? boardId : ''}
-                        cardListId={cardList.id}
-                        key={card._id}
-                      />
+                      <>
+                        {card.archive_at && card.archive_at.toString() !== '1970-01-01T00:00:00.000Z' && (
+                          <ArCard
+                            card={card}
+                            switchToLists={switchToLists}
+                            boardId={boardId !== undefined ? boardId : ''}
+                            cardListId={cardList.id}
+                            key={card._id}
+                          />
+                        )}
+                      </>
                     ))
                   ) : (
                     <div>No cards found in this list</div>
@@ -136,16 +144,17 @@ const ArchivedItems: React.FC<Props> = ({ open, handleDrawerClose }) => {
                 {/* Render cardlists here */}
                 {CardData.data.map((cardList: any, index: number) => (
                   <div key={index}>
-                    {cardList ? (
-                      <ArCard
-                        card={cardList}
-                        switchToLists={switchToLists}
-                        boardId={boardId !== undefined ? boardId : ''}
-                        key={cardList.id}
-                      />
-                    ) : (
-                      <div>No cards list found</div>
-                    )}
+                    {cardList.archive_at &&
+                      cardList.archive_at.toString() !== '1970-01-01T00:00:00.000Z' &&
+                      cardList && (
+                        <ArCard
+                          card={cardList}
+                          switchToLists={switchToLists}
+                          boardId={boardId !== undefined ? boardId : ''}
+                          key={cardList.id}
+                          cardListId={cardList._id}
+                        />
+                      )}
                   </div>
                 ))}
               </div>

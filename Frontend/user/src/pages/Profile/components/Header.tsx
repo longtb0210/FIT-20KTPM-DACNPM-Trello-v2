@@ -4,6 +4,7 @@ import { User } from '@trello-v2/shared/src/schemas/User'
 import React, { useEffect, useState } from 'react'
 
 import { RxAvatar } from 'react-icons/rx'
+import { Link } from 'react-router-dom'
 import { useTheme } from '~/components/Theme/themeContext'
 import { stringAvatar } from '~/utils/StringAvatar'
 import { stringToColor } from '~/utils/StringToColor'
@@ -96,21 +97,23 @@ export const Header: React.FC<HeaderProps> = ({ currentTab, userInfo, onSelectTa
         </Box>
       </div>
       <div className='mt-9 flex'>
-        <p
+        <Link
+          to={`/profile`}
           className={`cursor-pointer border-b-[2px] pb-2 font-bold ${selectedTab === 'profile' ? (!darkMode ? 'border-blue-600 text-blue-600' : 'border-blue-400 text-blue-400') : !darkMode ? 'border-gray-300  hover:text-blue-600' : 'border-gray-700  hover:text-blue-400'}`}
           onClick={() => handleTabClick('profile')}
         >
           Profile and visibility
-        </p>
+        </Link>
         <div
           className={` w-[20px] border-b-[2px] ${!darkMode ? 'border-gray-300  hover:text-blue-600' : 'border-gray-700  hover:text-blue-600'}`}
         ></div>
-        <p
+        <Link
+          to={`/activity`}
           className={`cursor-pointer border-b-[2px] pb-2 font-bold ${selectedTab === 'activity' ? (!darkMode ? 'border-blue-600 text-blue-600' : 'border-blue-400 text-blue-400') : !darkMode ? 'border-gray-300  hover:text-blue-600' : 'border-gray-700  hover:text-blue-400'}`}
           onClick={() => handleTabClick('activity')}
         >
           Activity
-        </p>
+        </Link>
 
         <div
           className={`flex-grow border-b-[2px] ${!darkMode ? 'border-gray-300  hover:text-blue-600' : 'border-gray-700  hover:text-blue-600'}`}

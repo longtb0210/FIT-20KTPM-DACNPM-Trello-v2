@@ -25,8 +25,6 @@ export class UserService implements IUserService {
   constructor(
     @InjectModel(DbSchemas.COLLECTION_NAMES[3])
     private UserMModel: Model<DbSchemas.UserSchema.User>,
-    @InjectModel(DbSchemas.COLLECTION_NAMES[5])
-    private ActivityMModel: Model<DbSchemas.UserSchema.Activity>,
   ) {}
 
   async createUser(data: TrelloApi.UserApi.CreateUserRequest) {
@@ -63,25 +61,33 @@ export class UserService implements IUserService {
   }
 
   async createActivity(email: string, data: TrelloApi.UserApi.CreateActivityRequest) {
-    const model = new this.ActivityMModel(data)
-
-    await this.UserMModel.updateOne({ email }, { $push: { activities: model } }, { upsert: true })
-
-    return model.save()
+    const user = await this.UserMModel.findOne({ email }, {}, { upsert: true })
+    user.activities.push({
+      ...data,
+    })
+    const json = (await user.save()).toJSON()
+    return json.activities[json.activities.length - 1]
   }
 
   async getAllActivities(email: string) {
-    return this.UserMModel.findOne({ email }, undefined, { upsert: true }).select('activities')
+    return this.UserMModel.findOne({ email: email }, undefined, { upsert: true })
   }
 
   async deleteActivity(email: string, id: number | string) {
-    const result = await this.ActivityMModel.findOneAndDelete({
-      _id: id.toString(),
-    }).exec()
+    const result = await this.UserMModel.findByIdAndUpdate(
+      {
+        email: email,
+        activities: { $elemMatch: { _id: id } },
+      },
+      {
+        $pull: {
+          activities: { _id: id },
+        },
+      },
+      { new: true },
+    ).exec()
 
-    await this.UserMModel.updateOne({ email }, { $pull: { activities: { _id: id } } })
-
-    return result
+    return result.toJSON()
   }
 
   async deleteActivities(email: string) {
