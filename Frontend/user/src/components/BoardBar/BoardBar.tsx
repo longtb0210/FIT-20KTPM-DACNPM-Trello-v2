@@ -21,6 +21,7 @@ import ChangeVisibility from './ChangeVisibility'
 import { stringAvatar } from '~/utils/StringAvatar'
 import ShareDialog from './ShareDialog'
 import { useParams } from 'react-router-dom'
+import { error } from 'console'
 
 function BoardBar() {
   //get id
@@ -67,11 +68,11 @@ function BoardBar() {
       const fetchBoardMembers = async () => {
         const members = []
         // eslint-disable-next-line no-unsafe-optional-chaining
-        for (const emailValue of boardData.data?.members_email !== undefined ? boardData.data?.members_email : '') {
-          const userData = await getUserByEmail({ email: emailValue })
-          members.push(userData.data)
-        }
-        setBoardMembers(members)
+        // for (const emailValue of boardData.data?.members_email !== undefined ? boardData.data?.members_email : '') {
+        //   const userData = await getUserByEmail({ email: emailValue })
+        //   members.push(userData.data)
+        // }
+        // setBoardMembers(members)
       }
       fetchBoardMembers()
     }

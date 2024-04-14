@@ -61,8 +61,12 @@ export const CardListApiSlice = createApi({
       })
     }),
     updateCardList: build.mutation<
-      TrelloApi.CardlistApi.UpdateCardlistResponse,
-      TrelloApi.CardlistApi.UpdateCardlistRequest
+      TrelloApi.CardlistApi.UpdateCardlistResponse, {
+        _id?: string | undefined;
+        index?: number | undefined;
+        archive_at?: Date | null;
+        name?: string | undefined;
+    }
     >({
       query: (data) => ({
         method: 'PUT',
@@ -133,9 +137,10 @@ export const CardListApiSlice = createApi({
       TrelloApi.CardlistApi.GetallCardlistArchivedByBoardIdResponse,
       TrelloApi.CardlistApi.DeleteCardlistsByBoardIdRequest
     >({
-      query: (boardID) => ({
-        url: `/api/cardlist/delete_cardlists_by_board_id/${boardID}`,
-        method: 'POST'
+      query: (data) => ({
+        url: `/api/cardlist/delete_cardlists_by_board_id/`,
+        method: 'DELETE',
+        body: data
       })
     }),
     removeWatcherCardList: build.mutation<null, { _id: string; watcher: string }>({
