@@ -275,3 +275,20 @@ export const MakeCommentSchemaResponseSchema = z.object({
 export type MakeCommentResponse = z.infer<
   typeof MakeCommentSchemaResponseSchema
 >;
+
+export const GetAllArchivedCardInBoardRequestSchema = z.object({
+  board_id: z.string(),
+});
+export type getAllArchivedCardInBoardRequest = z.infer<
+  typeof GetAllArchivedCardInBoardRequestSchema
+>;
+
+export const GetAllArchivedCardInBoardResponseSchema = z.object({
+  data: CardSchema.pick({ archive_at: true, _id: true, name: true })
+    .required({ _id: true })
+    .merge(z.object({ cardlist_id: z.string() }))
+    .array(),
+});
+export type GetAllArchivedCardInBoardResponse = z.infer<
+  typeof GetAllArchivedCardInBoardResponseSchema
+>;
