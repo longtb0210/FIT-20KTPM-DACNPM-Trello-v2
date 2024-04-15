@@ -119,6 +119,7 @@ export function Board() {
         }))
     }))
   }
+
   useEffect(() => {
     if (!cardlistDataByBoardId) return
 
@@ -138,7 +139,10 @@ export function Board() {
       })) as List[]
     const updatedLists = updatedLists_placeHolder?.map((list) => {
       // Check if data array is empty
-      if (list.cards.length === 0) {
+      if (
+        list.cards.length === 0 ||
+        list.cards.every((obj) => obj.archive_at !== null && obj.archive_at !== undefined)
+      ) {
         // Add a new item to data array
         const newItem = generatePlaceHolderCard(list)
         return {
@@ -432,6 +436,7 @@ export function Board() {
                 isOpenCDW={true}
                 handleCloseCDW={() => {
                   setSelectedCard(undefined)
+                  getCardListByBoardId({ id: boardId })
                 }}
                 boardId={boardId}
               />
