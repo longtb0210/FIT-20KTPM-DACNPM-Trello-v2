@@ -9,12 +9,14 @@ import ListItem from '@mui/material/ListItem'
 import Avatar from '@mui/material/Avatar'
 import { stringToColor } from '~/utils/StringToColor'
 import React from 'react'
-import { BoardApiRTQ, UserApiRTQ } from '~/api'
+import { BoardApiRTQ, UserApiRTQ, WorkspaceApiRTQ } from '~/api'
+import { useNavigate } from 'react-router-dom'
 
 interface Props {
   open: boolean
   handleCloseShare: () => void
   boardID: string
+  workspaceId: string
 }
 
 const isValidEmail = (email: string) => {
@@ -52,14 +54,16 @@ function stringAvatar(name: string) {
   }
 }
 
-export default function ShareDialog({ open, handleCloseShare, boardID }: Props) {
+export default function ShareDialog({ open, handleCloseShare, boardID, workspaceId }: Props) {
   const [emailInput, setEmailInput] = React.useState('')
   const { colors } = useTheme()
   const [getUserByEmail, { data: UserData }] = UserApiRTQ.UserApiSlice.useLazyGetUserByEmailQuery()
+  const [addMemberToWorkspace] = WorkspaceApiRTQ.WorkspaceApiSlice.useInviteMember2WorkspaceMutation()
   const [addMemberToBoard] = BoardApiRTQ.BoardApiSlice.useAddMemberToBoardMutation()
   // eslint-disable-next-line react-hooks/rules-of-hooks
   const [selectedValue, setSelectedValue] = React.useState('')
   const options = ['Admin', 'Observer', 'Member']
+  const navigate = useNavigate() // Get the history object
 
   const handleChange = (event: { target: { value: React.SetStateAction<string> } }) => {
     setSelectedValue(event.target.value)
@@ -68,10 +72,21 @@ export default function ShareDialog({ open, handleCloseShare, boardID }: Props) 
   const handleShare = () => {
     if (isValidEmail(emailInput)) {
       // Nếu là email hợp lệ, gọi hàm gọi API
+      addMemberToWorkspace({
+        id: workspaceId,
+        members: [
+          {
+            email: emailInput,
+            role: 'member'
+          }
+        ]
+      }).then((a) => console.log(a))
       addMemberToBoard({ _id: boardID, email: emailInput })
         .then(() => {
           // Xử lý kết quả trả về từ API ở đây
           alert('Thêm thành công')
+          console.log('Navigating to home page...')
+          navigate('/')
         })
         .catch((error) => {
           // Xử lý lỗi nếu có

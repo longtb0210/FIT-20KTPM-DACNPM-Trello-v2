@@ -239,7 +239,8 @@ export default function CardDetailWindow({
   function handleUnArchive() {
     unArchiveCardAPI({
       cardlist_id: cardlistId,
-      card_id: cardId
+      card_id: cardId,
+      archive_at: undefined
     }).then(() => {
       setIsArchived(false)
     })

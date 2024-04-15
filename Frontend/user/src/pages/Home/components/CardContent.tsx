@@ -69,32 +69,36 @@ const CardContent: React.FC<CarContent> = ({ boardData }) => {
   const [isData, setIsData] = useState(false)
 
   React.useEffect(() => {
-    getCardlistByBoardId({ id: boardData._id })
-      .then((response) => {
-        if (response.error) {
-          // Nếu có lỗi trong response, set isData thành false
-          setIsData(false)
-        } else {
-          // Nếu không có lỗi và status là 200, set isData thành true
-          setIsData(true)
-          const activities: Activity[] = []
-          if (response.data !== undefined) {
-            response.data.data.forEach((cardlist: { cards: any[] }) => {
-              cardlist.cards.forEach((card) => {
-                if (card.activities && card.activities.length > 0) {
-                  activities.push(...card.activities)
-                }
+    const fetchBoards = async () => {
+      getCardlistByBoardId({ id: boardData._id })
+        .then((response) => {
+          if (response.error) {
+            // Nếu có lỗi trong response, set isData thành false
+            setIsData(false)
+          } else {
+            // Nếu không có lỗi và status là 200, set isData thành true
+            setIsData(true)
+            const activities: Activity[] = []
+            if (response.data !== undefined) {
+              response.data.data.forEach((cardlist: { cards: any[] }) => {
+                cardlist.cards.forEach((card) => {
+                  if (card.activities && card.activities.length > 0) {
+                    activities.push(...card.activities)
+                  }
+                })
               })
-            })
+            }
+            setActivityData(activities)
           }
-          setActivityData(activities)
-        }
-      })
-      .catch((error) => {
-        // Xử lý lỗi trong quá trình gọi API
-        console.error('Error calling API:', error)
-        setIsData(false)
-      })
+        })
+        .catch((error) => {
+          // Xử lý lỗi trong quá trình gọi API
+          console.error('Error calling API:', error)
+          setIsData(false)
+        })
+    }
+
+    fetchBoards()
   }, [getCardlistByBoardId])
 
   // eslint-disable-next-line @typescript-eslint/no-unused-vars

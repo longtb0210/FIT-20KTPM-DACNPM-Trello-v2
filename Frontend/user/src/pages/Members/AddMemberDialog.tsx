@@ -9,13 +9,12 @@ import ListItem from '@mui/material/ListItem'
 import Avatar from '@mui/material/Avatar'
 import { stringToColor } from '~/utils/StringToColor'
 import React from 'react'
-import { BoardApiRTQ, UserApiRTQ } from '~/api'
-import { board_id } from '~/api/getInfo'
+import { BoardApiRTQ, UserApiRTQ, WorkspaceApiRTQ } from '~/api'
 
 interface Props {
   open: boolean
   handleCloseShare: () => void
-  boardID: string
+  workspaceId: string
 }
 
 const isValidEmail = (email: string) => {
@@ -27,15 +26,21 @@ const isValidEmail = (email: string) => {
 function stringAvatar(name: string) {
   let abbreviation = ''
 
-  if (name.includes(' ')) {
-    // Nếu tên có ít nhất một khoảng trắng, lấy hai chữ cái đầu tiên từ các từ
-    abbreviation = name
-      .split(' ')
-      .map((word) => word[0])
-      .join('')
+  if (name && typeof name === 'string') {
+    // Kiểm tra xem name có tồn tại và là một chuỗi không
+    if (name.includes(' ')) {
+      // Nếu tên có ít nhất một khoảng trắng, lấy hai chữ cái đầu tiên từ các từ
+      abbreviation = name
+        .split(' ')
+        .map((word) => word[0])
+        .join('')
+    } else {
+      // Nếu tên chỉ có một từ, lấy chữ cái đầu tiên của từ đó
+      abbreviation = name[0].toUpperCase()
+    }
   } else {
-    // Nếu tên chỉ có một từ, lấy chữ cái đầu tiên của từ đó
-    abbreviation = name[0].toUpperCase()
+    // Xử lý trường hợp name không tồn tại hoặc không phải là một chuỗi
+    abbreviation = '' // hoặc giá trị mặc định khác tùy thuộc vào logic ứng dụng của bạn
   }
 
   return {
@@ -53,14 +58,16 @@ function stringAvatar(name: string) {
   }
 }
 
-export default function AddMemberDialog({ open, handleCloseShare, boardID }: Props) {
+export default function AddMemberDialog({ open, handleCloseShare, workspaceId }: Props) {
   const [emailInput, setEmailInput] = React.useState('')
   const { colors } = useTheme()
   const [getUserByEmail, { data: UserData }] = UserApiRTQ.UserApiSlice.useLazyGetUserByEmailQuery()
-  const [addMemberToBoard] = BoardApiRTQ.BoardApiSlice.useAddMemberToBoardMutation()
+  const [addMemberToWorkspace] = WorkspaceApiRTQ.WorkspaceApiSlice.useInviteMember2WorkspaceMutation()
   // eslint-disable-next-line react-hooks/rules-of-hooks
   const [selectedValue, setSelectedValue] = React.useState('')
   const options = ['Admin', 'Observer', 'Member']
+
+  const [getWorkspaceById, { data: workspaceData }] = WorkspaceApiRTQ.WorkspaceApiSlice.useLazyGetWorkspaceInfoQuery()
 
   const handleChange = (event: { target: { value: React.SetStateAction<string> } }) => {
     setSelectedValue(event.target.value)
@@ -68,11 +75,22 @@ export default function AddMemberDialog({ open, handleCloseShare, boardID }: Pro
   // Hàm xử lý khi nhấn nút Share
   const handleShare = () => {
     if (isValidEmail(emailInput)) {
+      console.log('email' + emailInput + ' wsp: ' + workspaceId)
       // Nếu là email hợp lệ, gọi hàm gọi API
-      addMemberToBoard({ _id: boardID, email: emailInput })
-        .then(() => {
+      addMemberToWorkspace({
+        id: workspaceId,
+        members: [
+          {
+            email: emailInput,
+            role: 'member'
+          }
+        ]
+      })
+        .then((response) => {
           // Xử lý kết quả trả về từ API ở đây
+          console.log(response)
           alert('Thêm thành công')
+          getWorkspaceById(workspaceId)
         })
         .catch((error) => {
           // Xử lý lỗi nếu có
@@ -82,6 +100,10 @@ export default function AddMemberDialog({ open, handleCloseShare, boardID }: Pro
       // Nếu không phải email hợp lệ, thông báo lỗi cho người dùng
       alert('Please enter a valid email address')
     }
+  }
+
+  const handleInputChange = (event: { target: { value: React.SetStateAction<string> } }) => {
+    setEmailInput(event.target.value)
   }
 
   // Hàm xử lý thay đổi giá trị trong ô input
@@ -94,11 +116,12 @@ export default function AddMemberDialog({ open, handleCloseShare, boardID }: Pro
 
   React.useEffect(() => {
     getUserByEmail({ email: profile.email })
-  }, [getUserByEmail])
+  }, [profile])
+
   return (
     <Dialog open={open} onClose={handleCloseShare} aria-labelledby='alert-dialog-title' className='rounded-[10px]'>
       <DialogTitle id='alert-dialog-title' sx={{ display: 'flex', justifyContent: 'space-between' }}>
-        {'Share board'}
+        {'Add member with email'}
         <IoMdClose className='cursor-pointer' onClick={handleCloseShare} />
       </DialogTitle>
       <DialogContent>
@@ -109,7 +132,7 @@ export default function AddMemberDialog({ open, handleCloseShare, boardID }: Pro
               className={`h-7 w-[342px] rounded-[3px] border-[3px] border-[#92a1b9] px-2 py-4 transition-all duration-100 active:scale-[0.98]`}
               placeholder='Email address or name'
               style={{ backgroundColor: '#ffff' }}
-              onChange={handleChange}
+              onChange={handleInputChange}
             />
             <select
               style={{
@@ -150,7 +173,7 @@ export default function AddMemberDialog({ open, handleCloseShare, boardID }: Pro
               }}
               onClick={handleShare}
             >
-              Share
+              Add
             </Box>
           </FormControl>
           {UserData && UserData.data && (
@@ -176,7 +199,9 @@ export default function AddMemberDialog({ open, handleCloseShare, boardID }: Pro
               }
             >
               <Box sx={{ marginRight: '10px' }}>
-                <Avatar {...stringAvatar(UserData.data.username)} />
+                <Avatar
+                  {...stringAvatar(UserData.data.username !== undefined ? UserData.data.username : 'undefined')}
+                />
               </Box>
               <Box>
                 <Box sx={{ fontSize: '13px', fontWeight: '300x' }}>{UserData.data.username} (you)</Box>

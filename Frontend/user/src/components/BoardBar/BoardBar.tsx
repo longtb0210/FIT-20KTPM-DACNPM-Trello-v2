@@ -65,11 +65,11 @@ function BoardBar() {
       const fetchBoardMembers = async () => {
         const members = []
         // eslint-disable-next-line no-unsafe-optional-chaining
-        // for (const emailValue of boardData.data?.members_email !== undefined ? boardData.data?.members_email : '') {
-        //   const userData = await getUserByEmail({ email: emailValue })
-        //   members.push(userData.data)
-        // }
-        // setBoardMembers(members)
+        for (const emailValue of boardData.data?.members_email !== undefined ? boardData.data?.members_email : '') {
+          const userData = await getUserByEmail({ email: emailValue })
+          members.push(userData.data)
+        }
+        setBoardMembers(members)
       }
       fetchBoardMembers()
     }
@@ -185,7 +185,7 @@ function BoardBar() {
               className='mr-1 flex h-9 cursor-pointer content-center rounded-md border-none bg-[rgba(58,58,75,0.1)] px-1 py-1 text-[18px] font-bold leading-9 text-white hover:bg-[rgba(58,58,75,0.4)]'
               onKeyDown={handleChangeName}
               style={{
-                width: `${Math.max(boardData?.data?.name.length !== undefined ? boardData?.data?.name.length : 5, 1) * (boardData?.data?.name.length !== undefined ? (boardData?.data?.name.length < 6 ? 15 : 10) : 10)}px`
+                width: `${Math.max(boardData?.data?.name.length !== undefined ? boardData?.data?.name.length : 5, 1) * (boardData?.data?.name.length !== undefined ? (boardData?.data?.name.length < 10 ? 15 : 10) : 10)}px`
               }}
             />
           </Box>
@@ -360,19 +360,19 @@ function BoardBar() {
                 if (infoUser !== undefined) {
                   return (
                     <Tooltip title={infoUser.data.username}>
-                      <Avatar {...stringAvatar(infoUser.data.username)} />
+                      <Avatar {...stringAvatar(infoUser.data.username, '10px')} />
                     </Tooltip>
                   )
                 } else {
                   return (
                     <Tooltip title='guest'>
-                      <Avatar {...stringAvatar('Guest')} />
+                      <Avatar {...stringAvatar('Guest', '10px')} />
                     </Tooltip>
                   )
                 }
               })}
             <Tooltip title={profile.name}>
-              <Avatar {...stringAvatar(profile.name)} />
+              <Avatar className='text-[12px]' {...stringAvatar(profile.name, '10px')} />
             </Tooltip>
           </AvatarGroup>
           <Tooltip title='Share'>
@@ -451,8 +451,8 @@ function BoardBar() {
         {popupContent}
       </BasePopup>
       <More open={openMore} handleDrawerClose={handleDrawerClose} />
-      {boardId !== undefined ? (
-        <ShareDialog open={openShare} handleCloseShare={handleCloseShare} boardID={boardId} />
+      {boardId !== undefined && workspaceId !== undefined ? (
+        <ShareDialog open={openShare} handleCloseShare={handleCloseShare} boardID={boardId} workspaceId={workspaceId} />
       ) : (
         ''
       )}

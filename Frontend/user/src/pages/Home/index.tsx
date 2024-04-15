@@ -5,10 +5,8 @@ import { useTheme } from '../../components/Theme/themeContext'
 import SidebarTemplate from '~/components/SidebarTemplate'
 import { Box } from '@mui/material'
 import CardContent from './components/CardContent'
-import { BoardApiRTQ, WorkspaceApiRTQ } from '~/api'
+import { BoardApiRTQ, UserApiRTQ, WorkspaceApiRTQ } from '~/api'
 import React, { useState } from 'react'
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
-import { faStar } from '@fortawesome/free-solid-svg-icons'
 
 export default function HomePage() {
   const { darkMode, colors } = useTheme()
@@ -20,7 +18,7 @@ export default function HomePage() {
   const [profile, setProFile] = React.useState({ email: '', name: '' })
 
   React.useEffect(() => {
-    getAllWorkspaceByEmail()
+    getAllWorkspaceByEmail().then((a) => console.log(a))
     const profileSave = storedProfile ? JSON.parse(storedProfile) : { email: '', name: '' }
     setProFile({ ...profileSave })
   }, [getAllWorkspaceByEmail])
@@ -32,22 +30,29 @@ export default function HomePage() {
   const [allBoards, setAllBoards] = useState<any[]>([])
 
   React.useEffect(() => {
-    // Kiểm tra xem có dữ liệu từ API getAllWorkspaceByEmail hay không
-    if (WorkspaceData?.data) {
-      // Duyệt qua mỗi workspace trong dữ liệu
-      WorkspaceData.data.owner.forEach(async (workspace) => {
-        // Gọi hàm API để lấy danh sách boards của từng workspace và đợi kết quả trả về
-        const boardsResponse = await getboardsByWorspaceId({ workspaceId: workspace._id })
-        // Kiểm tra xem boardsResponse có dữ liệu hay không
-        if (boardsResponse?.data?.data) {
-          // Lấy danh sách boards từ kết quả trả về và chuyển đổi thành một mảng
-          const boards = Object.values(boardsResponse.data.data)
-          // Cập nhật danh sách boards của tất cả các workspace
-          setAllBoards((prevBoards) => [...prevBoards, ...boards])
-        }
-      })
+    const fetchBoards = async () => {
+      if (WorkspaceData?.data) {
+        const ownerPromises = WorkspaceData.data.owner.map(async (workspace) => {
+          const boardsResponse = await getboardsByWorspaceId({ workspaceId: workspace._id })
+          return boardsResponse?.data?.data ? Object.values(boardsResponse.data.data) : []
+        })
+
+        const memberPromises = WorkspaceData.data.member.map(async (workspace) => {
+          const boardsResponse = await getboardsByWorspaceId({ workspaceId: workspace._id })
+          return boardsResponse?.data?.data ? Object.values(boardsResponse.data.data) : []
+        })
+
+        const ownerBoards = await Promise.all(ownerPromises)
+        const memberBoards = await Promise.all(memberPromises)
+
+        const allBoards = [...ownerBoards.flat(), ...memberBoards.flat()]
+
+        setAllBoards(allBoards)
+      }
     }
-  }, [WorkspaceData, getboardsByWorspaceId])
+
+    fetchBoards()
+  }, [WorkspaceData])
 
   const [starred, setStarred] = useState(false)
 
@@ -61,7 +66,7 @@ export default function HomePage() {
         className='flex flex-row items-start justify-center'
         sx={{
           color: colors.text,
-          height: '100vh',
+          height: '100%',
           backgroundColor: colors.background,
           transition: darkMode ? 'all 0.2s ease-in' : 'all 0.2s ease-in',
           a: {
@@ -142,9 +147,10 @@ export default function HomePage() {
                 {/* Kiểm tra xem workspaceData có tồn tại và có phần tử data không trước khi sử dụng */}
                 {allBoards.map(
                   (
-                    owner // Mapping qua mảng các chủ sở hữu
+                    owner,
+                    index // Mapping qua mảng các chủ sở hữu
                   ) => (
-                    <ProjectTile key={owner._id} boardData={owner} /> // Truyền dữ liệu từng chủ sở hữu vào ProjectTile
+                    <ProjectTile key={index} boardData={owner} /> // Truyền dữ liệu từng chủ sở hữu vào ProjectTile
                   )
                 )}
               </div>
