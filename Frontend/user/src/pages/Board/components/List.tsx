@@ -38,7 +38,8 @@ export default function ListComponent({
   const [createCardOnTop, { data: createCardRes }] = CardApiRTQ.CardApiSlice.useCreateCardMutation()
   const [updateCardList] = CardlistApiRTQ.CardListApiSlice.useUpdateCardListMutation()
   // const [getAllCardlist] = CardlistApiRTQ.CardListApiSlice.useLazyGetAllCardlistQuery()
-  const [getCardListByBoardId] = CardlistApiRTQ.CardListApiSlice.useLazyGetCardlistByBoardIdQuery()
+  const [getCardListByBoardId, { data: cardlistRes }] =
+    CardlistApiRTQ.CardListApiSlice.useLazyGetCardlistByBoardIdQuery()
   const [moveCardAPI] = CardApiRTQ.CardApiSlice.useMoveCardMutation()
   const { colors, darkMode } = useTheme()
   const [listSettingOpen, setListSettingOpen] = useState<string>()
@@ -82,10 +83,16 @@ export default function ListComponent({
   const [inputValue, setInputValue] = useState<string>('')
   const [isInputFocused, setIsInputFocused] = useState<boolean>(false)
   const [editName, setEditName] = useState<boolean>(false)
+  const [listsData, setListsData] = useState<List[]>([])
   useEffect(() => {
     setInputValue(list.name)
   }, [list])
-
+  useEffect(() => {
+    getCardListByBoardId({ id: boardId })
+  }, [addCardOpenAt, addCardOnTop])
+  useEffect(() => {
+    if (cardlistRes) setListsData(cardlistRes?.data as List[])
+  }, [cardlistRes])
   useEffect(() => {
     if (createCardRes) {
       const listIdArray = list.cards.map((card) => card._id)
@@ -176,6 +183,7 @@ export default function ListComponent({
     id: list._id,
     data: { ...list }
   })
+
   const [isHovered, setIsHovered] = useState(false)
   const [styleList, setStyleList] = useState({
     transform: CSS.Transform.toString(transform),
@@ -188,13 +196,17 @@ export default function ListComponent({
   })
   useEffect(() => {
     setStyleList({ ...styleList, minHeight: `${maxHeight + 120}px` })
-    console.log(maxHeight)
   }, [maxHeight, boardId, list])
   useEffect(() => {
-    if (addCardOnTop.length > 0 || addCardOpenAt.length > 0)
-      setStyleList({ ...styleList, minHeight: `${maxHeight + 190}px` })
-    else if (addCardOnTop.length === 0 || addCardOpenAt.length === 0)
-      setStyleList({ ...styleList, minHeight: `${maxHeight + 120}px` })
+    const listFiltered = list.cards.filter((card) => !card.archive_at)
+
+
+    if (listFiltered && listFiltered.length >= 9) {
+      if ((addCardOnTop && addCardOnTop.length > 0) || (addCardOpenAt && addCardOpenAt.length > 0))
+        setStyleList({ ...styleList, minHeight: `${maxHeight + 190}px` })
+      else if (addCardOnTop.length === 0 || addCardOpenAt.length === 0)
+        setStyleList({ ...styleList, minHeight: `${maxHeight + 120}px` })
+    }
   }, [addCardOnTop, addCardOpenAt])
   const renderCards = (list: List) => {
     return (
@@ -342,6 +354,8 @@ export default function ListComponent({
                         if (list._id) setAddCardOnTop(list._id)
                         handleAddCardOnTop()
                       }}
+                      onMouseEnter={() => setIsHovered(true)}
+                      onMouseLeave={() => setIsHovered(false)}
                     >
                       <p className={`text-left ${darkMode ? '' : 'font-semibold'}`}> Add card</p>
                     </button>
@@ -418,7 +432,7 @@ export default function ListComponent({
                   </div>
                 </div>
               ) : (
-                <div ref={componentRef_AddCard} className=' mx-3 -mt-[35px] '>
+                <div ref={componentRef_AddCard} className=' mx-3 -mt-[47px] '>
                   <div className={` space-y-2 rounded-xl  ${darkMode ? `` : ' shadow-sm shadow-gray-300'} `}>
                     <div className={`flex flex-row items-center   justify-between`}>
                       <input
@@ -445,6 +459,8 @@ export default function ListComponent({
                         if (list._id) setAddCardOpenAt(list._id)
                         handleAddCard()
                       }}
+                      onMouseEnter={() => setIsHovered(true)}
+                      onMouseLeave={() => setIsHovered(false)}
                     >
                       <p className={`text-left ${darkMode ? '' : 'font-semibold'}`}> Add card</p>
                     </button>

@@ -57,7 +57,6 @@ export default function ListsComponent({
   useEffect(() => {
     // Calculate the biggest height whenever list.cards changes
     setTimeout(() => updateBiggestHeight(), 10)
-    console.log(lists)
     setListsData(lists.sort((a, b) => (a.index ?? Infinity) - (b.index ?? Infinity)))
     // Re-calculate biggest height when the window is resized
     window.addEventListener('resize', updateBiggestHeight)

@@ -161,7 +161,7 @@ export const CardApiSlice = createApi({
       query: (data) => ({
         url: '/api/card/detail',
         method: 'PUT',
-        body: data
+        body: { ...data }
       })
     }),
     restoreCartToBoard: build.mutation<TrelloApi.CardApi.UnArchiveCardResponse, TrelloApi.CardApi.UnArchiveCardRequest>(

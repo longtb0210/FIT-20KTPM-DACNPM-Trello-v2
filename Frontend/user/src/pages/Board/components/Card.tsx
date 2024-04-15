@@ -30,11 +30,9 @@ export default function CardComponent({ card, cardSelected, setOpenCardSetting }
     setProfile({ ...profileSave })
   }, [profile.email, storedProfile])
   useEffect(() => {
-    if (card.member_email && card.member_email.length > 0) {
-      const arrayMembers = createMembersArray(card.member_email)
-      setCardMembers(arrayMembers)
-    }
-  }, [card])
+    const arrayMembers = createMembersArray(card.member_email)
+    setCardMembers(arrayMembers)
+  }, [card.member_email, cardlistDataByBoardId])
   useEffect(() => {
     const bgColorCode = []
     setEditedName(card.name)
@@ -159,7 +157,7 @@ export default function CardComponent({ card, cardSelected, setOpenCardSetting }
                       </div>
                       <div className={`flex flex-row items-center justify-between space-x-1`}>
                         {cardMembers &&
-                          card.member_email.includes(profile.email) &&
+                          cardMembers.length > 0 &&
                           cardMembers.map((member, index) => (
                             <div key={index} className={`relative z-10 flex flex-row items-center justify-center`}>
                               <div onMouseEnter={() => handleMouseOver(member)} onMouseLeave={handleMouseLeave}>

@@ -112,6 +112,7 @@ export const Settings: React.FC = () => {
                       <IoMdClose className={``} size={'17px '} />
                     </div>
                   </div>
+                  <div className='p-2'>
                   <button
                     onClick={() => handleVisibilityChange('private')}
                     className={`m-0 w-full py-1 ${darkMode ? ' hover:bg-[#333c43]' : ' hover:bg-[#dcdfe4]'}`}
@@ -159,6 +160,7 @@ export const Settings: React.FC = () => {
                       engines like Google. Only those invited to the Workspace can add and edit Workspace boards.
                     </p>
                   </button>
+                  </div>
                 </div>
               )}
             </div>
