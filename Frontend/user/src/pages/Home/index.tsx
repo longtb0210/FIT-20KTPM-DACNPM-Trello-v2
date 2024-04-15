@@ -7,6 +7,8 @@ import { Box } from '@mui/material'
 import CardContent from './components/CardContent'
 import { BoardApiRTQ, WorkspaceApiRTQ } from '~/api'
 import React, { useState } from 'react'
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
+import { faStar } from '@fortawesome/free-solid-svg-icons'
 
 export default function HomePage() {
   const { darkMode, colors } = useTheme()
@@ -18,11 +20,10 @@ export default function HomePage() {
   const [profile, setProFile] = React.useState({ email: '', name: '' })
 
   React.useEffect(() => {
-    getAllWorkspaceByEmail().then((a) => console.log(a))
+    getAllWorkspaceByEmail()
     const profileSave = storedProfile ? JSON.parse(storedProfile) : { email: '', name: '' }
     setProFile({ ...profileSave })
   }, [getAllWorkspaceByEmail])
-  // console.log(boardData?.data)
 
   //lấy danh sách workspaceId từ getAllWorkspaceByEmail
   //sau đó get board by workspace id và lưu lại danh sách board
@@ -37,7 +38,6 @@ export default function HomePage() {
       WorkspaceData.data.owner.forEach(async (workspace) => {
         // Gọi hàm API để lấy danh sách boards của từng workspace và đợi kết quả trả về
         const boardsResponse = await getboardsByWorspaceId({ workspaceId: workspace._id })
-        console.log(boardsResponse.data)
         // Kiểm tra xem boardsResponse có dữ liệu hay không
         if (boardsResponse?.data?.data) {
           // Lấy danh sách boards từ kết quả trả về và chuyển đổi thành một mảng
@@ -48,8 +48,6 @@ export default function HomePage() {
       })
     }
   }, [WorkspaceData, getboardsByWorspaceId])
-
-  console.log(allBoards)
 
   const [starred, setStarred] = useState(false)
 
@@ -63,6 +61,7 @@ export default function HomePage() {
         className='flex flex-row items-start justify-center'
         sx={{
           color: colors.text,
+          height: '100vh',
           backgroundColor: colors.background,
           transition: darkMode ? 'all 0.2s ease-in' : 'all 0.2s ease-in',
           a: {
@@ -81,34 +80,18 @@ export default function HomePage() {
           </nav>
 
           {/* highlight main content */}
-          <div className='ml-24 mt-3'>
+          <div className='ml-[100px] mt-3'>
             <div className='relative z-0'>
               <div className='pb-5'>
                 {/* content: Icon + HighLight */}
                 <div className='mb-3 flex h-8 items-baseline justify-start pl-4'>
                   <div className='relative top-px -ml-2 w-8 text-center'>
-                    <span className='mb-1 h-3 w-4 leading-4'>
-                      <StarBorderIcon
-                        sx={{
-                          fontSize: '20px',
-                          color: starred ? '#FF991F' : '',
-                          marginBottom: '4px',
-                          marginLeft: '5px',
-                          cursor: 'pointer',
-                          '&hover': {
-                            color: '#FF991F',
-                            fontSize: '22px'
-                          },
-                          '&:active': {
-                            color: '#FF991F'
-                          }
-                        }}
-                        onClick={handleClickToStar}
-                      />
+                    <span className='ml-7 h-3 w-4 leading-4'>
+                      <StarBorderIcon sx={{ fontSize: '15px' }} onClick={handleClickToStar} />
                     </span>
                   </div>
                   <div
-                    className='m-0 mt-4 flex-auto py-2 text-xs font-semibold leading-4 text-gray-700'
+                    className='m-0 ml-4 mt-4 flex-auto py-2 text-xs font-semibold leading-4 text-gray-700'
                     style={{ color: colors.text }}
                   >
                     Highlights
@@ -122,7 +105,7 @@ export default function HomePage() {
 
                 <ul data-testid='home-highlights-list'>
                   {/* Add card highlight items here */}
-                  <div className='container mx-auto w-[450px] pl-5'>
+                  <div className='container mx-auto ml-5 w-[450px] pl-5'>
                     {allBoards.map(
                       (
                         owner // Mapping qua mảng các chủ sở hữu
@@ -150,7 +133,7 @@ export default function HomePage() {
                   className='m-0 mt-4 flex-auto py-2 text-xs font-semibold leading-4 text-gray-700'
                   style={{ color: colors.text }}
                 >
-                  Recently viewed
+                  Boards view
                 </div>
               </div>
 

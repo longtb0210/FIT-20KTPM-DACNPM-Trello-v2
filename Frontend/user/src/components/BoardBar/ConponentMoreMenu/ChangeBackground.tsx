@@ -116,10 +116,7 @@ const ChangeBackground: React.FC<Props> = ({ open, handleDrawerClose }) => {
 
   // Cập nhật previewUrl khi selectedFile thay đổi
   React.useEffect(() => {
-    getBoardById(boardId).then(() => {
-      // console.log(a)
-      console.log(boardData?.data)
-    })
+    getBoardById(boardId)
     if (!selectedFile) {
       setPreviewUrl('')
       return

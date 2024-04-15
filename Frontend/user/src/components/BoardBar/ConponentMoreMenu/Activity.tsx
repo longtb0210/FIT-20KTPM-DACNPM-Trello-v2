@@ -71,7 +71,6 @@ const Activity: React.FC<Props> = ({ open, handleDrawerClose }) => {
 
   useEffect(() => {
     getCardlistByBoardId({ id: boardId }).then((response) => {
-      console.log(response)
       const activities: Activity[] = []
       if (response.data !== undefined) {
         response.data.data.forEach((cardlist: { cards: any[] }) => {

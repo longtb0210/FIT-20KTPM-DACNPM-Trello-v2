@@ -1,4 +1,4 @@
-import { Avatar, AvatarGroup, Box, Chip } from '@mui/material'
+import { Avatar, AvatarGroup, Box, Chip, Dialog } from '@mui/material'
 import StarBorderIcon from '@mui/icons-material/StarBorder'
 import { MdOutlineLock } from 'react-icons/md'
 import GroupTrelloIcon from '~/assets/GroupTrelloIcon.svg'
@@ -21,14 +21,12 @@ import ChangeVisibility from './ChangeVisibility'
 import { stringAvatar } from '~/utils/StringAvatar'
 import ShareDialog from './ShareDialog'
 import { useParams } from 'react-router-dom'
-import { error } from 'console'
+import { useNavigate } from 'react-router-dom'
 
 function BoardBar() {
   //get id
   const { workspaceId, boardId } = useParams()
 
-  // console.log('Workspace ID:', workspaceId)
-  // console.log('Board ID:', boardId)
   const [openShare, setOpenShare] = React.useState(false)
 
   const handleClickOpenShare = () => {
@@ -57,7 +55,6 @@ function BoardBar() {
     setProFile({ ...profileSave })
 
     getBoardById(boardId).then(() => {
-      // console.log(boardData?.data?.visibility[0])
       setStarred(boardData?.data?.is_star)
       setVisibility(boardData?.data?.visibility[0])
     })
@@ -77,9 +74,7 @@ function BoardBar() {
       fetchBoardMembers()
     }
   }, [boardData, getUserByEmail])
-  console.log(boardMembers)
 
-  // console.log(boardMembers)
   const [anchor, setAnchor] = React.useState<null | HTMLElement>(null)
   const [popupContent, setPopupContent] = useState(<div>Kine</div>)
   const handleClick = (event: React.MouseEvent<HTMLElement>, customPopupContent: JSX.Element) => {
@@ -132,26 +127,27 @@ function BoardBar() {
   }
 
   const inputRef = useRef<HTMLInputElement>(null)
+  // const [redirect, setRedirect] = useState(false) // Thêm state để điều hướng
+  const navigate = useNavigate() // Get the history object
 
   const handleChangeName = (event: React.KeyboardEvent) => {
     if (event.key == 'Enter') {
       event.preventDefault()
       const updatedName = inputRef.current?.value
-      // console.log(updatedName)
       if (updatedName && boardId !== undefined) {
         editBoardById({
           _id: boardId,
           name: updatedName
         })
           .unwrap()
-          .then((response) => {
-            // console.log(response)
-            alert('Thay đổi thành công')
-            window.location.reload()
+          .then(() => {
+            console.log('Navigating to home page...')
+            navigate('/')
           })
           .catch((error) => {
             console.error('Lỗi khi chỉnh sửa bảng:', error)
-            alert('Đã xảy ra lỗi khi thay đổi tên bảng')
+            console.log('Navigating to home page...')
+            navigate('/')
           })
       }
     }
@@ -161,10 +157,10 @@ function BoardBar() {
     await editBoardById({
       _id: boardId !== undefined ? boardId : '',
       is_star: !starred
-    }).then((response) => {
+    }).then(() => {
       // console.log(response)
       setStarred(!starred)
-      alert('Thay đổi thành công')
+      console.log('Thay đổi tên thành công')
       // window.location.reload()
     })
   }
@@ -189,7 +185,7 @@ function BoardBar() {
               className='mr-1 flex h-9 cursor-pointer content-center rounded-md border-none bg-[rgba(58,58,75,0.1)] px-1 py-1 text-[18px] font-bold leading-9 text-white hover:bg-[rgba(58,58,75,0.4)]'
               onKeyDown={handleChangeName}
               style={{
-                width: `${Math.max(boardData?.data?.name.length !== undefined ? boardData?.data?.name.length : 5, 1) * 10}px`
+                width: `${Math.max(boardData?.data?.name.length !== undefined ? boardData?.data?.name.length : 5, 1) * (boardData?.data?.name.length !== undefined ? (boardData?.data?.name.length < 6 ? 15 : 10) : 10)}px`
               }}
             />
           </Box>
@@ -461,6 +457,7 @@ function BoardBar() {
         ''
       )}
       {/* <ShareDialog open={openShare} handleCloseShare={handleCloseShare} boardID={boardId} /> */}
+      {/* {redirect && <Link to='/'></Link>} */}
     </>
   )
 }

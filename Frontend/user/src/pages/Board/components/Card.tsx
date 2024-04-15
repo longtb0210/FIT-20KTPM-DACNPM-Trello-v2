@@ -32,7 +32,6 @@ export default function CardComponent({ card, cardSelected, setOpenCardSetting }
   useEffect(() => {
     if (card.member_email && card.member_email.length > 0) {
       const arrayMembers = createMembersArray(card.member_email)
-      console.log(arrayMembers)
       setCardMembers(arrayMembers)
     }
   }, [card])
@@ -230,20 +229,21 @@ export default function CardComponent({ card, cardSelected, setOpenCardSetting }
                             {card.watcher_email.includes(profile.email) && <MdOutlineRemoveRedEye className={``} />}
                           </div>
                           <div className={`flex flex-row items-center justify-between space-x-1`}>
-                            {card.watcher_email.includes(profile.email) && cardMembers.map((member, index) => (
-                              <div key={index} className={`relative z-10 flex flex-row items-center justify-center`}>
-                                <div onMouseEnter={() => handleMouseOver(member)} onMouseLeave={handleMouseLeave}>
-                                  <Typography variant='h4' className='text-center'>
-                                    <Avatar {...stringAvatar(member)} className={`font-bold`} />
-                                  </Typography>
-                                  {isHoveredWatcher && isHoveredWatcher === member && isValidEmail(member) && (
-                                    <div className='absolute -bottom-10 left-2 z-20 ml-6 bg-yellow-200 p-1 text-black hover:bg-gray-100'>
-                                      {member}
-                                    </div>
-                                  )}
+                            {card.watcher_email.includes(profile.email) &&
+                              cardMembers.map((member, index) => (
+                                <div key={index} className={`relative z-10 flex flex-row items-center justify-center`}>
+                                  <div onMouseEnter={() => handleMouseOver(member)} onMouseLeave={handleMouseLeave}>
+                                    <Typography variant='h4' className='text-center'>
+                                      <Avatar {...stringAvatar(member)} className={`font-bold`} />
+                                    </Typography>
+                                    {isHoveredWatcher && isHoveredWatcher === member && isValidEmail(member) && (
+                                      <div className='absolute -bottom-10 left-2 z-20 ml-6 bg-yellow-200 p-1 text-black hover:bg-gray-100'>
+                                        {member}
+                                      </div>
+                                    )}
+                                  </div>
                                 </div>
-                              </div>
-                            ))}
+                              ))}
                           </div>
                         </div>
                       )}

@@ -94,10 +94,9 @@ export default function ShareDialog({ open, handleCloseShare, boardID }: Props) 
     const profileSave = storedProfile ? JSON.parse(storedProfile) : { email: '', name: '' }
     setProFile({ ...profileSave })
   }, [storedProfile])
-  console.log(profile)
 
   React.useEffect(() => {
-    getUserByEmail({ email: profile.email }).then((a) => console.log(a))
+    getUserByEmail({ email: profile.email })
   }, [getUserByEmail])
 
   return (

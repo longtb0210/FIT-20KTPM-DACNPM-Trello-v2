@@ -52,7 +52,6 @@ export default function ListsComponent({
         maxHeight = height
       }
     })
-    console.log('maxHeight: ', maxHeight)
     setBiggestHeight(maxHeight)
   }
   useEffect(() => {
@@ -89,8 +88,6 @@ export default function ListsComponent({
         archive_at: undefined,
         created_at: new Date()
       }).then(() => getCardListByBoardId({ id: boardId }))
-    // const res = await createListAPI(data)
-    // console.log(res)
   }
 
   return (

@@ -53,7 +53,6 @@ export default function ListComponent({
     setCardsData(list.cards.sort((a, b) => (a.index ?? Infinity) - (b.index ?? Infinity)))
   }, [list])
   useEffect(() => {
-    console.log('list data:', list.archive_at)
     const handleClickOutside_AddCard = (event: MouseEvent) => {
       if (componentRef_AddCard.current && !componentRef_AddCard.current.contains(event.target as Node)) {
         // Clicked outside of Component A, hide it

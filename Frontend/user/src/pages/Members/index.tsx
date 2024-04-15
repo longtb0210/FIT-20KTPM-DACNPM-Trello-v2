@@ -24,6 +24,7 @@ import Typography from '@mui/material/Typography'
 import SidebarCateWorkSpace from '../CategoryWorkspace/component/SidebarCateWorkspace'
 import AddMemberDialog from './AddMemberDialog'
 import { useParams } from 'react-router-dom'
+import { WorkspaceHeader } from '~/components/WorkspaceHeader/WorkspaceHeader'
 
 function stringToColor(string: string) {
   let hash = 0
@@ -122,8 +123,6 @@ export default function PageMembers() {
     }
   }, [])
 
-  console.log(workspaceData)
-
   return (
     <>
       <Box sx={{ display: 'flex' }}>
@@ -155,7 +154,7 @@ export default function PageMembers() {
         <Main open={open} sx={{ padding: 0 }}>
           <Box sx={{ width: '100%', bgcolor: colors.background, color: colors.text }}>
             {/* head content */}
-            <Box sx={{ width: '100%', height: '125px', display: 'flex', justifyContent: 'center' }}>
+            {/* <Box sx={{ width: '100%', height: '125px', display: 'flex', justifyContent: 'center' }}>
               <Box
                 sx={{
                   maxWidth: '850px',
@@ -214,8 +213,8 @@ export default function PageMembers() {
                   </Box>
                 </Box>
               </Box>
-            </Box>
-            {/* <WorkspaceHeader visibility={workspaceInfo?.visibility} /> */}
+            </Box> */}
+            <WorkspaceHeader visibility={workspaceData?.data.visibility} />
             <Divider variant='middle' sx={{ bgcolor: '#E5E7EB' }} />
             {/* end head content */}
             {/* content */}

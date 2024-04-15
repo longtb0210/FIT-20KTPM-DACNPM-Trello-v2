@@ -106,8 +106,9 @@ const CardContent: React.FC<CarContent> = ({ boardData }) => {
     <>
       <Box>
         {activityData.length > 0 ? (
-          activityData.map((activity) => (
+          activityData.map((activity, index) => (
             <div
+              key={index}
               className='mx-auto mt-5 flex w-[420px] flex-col rounded-lg border-gray-500 shadow-md'
               style={{ backgroundColor: colors.backgroundSecond, color: colors.text }}
             >
@@ -115,16 +116,17 @@ const CardContent: React.FC<CarContent> = ({ boardData }) => {
                 className='flex h-[110px] justify-center rounded-t-lg'
                 style={{
                   backgroundSize: '100% 36px, cover',
-                  backgroundImage: `linear-gradient(0deg, rgba(33, 36, 37, 0.7) 50%, rgba(33, 36, 37, 0.7) 0%), url(${boardData.background || 'https://trello-backgrounds.s3.amazonaws.com/SharedBackground/480x270/09b457ee43a8833c515e9d3d5796f59f/photo-1698859858637-9aa64302f629.jpg'})`
+                  backgroundImage:
+                    boardData.background.charAt(0) === 'h' ? `url('${boardData.background}')` : boardData.background
                 }}
               >
                 <Link to={`/workspace/${boardData.workspace_id}/board/${boardData._id}`}>
                   <div
-                    className={`mt-3 h-[70px] w-[404px] cursor-pointer rounded-lg bg-white px-3 py-[10px]   hover:bg-slate-200 ${darkMode ? 'hover:bg-gray-700 dark:bg-[#23262A]' : ''}`}
+                    className={`mt-3 h-[70px] w-[404px] cursor-pointer rounded-lg  px-3 py-[10px]    ${darkMode ? 'hover:bg-gray-700 dark:bg-[#23262A]' : 'bg-white hover:bg-slate-200'}`}
                   >
                     <div className='flex items-center justify-between'>
                       <h4 className='mb-1 text-[14px]' style={{ color: colors.text }}>
-                        test {cardlistData?.data[0].name}
+                        {cardlistData?.data[0].name}
                       </h4>
                     </div>
                     <div className='flex justify-between'>
@@ -185,43 +187,41 @@ const CardContent: React.FC<CarContent> = ({ boardData }) => {
         ) : (
           <div
             className='mx-auto mt-5 flex w-[420px] flex-col rounded-lg border-gray-500 shadow-md'
-            style={{ backgroundColor: colors.backgroundSecond, color: colors.text }}
+            // style={{ backgroundColor: colors.backgroundSecond, color: colors.text }}
           >
-            <div
+            {/* <div
               className='flex h-[110px] justify-center rounded-t-lg'
               style={{
                 backgroundSize: '100% 36px, cover',
-                backgroundImage: `linear-gradient(0deg, rgba(33, 36, 37, 0.7) 50%, rgba(33, 36, 37, 0.7) 0%), url(${boardData.background || 'https://trello-backgrounds.s3.amazonaws.com/SharedBackground/480x270/09b457ee43a8833c515e9d3d5796f59f/photo-1698859858637-9aa64302f629.jpg'})`
+                backgroundImage: `linear-gradient(0deg, rgba(33, 36, 37, 0.7) 50%, rgba(33, 36, 37, 0.7) 0%), url('https://trello-backgrounds.s3.amazonaws.com/SharedBackground/480x270/09b457ee43a8833c515e9d3d5796f59f/photo-1698859858637-9aa64302f629.jpg'})`
               }}
             >
-              <Link to={`/workspace/${boardData.workspace_id}&${boardData._id}`}>
-                <div
-                  className={`mt-3 h-[70px] w-[404px] cursor-pointer rounded-lg bg-white px-3 py-[10px]   hover:bg-slate-200 ${darkMode ? 'hover:bg-gray-700 dark:bg-[#23262A]' : ''}`}
-                >
-                  <div className='flex items-center justify-between'>
-                    <h4 className='mb-1 text-[14px]' style={{ color: colors.text }}>
-                      test
-                    </h4>
-                  </div>
+              <div
+                className={`mt-3 h-[70px] w-[404px] cursor-pointer rounded-lg bg-white px-3 py-[10px]   hover:bg-slate-200 ${darkMode ? 'hover:bg-gray-700 dark:bg-[#23262A]' : ''}`}
+              >
+                <div className='flex items-center justify-between'>
+                  <h4 className='mb-1 text-[14px]' style={{ color: colors.text }}>
+                    test
+                  </h4>
+                </div>
 
-                  <div className='flex justify-between'>
-                    <div className='mb-4 flex items-center text-xs'>
-                      <MdOutlineRemoveRedEye size={16} className='ml-1 mr-3' />
-                      <div className='flex text-[12px]'>
-                        <FaRegClock size={13} className='mr-1 mt-[2px]' /> Mar 24
-                      </div>
-                    </div>
-                    <div className='mb-4 flex items-center justify-between'>
-                      <span className='rounded-full bg-blue-500 px-2 py-1 text-xs font-bold text-white'>N</span>
+                <div className='flex justify-between'>
+                  <div className='mb-4 flex items-center text-xs'>
+                    <MdOutlineRemoveRedEye size={16} className='ml-1 mr-3' />
+                    <div className='flex text-[12px]'>
+                      <FaRegClock size={13} className='mr-1 mt-[2px]' /> Mar 24
                     </div>
                   </div>
-
-                  <div className='relative -left-3 -top-0 flex'>
-                    <label className='text-[12px] font-bold text-white'>Kiểm thử phần mềm:</label>
-                    <h3 className='ml-[2px] text-[12px] text-white'> To Do</h3>
+                  <div className='mb-4 flex items-center justify-between'>
+                    <span className='rounded-full bg-blue-500 px-2 py-1 text-xs font-bold text-white'>N</span>
                   </div>
                 </div>
-              </Link>
+
+                <div className='relative -left-3 -top-0 flex'>
+                  <label className='text-[12px] font-bold text-white'>Kiểm thử phần mềm:</label>
+                  <h3 className='ml-[2px] text-[12px] text-white'> To Do</h3>
+                </div>
+              </div>
             </div>
 
             <div
@@ -240,23 +240,19 @@ const CardContent: React.FC<CarContent> = ({ boardData }) => {
                 </div>
               </div>
               <div className='flex'>
-                <Link to={'/workspace/123'}>
-                  <button
-                    className='mr-1 flex rounded border-[1px] border-solid border-[#384148] px-[60px] py-1 transition-colors duration-200 hover:bg-[#dcdfe439]'
-                    style={{ paddingBottom: '12px' }}
-                  >
-                    <FontAwesomeIcon icon={faCheck} className='mr-1 mt-[5px]' /> Complete
-                  </button>
-                </Link>
+                <button
+                  className='mr-1 flex rounded border-[1px] border-solid border-[#384148] px-[60px] py-1 transition-colors duration-200 hover:bg-[#dcdfe439]'
+                  style={{ paddingBottom: '12px' }}
+                >
+                  <FontAwesomeIcon icon={faCheck} className='mr-1 mt-[5px]' /> Complete
+                </button>
 
-                <Link to={'/workspace/123'}>
-                  <button className='ml-1 flex rounded border-[1px] border-solid border-[#384148] px-[60px] transition-colors duration-200 hover:bg-[#dcdfe439]'>
-                    <FontAwesomeIcon icon={faXmark} className='mr-1 mt-[5px]' />
-                    <span className='mt-[2px]'>Dismiss</span>
-                  </button>
-                </Link>
+                <button className='ml-1 flex rounded border-[1px] border-solid border-[#384148] px-[60px] transition-colors duration-200 hover:bg-[#dcdfe439]'>
+                  <FontAwesomeIcon icon={faXmark} className='mr-1 mt-[5px]' />
+                  <span className='mt-[2px]'>Dismiss</span>
+                </button>
               </div>
-            </div>
+            </div> */}
           </div>
         )}
       </Box>

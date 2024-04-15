@@ -70,9 +70,8 @@ export default function AddMemberDialog({ open, handleCloseShare, boardID }: Pro
     if (isValidEmail(emailInput)) {
       // Nếu là email hợp lệ, gọi hàm gọi API
       addMemberToBoard({ _id: boardID, email: emailInput })
-        .then((response) => {
+        .then(() => {
           // Xử lý kết quả trả về từ API ở đây
-          console.log(response)
           alert('Thêm thành công')
         })
         .catch((error) => {
@@ -86,12 +85,15 @@ export default function AddMemberDialog({ open, handleCloseShare, boardID }: Pro
   }
 
   // Hàm xử lý thay đổi giá trị trong ô input
-  const handleInputChange = (event: { target: { value: React.SetStateAction<string> } }) => {
-    setEmailInput(event.target.value)
-  }
+  const storedProfile = localStorage.getItem('profile')
+  const [profile, setProFile] = React.useState({ email: '', name: '' })
+  React.useEffect(() => {
+    const profileSave = storedProfile ? JSON.parse(storedProfile) : { email: '', name: '' }
+    setProFile({ ...profileSave })
+  }, [storedProfile])
 
   React.useEffect(() => {
-    getUserByEmail({ email: 'nguyeenkieen141@gmail.com' }).then((a) => console.log(a))
+    getUserByEmail({ email: profile.email })
   }, [getUserByEmail])
   return (
     <Dialog open={open} onClose={handleCloseShare} aria-labelledby='alert-dialog-title' className='rounded-[10px]'>
@@ -107,7 +109,7 @@ export default function AddMemberDialog({ open, handleCloseShare, boardID }: Pro
               className={`h-7 w-[342px] rounded-[3px] border-[3px] border-[#92a1b9] px-2 py-4 transition-all duration-100 active:scale-[0.98]`}
               placeholder='Email address or name'
               style={{ backgroundColor: '#ffff' }}
-              onChange={handleInputChange}
+              onChange={handleChange}
             />
             <select
               style={{

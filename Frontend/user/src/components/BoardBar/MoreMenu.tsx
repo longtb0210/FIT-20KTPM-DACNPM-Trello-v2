@@ -41,7 +41,11 @@ const MoreMenu: React.FC<Props> = ({ open, handleDrawerClose }) => {
   const [openDrawerIndex, setOpenDrawerIndex] = React.useState(null)
 
   const handleDrawerOpen = (index: number | React.SetStateAction<null>) => {
-    setOpenDrawerIndex(index)
+    if (typeof index === 'number') {
+      setOpenDrawerIndex(index as unknown as React.SetStateAction<null>)
+    } else {
+      setOpenDrawerIndex(index)
+    }
   }
 
   const handleDetailTabClose = () => {
@@ -109,6 +113,9 @@ const MoreMenu: React.FC<Props> = ({ open, handleDrawerClose }) => {
             color: colors.text,
             backgroundColor: colors.background
           },
+          '.css-1t8x7v1 >.ps-menu-button:hover': {
+            backgroundColor: darkMode ? 'rgb(51 65 85 / var(--tw-bg-opacity))' : '#DCDFE4'
+          },
           color: colors.text,
           backgroundColor: colors.background
         }}
@@ -132,7 +139,7 @@ const MoreMenu: React.FC<Props> = ({ open, handleDrawerClose }) => {
         <Sidebar width='100%' className='overflow-hidden text-sm'>
           <Menu>
             <MenuItem
-              className={`menu-item h-[50px] ${darkMode ? 'bg-[#1D2125] text-white hover:bg-slate-600' : `bg-${colors.button} text-${colors.text} hover:bg-[#DCDFE4]`}`}
+              className={`menu-item h-[50px] ${darkMode ? 'bg-[#1D2125] text-white hover:bg-slate-600' : `text-${colors.text} hover:bg-[#DCDFE4]`}`}
               onClick={() => handleDrawerOpen(0)}
             >
               <div className='flex items-center'>
@@ -143,7 +150,7 @@ const MoreMenu: React.FC<Props> = ({ open, handleDrawerClose }) => {
           </Menu>
           <Menu>
             <MenuItem
-              className={`menu-item h-[50px] ${darkMode ? 'bg-[#1D2125] text-white hover:bg-slate-700' : `bg-[${colors.button}] text-[${colors.text}] hover:bg-[#DCDFE4]`}`}
+              className={`menu-item h-[50px] ${darkMode ? 'bg-[#1D2125] text-white hover:bg-slate-700' : `text-[${colors.text}] hover:bg-[#DCDFE4]`}`}
               onClick={() => handleDrawerOpen(1)}
             >
               <div className='flex items-center'>
@@ -155,7 +162,7 @@ const MoreMenu: React.FC<Props> = ({ open, handleDrawerClose }) => {
           <Divider />
           <Menu>
             <MenuItem
-              className={`menu-item h-[50px] ${darkMode ? 'bg-[#1D2125] text-white hover:bg-slate-600' : `bg-${colors.button} text-${colors.text} hover:bg-[#DCDFE4]`}`}
+              className={`menu-item h-[50px] ${darkMode ? 'bg-[#1D2125] text-white hover:bg-slate-600' : `text-${colors.text} hover:bg-[#DCDFE4]`}`}
               // onClick={() => handleItemClick('boards')}
               onClick={() => handleDrawerOpen(2)}
             >
@@ -168,8 +175,10 @@ const MoreMenu: React.FC<Props> = ({ open, handleDrawerClose }) => {
                     borderRadius: '3px',
                     backgroundPosition: '50%',
                     marginRight: '10px',
-                    // backgroundImage: `url(${boardData?.data?.background !== undefined ? boardData?.data?.background : })`
-                    backgroundImage: `url(${boardData?.data?.background || 'https://images.unsplash.com/photo-1551963831-b3b1ca40c98e'})`
+                    backgroundImage:
+                      boardData?.data?.background.charAt(0) === 'h'
+                        ? `url('${boardData?.data?.background}')`
+                        : boardData?.data?.background
                   }}
                 ></span>
                 ChangeBackground
@@ -178,7 +187,7 @@ const MoreMenu: React.FC<Props> = ({ open, handleDrawerClose }) => {
           </Menu>
           <Menu>
             <MenuItem
-              className={`menu-item h-[50px] ${darkMode ? 'bg-[#1D2125] text-white hover:bg-slate-600' : `bg-${colors.button} text-${colors.text} hover:bg-[##DCDFE4]`}`}
+              className={`menu-item h-[50px] ${darkMode ? 'bg-[#1D2125] text-white hover:bg-slate-600' : `text-${colors.text} hover:bg-[#DCDFE4]`}`}
 
               // onClick={() => handleItemClick('boards')}
             >
@@ -191,7 +200,7 @@ const MoreMenu: React.FC<Props> = ({ open, handleDrawerClose }) => {
           <Divider />
           <Menu>
             <MenuItem
-              className={`menu-item h-[50px] ${darkMode ? 'bg-[#1D2125] text-white hover:bg-slate-600' : `bg-${colors.button} text-${colors.text} hover:bg-[##DCDFE4]`}`}
+              className={`menu-item h-[50px] ${darkMode ? 'bg-[#1D2125] text-white hover:bg-slate-600' : `text-${colors.text} hover:bg-[#DCDFE4]`}`}
 
               // onClick={() => handleItemClick('boards')}
             >
@@ -204,7 +213,7 @@ const MoreMenu: React.FC<Props> = ({ open, handleDrawerClose }) => {
           </Menu>
           <Menu>
             <MenuItem
-              className={`menu-item h-[50px] ${darkMode ? 'bg-[#1D2125] text-white hover:bg-slate-600' : `bg-${colors.button} text-${colors.text} hover:bg-[##DCDFE4]`}`}
+              className={`menu-item h-[50px] ${darkMode ? 'bg-[#1D2125] text-white hover:bg-slate-600' : `text-${colors.text} hover:bg-[#DCDFE4]`}`}
 
               // onClick={() => handleItemClick('boards')}
             >
@@ -216,7 +225,7 @@ const MoreMenu: React.FC<Props> = ({ open, handleDrawerClose }) => {
           </Menu>
           <Menu>
             <MenuItem
-              className={`menu-item h-[50px] ${darkMode ? 'bg-[#1D2125] text-white hover:bg-slate-600' : `bg-${colors.button} text-${colors.text} hover:bg-[##DCDFE4]`}`}
+              className={`menu-item h-[50px] ${darkMode ? 'bg-[#1D2125] text-white hover:bg-slate-600' : `text-${colors.text} hover:bg-[#DCDFE4]`}`}
 
               // onClick={() => handleItemClick('boards')}
             >
