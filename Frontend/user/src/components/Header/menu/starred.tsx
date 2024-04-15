@@ -80,8 +80,6 @@ export default function Starred() {
           const responseData = res.data
           const workspaceName = item.name
 
-          console.log(responseData)
-
           if (responseData && responseData.data) {
             const boardsWithWorkspaceName = responseData.data.map((board) => ({
               ...board,

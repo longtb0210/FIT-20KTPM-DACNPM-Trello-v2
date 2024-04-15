@@ -104,7 +104,7 @@ export default function Account() {
                       marginTop: '8px',
                       transition: 'all 0.1s ease-in',
                       padding: '12px 0 6px 0',
-                      backgroundColor: colors.background,
+                      backgroundColor: colors.background_menu_header,
                       minWidth: '224px',
                       borderRadius: '4px'
                     }}

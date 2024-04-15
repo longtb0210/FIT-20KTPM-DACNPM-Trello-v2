@@ -40,13 +40,13 @@ export function AuthProvider({ children }: { children?: React.ReactNode }) {
               .then((profile) => {
                 const email = profile.email
                 const name = profile.firstName + ' ' + profile.lastName
-                console.log("MyName")
-                fetch(`${import.meta.env.VITE_URL_API}/api/user/`,{
-                  method:"POST",
-                  headers:{
-                    "Authorization":`Bearer ${keycloak.current?.token}`,
-                    "Content-Type":"application/json"
-                  },body:JSON.stringify({email: email, username: name || email,bio:"string",avatar:"string"}),
+                fetch(`${import.meta.env.VITE_URL_API}/api/user/`, {
+                  method: 'POST',
+                  headers: {
+                    Authorization: `Bearer ${keycloak.current?.token}`,
+                    'Content-Type': 'application/json'
+                  },
+                  body: JSON.stringify({ email: email, username: name || email, bio: 'string', avatar: 'string' })
                 })
                 localStorage.setItem('profile', JSON.stringify({ email, name }))
               })
@@ -63,14 +63,14 @@ export function AuthProvider({ children }: { children?: React.ReactNode }) {
 
   const login = () => {
     if (keycloak.current) {
-      keycloak.current.login({ redirectUri: `${import.meta.env.VITE_HOST_URL || "http://localhost:3000"}/login` })
+      keycloak.current.login({ redirectUri: `${import.meta.env.VITE_HOST_URL || 'http://localhost:3000'}/login` })
     }
   }
 
   const logout = () => {
     if (keycloak.current) {
       localStorage.clear()
-      keycloak.current.logout({ redirectUri: `${import.meta.env.VITE_HOST_URL || "http://localhost:3000"}/login` })
+      keycloak.current.logout({ redirectUri: `${import.meta.env.VITE_HOST_URL || 'http://localhost:3000'}/login` })
     }
   }
 

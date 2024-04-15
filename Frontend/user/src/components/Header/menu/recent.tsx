@@ -43,7 +43,6 @@ export default function Recent() {
   const anchorRef = React.useRef<HTMLButtonElement>(null)
   const { colors } = useTheme()
   const [getBoardById] = BoardApiRTQ.BoardApiSlice.useLazyGetBoardByIdQuery()
-  // const [getWorkspaceByID] = WorkspaceApiRTQ.WorkspaceApiSlice.useGetWorkspaceByIDMutation()
   const [listBoard, setListBoard] = React.useState<Board[]>([])
 
   const savedValuesString = localStorage.getItem('savedValues')
@@ -210,12 +209,6 @@ export default function Recent() {
                                 >
                                   {board.name}
                                 </Typography>
-                                {/* <Typography
-                                  variant='body1'
-                                  sx={{ fontSize: '12px', color: colors.text, marginLeft: '12px' }}
-                                >
-                                  {listNameWorkspace[index]}
-                                </Typography> */}
                               </Box>
                             </Box>
                           </Box>
@@ -229,7 +222,7 @@ export default function Recent() {
                           variant='body1'
                           sx={{ fontSize: '14px', color: colors.text, textAlign: 'center', margin: '12px 0 8px 0' }}
                         >
-                          No workspace
+                          You’ll find the boards you’ve recently viewed here.
                         </Typography>
                       </Box>
                     )}

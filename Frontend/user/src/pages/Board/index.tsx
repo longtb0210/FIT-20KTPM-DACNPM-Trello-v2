@@ -1,6 +1,5 @@
 import { useState, useEffect, lazy, Suspense } from 'react'
-import { lists } from './testData/test_data'
-import { List, Card, defaultCard } from './type/index'
+import { List, Card } from './type/index'
 
 import {
   DndContext,
@@ -24,52 +23,20 @@ import { BoardLayout } from '../../layouts'
 import { generatePlaceHolderCard } from '../../utils/fomatter'
 import LoadingComponent from '../../components/Loading'
 import { CardComponent, ListComponent } from './components'
-import { useTheme } from '../../components/Theme/themeContext'
-import { getAllListAPI } from '../../api/List'
 import { CardApiRTQ, CardlistApiRTQ } from '../../api'
-import { TrelloApi } from '@trello-v2/shared'
 import { board_id } from '~/api/getInfo'
-// import CardDetailWindow from '~/components/CardDetailWindow'
 import { useParams } from 'react-router-dom'
-// const MOCK_CARD_DATA: TrelloApi.CardlistApi.GetallCardlistResponse = {
-//   data: [
-//     {
-//       _id: 'CardlistId1',
-//       name: 'Card list 1',
-//       watcher_email: [],
-//       board_id: 'BoardId1',
-//       cards: [
-//         { _id: 'CardId1', name: 'Card 1', watcher_email: [], activities: [], features: [], created_at: new Date() },
-//         { _id: 'CardId2', name: 'Card 2', watcher_email: [], activities: [], features: [], created_at: new Date() }
-//       ]
-//     },
-//     {
-//       _id: 'CardlistId2',
-//       name: 'Card list 2',
-//       watcher_email: [],
-//       board_id: 'BoardId2',
-//       cards: [
-//         { _id: 'CardId3', name: 'Card 3', watcher_email: [], activities: [], features: [], created_at: new Date() },
-//         { _id: 'CardId4', name: 'Card 4', watcher_email: [], activities: [], features: [], created_at: new Date() }
-//       ]
-//     }
-//   ]
-// }
 
 const ACTIVE_DRAG_ITEM_TYPE = {
   COLUMN: 'ACTIVE_DRAG_ITEM_TYPE_COLUMN',
   CARD: 'ACTIVE_DRAG_ITEM_TYPE_CARD'
 }
-// const LazyCardComponent = lazy(() => import('./components/Card'))
-// const LazyListComponent = lazy(() => import('./components/List'))
 const LazyListsComponent = lazy(() => import('./components/Lists'))
 const LazyCardDetailsComponent = lazy(() => import('~/components/CardDetailWindow'))
 export function Board() {
-  // const [getAllCardlist, { data: cardlistData }] = CardlistApiRTQ.CardListApiSlice.useLazyGetAllCardlistQuery()
   const [getCardListByBoardId, { data: cardlistDataByBoardId }] =
     CardlistApiRTQ.CardListApiSlice.useLazyGetCardlistByBoardIdQuery()
-  // const { colors, darkMode } = useTheme()
-  const [moveCardAPI, { data: moveCardAPIRes }] = CardApiRTQ.CardApiSlice.useMoveCardMutation()
+  const [moveCardAPI] = CardApiRTQ.CardApiSlice.useMoveCardMutation()
   const [moveListAPI] = CardlistApiRTQ.CardListApiSlice.useMoveCardListMutation()
   const [oldListWhenDragging, setOldListWhenDraggingCard] = useState<List>()
   const [listsData, setListsData] = useState<Array<List>>()
@@ -170,6 +137,7 @@ export function Board() {
     getAllList()
 
     // You can call your API update function here
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [boardId])
 
   function findListByCardId(cardId: string) {

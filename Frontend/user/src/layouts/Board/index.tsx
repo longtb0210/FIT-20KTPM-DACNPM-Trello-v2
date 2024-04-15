@@ -1,5 +1,4 @@
 import { ReactNode, useEffect, useState } from 'react'
-import backgroundImage from '../../assets/Board/bg_2.jpg'
 import { BoardApiRTQ } from '~/api'
 import { Board } from '@trello-v2/shared/src/schemas/Board'
 import { useParams } from 'react-router-dom'
@@ -13,15 +12,13 @@ export const BoardLayout: React.FC<LayoutProps> = ({ children, openCardSetting }
   const params = useParams()
   const boardId = params.boardId
   useEffect(() => {
-    console.log('boardId BG: ', boardId)
     getBoardById(boardId)
-  }, [boardRes])
+  }, [boardId, boardRes, getBoardById])
   useEffect(() => {
-    console.log('boardData BG: ', boardRes)
     setBoardData(boardRes?.data)
   }, [boardRes])
   const backgroundStyle = {
-    backgroundImage: `url(${boardData?.background ? boardData?.background : backgroundImage})`,
+    backgroundImage: boardData?.background.charAt(0) === 'h' ? `url(${boardData?.background})` : boardData?.background,
     backgroundSize: 'cover',
     backgroundPosition: 'center',
     opacity: 0.7

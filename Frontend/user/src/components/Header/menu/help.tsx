@@ -92,7 +92,7 @@ export default function Help() {
                     sx={{
                       marginTop: '8px',
                       transition: 'all 0.1s ease-in',
-                      backgroundColor: colors.background,
+                      backgroundColor: colors.background_menu_header,
                       width: '377px',
                       padding: '20px',
                       borderRadius: '4px'
