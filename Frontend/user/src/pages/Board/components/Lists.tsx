@@ -28,6 +28,7 @@ export default function ListsComponent({
   const boardId = params.boardId
   const [listsData, setListsData] = useState<List[]>()
   useEffect(() => {
+    console.log(lists)
     setListsData(lists.sort((a, b) => (a.index ?? Infinity) - (b.index ?? Infinity)))
   }, [lists])
   const handleAddListClick = () => {
@@ -83,7 +84,7 @@ export default function ListsComponent({
       createCardlist({
         name: newListName,
         board_id: boardId,
-        index: cardlistDataByBoardId?.data.length || 0,
+        index: lists?.length || 0,
         watcher_email: [],
         archive_at: undefined,
         created_at: new Date()
