@@ -47,9 +47,6 @@ export default function ListComponent({
   const componentRef_AddCard = useRef<HTMLDivElement>(null)
   const componentRef_ListSetting = useRef<HTMLDivElement>(null)
   useEffect(() => {
-    setMaxH(maxHeight)
-  }, [maxHeight])
-  useEffect(() => {
     setCardsData(list.cards.sort((a, b) => (a.index ?? Infinity) - (b.index ?? Infinity)))
   }, [list])
   useEffect(() => {
@@ -180,18 +177,28 @@ export default function ListComponent({
     data: { ...list }
   })
   const [isHovered, setIsHovered] = useState(false)
-  const styleList = {
+  const [styleList, setStyleList] = useState({
     transform: CSS.Transform.toString(transform),
     opacity: isDragging ? 0.5 : undefined,
     height: '100%',
     backgroundColor: darkMode ? 'black' : '#f1f2f6',
     color: colors.text,
-    minHeight: `${maxH + 120}px`
+    minHeight: `${maxHeight + 120}px`
     // maxHeight: `${maxHeight > 590 ? 590 : maxHeight}px`
-  }
+  })
+  useEffect(() => {
+    setStyleList({ ...styleList, minHeight: `${maxHeight + 120}px` })
+    console.log(maxHeight)
+  }, [maxHeight, boardId, list])
+  useEffect(() => {
+    if (addCardOnTop.length > 0 || addCardOpenAt.length > 0)
+      setStyleList({ ...styleList, minHeight: `${maxHeight + 190}px` })
+    else if (addCardOnTop.length === 0 || addCardOpenAt.length === 0)
+      setStyleList({ ...styleList, minHeight: `${maxHeight + 120}px` })
+  }, [addCardOnTop, addCardOpenAt])
   const renderCards = (list: List) => {
     return (
-      <div className={`list-component space-y-[10px]`}>
+      <div className={`list-component space-y-[10px] `}>
         {list.cards &&
           list.cards.map((card, index) => (
             <CardComponent
@@ -210,11 +217,11 @@ export default function ListComponent({
         <div
           ref={setNodeRef}
           style={styleList}
-          className={`relative mr-2 flex h-fit w-[300px] max-w-[300px] flex-col rounded-xl border pt-1 shadow-sm`}
+          className={`relative   mr-2 flex h-fit w-[300px] max-w-[300px] flex-col rounded-xl border pt-1 shadow-sm`}
           {...attributes}
           {...listeners}
         >
-          <div className=' relative my-1 ml-4 mr-6 flex flex-row items-center justify-between'>
+          <div className=' relative my-1 ml-4 mr-6 flex flex-row items-center  justify-between'>
             {!editName ? (
               <h2
                 onClick={() => setEditName(true)}
@@ -456,24 +463,25 @@ export default function ListComponent({
                   </div>
                 </div>
               ))}
+            {!addCardOpenAt && (
+              <div className={`mx-3 my-3 flex flex-row space-x-2`}>
+                <button
+                  className={`w-10/12 rounded-lg p-2 ${darkMode ? 'hover:bg-gray-600' : 'hover:bg-gray-300'}`}
+                  onClick={() => {
+                    setAddCardOpenAt(list._id)
+                  }}
+                >
+                  <p className={`text-left font-semibold `}>+ Add a card</p>
+                </button>
+                <button
+                  className={` content-center rounded-lg p-2 text-center  ${darkMode ? 'hover:bg-gray-600' : 'hover:bg-gray-300'}`}
+                >
+                  <IoImagesOutline className={`text-center`} />
+                </button>
+              </div>
+            )}
           </div>
-          {!addCardOpenAt && (
-            <div className={`mx-3 my-2 flex flex-row space-x-2`}>
-              <button
-                className={`w-10/12 rounded-lg p-2 ${darkMode ? 'hover:bg-gray-600' : 'hover:bg-gray-300'}`}
-                onClick={() => {
-                  setAddCardOpenAt(list._id)
-                }}
-              >
-                <p className={`text-left font-semibold `}>+ Add a card</p>
-              </button>
-              <button
-                className={` content-center rounded-lg p-2 text-center  ${darkMode ? 'hover:bg-gray-600' : 'hover:bg-gray-300'}`}
-              >
-                <IoImagesOutline className={`text-center`} />
-              </button>
-            </div>
-          )}
+
           {/* {index !== 0 && (
         <div style={{ position: 'absolute', top: '100%', left: 0, width: '100%', height: '200px', zIndex: 50 }}>
         

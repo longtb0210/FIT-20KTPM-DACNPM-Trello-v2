@@ -18,7 +18,16 @@ import { formatDate, formatDateISO, formatDateTime } from '~/utils/fomatter'
 interface ActivityProps {
   userInfo: User | undefined
 }
-const options = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric', hour: 'numeric', minute: 'numeric', second: 'numeric', timeZoneName: 'short' };
+const options = {
+  weekday: 'long',
+  year: 'numeric',
+  month: 'long',
+  day: 'numeric',
+  hour: 'numeric',
+  minute: 'numeric',
+  second: 'numeric',
+  timeZoneName: 'short'
+}
 export const ActivityComponent: React.FC<ActivityProps> = ({ userInfo }) => {
   const { colors, darkMode } = useTheme()
   const [activity, setActivity] = useState<Activity[]>()
@@ -166,13 +175,12 @@ export const ActivityComponent: React.FC<ActivityProps> = ({ userInfo }) => {
             actData.map((activity, index) => (
               <div className='flex flex-row'>
                 <RxAvatar className={`-ml-2 mr-1 h-9 w-9 cursor-pointer rounded-full  hover:opacity-60`} />
-              <div key={index} className={`mb-2 ml-2`}>
-                <span dangerouslySetInnerHTML={{ __html: activity.content }} />
-                <div className={`flex flex-row items-center space-x-2`}>
-                  <p className={`text-sm font-light  `}>At {formatDateTime(activity.create_time.toString())} </p>
-                 
+                <div key={index} className={`mb-2 ml-2`}>
+                  <span dangerouslySetInnerHTML={{ __html: activity.content }} />
+                  <div className={`flex flex-row items-center space-x-2`}>
+                    <p className={`text-sm font-light  `}>At {formatDateTime(activity.create_time.toString())} </p>
+                  </div>
                 </div>
-              </div>
               </div>
             ))}
         </div>

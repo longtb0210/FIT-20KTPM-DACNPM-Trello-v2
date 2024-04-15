@@ -27,10 +27,9 @@ export default function ListsComponent({
   const params = useParams()
   const boardId = params.boardId
   const [listsData, setListsData] = useState<List[]>()
-  useEffect(() => {
-    console.log(lists)
-    setListsData(lists.sort((a, b) => (a.index ?? Infinity) - (b.index ?? Infinity)))
-  }, [lists])
+  // useEffect(() => {
+
+  // }, [lists])
   const handleAddListClick = () => {
     setShowAddListForm(true)
   }
@@ -57,15 +56,16 @@ export default function ListsComponent({
   }
   useEffect(() => {
     // Calculate the biggest height whenever list.cards changes
-    updateBiggestHeight()
-
+    setTimeout(() => updateBiggestHeight(), 10)
+    console.log(lists)
+    setListsData(lists.sort((a, b) => (a.index ?? Infinity) - (b.index ?? Infinity)))
     // Re-calculate biggest height when the window is resized
     window.addEventListener('resize', updateBiggestHeight)
 
     return () => {
       window.removeEventListener('resize', updateBiggestHeight)
     }
-  }, [lists])
+  }, [lists, boardId, cardlistDataByBoardId, biggestHeight])
   useEffect(() => {
     if (!cardlistDataByBoardId) getCardListByBoardId({ id: boardId })
     document.addEventListener('mousedown', handleClickOutside)
@@ -113,7 +113,6 @@ export default function ListsComponent({
                   />
                 </div>
               ))}
-              {/* <p>The maximum height of ListComponents is: {biggestHeight}px</p> */}
               {showAddListForm ? (
                 <div ref={listFormRef} className={`h-[120px]`}>
                   <AddListForm
@@ -127,7 +126,7 @@ export default function ListsComponent({
                 </div>
               ) : (
                 <button
-                  className={`h-fit w-[300px]   rounded-xl border bg-black bg-opacity-20 p-3 text-left font-semibold text-white hover:bg-opacity-50`}
+                  className={`h-fit w-[300px] rounded-xl border bg-black bg-opacity-20 p-3 text-left font-semibold text-white hover:bg-opacity-50`}
                   onClick={handleAddListClick}
                 >
                   + Add another list
