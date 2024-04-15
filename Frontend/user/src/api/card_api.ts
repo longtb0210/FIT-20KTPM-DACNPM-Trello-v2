@@ -154,10 +154,13 @@ export const CardApiSlice = createApi({
         body: data
       })
     }),
-    unArchiveCard: build.mutation<TrelloApi.CardApi.UnArchiveCardResponse, TrelloApi.CardApi.UnArchiveCardRequest>({
+    unArchiveCard: build.mutation<
+      TrelloApi.CardApi.UnArchiveCardResponse,
+      { cardlist_id: string; card_id: string; archive_at: Date | undefined }
+    >({
       query: (data) => ({
-        url: '/api/card/archive',
-        method: 'DELETE',
+        url: '/api/card/detail',
+        method: 'PUT',
         body: data
       })
     }),
