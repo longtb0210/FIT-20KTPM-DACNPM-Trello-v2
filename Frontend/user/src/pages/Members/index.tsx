@@ -374,7 +374,7 @@ export default function PageMembers() {
                             onClick={handleClickOpenShare}
                           >
                             <FaLink className='mr-1 mt-1' size={14} />
-                            Invite with link
+                            Invite with email
                           </Button>
                         </Grid>
                       </Grid>
@@ -468,7 +468,7 @@ export default function PageMembers() {
         <AddMemberDialog
           open={openShare}
           handleCloseShare={handleCloseShare}
-          boardID={workspaceId !== undefined ? workspaceId : ''}
+          workspaceId={workspaceId !== undefined ? workspaceId : ''}
         />
         {/* end content */}
       </Box>
