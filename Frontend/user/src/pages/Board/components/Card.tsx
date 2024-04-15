@@ -227,7 +227,8 @@ export default function CardComponent({ card, cardSelected, setOpenCardSetting }
                             {card.watcher_email.includes(profile.email) && <MdOutlineRemoveRedEye className={``} />}
                           </div>
                           <div className={`flex flex-row items-center justify-between space-x-1`}>
-                            {card.watcher_email.includes(profile.email) &&
+                            {cardMembers &&
+                              cardMembers.length > 0 &&
                               cardMembers.map((member, index) => (
                                 <div key={index} className={`relative z-10 flex flex-row items-center justify-center`}>
                                   <div onMouseEnter={() => handleMouseOver(member)} onMouseLeave={handleMouseLeave}>
