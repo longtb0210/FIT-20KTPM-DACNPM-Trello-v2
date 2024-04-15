@@ -1,12 +1,12 @@
 import { InjectController, InjectRoute } from '@app/common/decorators'
 import { ZodValidationPipe } from '@app/common/pipes'
-import { Body, InternalServerErrorException, NotFoundException, Query } from '@nestjs/common'
+import { Body, InternalServerErrorException, NotFoundException, Query, RequestMethod } from '@nestjs/common'
 import { TrelloApi } from '@trello-v2/shared'
 
 import { CardRoutes } from '../card.routes'
 import { CardService } from '../services/card.service'
 import { UserInfoDto } from '@app/common/auth/user-info.dto'
-import { AuthenticatedUser } from 'nest-keycloak-connect'
+import { AuthenticatedUser, Public } from 'nest-keycloak-connect'
 
 @InjectController({
   name: '/api/card',
@@ -254,5 +254,11 @@ export class CardController {
     return {
       data: card,
     }
+  }
+
+  @Public()
+  @InjectRoute({ method: RequestMethod.GET, path: 'test/demo' })
+  demo() {
+    return { Hello: 'demo' }
   }
 }
