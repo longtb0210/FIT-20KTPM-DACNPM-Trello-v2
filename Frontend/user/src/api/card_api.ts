@@ -154,13 +154,10 @@ export const CardApiSlice = createApi({
         body: data
       })
     }),
-    unArchiveCard: build.mutation<
-      TrelloApi.CardApi.UnArchiveCardResponse,
-      { cardlist_id: string; card_id: string; archive_at: Date | undefined }
-    >({
+    unArchiveCard: build.mutation<TrelloApi.CardApi.UnArchiveCardResponse, TrelloApi.CardApi.ArchiveCardRequest>({
       query: (data) => ({
-        url: '/api/card/detail',
-        method: 'PUT',
+        url: '/api/card/archive',
+        method: 'DELETE',
         body: data
       })
     }),
@@ -194,34 +191,36 @@ export const CardApiSlice = createApi({
         }
       })
     }),
-    getCardArchiveByBoardId: build.query<{
-      data: {
-      name: string,
-      _id: string,
-      watcher_email: string[],
-      member_email: string[],
-      created_at: Date,
-      index?: number | null | undefined,
-      archive_at?: Date | null | undefined,
-      cover?: string |null| undefined,
-      description?: string |null| undefined,
-  }[]}
-  , 
-  { board_id: string }>({
+    getCardArchiveByBoardId: build.query<
+      {
+        data: {
+          name: string
+          _id: string
+          watcher_email: string[]
+          member_email: string[]
+          created_at: Date
+          index?: number | null | undefined
+          archive_at?: Date | null | undefined
+          cover?: string | null | undefined
+          description?: string | null | undefined
+        }[]
+      },
+      { board_id: string }
+    >({
       query: (data) => ({
         url: `/api/card/archive/byBoardId?board_id=${data.board_id}`,
-        method: 'GET',
+        method: 'GET'
       })
     }),
     RestoreCardArchive: build.mutation<
-    TrelloApi.CardApi.UpdateCardDetailResponse,
-    { cardlist_id: string, card_id: string, archive_at: Date }
-  >({
-    query: (data) => ({
-      url: '/api/card/detail',
-      method: 'PUT',
-      body: data
+      TrelloApi.CardApi.UpdateCardDetailResponse,
+      { cardlist_id: string; card_id: string; archive_at: Date }
+    >({
+      query: (data) => ({
+        url: '/api/card/detail',
+        method: 'PUT',
+        body: data
+      })
     })
-  }),
   })
 })
