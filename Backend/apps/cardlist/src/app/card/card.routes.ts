@@ -219,4 +219,23 @@ export const CardRoutes = {
       responses: [{ status: 200, schema: { $ref: getSchemaPath('MakeCommentSchemaResponseSchema') } }],
     },
   } as IRouteParams,
+  getAllArchivedCardInBoard: {
+    path: 'archive/byBoardId',
+    method: RequestMethod.GET,
+    jwtSecure: false,
+    swaggerInfo: {
+      query: {
+        name: 'query',
+        schema: { $ref: getSchemaPath('GetAllArchivedCardInBoardRequestSchema') },
+        style: 'form',
+        explode: true,
+      },
+      responses: [
+        {
+          status: 200,
+          schema: { $ref: getSchemaPath('GetAllArchivedCardInBoardResponseSchema') },
+        },
+      ],
+    },
+  } as IRouteParams,
 } as const

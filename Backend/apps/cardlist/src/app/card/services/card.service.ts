@@ -190,7 +190,7 @@ export class CardService {
         cards: { $elemMatch: { _id: data.card_id } },
       },
       {
-        $set: { 'cards.$.archive_at': new Date().toISOString(), index: null },
+        $set: { 'cards.$.archive_at': new Date().toISOString() },
         $push: {
           'cards.$.activities': {
             workspace_id: 'workspace_id',
@@ -406,5 +406,37 @@ export class CardService {
     ).exec()
     const newCard = res?.toJSON().cards.find((e) => e._id?.toString() === data.card_id)
     return newCard
+  }
+
+  async getAllArchiveCardInBoard(
+    data: TrelloApi.CardApi.getAllArchivedCardInBoardRequest,
+  ): Promise<TrelloApi.CardApi.GetAllArchivedCardInBoardResponse> {
+    const lists = await this.CardlistMModel.find(
+      {
+        board_id: data.board_id,
+        cards: { $elemMatch: { archive_at: { $exists: true } } },
+      },
+      {
+        board_id: 0,
+        name: 0,
+        archive_at: 0,
+        created_at: 0,
+        watcher_email: 0,
+        'cards.activities': 0,
+        'cards.features': 0,
+        'cards.description': 0,
+        'cards.watcher_email': 0,
+        'cards.member_email': 0,
+      },
+    ).lean()
+    return {
+      data: lists.reduce(
+        (prev, cur) => {
+          prev.push(...cur.cards.filter((e) => e.archive_at).map((e) => ({ ...e, _id: e._id, cardlist_id: cur._id })))
+          return prev
+        },
+        [] as TrelloApi.CardApi.GetAllArchivedCardInBoardResponse['data'],
+      ),
+    }
   }
 }

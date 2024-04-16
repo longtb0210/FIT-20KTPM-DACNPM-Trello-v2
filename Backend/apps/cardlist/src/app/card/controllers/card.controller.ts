@@ -255,4 +255,13 @@ export class CardController {
       data: card,
     }
   }
+
+  @InjectRoute(CardRoutes.getAllArchivedCardInBoard)
+  async getAllArchiveCardsInBoard(
+    @Query(new ZodValidationPipe(TrelloApi.CardApi.GetAllArchivedCardInBoardRequestSchema))
+    query: TrelloApi.CardApi.getAllArchivedCardInBoardRequest,
+  ): Promise<TrelloApi.CardApi.GetAllArchivedCardInBoardResponse> {
+    const cards = this.cardService.getAllArchiveCardInBoard(query)
+    return cards
+  }
 }
