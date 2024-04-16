@@ -17,8 +17,6 @@ interface ArchiveCardProps {
 }
 
 const ArchiveCard: React.FC<ArchiveCardProps> = ({ card, switchToLists, boardId, cardListId }) => {
-  //   const restoreCartToBoard = CardApiRTQ.CardApiSlice.useRestoreCartToBoardMutation()
-  //   const deleteCardArchive = CardApiRTQ.CardApiSlice.useDeleteCardArchiveMutation()
   const [restoreCartToBoard] = CardApiRTQ.CardApiSlice.useRestoreCartToBoardMutation()
   const [updateCardList] = CardlistApiRTQ.CardListApiSlice.useUpdateCardListMutation()
   const [deleteCardListByBoard] = CardlistApiRTQ.CardListApiSlice.useDeleteCardListByBoardMutation()
@@ -47,11 +45,11 @@ const ArchiveCard: React.FC<ArchiveCardProps> = ({ card, switchToLists, boardId,
 
   const handleRestoreCard = () => {
     if (cardListId !== undefined) {
-      restoreCartToBoard({ card_id: card._id, cardlist_id: cardListId })
+      console.log(cardListId + ' & ' + card._id)
+      restoreCartToBoard({ card_id: card._id, cardlist_id: cardListId }).then((a) => console.log(a))
     }
   }
   const handleDeleteCard = () => {}
-
   return (
     <Box
       key={card._id}

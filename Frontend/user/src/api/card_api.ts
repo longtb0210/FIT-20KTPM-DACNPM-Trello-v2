@@ -165,7 +165,7 @@ export const CardApiSlice = createApi({
       {
         query: (data) => ({
           url: '/api/card/archive',
-          method: 'POST',
+          method: 'DELETE',
           body: data
         })
       }

@@ -131,7 +131,7 @@ const ArchivedItems: React.FC<Props> = ({ open, handleDrawerClose }) => {
                       card={card}
                       switchToLists={switchToLists}
                       boardId={boardId !== undefined ? boardId : ''}
-                      cardListId={card._id}
+                      cardListId={card.cardlist_id}
                       key={card._id}
                     />
                   )}
