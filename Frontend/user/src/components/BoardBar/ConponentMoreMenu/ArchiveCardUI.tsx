@@ -2,7 +2,7 @@ import React from 'react'
 import { Box, Paper } from '@mui/material'
 import { TiArchive } from 'react-icons/ti'
 import { CardApiRTQ, CardlistApiRTQ } from '~/api'
-import { useParams } from 'react-router-dom'
+import { useNavigate, useParams } from 'react-router-dom'
 
 interface Card {
   _id: string
@@ -42,11 +42,14 @@ const ArchiveCard: React.FC<ArchiveCardProps> = ({ card, switchToLists, boardId,
     }
     // onDelete();
   }
-
+  const navigate = useNavigate() // Get the history object
   const handleRestoreCard = () => {
     if (cardListId !== undefined) {
       console.log(cardListId + ' & ' + card._id)
-      restoreCartToBoard({ card_id: card._id, cardlist_id: cardListId }).then((a) => console.log(a))
+      restoreCartToBoard({ card_id: card._id, cardlist_id: cardListId }).then(() => {
+        alert('Restore thanh cong !')
+        navigate('/')
+      })
     }
   }
   const handleDeleteCard = () => {}
