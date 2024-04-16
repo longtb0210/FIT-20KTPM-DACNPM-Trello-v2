@@ -10,6 +10,8 @@ import { CardlistApiRTQ, WorkspaceApiRTQ } from '~/api'
 import { stringToColor } from '~/utils/StringToColor'
 import Box from '@mui/material/Box'
 import Avatar from '@mui/material/Avatar'
+import Tooltip from '@mui/material/Tooltip'
+import AvatarGroup from '@mui/material/AvatarGroup'
 
 interface CarContent {
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -44,11 +46,15 @@ function stringAvatar(name: string) {
 }
 
 interface Activity {
-  _id: string
-  workspace_id: string
-  content: string
-  create_time: string
-  creator_email: string
+  name: string
+  watcher_email: string[]
+  member_email: string[]
+  created_at: Date
+  workspace_id?: string // Thêm thuộc tính workspace_id vào Activity
+  content?: string // Thêm thuộc tính content vào Activity
+  create_time?: Date // Thêm thuộc tính create_time vào Activity
+  creator_email?: string // Thêm thuộc tính creator_email vào Activity
+  _id?: string // Thêm thuộc tính _id vào Activity
 }
 
 const CardContent: React.FC<CarContent> = ({ boardData }) => {
@@ -82,8 +88,8 @@ const CardContent: React.FC<CarContent> = ({ boardData }) => {
             if (response.data !== undefined) {
               response.data.data.forEach((cardlist: { cards: any[] }) => {
                 cardlist.cards.forEach((card) => {
-                  if (card.activities && card.activities.length > 0) {
-                    activities.push(...card.activities)
+                  if (!(card.archive_at !== undefined)) {
+                    activities.push(card)
                   }
                 })
               })
@@ -130,7 +136,7 @@ const CardContent: React.FC<CarContent> = ({ boardData }) => {
                   >
                     <div className='flex items-center justify-between'>
                       <h4 className='mb-1 text-[14px]' style={{ color: colors.text }}>
-                        {cardlistData?.data[0].name}
+                        {activity.name}
                       </h4>
                     </div>
                     <div className='flex justify-between'>
@@ -141,12 +147,36 @@ const CardContent: React.FC<CarContent> = ({ boardData }) => {
                         </div>
                       </div>
                       <div className='mb-4 flex items-center justify-between'>
-                        <Avatar {...stringAvatar(activity.creator_email)} />
+                        <AvatarGroup
+                          max={5}
+                          sx={{
+                            marginRight: '5px',
+                            '& .MuiAvatar-root': {
+                              width: '24px',
+                              height: '24px',
+                              fontSize: '14px',
+                              padding: '2px',
+                              marginRight: '5px',
+                              border: 'none'
+                            },
+                            padding: '0'
+                          }}
+                        >
+                          {activity.watcher_email.map((infoUser, index) => {
+                            return (
+                              <Tooltip key={index} title={infoUser}>
+                                <Avatar {...stringAvatar(infoUser)} />
+                              </Tooltip>
+                            )
+                          })}
+                        </AvatarGroup>
                       </div>
                     </div>
 
                     <div className='relative -left-3 -top-0 flex'>
-                      <label className='text-[12px] font-bold text-white'>{boardData.name}:</label>
+                      <label className='text-[12px] font-bold text-white'>
+                        {boardData.name}:{activity.create_time}
+                      </label>
                       <h3 className='ml-[2px] text-[12px] text-white'> {workspaceData?.data.description}</h3>
                     </div>
                   </div>
@@ -161,7 +191,7 @@ const CardContent: React.FC<CarContent> = ({ boardData }) => {
                   <div className='flex h-[40px] w-[388px] content-between'>
                     <div className='mt-1 flex'>
                       <FaRegClock fontSize={20} className='mr-[5px]' />
-                      <span>Create at: {activity.create_time}</span>
+                      <span>Create at: {activity.created_at.toString()}</span>
                     </div>
                     <div className='ml-auto mt-1'>
                       <IoIosMore />

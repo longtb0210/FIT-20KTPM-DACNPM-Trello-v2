@@ -75,7 +75,6 @@ export default function AddMemberDialog({ open, handleCloseShare, workspaceId }:
   // Hàm xử lý khi nhấn nút Share
   const handleShare = () => {
     if (isValidEmail(emailInput)) {
-      console.log('email' + emailInput + ' wsp: ' + workspaceId)
       // Nếu là email hợp lệ, gọi hàm gọi API
       addMemberToWorkspace({
         id: workspaceId,

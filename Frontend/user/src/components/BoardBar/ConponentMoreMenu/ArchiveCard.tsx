@@ -4,7 +4,7 @@ import { Box, Divider, Drawer } from '@mui/material'
 import { IoMdClose } from 'react-icons/io'
 import { useTheme } from '~/components/Theme/themeContext'
 import Button from '@mui/material/Button'
-import { CardlistApiRTQ } from '~/api'
+import { CardApiRTQ, CardlistApiRTQ } from '~/api'
 import ArCard from './ArchiveCardUI'
 import { useParams } from 'react-router-dom'
 import { CardList } from '@trello-v2/shared/src/schemas/CardList'
@@ -31,17 +31,23 @@ const ArchivedItems: React.FC<Props> = ({ open, handleDrawerClose }) => {
   const { colors } = useTheme()
   const [getCardListArchiveByBoardId, { data: CardData }] =
     CardlistApiRTQ.CardListApiSlice.useLazyGetCardListArchiveByBoardIdQuery()
+  const [getCardArchiveByBoardId, { data: cardArchiveData }] =
+    CardApiRTQ.CardApiSlice.useLazyGetCardArchiveByBoardIdQuery()
   const [archiveItems, setArchiveItems] = useState<CardList[]>([])
   const [switchToLists, setSwitchToLists] = useState(true)
 
-  React.useEffect(() => {
-    setArchiveItems(CardData?.data as unknown as CardList[])
-  }, [CardData])
   React.useEffect(() => {
     if (boardId !== undefined) {
       getCardListArchiveByBoardId(boardId)
     }
   }, [boardId])
+
+  React.useEffect(() => {
+    if (boardId !== undefined) {
+      getCardArchiveByBoardId({ board_id: boardId })
+    }
+    setArchiveItems(CardData?.data as unknown as CardList[])
+  }, [CardData, cardArchiveData, open])
 
   const handleSwitchButtonClick = () => {
     setSwitchToLists((prev) => !prev)
@@ -113,50 +119,43 @@ const ArchivedItems: React.FC<Props> = ({ open, handleDrawerClose }) => {
         </div>
         {/* Content */}
         <Box sx={{ display: 'flex', flexDirection: 'column', marginTop: '10px' }}>
-          {archiveItems &&
-            archiveItems &&
-            (switchToLists ? (
-              archiveItems.map((cardList: any, index: number) => (
+          {switchToLists ? (
+            cardArchiveData &&
+            cardArchiveData.data &&
+            cardArchiveData.data &&
+            cardArchiveData.data.map((card: any, index: number) => (
+              <div key={index}>
+                <>
+                  {card && card.archive_at.toString() !== '1970-01-01T00:00:00.000Z' && (
+                    <ArCard
+                      card={card}
+                      switchToLists={switchToLists}
+                      boardId={boardId !== undefined ? boardId : ''}
+                      cardListId={card._id}
+                      key={card._id}
+                    />
+                  )}
+                </>
+              </div>
+            ))
+          ) : (
+            <div>
+              {/* Render cardlists here */}
+              {archiveItems.map((cardList: any, index: number) => (
                 <div key={index}>
-                  {cardList.cards && cardList.cards.length > 0 ? (
-                    cardList.cards.map((card: any) => (
-                      <>
-                        {card.archive_at && card.archive_at.toString() !== '1970-01-01T00:00:00.000Z' && (
-                          <ArCard
-                            card={card}
-                            switchToLists={switchToLists}
-                            boardId={boardId !== undefined ? boardId : ''}
-                            cardListId={cardList.id}
-                            key={card._id}
-                          />
-                        )}
-                      </>
-                    ))
-                  ) : (
-                    <div>No cards found in this list</div>
+                  {cardList.archive_at && cardList.archive_at.toString() !== '1970-01-01T00:00:00.000Z' && cardList && (
+                    <ArCard
+                      card={cardList}
+                      switchToLists={switchToLists}
+                      boardId={boardId !== undefined ? boardId : ''}
+                      key={cardList.id}
+                      cardListId={cardList._id}
+                    />
                   )}
                 </div>
-              ))
-            ) : (
-              <div>
-                {/* Render cardlists here */}
-                {archiveItems.map((cardList: any, index: number) => (
-                  <div key={index}>
-                    {cardList.archive_at &&
-                      cardList.archive_at.toString() !== '1970-01-01T00:00:00.000Z' &&
-                      cardList && (
-                        <ArCard
-                          card={cardList}
-                          switchToLists={switchToLists}
-                          boardId={boardId !== undefined ? boardId : ''}
-                          key={cardList.id}
-                          cardListId={cardList._id}
-                        />
-                      )}
-                  </div>
-                ))}
-              </div>
-            ))}
+              ))}
+            </div>
+          )}
         </Box>
       </Drawer>
     </div>

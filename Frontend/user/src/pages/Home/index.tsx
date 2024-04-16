@@ -18,7 +18,7 @@ export default function HomePage() {
   const [profile, setProFile] = React.useState({ email: '', name: '' })
 
   React.useEffect(() => {
-    getAllWorkspaceByEmail().then((a) => console.log(a))
+    getAllWorkspaceByEmail()
     const profileSave = storedProfile ? JSON.parse(storedProfile) : { email: '', name: '' }
     setProFile({ ...profileSave })
   }, [getAllWorkspaceByEmail])

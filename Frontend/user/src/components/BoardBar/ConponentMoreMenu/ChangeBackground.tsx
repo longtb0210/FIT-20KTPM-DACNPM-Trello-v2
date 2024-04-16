@@ -139,9 +139,8 @@ const ChangeBackground: React.FC<Props> = ({ open, handleDrawerClose }) => {
         // console.log('File đã được chọn:', file)
         //lưu file vào local
         if (boardId !== undefined && workspaceId !== undefined) {
-          addBackgroundById({ id: boardId, background: file }).then((response) => {
+          addBackgroundById({ id: boardId, background: file }).then(() => {
             // Xử lý response ở đây nếu cần
-            console.log(response)
             getBoardById(boardId)
             getAllBoard({ workspaceId: workspaceId })
           })

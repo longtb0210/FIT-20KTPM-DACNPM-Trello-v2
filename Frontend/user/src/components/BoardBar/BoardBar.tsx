@@ -356,16 +356,16 @@ function BoardBar() {
             }}
           >
             {boardMembers &&
-              boardMembers.map((infoUser) => {
+              boardMembers.map((infoUser, index) => {
                 if (infoUser !== undefined) {
                   return (
-                    <Tooltip title={infoUser.data.username}>
+                    <Tooltip key={index} title={infoUser.data.username}>
                       <Avatar {...stringAvatar(infoUser.data.username, '10px')} />
                     </Tooltip>
                   )
                 } else {
                   return (
-                    <Tooltip title='guest'>
+                    <Tooltip key={index} title='guest'>
                       <Avatar {...stringAvatar('Guest', '10px')} />
                     </Tooltip>
                   )
