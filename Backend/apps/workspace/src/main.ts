@@ -26,6 +26,8 @@ async function bootstrap() {
   initProtos(app, `${GRPC_HOST}:${GRPC_PORT}`, grpcPaths, ['trello.workspace', 'trello.auth'])
 
   await app.startAllMicroservices()
-  await app.listen(PORT, () => console.log(`workspace server http://localhost:${PORT}`))
+  await app.listen(PORT, () => {
+    console.log(`workspace server http://localhost:${PORT}`)
+  })
 }
 bootstrap()

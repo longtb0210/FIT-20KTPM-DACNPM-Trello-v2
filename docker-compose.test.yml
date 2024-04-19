@@ -14,9 +14,9 @@ services:
       - KEYCLOAK_REALM=trello
       - KEYCLOAK_CLIENT_ID=trello
       - KEYCLOAK_CLIENT_SECRET=${keycloak_client_secret}
-    ports:
-      - 3030:3000
-      - 3031:3001
+    # ports:
+    #   - 3030:3000
+    #   - 3031:3001
 
   nginx:
     image: nginx:stable-alpine3.17-slim

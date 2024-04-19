@@ -1,9 +1,10 @@
 import { AuthenticatedUser, Public } from 'nest-keycloak-connect'
+import * as os from 'os'
 
 import { UserInfoDto } from '@app/common/auth/user-info.dto'
 import { InjectController, InjectRoute } from '@app/common/decorators'
 import { IdParamValidationPipe, ZodValidationPipe } from '@app/common/pipes'
-import { Body, InternalServerErrorException, NotFoundException, Param } from '@nestjs/common'
+import { Body, Get, InternalServerErrorException, NotFoundException, Param } from '@nestjs/common'
 import { TrelloApi } from '@trello-v2/shared'
 
 import workspaceRoutes from '../workspace.routes'
@@ -14,6 +15,11 @@ import { WorkspaceService } from '../workspace.service'
 })
 export class WorkspaceController {
   constructor(private workspaceService: WorkspaceService) {}
+
+  @Get('hostname')
+  getHostname(): string {
+    return os.hostname()
+  }
 
   @InjectRoute(workspaceRoutes.getAll)
   @Public(false)
