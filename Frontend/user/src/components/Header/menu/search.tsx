@@ -112,19 +112,25 @@ const SearchMenu = () => {
                     marginTop: '8px',
                     transition: 'all 0.1s ease-in',
                     padding: '12px 0 6px 0',
-                    backgroundColor: colors.background,
+                    backgroundColor: colors.background_menu_header,
                     minWidth: '224px',
                     borderRadius: '4px'
                   }}
                 >
                   <Typography
                     variant='body1'
-                    sx={{ fontSize: '11px', fontWeight: 500, color: colors.text, margin: '0 18px 8px 18px' }}
+                    sx={{
+                      fontSize: '14px',
+                      textAlign: 'center',
+                      fontWeight: 500,
+                      color: colors.text,
+                      margin: '0 18px 8px 18px'
+                    }}
                   >
-                    RECENT BOARD
+                    Không có dữ liệu
                   </Typography>
 
-                  <Box
+                  {/* <Box
                     sx={{
                       display: 'flex',
                       alignItems: 'center',
@@ -278,7 +284,7 @@ const SearchMenu = () => {
                         </Typography>
                       </Box>
                     </Box>
-                  </Box>
+                  </Box> */}
                 </MenuList>
               </ClickAwayListener>
             </Paper>

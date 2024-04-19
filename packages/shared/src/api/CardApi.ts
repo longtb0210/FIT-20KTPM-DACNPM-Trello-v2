@@ -246,3 +246,49 @@ export const DeleteFeatureResponseSchema = z.object({
 });
 export type DeleteFeatureRequest = z.infer<typeof DeleteFeatureRequestSchema>;
 export type DeleteFeatureResponse = z.infer<typeof DeleteFeatureResponseSchema>;
+
+export const AddCardMemberRequestSchema = z.object({
+  cardlist_id: z.string(),
+  card_id: z.string(),
+  member_email: z.string(),
+});
+export const AddCardMemberResponseSchema = CardSchema.omit({
+  features: true,
+}).required({ _id: true });
+export type AddCardMemberRequest = z.infer<typeof AddCardMemberRequestSchema>;
+export type AddCardMemberResponse = z.infer<typeof AddCardMemberResponseSchema>;
+
+export const DeleteCardMemberRequestSchema = AddCardMemberRequestSchema;
+export const DeleteCardMemberResponseSchema = AddCardFeatureResponseSchema;
+export type DeleteCardMemberRequest = AddCardMemberRequest;
+export type DeleteCardMemberResponse = AddCardMemberResponse;
+
+export const MakeCommentSchemaRequestSchema = z.object({
+  card_id: z.string(),
+  cardlist_id: z.string(),
+  content: z.string(),
+});
+export type MakeCommentRequest = z.infer<typeof MakeCommentSchemaRequestSchema>;
+export const MakeCommentSchemaResponseSchema = z.object({
+  data: CardSchema,
+});
+export type MakeCommentResponse = z.infer<
+  typeof MakeCommentSchemaResponseSchema
+>;
+
+export const GetAllArchivedCardInBoardRequestSchema = z.object({
+  board_id: z.string(),
+});
+export type getAllArchivedCardInBoardRequest = z.infer<
+  typeof GetAllArchivedCardInBoardRequestSchema
+>;
+
+export const GetAllArchivedCardInBoardResponseSchema = z.object({
+  data: CardSchema.pick({ archive_at: true, _id: true, name: true })
+    .required({ _id: true })
+    .merge(z.object({ cardlist_id: z.string() }))
+    .array(),
+});
+export type GetAllArchivedCardInBoardResponse = z.infer<
+  typeof GetAllArchivedCardInBoardResponseSchema
+>;

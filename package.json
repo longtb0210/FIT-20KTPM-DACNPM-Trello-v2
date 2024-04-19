@@ -17,9 +17,12 @@
     "Backend",
     "Frontend/admin",
     "Frontend/user",
-    "packages/shared"
+    "packages/shared",
+    "Frontend/react_server"
   ],
-  "dependencies": {},
+  "dependencies": {
+    "keycloak-js": "^24.0.2"
+  },
   "devDependencies": {
     "@rollup/plugin-commonjs": "^25.0.7",
     "rimraf": "^5.0.5"

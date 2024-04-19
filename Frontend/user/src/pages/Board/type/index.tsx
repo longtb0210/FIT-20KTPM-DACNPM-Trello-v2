@@ -14,15 +14,6 @@ export type List = Omit<DbSchemas.CardlistSchema.CardList, 'cards' | '_id'> & {
   cards: Card[]
   _id: string
 }
-// export interface Card {
-//   id: string
-//   list_id: string
-//   order: number
-//   name: string
-//   list_name: string
-//   watcher_email: Array<string>
-//   placeHolder: boolean
-// }
 export const defaultCard = {
   _id: '',
   list_id: '',
@@ -31,7 +22,7 @@ export const defaultCard = {
   cover: '',
   description: '',
   watcher_email: ['email1', 'email2'],
-  archive_at: generateRandomDateOrNull(),
+  archive_at: null,
   activities: [
     {
       workspace_id: 'workspace1',
@@ -55,13 +46,7 @@ export interface CardComponentProps {
   cardSelected: (card: Card) => void | undefined
   setOpenCardSetting: (data: string) => void
 }
-// export interface List {
-//   _id: string
-//   board_id: number
-//   index: number
-//   name: string
-//   data: Array<Card>
-// }
+
 export interface ListComponentProps {
   list: List
   index: number

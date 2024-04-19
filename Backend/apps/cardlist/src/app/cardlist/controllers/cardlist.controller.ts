@@ -158,6 +158,26 @@ export class CardlistController {
       data: data,
     }
   }
+  @InjectRoute(CardlistRoutes.moveCardlistInBoard)
+  async moveCardlistInBoard(
+    @Body(new ZodValidationPipe(TrelloApi.CardlistApi.MoveCardlistInBoardRequestSchema))
+    body: TrelloApi.CardlistApi.MoveCardlistInBoardRequest,
+  ): Promise<TrelloApi.CardlistApi.MoveCardlistInBoardResponse> {
+    const data = await this.cardlistService.moveCardlistInBoard(body)
+    return {
+      data: data,
+    }
+  }
+  @InjectRoute(CardlistRoutes.moveAllCards)
+  async moveAllCards(
+    @Body(new ZodValidationPipe(TrelloApi.CardlistApi.MoveAllCardsRequestSchema))
+    body: TrelloApi.CardlistApi.MoveAllCardsRequest,
+  ): Promise<TrelloApi.CardlistApi.MoveAllCardsResponse> {
+    const data = await this.cardlistService.moveAllCards(body)
+    return {
+      data: data,
+    }
+  }
 
   @InjectRoute(CardlistRoutes.archiveCardsInList)
   async archiveCardsInList(
@@ -185,6 +205,17 @@ export class CardlistController {
     body: TrelloApi.CardlistApi.AddWatcherRequest,
   ): Promise<TrelloApi.CardlistApi.AddWatcherResponse> {
     const data = await this.cardlistService.addWatcher(body)
+    return {
+      data: data,
+    }
+  }
+
+  @InjectRoute(CardlistRoutes.removeWatcher)
+  async removeWatcher(
+    @Body(new ZodValidationPipe(TrelloApi.CardlistApi.RemoveWatcherRequestSchema))
+    body: TrelloApi.CardlistApi.RemoveWatcherRequest,
+  ): Promise<TrelloApi.CardlistApi.RemoveWatcherResponse> {
+    const data = await this.cardlistService.removeWatcher(body)
     return {
       data: data,
     }

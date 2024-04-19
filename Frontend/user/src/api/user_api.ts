@@ -1,17 +1,27 @@
 import { createApi, fetchBaseQuery } from '@reduxjs/toolkit/query/react'
 import { TrelloApi } from '@trello-v2/shared'
-
-import { token } from './getInfo'
+import { RootState } from '~/store'
 
 const UserApiSlice = createApi({
   reducerPath: 'UserdApi',
   baseQuery: fetchBaseQuery({
     baseUrl: import.meta.env.VITE_URL_API,
-    headers: {
-      Authorization: `Bearer ${token}`
+    prepareHeaders: (headers, { getState }) => {
+      const token = (getState() as RootState).KC_TOKEN?.acessToken
+
+      if (token) {
+        headers.set('authorization', `Bearer ${token}`)
+      }
+      return headers
     }
   }),
   endpoints: (builder) => ({
+    getUser: builder.mutation<TrelloApi.UserApi.GetUserResponse, void>({
+      query: () => ({
+        url: `/api/user`,
+        method: 'GET'
+      })
+    }),
     updateUser: builder.mutation<TrelloApi.UserApi.UpdateUserResponse, TrelloApi.UserApi.UpdateUserRequest>({
       query: (data) => ({
         url: `/api/user/${data.email}`,
@@ -27,7 +37,7 @@ const UserApiSlice = createApi({
     }),
     getActivities: builder.query<TrelloApi.UserApi.GetallActivitiesResponse, { email: string }>({
       query: ({ email }) => ({
-        url: `/api/user/${email}`,
+        url: `/api/activity/${email}`,
         method: 'GET'
       })
     }),
@@ -40,10 +50,7 @@ const UserApiSlice = createApi({
     getUserById: builder.query<TrelloApi.UserApi.GetUserResponse, string>({
       query: (email_name) => ({
         url: `/api/user/${email_name}`,
-        method: 'GET',
-        headers: {
-          Authorization: `Bearer ${token}`
-        }
+        method: 'GET'
       })
     })
   })

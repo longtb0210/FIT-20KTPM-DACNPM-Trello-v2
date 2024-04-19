@@ -4,15 +4,158 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { faChevronDown, faStar as starFull } from '@fortawesome/free-solid-svg-icons'
 import noneStar from '~/assets/noneStar.svg'
 import { useTheme } from './../../Theme/themeContext'
+import { BoardApiRTQ, WorkspaceApiRTQ } from '~/api'
+import { Link } from 'react-router-dom'
 
-const length = 3
+interface Board {
+  name: string
+  workspace_id: string
+  background: string
+  background_list: string[]
+  activities: {
+    workspace_id: string
+    content: string
+    create_time: Date
+    creator_email: string
+    _id?: string | undefined
+    board_id?: string | undefined
+    cardlist_id?: string | undefined
+    card_id?: string | undefined
+  }[]
+  _id?: string | undefined
+  workspace_name: string
+  is_star: boolean
+}
 
 export default function Starred() {
   const [open, setOpen] = React.useState(false)
-  const [isHoveredStar, setIsHoveredStar] = React.useState(false)
-  const [star, setStar] = React.useState(true)
   const anchorRef = React.useRef<HTMLButtonElement>(null)
   const { colors } = useTheme()
+  const [getAllBoardById] = BoardApiRTQ.BoardApiSlice.useLazyGetBoardsByWorkspaceIDQuery()
+  const [getAllWorkspace, { data: dataWorkspace }] = WorkspaceApiRTQ.WorkspaceApiSlice.useLazyGetAllWorkspaceQuery()
+  const [editBoardByIdAPI] = BoardApiRTQ.BoardApiSlice.useEditBoardByIdMutation()
+  const [listBoard, setListBoard] = React.useState<Board[]>([])
+
+  React.useEffect(() => {
+    getAllWorkspace()
+  }, [getAllWorkspace])
+
+  React.useEffect(() => {
+    dataWorkspace?.data.owner.forEach(async (item) => {
+      try {
+        if (item?._id !== undefined) {
+          const res = await getAllBoardById({ workspace_id: item._id })
+          const responseData = res.data
+          const workspaceName = item.name
+
+          if (responseData && responseData.data) {
+            const boardsWithWorkspaceName = responseData.data.map((board) => ({
+              ...board,
+              workspace_name: workspaceName
+            })) as Partial<Board>[]
+
+            const updatedBoards: Board[] = boardsWithWorkspaceName.map((board) => ({
+              name: board.name ?? '',
+              workspace_id: board.workspace_id ?? '',
+              background: board.background ?? '',
+              background_list: board.background_list ?? [],
+              activities: board.activities ?? [],
+              _id: board._id ?? '',
+              workspace_name: board.workspace_name ?? '',
+              is_star: board.is_star ?? false
+            }))
+
+            setListBoard((prevList) => [...prevList, ...updatedBoards.filter((board) => board?.is_star)])
+          }
+        }
+      } catch (error) {
+        console.error('Error fetching boards:', error)
+      }
+    })
+
+    dataWorkspace?.data.admin.forEach(async (item) => {
+      try {
+        if (item?._id !== undefined) {
+          const res = await getAllBoardById({ workspace_id: item._id })
+          const responseData = res.data
+          const workspaceName = item.name
+
+          if (responseData && responseData.data) {
+            const boardsWithWorkspaceName = responseData.data.map((board) => ({
+              ...board,
+              workspace_name: workspaceName
+            })) as Partial<Board>[]
+
+            const updatedBoards: Board[] = boardsWithWorkspaceName.map((board) => ({
+              name: board.name ?? '',
+              workspace_id: board.workspace_id ?? '',
+              background: board.background ?? '',
+              background_list: board.background_list ?? [],
+              activities: board.activities ?? [],
+              _id: board._id ?? '',
+              workspace_name: board.workspace_name ?? '',
+              is_star: board.is_star ?? false
+            }))
+
+            setListBoard((prevList) => [...prevList, ...updatedBoards.filter((board) => board?.is_star)])
+          }
+        }
+      } catch (error) {
+        console.error('Error fetching boards:', error)
+      }
+    })
+
+    dataWorkspace?.data.member.forEach(async (item) => {
+      try {
+        if (item?._id !== undefined) {
+          const res = await getAllBoardById({ workspace_id: item._id })
+          const responseData = res.data
+          const workspaceName = item.name
+
+          if (responseData && responseData.data) {
+            const boardsWithWorkspaceName = responseData.data.map((board) => ({
+              ...board,
+              workspace_name: workspaceName
+            })) as Partial<Board>[]
+
+            const updatedBoards: Board[] = boardsWithWorkspaceName.map((board) => ({
+              name: board.name ?? '',
+              workspace_id: board.workspace_id ?? '',
+              background: board.background ?? '',
+              background_list: board.background_list ?? [],
+              activities: board.activities ?? [],
+              _id: board._id ?? '',
+              workspace_name: board.workspace_name ?? '',
+              is_star: board.is_star ?? false
+            }))
+
+            setListBoard((prevList) => [...prevList, ...updatedBoards.filter((board) => board?.is_star)])
+          }
+        }
+      } catch (error) {
+        console.error('Error fetching boards:', error)
+      }
+    })
+
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [dataWorkspace, getAllBoardById, getAllWorkspace])
+
+  const updateStar = (index: number) => {
+    const boardId = listBoard && listBoard[index] ? listBoard[index]._id : undefined
+
+    if (boardId) {
+      editBoardByIdAPI({
+        _id: boardId,
+        is_star: false
+      })
+        .then(() => {
+          setListBoard((prevList) => prevList.filter((board, i) => i !== index))
+        })
+        .catch((error) => {
+          console.error('Error updating board:', error)
+        })
+    }
+  }
 
   const handleToggle = () => {
     setOpen((prevOpen) => !prevOpen)
@@ -101,7 +244,7 @@ export default function Starred() {
                       borderRadius: '4px'
                     }}
                   >
-                    {length !== 3 ? (
+                    {listBoard && listBoard?.length === 0 ? (
                       <Box>
                         <img src={noneStar} alt='' style={{ backgroundSize: 'cover', width: '100%' }} />
 
@@ -113,64 +256,74 @@ export default function Starred() {
                         </Typography>
                       </Box>
                     ) : (
-                      <Box
-                        sx={{
-                          display: 'flex',
-                          alignItems: 'center',
-                          justifyContent: 'space-between',
-                          padding: '4px',
-                          cursor: 'pointer',
-                          '&:hover': {
-                            backgroundColor:
-                              colors.background === '#ffffff' ? `rgba(0,0,0,0.1)` : `rgba(255,255,255,0.1)`,
-                            borderRadius: '4px'
-                          }
-                        }}
-                      >
-                        <Box sx={{ display: 'flex', alignItems: 'center' }}>
+                      listBoard?.map((board, index) => (
+                        <Link
+                          key={index}
+                          to={`workspace/${board.workspace_id}/board/${board._id}`}
+                          onClick={() => setOpen(false)}
+                        >
                           <Box
                             sx={{
-                              backgroundImage:
-                                'url("https://trello-backgrounds.s3.amazonaws.com/SharedBackground/480x320/69360d5ef9e7535cda824ab868bb1628/photo-1708058885492-09ef26cd4af8.jpg")',
-                              backgroundSize: 'cover',
-                              backgroundPosition: 'center',
-                              width: '40px',
-                              height: '32px',
-                              borderRadius: '4px'
+                              display: 'flex',
+                              alignItems: 'center',
+                              justifyContent: 'space-between',
+                              padding: '4px',
+                              cursor: 'pointer',
+                              '&:hover': {
+                                backgroundColor:
+                                  colors.background === '#ffffff' ? `rgba(0,0,0,0.1)` : `rgba(255,255,255,0.1)`,
+                                borderRadius: '4px'
+                              }
                             }}
-                          ></Box>
+                          >
+                            <Box sx={{ display: 'flex', alignItems: 'center' }}>
+                              <Box
+                                sx={{
+                                  backgroundImage:
+                                    board.background.charAt(0) === 'h'
+                                      ? `url("${board.background}")`
+                                      : board.background,
+                                  backgroundSize: 'cover',
+                                  backgroundPosition: 'center',
+                                  width: '40px',
+                                  height: '32px',
+                                  borderRadius: '4px'
+                                }}
+                              ></Box>
 
-                          <Box sx={{ display: 'flex', flexDirection: 'column' }}>
-                            <Typography
-                              variant='body1'
-                              sx={{ fontSize: '14px', fontWeight: 600, color: colors.text, marginLeft: '12px' }}
-                            >
-                              front-end
-                            </Typography>
-                            <Typography
-                              variant='body1'
-                              sx={{ fontSize: '12px', color: colors.text, marginLeft: '12px' }}
-                            >
-                              Trello Workspaces
-                            </Typography>
+                              <Box sx={{ display: 'flex', flexDirection: 'column' }}>
+                                <Typography
+                                  variant='body1'
+                                  sx={{ fontSize: '14px', fontWeight: 600, color: colors.text, marginLeft: '12px' }}
+                                >
+                                  {board.name}
+                                </Typography>
+                                <Typography
+                                  variant='body1'
+                                  sx={{ fontSize: '12px', color: colors.text, marginLeft: '12px' }}
+                                >
+                                  {board.workspace_name}
+                                </Typography>
+                              </Box>
+                            </Box>
+
+                            <FontAwesomeIcon
+                              onClick={(event) => {
+                                event.stopPropagation()
+                                event.preventDefault()
+                                updateStar(index)
+                              }}
+                              icon={starFull}
+                              style={{
+                                color: 'orange',
+                                marginRight: '8px',
+                                fontSize: '16px',
+                                transition: 'all 0.1s ease-in'
+                              }}
+                            />
                           </Box>
-                        </Box>
-
-                        {star && (
-                          <FontAwesomeIcon
-                            icon={starFull}
-                            style={{
-                              color: 'yellow',
-                              marginRight: '8px',
-                              fontSize: isHoveredStar ? '16px' : '14px',
-                              transition: 'all 0.1s ease-in'
-                            }}
-                            onMouseEnter={() => setIsHoveredStar(true)}
-                            onMouseLeave={() => setIsHoveredStar(false)}
-                            onClick={() => setStar(false)}
-                          />
-                        )}
-                      </Box>
+                        </Link>
+                      ))
                     )}
                   </MenuList>
                 </ClickAwayListener>

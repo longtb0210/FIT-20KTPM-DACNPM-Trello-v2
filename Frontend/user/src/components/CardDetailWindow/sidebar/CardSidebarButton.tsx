@@ -9,13 +9,15 @@ import {
   faGripLines,
   faArrowRight,
   faCopy,
-  faBoxArchive
+  faBoxArchive,
+  faRotateLeft
 } from '@fortawesome/free-solid-svg-icons'
 import { Box } from '@mui/material'
 import { useTheme } from '~/components/Theme/themeContext'
 
 // eslint-disable-next-line react-refresh/only-export-components
 export enum ButtonType {
+  Join = 'Join',
   Members = 'Members',
   Labels = 'Labels',
   Checklists = 'Checklists',
@@ -24,11 +26,13 @@ export enum ButtonType {
   CustomFields = 'Custom Fields',
   Move = 'Move',
   Copy = 'Copy',
-  Archive = 'Archive'
+  Archive = 'Archive',
+  UnArchive = 'Send to board'
 }
 
 // eslint-disable-next-line react-refresh/only-export-components
 export const buttonTypeIconMap: Record<ButtonType, IconProp> = {
+  Join: faUser,
   Members: faUser,
   Labels: faTag,
   Checklists: faSquareCheck,
@@ -37,7 +41,8 @@ export const buttonTypeIconMap: Record<ButtonType, IconProp> = {
   'Custom Fields': faGripLines,
   Move: faArrowRight,
   Copy: faCopy,
-  Archive: faBoxArchive
+  Archive: faBoxArchive,
+  'Send to board': faRotateLeft
 }
 
 interface SidebarButtonProps {

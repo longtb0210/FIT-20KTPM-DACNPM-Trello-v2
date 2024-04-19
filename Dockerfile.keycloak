@@ -1,0 +1,7 @@
+FROM alpine/curl:8.5.0 as digicert
+
+WORKDIR /app
+RUN curl https://dl.cacerts.digicert.com/DigiCertGlobalRootCA.crt.pem -o DigiCertGlobalRootCA.crt.pem
+
+FROM keycloak/keycloak:24.0
+COPY --from=digicert /app/DigiCertGlobalRootCA.crt.pem /opt/keycloak/.postgresql/root.crt

@@ -86,15 +86,6 @@ describe('CardlistController', () => {
     azp: '',
     session_state: '',
     acr: '',
-    'allowed-origins': [],
-    realm_access: {
-      roles: [],
-    },
-    resource_access: {
-      account: {
-        roles: [],
-      },
-    },
     scope: '',
     sid: '',
     email_verified: false,
@@ -437,10 +428,11 @@ describe('CardlistController', () => {
       const mockRequest: TrelloApi.CardlistApi.AddCardToListRequest = {
         name: 'Card AXC',
         index: 0,
-        watcher_email: [],
+        member_email: [],
         cover: 'string',
         description: 'string',
         cardlist_id: '660a78f3f0ab0c0a48462940',
+        watcher_email: [],
       }
 
       // const mockResponse: TrelloApi.CardlistApi.AddCardToListResponse = {

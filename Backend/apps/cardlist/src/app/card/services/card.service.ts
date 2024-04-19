@@ -16,15 +16,23 @@ export class CardService {
     return cardlist ? cardlist.toJSON() : null
   }
 
-  async createCard(data: TrelloApi.CardApi.CreateCardRequest) {
+  async createCard(data: TrelloApi.CardApi.CreateCardRequest, creator_email: string) {
     const cardlist = await this.CardlistMModel.findById(data.cardlist_id)
     if (!cardlist) return null
     cardlist.cards.push({
       name: data.name,
       index: data.index,
       watcher_email: [],
-      activities: [],
+      activities: [
+        {
+          workspace_id: 'workspace_id',
+          content: `<b>${creator_email}</b> has created <b>${data.name}</b> card`,
+          create_time: new Date(),
+          creator_email: creator_email,
+        },
+      ],
       features: [],
+      member_email: [],
       created_at: new Date(),
     })
     await cardlist.save()
@@ -41,16 +49,25 @@ export class CardService {
     return cardlistJson && cardlistJson.cards.length >= 0 ? cardlistJson.cards[0] : null
   }
 
-  async updateCardDetail(data: TrelloApi.CardApi.UpdateCardDetailRequest) {
+  async updateCardDetail(data: TrelloApi.CardApi.UpdateCardDetailRequest, creator_email: string) {
     const res = await this.CardlistMModel.findOneAndUpdate(
       {
         _id: data.cardlist_id,
         cards: { $elemMatch: { _id: data.card_id } },
       },
       {
+        $push: {
+          'cards.$.activities': {
+            workspace_id: 'workspace_id',
+            content: `<b>${creator_email}</b> has update the card`,
+            create_time: new Date(),
+            creator_email: creator_email,
+          },
+        },
         $set: {
           ...(data.name ? { 'cards.$.name': data.name } : {}),
           ...(data.cover ? { 'cards.$.cover': data.cover } : {}),
+          ...(data.description ? { 'cards.$.description': data.description } : {}),
         },
       },
       { new: true },
@@ -60,7 +77,7 @@ export class CardService {
     return newCard ? newCard : null
   }
 
-  async addFeatureToCard(data: TrelloApi.CardApi.AddCardFeatureRequest) {
+  async addFeatureToCard(data: TrelloApi.CardApi.AddCardFeatureRequest, creator_email: string) {
     const res = await this.CardlistMModel.findOneAndUpdate(
       {
         _id: data.cardlist_id,
@@ -68,6 +85,12 @@ export class CardService {
       },
       {
         $push: {
+          'cards.$.activities': {
+            workspace_id: 'workspace_id',
+            content: `<b>${creator_email}</b> has add ${data.feature.type} to card`,
+            create_time: new Date(),
+            creator_email: creator_email,
+          },
           'cards.$.features': data.feature,
         },
       },
@@ -77,7 +100,7 @@ export class CardService {
     return newCard ? newCard.features[newCard.features.length - 1] : null
   }
 
-  async updateFeatureOfCard(data: TrelloApi.CardApi.UpdateCardFeatureRequest) {
+  async updateFeatureOfCard(data: TrelloApi.CardApi.UpdateCardFeatureRequest, creator_email: string) {
     const res = await this.CardlistMModel.findOneAndUpdate(
       {
         _id: data.cardlist_id,
@@ -88,6 +111,14 @@ export class CardService {
         },
       },
       {
+        $push: {
+          'cards.$[i].activities': {
+            workspace_id: 'workspace_id',
+            content: `<b>${creator_email}</b> has update ${data.feature.type} of card`,
+            create_time: new Date(),
+            creator_email: creator_email,
+          },
+        },
         $set: {
           'cards.$[i].features.$[j]': { ...data.feature },
         },
@@ -104,14 +135,22 @@ export class CardService {
     return feature
   }
 
-  async addWatcherToCard(data: TrelloApi.CardApi.AddWatcherToCardRequest) {
+  async addWatcherToCard(data: TrelloApi.CardApi.AddWatcherToCardRequest, creator_email: string) {
     const res = await this.CardlistMModel.findOneAndUpdate(
       {
         _id: data.cardlist_id,
         cards: { $elemMatch: { _id: data.card_id } },
       },
       {
-        $push: { 'cards.$.watcher_email': data.watcher_email },
+        $push: {
+          'cards.$.watcher_email': data.watcher_email,
+          'cards.$.activities': {
+            workspace_id: 'workspace_id',
+            content: `<b>${creator_email}</b> has add ${data.watcher_email} to card`,
+            create_time: new Date(),
+            creator_email: creator_email,
+          },
+        },
       },
       { new: true, fields: { 'cards.features': 0, 'cards.activities': 0 } },
     )
@@ -119,13 +158,21 @@ export class CardService {
     return card ? card : null
   }
 
-  async deleteWatcherFromCard(data: TrelloApi.CardApi.DeleteWatcherToCardRequest) {
+  async deleteWatcherFromCard(data: TrelloApi.CardApi.DeleteWatcherToCardRequest, creator_email: string) {
     const res = await this.CardlistMModel.findOneAndUpdate(
       {
         _id: data.cardlist_id,
         cards: { $elemMatch: { _id: data.card_id } },
       },
       {
+        $push: {
+          'cards.$.activities': {
+            workspace_id: 'workspace_id',
+            content: `<b>${creator_email}</b> has remove ${data.watcher_email} from card`,
+            create_time: new Date(),
+            creator_email: creator_email,
+          },
+        },
         $pullAll: {
           'cards.$.watcher_email': [data.watcher_email],
         },
@@ -136,26 +183,46 @@ export class CardService {
     return card ? card : null
   }
 
-  async archiveCard(data: TrelloApi.CardApi.ArchiveCardRequest) {
+  async archiveCard(data: TrelloApi.CardApi.ArchiveCardRequest, creator_email: string) {
     const res = await this.CardlistMModel.findOneAndUpdate(
       {
         _id: data.cardlist_id,
         cards: { $elemMatch: { _id: data.card_id } },
       },
-      { $set: { 'cards.$.archive_at': new Date().toISOString(), index: null } },
+      {
+        $set: { 'cards.$.archive_at': new Date().toISOString() },
+        $push: {
+          'cards.$.activities': {
+            workspace_id: 'workspace_id',
+            content: `<b>${creator_email}</b> has archive card`,
+            create_time: new Date(),
+            creator_email: creator_email,
+          },
+        },
+      },
       { new: true, fields: { 'cards.features': 0, 'cards.activities': 0 } },
     )
     const card = res?.toJSON().cards.find((e) => e._id?.toString() === data.card_id)
     return card ? card : null
   }
 
-  async unArchiveCard(data: TrelloApi.CardApi.UnArchiveCardRequest) {
+  async unArchiveCard(data: TrelloApi.CardApi.UnArchiveCardRequest, creator_email: string) {
     const res = await this.CardlistMModel.findOneAndUpdate(
       {
         _id: data.cardlist_id,
         cards: { $elemMatch: { _id: data.card_id } },
       },
-      { $unset: { 'cards.$.archive_at': 1 } },
+      {
+        $unset: { 'cards.$.archive_at': 1 },
+        $push: {
+          'cards.$.activities': {
+            workspace_id: 'workspace_id',
+            content: `<b>${creator_email}</b> has unarchive card`,
+            create_time: new Date(),
+            creator_email: creator_email,
+          },
+        },
+      },
       { new: true, fields: { 'cards.features': 0, 'cards.activities': 0 } },
     )
     const card = res?.toJSON().cards.find((e) => e._id?.toString() === data.card_id)
@@ -239,7 +306,7 @@ export class CardService {
     return lists.map((c) => c.toJSON())
   }
 
-  async deleteFeature(data: TrelloApi.CardApi.DeleteFeatureRequest) {
+  async deleteFeature(data: TrelloApi.CardApi.DeleteFeatureRequest, creator_email: string) {
     const res = await this.CardlistMModel.findOneAndUpdate(
       {
         _id: data.cardlist_id,
@@ -250,6 +317,14 @@ export class CardService {
         },
       },
       {
+        $push: {
+          'cards.$[i].activities': {
+            workspace_id: 'workspace_id',
+            content: `<b>${creator_email}</b> has delete a feature`,
+            create_time: new Date(),
+            creator_email: creator_email,
+          },
+        },
         $pull: {
           'cards.$[i].features': { _id: data.feature_id },
         },
@@ -260,5 +335,108 @@ export class CardService {
       },
     )
     return res.toJSON().cards.find((c) => data.card_id === c._id.toString())
+  }
+
+  async addMemberToCard(creator_email: string, data: TrelloApi.CardApi.AddCardMemberRequest) {
+    const res = await this.CardlistMModel.findOneAndUpdate(
+      {
+        _id: data.cardlist_id,
+        cards: { $elemMatch: { _id: data.card_id } },
+      },
+      {
+        $push: {
+          'cards.$.member_email': data.member_email,
+          'cards.$.activities': {
+            workspace_id: 'workspace_id',
+            content: `<b>${creator_email}</b> has add ${data.member_email} to card`,
+            create_time: new Date(),
+            creator_email: creator_email,
+          },
+        },
+      },
+      { new: true, fields: { 'cards.features': 0 } },
+    )
+    const cardIdx = res.cards.findIndex((e) => e._id?.toString() === data.card_id)
+    if (cardIdx < 0) return null
+    res.cards[cardIdx].activities.push({
+      content: `<b>${creator_email}</b> has add <b>${data.member_email}</b> to ${res.cards[cardIdx].name} card`,
+      create_time: new Date(),
+      creator_email: creator_email,
+      workspace_id: 'id',
+    })
+    res.save()
+    return res.toJSON().cards[cardIdx]
+  }
+
+  async deleteMemberToCard(data: TrelloApi.CardApi.DeleteCardMemberRequest) {
+    const res = await this.CardlistMModel.findOneAndUpdate(
+      {
+        _id: data.cardlist_id,
+        cards: { $elemMatch: { _id: data.card_id } },
+      },
+      {
+        $pullAll: {
+          'cards.$.member_email': [data.member_email],
+        },
+      },
+      { new: true, fields: { 'cards.features': 0 } },
+    )
+    const card = res?.toJSON().cards.find((e) => e._id?.toString() === data.card_id)
+    return card ? card : null
+  }
+
+  async commentCard(data: TrelloApi.CardApi.MakeCommentRequest, creator_email: string) {
+    const res = await this.CardlistMModel.findOneAndUpdate(
+      {
+        _id: data.cardlist_id,
+        cards: { $elemMatch: { _id: data.card_id } },
+      },
+      {
+        $push: {
+          'cards.$.activities': {
+            workspace_id: 'workspace_id',
+            content: `<b>${creator_email}</b>: ${data.content}`,
+            create_time: new Date(),
+            creator_email: creator_email,
+            is_comment: true,
+          },
+        },
+      },
+      { new: true },
+    ).exec()
+    const newCard = res?.toJSON().cards.find((e) => e._id?.toString() === data.card_id)
+    return newCard
+  }
+
+  async getAllArchiveCardInBoard(
+    data: TrelloApi.CardApi.getAllArchivedCardInBoardRequest,
+  ): Promise<TrelloApi.CardApi.GetAllArchivedCardInBoardResponse> {
+    const lists = await this.CardlistMModel.find(
+      {
+        board_id: data.board_id,
+        cards: { $elemMatch: { archive_at: { $exists: true } } },
+      },
+      {
+        board_id: 0,
+        name: 0,
+        archive_at: 0,
+        created_at: 0,
+        watcher_email: 0,
+        'cards.activities': 0,
+        'cards.features': 0,
+        'cards.description': 0,
+        'cards.watcher_email': 0,
+        'cards.member_email': 0,
+      },
+    ).lean()
+    return {
+      data: lists.reduce(
+        (prev, cur) => {
+          prev.push(...cur.cards.filter((e) => e.archive_at).map((e) => ({ ...e, _id: e._id, cardlist_id: cur._id })))
+          return prev
+        },
+        [] as TrelloApi.CardApi.GetAllArchivedCardInBoardResponse['data'],
+      ),
+    }
   }
 }

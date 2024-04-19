@@ -19,6 +19,16 @@ export const Profile: React.FC<ProfileProps> = ({ userInfo, handleUpdateProfile 
   const [username, setUsername] = useState<string>() // State for username input
   const [bio, setBio] = useState<string>() // State for bio input
   const [updateProfile] = UserApiRTQ.UserApiSlice.useUpdateUserMutation()
+
+  const [profile, setProfile] = React.useState({ email: '', name: '' })
+
+  const storedProfile = localStorage.getItem('profile')
+
+  useEffect(() => {
+    const profileSave = storedProfile ? JSON.parse(storedProfile) : { email: '', name: '' }
+    setProfile({ ...profileSave })
+  }, [profile.email, storedProfile])
+
   useEffect(() => {
     setSelectedOption('Instantly')
   }, [])
@@ -38,8 +48,8 @@ export const Profile: React.FC<ProfileProps> = ({ userInfo, handleUpdateProfile 
   const handleSave = () => {
     // Call the API to update user info with updated username and bio
     const data = {
-      email: userInfo?.email || '',
-      username: username || userInfo?.username || '',
+      email: profile.email,
+      username: username ? username.trim() : '',
       bio: bio || userInfo?.bio || '',
       avatar: userInfo?.avatar || '',
       activities: userInfo?.activities || [], // Ensure activities is always an array

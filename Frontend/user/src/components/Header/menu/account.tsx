@@ -1,14 +1,22 @@
 import * as React from 'react'
-import { Box, ClickAwayListener, Grow, Paper, Popper, MenuList, Stack, Typography } from '@mui/material'
+import { Box, ClickAwayListener, Grow, Paper, Popper, MenuList, Stack, Typography, Avatar } from '@mui/material'
 import { Link } from 'react-router-dom'
 import { useTheme } from './../../Theme/themeContext'
 import { AuthContext } from '~/components/AuthProvider/AuthProvider'
+import { stringAvatar } from '~/utils/StringAvatar'
 
 export default function Account() {
   const [open, setOpen] = React.useState(false)
+  const [profile, setProfile] = React.useState({ email: '', name: '' })
   const anchorRef = React.useRef<HTMLButtonElement>(null)
   const { darkMode, toggleDarkMode, colors } = useTheme()
   const authContext = React.useContext(AuthContext)
+
+  const storedProfile = localStorage.getItem('profile')
+  React.useEffect(() => {
+    const profileSave = storedProfile ? JSON.parse(storedProfile) : { email: '', name: '' }
+    setProfile({ ...profileSave })
+  }, [storedProfile])
 
   const handleToggle = () => {
     setOpen((prevOpen) => !prevOpen)
@@ -67,19 +75,7 @@ export default function Account() {
             cursor: 'pointer'
           }}
         >
-          <Box
-            sx={{
-              padding: '4px',
-              fontSize: '10px',
-              lineHeight: '13px',
-              fontWeight: 600,
-              color: '#fff',
-              backgroundColor: '#172b4d',
-              borderRadius: '50%'
-            }}
-          >
-            HT
-          </Box>
+          <Avatar {...stringAvatar(profile.name, '9px', 22, 22)} className={`font-bold`} />
         </Box>
 
         <Popper
@@ -108,7 +104,7 @@ export default function Account() {
                       marginTop: '8px',
                       transition: 'all 0.1s ease-in',
                       padding: '12px 0 6px 0',
-                      backgroundColor: colors.background,
+                      backgroundColor: colors.background_menu_header,
                       minWidth: '224px',
                       borderRadius: '4px'
                     }}
@@ -122,28 +118,14 @@ export default function Account() {
                           padding: '0 20px'
                         }}
                       >
-                        <Typography
-                          variant='h4'
-                          sx={{
-                            display: 'inline-block',
-                            fontSize: '14px',
-                            lineHeight: '22px',
-                            color: '#fff',
-                            fontWeight: 700,
-                            padding: '8px 10px',
-                            borderRadius: '50%',
-                            backgroundImage: 'linear-gradient(to bottom, #E774BB, #943D73)'
-                          }}
-                        >
-                          HT
-                        </Typography>
+                        <Avatar {...stringAvatar(profile.name, '14px', 44, 44)} className={`font-bold`} />
 
                         <Box sx={{ display: 'flex', flexDirection: 'column' }}>
                           <Typography variant='body1' sx={{ fontSize: '14px', color: colors.text, marginLeft: '12px' }}>
-                            Hữu Chính Trần
+                            {profile.name}
                           </Typography>
                           <Typography variant='body1' sx={{ fontSize: '12px', color: colors.text, marginLeft: '12px' }}>
-                            abc@gmail.com
+                            {profile.email}
                           </Typography>
                         </Box>
                       </Box>
@@ -161,7 +143,7 @@ export default function Account() {
                         >
                           TRELLO
                         </Typography>
-                        <Link to={'/profile/123'}>
+                        <Link to={'/profile'}>
                           <Typography
                             variant='body1'
                             sx={{
@@ -178,7 +160,7 @@ export default function Account() {
                             Account management
                           </Typography>
                         </Link>
-                        <Link to={'/activity/123'}>
+                        <Link to={'/activity'}>
                           <Typography
                             variant='body1'
                             sx={{

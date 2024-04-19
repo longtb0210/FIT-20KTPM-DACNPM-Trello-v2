@@ -26,3 +26,10 @@ services:
       - GRPC_HOST=0.0.0.0
       - PORT=3000
       - SERVICE_NAME=workspace
+
+  backend-user:
+    image: lamlance/trello-backend:user-latest
+    environment:
+      - GRPC_HOST=0.0.0.0
+      - PORT=3000
+      - SERVICE_NAME=user

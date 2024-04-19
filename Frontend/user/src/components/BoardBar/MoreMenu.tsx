@@ -1,4 +1,4 @@
-import React, { useState } from 'react'
+import React from 'react'
 import { styled } from '@mui/material/styles'
 import { faTrello } from '@fortawesome/free-brands-svg-icons'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
@@ -6,10 +6,13 @@ import { Sidebar, Menu, MenuItem } from 'react-pro-sidebar'
 import { Divider, Drawer } from '@mui/material'
 import { IoMdClose } from 'react-icons/io'
 import { useTheme } from '../Theme/themeContext'
-import { faBoxArchive, faCopy, faEye, faList, faRightFromBracket } from '@fortawesome/free-solid-svg-icons'
+import { faBoxArchive, faCheck, faCopy, faEye, faList, faRightFromBracket } from '@fortawesome/free-solid-svg-icons'
 import ChangeBackground from './ConponentMoreMenu/ChangeBackground'
-
-const drawerWidth =320
+import { BoardApiRTQ } from '~/api'
+import ArchivedItems from './ConponentMoreMenu/ArchiveCard'
+import Activity from './ConponentMoreMenu/Activity'
+import { useParams } from 'react-router-dom'
+const drawerWidth = 320
 
 const DrawerHeader = styled('div')(({ theme }) => ({
   display: 'flex',
@@ -26,16 +29,72 @@ interface Props {
 }
 
 const MoreMenu: React.FC<Props> = ({ open, handleDrawerClose }) => {
-  const { darkMode, colors } = useTheme()
-  const [isOpenChangeBg, setOpenBg] = React.useState(false)
-  const handleChangeBgClose = () => {
-    setOpenBg(false)
+  const { workspaceId, boardId } = useParams()
+
+  const { colors, darkMode } = useTheme()
+  const [isWatching, setWatch] = React.useState<boolean>(true)
+  const [getBoardById, { data: boardData }] = BoardApiRTQ.BoardApiSlice.useLazyGetBoardByIdQuery()
+  const [addWatcherToBoard] = BoardApiRTQ.BoardApiSlice.useAddWatcherMemberMutation()
+  const [removeWatcherFromBoard] = BoardApiRTQ.BoardApiSlice.useRemoveWatcherMemberMutation()
+  const [removeMemberInBoardByEmail] = BoardApiRTQ.BoardApiSlice.useRemoveMemberInBoardByEmailMutation()
+
+  const [openDrawerIndex, setOpenDrawerIndex] = React.useState(null)
+
+  const handleDrawerOpen = (index: number | React.SetStateAction<null>) => {
+    if (typeof index === 'number') {
+      setOpenDrawerIndex(index as unknown as React.SetStateAction<null>)
+    } else {
+      setOpenDrawerIndex(index)
+    }
   }
-  const handleChangeBgOpen = () => {
-    setOpenBg(true)
+
+  const handleDetailTabClose = () => {
+    setOpenDrawerIndex(null)
   }
-  
-  const [activeItem, setActiveItem] = useState<string | null>(null)
+
+  const storedProfile = localStorage.getItem('profile')
+  const [profile, setProFile] = React.useState({ email: '', name: '' })
+
+  React.useEffect(() => {
+    const profileSave = storedProfile ? JSON.parse(storedProfile) : { email: '', name: '' }
+    setProFile({ ...profileSave })
+    getBoardById(boardId).then((a) => {
+      // if (boardData?.data?.watcher_email.includes(profile.email)) {
+      //   setWatch(true)
+      // }
+    })
+  }, [boardData, boardId, getBoardById])
+
+  const handleSetWatching = () => {
+    setWatch(!isWatching)
+    if (boardId !== undefined) {
+      if (isWatching) {
+        addWatcherToBoard({ _id: boardId, email: profile.email })
+      } else removeWatcherFromBoard({ _id: boardId, email: profile.email })
+    }
+  }
+
+  const handleLeaveBoard = () => {
+    if (boardId !== undefined) {
+      removeMemberInBoardByEmail({ _id: boardId, email: profile.email })
+        .then((response) => {
+          // Kiểm tra nếu response trả về là đúng
+          if (response) {
+            // Điều hướng đến trang chủ
+            window.location.href = 'http://localhost:3000/'
+          } else {
+            // Xử lý lỗi ở đây, ví dụ thông báo cho người dùng
+            console.error('Có lỗi xảy ra:', response)
+          }
+        })
+        .catch((error) => {
+          // Xử lý lỗi nếu có
+          console.error('Có lỗi xảy ra khi gọi API:', error)
+        })
+    }
+  }
+
+  // const [activeItem, setActiveItem] = useState<string | null>(null)
 
   // const handleItemClick = (item: string) => {
   //   setActiveItem(item)
@@ -52,10 +111,13 @@ const MoreMenu: React.FC<Props> = ({ open, handleDrawerClose }) => {
             boxSizing: 'border-box',
             marginTop: '53px',
             color: colors.text,
-            backgroundColor: colors.background,
+            backgroundColor: colors.background
+          },
+          '.css-1t8x7v1 >.ps-menu-button:hover': {
+            backgroundColor: darkMode ? 'rgb(51 65 85 / var(--tw-bg-opacity))' : '#DCDFE4'
           },
           color: colors.text,
-          backgroundColor: colors.background,
+          backgroundColor: colors.background
         }}
         variant='persistent'
         anchor='right'
@@ -74,24 +136,25 @@ const MoreMenu: React.FC<Props> = ({ open, handleDrawerClose }) => {
         </DrawerHeader>
         <Divider />
 
-        <Sidebar width='100%' className='text-sm'>
+        <Sidebar width='100%' className='overflow-hidden text-sm'>
           <Menu>
             <MenuItem
-              className={`menu-item h-10 bg-[${colors.background}] text-[${colors.text}] hover:bg-gray-500`}
-              // onClick={() => handleItemClick('boards')}
+              className={`menu-item h-[50px] ${darkMode ? 'bg-[#1D2125] text-white hover:bg-slate-600' : `text-${colors.text} hover:bg-[#DCDFE4]`}`}
+              onClick={() => handleDrawerOpen(0)}
             >
               <div className='flex items-center'>
-                <FontAwesomeIcon icon={faList} fontSize='small' className='mr-2' />
+                <FontAwesomeIcon icon={faList} fontSize='small' className='mr-4' />
                 Activity
               </div>
             </MenuItem>
           </Menu>
           <Menu>
             <MenuItem
-              className={`menu-item h-10 bg-[${colors.background}] text-[${colors.text}] hover:bg-gray-500`}
+              className={`menu-item h-[50px] ${darkMode ? 'bg-[#1D2125] text-white hover:bg-slate-700' : `text-[${colors.text}] hover:bg-[#DCDFE4]`}`}
+              onClick={() => handleDrawerOpen(1)}
             >
               <div className='flex items-center'>
-                <FontAwesomeIcon icon={faBoxArchive} fontSize='small' className='mr-2'/>
+                <FontAwesomeIcon icon={faBoxArchive} fontSize='small' className='mr-4' />
                 Archived items
               </div>
             </MenuItem>
@@ -99,24 +162,37 @@ const MoreMenu: React.FC<Props> = ({ open, handleDrawerClose }) => {
           <Divider />
           <Menu>
             <MenuItem
-              className={`menu-item h-10 bg-[${colors.background}] text-[${colors.text}] hover:bg-gray-500`}
+              className={`menu-item h-[50px] ${darkMode ? 'bg-[#1D2125] text-white hover:bg-slate-600' : `text-${colors.text} hover:bg-[#DCDFE4]`}`}
               // onClick={() => handleItemClick('boards')}
-              onClick={handleChangeBgOpen}
+              onClick={() => handleDrawerOpen(2)}
             >
               <div className='flex items-center'>
-                <span style={{width: '20px', height: '20px',backgroundSize: 'cover', borderRadius: '3px', backgroundPosition:'50%' , backgroundImage: 'url(	https://trello-backgrounds.s3.amazonaws.com/Shared…3a8a56e787a3/photo-1707588883437-9b3709880e3b.jpg)'}}>
-                </span>
+                <span
+                  style={{
+                    width: '20px',
+                    height: '20px',
+                    backgroundSize: 'cover',
+                    borderRadius: '3px',
+                    backgroundPosition: '50%',
+                    marginRight: '10px',
+                    backgroundImage:
+                      boardData?.data?.background.charAt(0) === 'h'
+                        ? `url('${boardData?.data?.background}')`
+                        : boardData?.data?.background
+                  }}
+                ></span>
                 ChangeBackground
               </div>
             </MenuItem>
           </Menu>
           <Menu>
             <MenuItem
-              className={`menu-item h-10 bg-[${colors.background}] text-[${colors.text}] hover:bg-gray-500`}
+              className={`menu-item h-[50px] ${darkMode ? 'bg-[#1D2125] text-white hover:bg-slate-600' : `text-${colors.text} hover:bg-[#DCDFE4]`}`}
+
               // onClick={() => handleItemClick('boards')}
             >
               <div className='flex items-center'>
-                <FontAwesomeIcon icon={faTrello} fontSize='small' className='mr-2' />
+                <FontAwesomeIcon icon={faTrello} fontSize='small' className='mr-4' />
                 Custom feilds
               </div>
             </MenuItem>
@@ -124,40 +200,46 @@ const MoreMenu: React.FC<Props> = ({ open, handleDrawerClose }) => {
           <Divider />
           <Menu>
             <MenuItem
-              className={`menu-item h-10 bg-[${colors.background}] text-[${colors.text}] hover:bg-gray-500`}
+              className={`menu-item h-[50px] ${darkMode ? 'bg-[#1D2125] text-white hover:bg-slate-600' : `text-${colors.text} hover:bg-[#DCDFE4]`}`}
+
               // onClick={() => handleItemClick('boards')}
             >
-              <div className='flex items-center'>
-                <FontAwesomeIcon icon={faEye} fontSize='small' className='mr-2'/>
+              <div className='flex items-center' onClick={handleSetWatching}>
+                <FontAwesomeIcon icon={faEye} fontSize='small' className='mr-4' />
                 Watch
+                {isWatching ? <FontAwesomeIcon icon={faCheck} fontSize='small' className='ml-5 mr-4' /> : ''}
               </div>
             </MenuItem>
           </Menu>
           <Menu>
             <MenuItem
-              className={`menu-item h-10 bg-[${colors.background}] text-[${colors.text}] hover:bg-gray-500`}
+              className={`menu-item h-[50px] ${darkMode ? 'bg-[#1D2125] text-white hover:bg-slate-600' : `text-${colors.text} hover:bg-[#DCDFE4]`}`}
+
               // onClick={() => handleItemClick('boards')}
             >
               <div className='flex items-center'>
-                <FontAwesomeIcon icon={faCopy} fontSize='small' className='mr-2'/>          
+                <FontAwesomeIcon icon={faCopy} fontSize='small' className='mr-4' />
                 Copy board
               </div>
             </MenuItem>
           </Menu>
           <Menu>
             <MenuItem
-              className={`menu-item h-10 bg-[${colors.background}] text-[${colors.text}] hover:bg-gray-500`}
+              className={`menu-item h-[50px] ${darkMode ? 'bg-[#1D2125] text-white hover:bg-slate-600' : `text-${colors.text} hover:bg-[#DCDFE4]`}`}
+
               // onClick={() => handleItemClick('boards')}
             >
-              <div className='flex items-center'>
-                <FontAwesomeIcon icon={faRightFromBracket} fontSize='small' className='mr-2'/>
+              <div className='flex items-center' onClick={handleLeaveBoard}>
+                <FontAwesomeIcon icon={faRightFromBracket} fontSize='small' className='mr-4' />
                 Leave board
               </div>
             </MenuItem>
           </Menu>
         </Sidebar>
       </Drawer>
-      <ChangeBackground open={isOpenChangeBg} handleDrawerClose={handleChangeBgClose}/>
+      <Activity open={openDrawerIndex === 0} handleDrawerClose={handleDetailTabClose} />
+      <ArchivedItems open={openDrawerIndex === 1} handleDrawerClose={handleDetailTabClose} />
+      <ChangeBackground open={openDrawerIndex === 2} handleDrawerClose={handleDetailTabClose} />
     </div>
   )
 }

@@ -1,8 +1,10 @@
-import { createContext, useState } from 'react'
 import Keycloak from 'keycloak-js'
+import { createContext, useEffect, useRef, useState } from 'react'
+import { useDispatch } from 'react-redux'
+import { TokenSlice } from '~/store/reducers'
 
 type AuthContext = {
-  keycloak: Keycloak
+  keycloak: Keycloak | undefined
   login: () => void
   logout: () => void
   isLoggedIn: boolean
@@ -11,78 +13,69 @@ type AuthContext = {
 export const AuthContext = createContext<AuthContext | null>(null)
 
 export function AuthProvider({ children }: { children?: React.ReactNode }) {
-  const [isLoggedIn, setIsLoggedIn] = useState(JSON.parse(localStorage.getItem('isLogin') || 'false'))
-  const [keycloak, setKeycloak] = useState<Keycloak>(
-    new Keycloak({
+  const [isLoggedIn, setIsLoggedIn] = useState(false)
+  const keycloak = useRef<Keycloak>()
+  const dispatch = useDispatch()
+  useEffect(() => {
+    if (keycloak.current) return console.log('Keycloak already created')
+    keycloak.current = new Keycloak({
       url: import.meta.env.VITE_KEYCLOAK_AUTH_SERVER_URL,
       realm: import.meta.env.VITE_KEYCLOAK_REALM,
       clientId: import.meta.env.VITE_KEYCLOAK_CLIENT_ID
     })
-  )
+    keycloak.current.onAuthSuccess = () => {
+      dispatch(TokenSlice.actions.setToken(keycloak.current?.token || ''))
+    }
+    keycloak.current
+      .init({
+        // redirectUri: 'http://localhost:3000/login',
+        onLoad: 'check-sso'
+      })
+      .then((success) => {
+        setIsLoggedIn(success)
+        if (success) {
+          if (keycloak.current) {
+            keycloak.current
+              .loadUserProfile()
+              .then((profile) => {
+                const email = profile.email
+                const name = profile.firstName + ' ' + profile.lastName
+                fetch(`${import.meta.env.VITE_URL_API}/api/user/`, {
+                  method: 'POST',
+                  headers: {
+                    Authorization: `Bearer ${keycloak.current?.token}`,
+                    'Content-Type': 'application/json'
+                  },
+                  body: JSON.stringify({ email: email, username: name || email, bio: 'string', avatar: 'string' })
+                })
+                localStorage.setItem('profile', JSON.stringify({ email, name }))
+              })
+              .catch((error) => {
+                // Xử lý lỗi nếu có
+                console.error('Error loading user profile:', error)
+              })
+          }
 
-  // useEffect(() => {
-  //   const initializeKeycloak = async () => {
-  //     try {
-  //       await keycloak.init({
-  //         onLoad: 'check-sso'
-  //         // redirectUri: 'http://localhost:3000/login'
-  //       })
-
-  //       if (keycloak.authenticated) {
-  //         localStorage.setItem('isLogin', JSON.stringify(true))
-  //         localStorage.setItem('data', JSON.stringify(keycloak))
-  //         localStorage.setItem('accessToken', keycloak.token || '')
-
-  //         localStorage.setItem(
-  //           'profile',
-  //           JSON.stringify({
-  //             name: `${keycloak.tokenParsed?.given_name || ''} ${keycloak.tokenParsed?.family_name || ''}`,
-  //             email: keycloak.tokenParsed?.email || ''
-  //           })
-  //         )
-  //         console.log('hê hê')
-
-  //         setIsLoggedIn(true)
-  //         setKeycloak(keycloak)
-  //       } else {
-  //         // setIsLoggedIn(false)
-  //         // localStorage.setItem('isLogin', JSON.stringify(false))
-  //         console.log('huhu')
-  //       }
-  //     } catch (error) {
-  //       console.error('Failed to initialize Keycloak: ', error)
-  //     }
-  //   }
-
-  //   if (!keycloak) {
-  //     setKeycloak(
-  //       new Keycloak({
-  //         url: import.meta.env.VITE_KEYCLOAK_AUTH_SERVER_URL,
-  //         realm: import.meta.env.VITE_KEYCLOAK_REALM,
-  //         clientId: import.meta.env.VITE_KEYCLOAK_CLIENT_ID
-  //       })
-  //     )
-  //   } else {
-  //     initializeKeycloak()
-  //   }
-  // }, [keycloak])
+          console.log('Redirect to normal page')
+        }
+      })
+  }, [])
 
   const login = () => {
-    if (keycloak) {
-      keycloak.login()
+    if (keycloak.current) {
+      keycloak.current.login({ redirectUri: `${import.meta.env.VITE_HOST_URL || 'http://localhost:3000'}/login` })
     }
   }
 
   const logout = () => {
-    if (keycloak) {
+    if (keycloak.current) {
       localStorage.clear()
-      // setIsLoggedIn(false)
-      keycloak.logout({ redirectUri: 'http://localhost:3000/login' })
+      keycloak.current.logout({ redirectUri: `${import.meta.env.VITE_HOST_URL || 'http://localhost:3000'}/login` })
     }
   }
 
   return (
-    <AuthContext.Provider value={keycloak ? { keycloak, login, logout, isLoggedIn } : null}>
+    <AuthContext.Provider value={{ keycloak: keycloak.current, login, logout, isLoggedIn }}>
       {children}
     </AuthContext.Provider>
   )

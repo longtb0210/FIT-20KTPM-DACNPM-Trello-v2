@@ -23,7 +23,9 @@ export const lightColors = {
   button_primary_text: '#ffffff',
   button: 'rgba(9, 30, 66, 0.08)',
   button_hover: 'rgba(9, 30, 66, 0.15)',
-  button_hover_hover: 'rgba(9, 30, 66, 0.25)'
+  button_hover_hover: 'rgba(9, 30, 66, 0.25)',
+  foreColor: '#fff',
+  colorHover: '#dcdfe4'
 }
 
 export const darkColors = {
@@ -51,5 +53,7 @@ export const darkColors = {
   button_primary_text: 'rgb(29, 33, 37)',
   button: 'rgba(161, 189, 217, 0.08)',
   button_hover: 'rgba(161, 189, 217, 0.15)',
-  button_hover_hover: 'rgba(161, 189, 217, 0.25)'
+  button_hover_hover: 'rgba(161, 189, 217, 0.25)',
+  foreColor: '#000',
+  colorHover: 'rgba(255,255,255,0.1)'
 }

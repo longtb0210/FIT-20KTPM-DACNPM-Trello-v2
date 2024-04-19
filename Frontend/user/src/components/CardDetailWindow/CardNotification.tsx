@@ -5,16 +5,16 @@ import { useTheme } from '../Theme/themeContext'
 
 interface CardNotificationProps {
   isWatching: boolean
-  setIsWatching: (newState: boolean) => void
+  handleWatching: () => void
 }
 
-export default function CardNotification({ isWatching, setIsWatching }: CardNotificationProps) {
+export default function CardNotification({ isWatching, handleWatching }: CardNotificationProps) {
   const { colors } = useTheme()
   const tipIsWatching = 'You are receiving notifactions for updates on this card (click to stop watching)'
   const tipNotWatching = 'Watch to get notifactions for updates on this card'
 
   function handleCheckboxClick() {
-    setIsWatching(!isWatching)
+    handleWatching()
   }
 
   return (
@@ -54,9 +54,9 @@ export default function CardNotification({ isWatching, setIsWatching }: CardNoti
         >
           <FontAwesomeIcon icon={faEye} style={{ width: 16, height: 16 }} />
           <p style={{ marginRight: 8 }} className='text-sm font-semibold'>
-            {isWatching ? 'Watching' : 'Watch'}
+            {isWatching === true ? 'Watching' : 'Watch'}
           </p>
-          {isWatching && (
+          {isWatching === true && (
             <Box
               sx={{ width: 28, height: 24, bgcolor: '#626f86', color: '#fff' }}
               className='flex items-center justify-center rounded'

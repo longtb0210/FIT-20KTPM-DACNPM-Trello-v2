@@ -40,7 +40,7 @@ const AddListForm: React.FC<ListFormProps> = ({
       />
       <div className={`mt-3 flex flex-row space-x-2`}>
         <button className='rounded bg-blue-600 px-3 py-2 hover:bg-blue-700' onClick={handleSaveListClick}>
-          <p className={`text-left font-semibold text-white`}> Add card</p>
+          <p className={`text-left font-semibold text-white`}> Add list</p>
         </button>
         <button
           className={`rounded-lg px-3 py-2 ${darkMode ? 'hover:bg-gray-600' : 'hover:bg-gray-300'}`}

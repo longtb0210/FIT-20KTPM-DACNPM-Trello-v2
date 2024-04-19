@@ -1,0 +1,6 @@
+node_modules
+Frontend/admin
+Frontend/admin/user/node_modules
+Frontend/admin/react_server/node_modules
+Backend
+package-lock.json

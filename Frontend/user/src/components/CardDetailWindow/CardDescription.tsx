@@ -57,20 +57,26 @@ export default function CardDescription({ cardlistId, cardId, currentCard, setCu
     setTextAreaValue(event.target.value)
   }
 
-  async function handleSave() {
+  function handleSave() {
     const trimmedValue = textAreaValue.replace(/\s+/g, ' ').trim()
     console.log(trimmedValue)
     if (trimmedValue !== initialValue.trim()) {
       setTextAreaValue(trimmedValue)
       setInitialValue(trimmedValue)
-      const response = await updateCardDetailAPI({
+      updateCardDetailAPI({
         cardlist_id: cardlistId,
         card_id: cardId,
         name: currentCard.name,
         cover: currentCard.cover,
         description: trimmedValue
       })
-      setCurrentCard(response.data.data)
+        .unwrap()
+        .then((response) => {
+          setCurrentCard(response.data)
+        })
+        .catch((error) => {
+          console.log('ERROR: update card description - ', error)
+        })
     }
     setTextAreaMinRows(2)
     setIsOpenTextArea(false)
@@ -102,7 +108,7 @@ export default function CardDescription({ cardlistId, cardId, currentCard, setCu
           <h2 className='font-semibold'>Description</h2>
         </div>
         {/* Edit button */}
-        <EditButton onClick={handleOpen} />
+        {textAreaValue.trim() !== '' && !isOpenTextArea && <EditButton onClick={handleOpen} />}
       </div>
       {/* END: Header */}
       <TextareaAutosize

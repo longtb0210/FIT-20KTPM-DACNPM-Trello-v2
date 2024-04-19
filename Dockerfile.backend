@@ -12,6 +12,7 @@ RUN npm install
 RUN npm run build -w @trello-v2/shared
 
 WORKDIR /app/Backend
+RUN truncate -s 0 ./db/Cache.db
 RUN npx ncc build apps/$SERVICE_NAME/src/main.ts --out build
 RUN node build.js $SERVICE_NAME
 

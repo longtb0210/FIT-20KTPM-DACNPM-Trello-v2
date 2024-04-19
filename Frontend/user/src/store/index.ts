@@ -1,10 +1,10 @@
 import { configureStore } from '@reduxjs/toolkit'
-import { exampleSlice } from './reducers'
+import { TokenSlice } from './reducers'
 import { BoardApiRTQ, CardApiRTQ, CardlistApiRTQ, WorkspaceApiRTQ, UserApiRTQ } from '~/api'
 
 export const store = configureStore({
   reducer: {
-    exampleReducer: exampleSlice.reducer,
+    KC_TOKEN: TokenSlice.reducer,
     [BoardApiRTQ.BoardApiSlice.reducerPath]: BoardApiRTQ.BoardApiSlice.reducer,
     [WorkspaceApiRTQ.WorkspaceApiSlice.reducerPath]: WorkspaceApiRTQ.WorkspaceApiSlice.reducer,
     [CardApiRTQ.CardApiSlice.reducerPath]: CardApiRTQ.CardApiSlice.reducer,

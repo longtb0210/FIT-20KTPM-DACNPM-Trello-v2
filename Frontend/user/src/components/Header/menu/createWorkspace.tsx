@@ -1,12 +1,13 @@
 import * as React from 'react'
-import { Box, Button, Autocomplete, TextField } from '@mui/material'
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
-import { faClose } from '@fortawesome/free-solid-svg-icons'
-import workspace from '~/assets/workspace_img.svg'
-import { useTheme } from './../../Theme/themeContext'
-import axios from 'axios'
 import { useNavigate } from 'react-router-dom'
 import { WorkspaceApiRTQ } from '~/api'
+import workspace from '~/assets/workspace_img.svg'
+
+import { faClose } from '@fortawesome/free-solid-svg-icons'
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
+import { Autocomplete, Box, Button, TextField } from '@mui/material'
+
+import { useTheme } from '../../Theme/themeContext'
 
 interface AutocompleteContainerProps {
   onClose: () => void
@@ -24,7 +25,8 @@ const type = [
 ]
 
 export default function CreateWorkspace(props: AutocompleteContainerProps) {
-  const [createWorkspace] = WorkspaceApiRTQ.WorkspaceApiSlice.useCreateWorkspaceMutation()
+  const [createWorkspace, { data: dataCreateWorkspace }] =
+    WorkspaceApiRTQ.WorkspaceApiSlice.useCreateWorkspaceMutation()
   const [getAllWorkspace] = WorkspaceApiRTQ.WorkspaceApiSlice.useLazyGetAllWorkspaceQuery()
   const [valueWorkspace, setValueWorkspace] = React.useState<string | undefined>(type[0])
   const [inputValueWorkspace, setInputValueWorkspace] = React.useState('')
@@ -34,26 +36,20 @@ export default function CreateWorkspace(props: AutocompleteContainerProps) {
   const navigator = useNavigate()
 
   const onSubmit = async () => {
-    // const data = {
-    //   name: workspaceName,
-    //   description: workspaceDescription
-    // }
-    // try {
-    //   const response = await axios.post('http://localhost:3333/api/worspace', data)
-
-    //   if (response && response.statusText === 'OK') {
-    //     navigator(`/workspace/${response.data.data._id}`)
-    //     props.onClose()
-    //   }
-    // } catch (error) {
-    //   console.error('Error fetching data:', error)
-    // }
-
     createWorkspace({
       name: workspaceName || '',
       description: workspaceDescription || ''
-    }).then(() => getAllWorkspace())
+    })
   }
+
+  React.useEffect(() => {
+    if (dataCreateWorkspace) {
+      getAllWorkspace()
+      props.onClose()
+      navigator(`/workspaceboard/${dataCreateWorkspace.data._id}`)
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [dataCreateWorkspace])
 
   const handleWorkspaceName = (event: React.ChangeEvent<HTMLInputElement>) => {
     setWorkspaceName(event.target.value)
@@ -85,7 +81,8 @@ export default function CreateWorkspace(props: AutocompleteContainerProps) {
           display: 'flex',
           alignItems: 'stretch',
           borderRadius: '4px',
-          position: 'relative'
+          position: 'relative',
+          boxShadow: 'rgba(100, 100, 111, 0.2) 0px 7px 29px 0px'
         }}
       >
         <Box
@@ -273,7 +270,9 @@ export default function CreateWorkspace(props: AutocompleteContainerProps) {
             justifyContent: 'center',
             padding: '0 120px',
             paddingTop: '112px',
-            backgroundImage: `url(${'https://trello.com/assets/df0d81969c6394b61c0d.svg'})` // Thay đổi đường dẫn ở đây
+            backgroundImage: `url(${'https://trello.com/assets/df0d81969c6394b61c0d.svg'})`,
+            borderTopRightRadius: '4px',
+            borderBottomRightRadius: '4px'
           }}
         >
           <Box sx={{}}>

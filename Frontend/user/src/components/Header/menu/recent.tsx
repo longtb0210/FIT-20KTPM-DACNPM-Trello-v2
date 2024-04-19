@@ -1,17 +1,84 @@
 import * as React from 'react'
 import { Box, Button, ClickAwayListener, Grow, Paper, Popper, MenuList, Stack, Typography } from '@mui/material'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
-import { faChevronDown, faStar as starFull } from '@fortawesome/free-solid-svg-icons'
-import { faStar } from '@fortawesome/free-regular-svg-icons'
+import { faChevronDown } from '@fortawesome/free-solid-svg-icons'
 import { useTheme } from './../../Theme/themeContext'
+import { BoardApiRTQ } from '~/api'
+import noWorkspace from '~/assets/no_workspace.svg'
+import { Link } from 'react-router-dom'
+
+interface Activity {
+  workspace_id: string
+  content: string
+  create_time: Date
+  creator_email: string
+  _id?: string
+  board_id?: string | null
+  cardlist_id?: string | null
+  card_id?: string | null
+}
+
+interface Label {
+  name: string
+  color: string
+  _id?: string
+}
+
+interface Board {
+  name: string
+  workspace_id: string
+  watcher_email: string[]
+  activities: Activity[]
+  background: string
+  background_list: string[]
+  visibility: 'private' | 'workspace' | 'public'
+  members_email: string[]
+  labels: Label[]
+  is_star: boolean
+  _id?: string
+}
 
 export default function Recent() {
   const [open, setOpen] = React.useState(false)
-  const [isHovered, setIsHovered] = React.useState(false)
-  const [isHoveredStar, setIsHoveredStar] = React.useState(false)
-  const [star, setStar] = React.useState(false)
   const anchorRef = React.useRef<HTMLButtonElement>(null)
   const { colors } = useTheme()
+  const [getBoardById] = BoardApiRTQ.BoardApiSlice.useLazyGetBoardByIdQuery()
+  const [listBoard, setListBoard] = React.useState<Board[]>([])
+
+  const savedValuesString = localStorage.getItem('savedValues')
+
+  React.useEffect(() => {
+    const fetchData = async () => {
+      if (savedValuesString) {
+        const savedValues = JSON.parse(savedValuesString)
+        const newBoards: Board[] = []
+
+        for (const recent of savedValues) {
+          const res = await getBoardById(recent)
+
+          if (res.data && res.data.data) {
+            const newBoard = {
+              name: res.data.data.name || '',
+              workspace_id: res.data.data.workspace_id || '',
+              background: res.data.data.background || '',
+              background_list: res.data.data.background_list || [],
+              activities: res.data.data.activities || [],
+              visibility: res.data.data.visibility || 'private',
+              members_email: res.data.data.members_email || [],
+              labels: res.data.data.labels || [],
+              is_star: res.data.data.is_star || false,
+              watcher_email: res.data.data.watcher_email || [],
+              _id: res.data.data._id || ''
+            }
+            newBoards.push(newBoard)
+          }
+        }
+        setListBoard((prev) => [...prev, ...newBoards])
+      }
+    }
+
+    fetchData()
+  }, [getBoardById, savedValuesString])
 
   const handleToggle = () => {
     setOpen((prevOpen) => !prevOpen)
@@ -34,7 +101,6 @@ export default function Recent() {
     }
   }
 
-  // return focus to the button when we transitioned from !open -> open
   const prevOpen = React.useRef(open)
   React.useEffect(() => {
     if (prevOpen.current === true && open === false) {
@@ -100,78 +166,66 @@ export default function Recent() {
                       borderRadius: '4px'
                     }}
                   >
-                    <Box
-                      sx={{
-                        display: 'flex',
-                        alignItems: 'center',
-                        justifyContent: 'space-between',
-                        padding: '4px',
-                        cursor: 'pointer',
-                        '&:hover': {
-                          backgroundColor:
-                            colors.background === '#ffffff' ? `rgba(0,0,0,0.1)` : `rgba(255,255,255,0.1)`,
-                          borderRadius: '4px'
-                        }
-                      }}
-                      onMouseEnter={() => setIsHovered(true)}
-                      onMouseLeave={() => setIsHovered(false)}
-                    >
-                      <Box sx={{ display: 'flex', alignItems: 'center' }}>
-                        <Box
-                          sx={{
-                            backgroundImage:
-                              'url("https://trello-backgrounds.s3.amazonaws.com/SharedBackground/480x320/69360d5ef9e7535cda824ab868bb1628/photo-1708058885492-09ef26cd4af8.jpg")',
-                            backgroundSize: 'cover',
-                            backgroundPosition: 'center',
-                            width: '40px',
-                            height: '32px',
-                            borderRadius: '4px'
-                          }}
-                        ></Box>
-
-                        <Box sx={{ display: 'flex', flexDirection: 'column' }}>
-                          <Typography
-                            variant='body1'
-                            sx={{ fontSize: '14px', fontWeight: 600, color: colors.text, marginLeft: '12px' }}
+                    {listBoard.length !== 0 ? (
+                      listBoard.map((board, index) => (
+                        <Link
+                          key={index}
+                          to={`workspace/${board.workspace_id}/board/${board._id}`}
+                          onClick={() => setOpen(false)}
+                        >
+                          <Box
+                            sx={{
+                              display: 'flex',
+                              alignItems: 'center',
+                              justifyContent: 'space-between',
+                              padding: '4px',
+                              cursor: 'pointer',
+                              '&:hover': {
+                                backgroundColor:
+                                  colors.background === '#ffffff' ? `rgba(0,0,0,0.1)` : `rgba(255,255,255,0.1)`,
+                                borderRadius: '4px'
+                              }
+                            }}
                           >
-                            front-end
-                          </Typography>
-                          <Typography variant='body1' sx={{ fontSize: '12px', color: colors.text, marginLeft: '12px' }}>
-                            Trello Workspaces
-                          </Typography>
-                        </Box>
-                      </Box>
+                            <Box sx={{ display: 'flex', alignItems: 'center' }}>
+                              <Box
+                                sx={{
+                                  backgroundImage:
+                                    board.background.charAt(0) === 'h'
+                                      ? `url("${board.background}")`
+                                      : board.background,
+                                  backgroundSize: 'cover',
+                                  backgroundPosition: 'center',
+                                  width: '40px',
+                                  height: '32px',
+                                  borderRadius: '4px'
+                                }}
+                              ></Box>
 
-                      {isHovered && (
-                        <FontAwesomeIcon
-                          icon={faStar}
-                          style={{
-                            color: isHoveredStar ? 'yellow' : colors.text,
-                            marginRight: '8px',
-                            display: star ? 'none' : 'block',
-                            fontSize: isHoveredStar ? '16px' : '14px',
-                            transition: 'all 0.1s ease-in'
-                          }}
-                          onMouseEnter={() => setIsHoveredStar(true)}
-                          onMouseLeave={() => setIsHoveredStar(false)}
-                          onClick={() => setStar(true)}
-                        />
-                      )}
-                      {star && (
-                        <FontAwesomeIcon
-                          icon={starFull}
-                          style={{
-                            color: 'yellow',
-                            marginRight: '8px',
-                            fontSize: isHoveredStar ? '16px' : '14px',
-                            transition: 'all 0.1s ease-in'
-                          }}
-                          onMouseEnter={() => setIsHoveredStar(true)}
-                          onMouseLeave={() => setIsHoveredStar(false)}
-                          onClick={() => setStar(false)}
-                        />
-                      )}
-                    </Box>
+                              <Box sx={{ display: 'flex', flexDirection: 'column' }}>
+                                <Typography
+                                  variant='body1'
+                                  sx={{ fontSize: '14px', fontWeight: 600, color: colors.text, marginLeft: '12px' }}
+                                >
+                                  {board.name}
+                                </Typography>
+                              </Box>
+                            </Box>
+                          </Box>
+                        </Link>
+                      ))
+                    ) : (
+                      <Box>
+                        <img src={noWorkspace} alt='' style={{ backgroundSize: 'cover', width: '100%' }} />
+
+                        <Typography
+                          variant='body1'
+                          sx={{ fontSize: '14px', color: colors.text, textAlign: 'center', margin: '12px 0 8px 0' }}
+                        >
+                          You’ll find the boards you’ve recently viewed here.
+                        </Typography>
+                      </Box>
+                    )}
                   </MenuList>
                 </ClickAwayListener>
               </Paper>

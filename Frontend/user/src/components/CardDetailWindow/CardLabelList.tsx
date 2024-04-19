@@ -1,14 +1,14 @@
 import { faPlus } from '@fortawesome/free-solid-svg-icons'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { Box, Tooltip } from '@mui/material'
-import { useEffect, useRef, useState } from 'react'
+import { useRef, useState } from 'react'
 import { CardLabelListModal, CreateCardLabelModal, EditCardLabelModal } from './modals/CardLabelModal'
 import { useTheme } from '../Theme/themeContext'
 import { Card } from '@trello-v2/shared/src/schemas/CardList'
 import { Feature_CardLabel } from '@trello-v2/shared/src/schemas/Feature'
 import React from 'react'
 import { BoardLabel } from '@trello-v2/shared/src/schemas/Board'
-import { CardApiRTQ } from '~/api'
+import { BoardApiRTQ, CardApiRTQ, CardlistApiRTQ } from '~/api'
 
 // eslint-disable-next-line react-refresh/only-export-components
 export const labelColors: string[] = [
@@ -119,6 +119,7 @@ export function CardLabelItem({ title, bgColor }: CardLabelItemProps) {
 }
 
 interface CardLabelListProps {
+  boardId: string
   cardlistId: string
   cardId: string
   currentCard: Card
@@ -128,6 +129,7 @@ interface CardLabelListProps {
 }
 
 export default function CardLabelList({
+  boardId,
   cardlistId,
   cardId,
   currentCard,
@@ -142,8 +144,11 @@ export default function CardLabelList({
   const [selectedLabel, setSelectedLabel] = useState<BoardLabel>(boardLabelState[0])
 
   // API
+  const [addBoardLabelAPI] = BoardApiRTQ.BoardApiSlice.useAddBoardLabelMutation()
+  const [removeBoardLabelAPI] = BoardApiRTQ.BoardApiSlice.useRemoveBoardLabelMutation()
   const [addCardFeatureAPI] = CardApiRTQ.CardApiSlice.useAddCardFeatureMutation()
   const [deleteCardFeatureAPI] = CardApiRTQ.CardApiSlice.useDeleteCardFeatureMutation()
+  const [getCardlistByBoardIdAPI] = CardlistApiRTQ.CardListApiSlice.useLazyGetCardlistByBoardIdQuery()
 
   function openModal(modalIndex: number) {
     const updatedOpenModal = modalState.map((state, index) => (index === modalIndex ? true : state))
@@ -151,12 +156,23 @@ export default function CardLabelList({
   }
 
   function addBoardLabel(color: string, name: string) {
-    const newBoardLabel: BoardLabel = {
-      _id: (parseInt(boardLabelState.slice(-1)[0]._id || '0', 10) + 1).toString(),
+    addBoardLabelAPI({
+      boardId: boardId,
       color: color,
       name: name
-    }
-    setBoardLabelState([...boardLabelState, newBoardLabel])
+    })
+      .unwrap()
+      .then((response) => {
+        const newBoardLabel: BoardLabel = {
+          _id: response.data._id,
+          color: color,
+          name: name
+        }
+        setBoardLabelState([...boardLabelState, newBoardLabel])
+      })
+      .catch((error) => {
+        console.log('ERROR: add board label', error)
+      })
   }
 
   function isLabelIncluded(boardLabel: BoardLabel): boolean {
@@ -169,6 +185,10 @@ export default function CardLabelList({
   }
 
   function removeBoardLabel() {
+    removeBoardLabelAPI({
+      boardId: boardId,
+      _id: selectedLabel._id!
+    })
     // Remove label from Board
     const updatedBoardLabelList = boardLabelState.filter((label) => label._id !== selectedLabel._id)
     setBoardLabelState(updatedBoardLabelList)
@@ -178,40 +198,50 @@ export default function CardLabelList({
     }
   }
 
-  async function handleIncludeLabel(boardLabel: BoardLabel) {
-    try {
-      const response = await addCardFeatureAPI({
-        cardlist_id: cardlistId,
-        card_id: cardId,
-        feature: {
-          type: 'label',
-          label_id: boardLabel._id!
-        }
-      })
-      const updatedCard: Card = {
-        ...currentCard,
-        features: [...currentCard.features, response.data.data]
+  function handleIncludeLabel(boardLabel: BoardLabel) {
+    addCardFeatureAPI({
+      cardlist_id: cardlistId,
+      card_id: cardId,
+      feature: {
+        type: 'label',
+        label_id: boardLabel._id!
       }
-      setCurrentCard(updatedCard)
-    } catch (error) {
-      console.error('Error while adding label to card:', error)
-    }
+    })
+      .unwrap()
+      .then((response) => {
+        const updatedCard: Card = {
+          ...currentCard,
+          features: [...currentCard.features, response.data]
+        }
+        setCurrentCard(updatedCard)
+        getCardlistByBoardIdAPI({
+          id: boardId
+        })
+      })
+      .catch((error) => {
+        console.log('ERROR: add label to card - ', error)
+      })
   }
 
-  async function handleExcludeLabel(boardLabel: BoardLabel) {
-    try {
-      const featureToDelete: Feature_CardLabel = currentCard.features.find(
-        (feature) => feature.type === 'label' && feature.label_id === boardLabel._id
-      ) as Feature_CardLabel
-      const response = await deleteCardFeatureAPI({
-        cardlist_id: cardlistId,
-        card_id: cardId,
-        feature_id: featureToDelete._id!
+  function handleExcludeLabel(boardLabel: BoardLabel) {
+    const featureToDelete: Feature_CardLabel = currentCard.features.find(
+      (feature) => feature.type === 'label' && feature.label_id === boardLabel._id
+    ) as Feature_CardLabel
+    deleteCardFeatureAPI({
+      cardlist_id: cardlistId,
+      card_id: cardId,
+      feature_id: featureToDelete._id!
+    })
+      .unwrap()
+      .then((response) => {
+        setCurrentCard(response.data)
+        getCardlistByBoardIdAPI({
+          id: boardId
+        })
       })
-      setCurrentCard(response.data.data)
-    } catch (error) {
-      console.error('Error while removing label from card:', error)
-    }
+      .catch((error) => {
+        console.log('ERROR: remove card from label - ', error)
+      })
   }
 
   return (
@@ -292,6 +322,7 @@ export default function CardLabelList({
             {modalState[2] && (
               <EditCardLabelModal
                 anchorEl={anchorEl}
+                boardId={boardId}
                 setModalState={setModalState}
                 currentCard={currentCard}
                 setCurrentCard={setCurrentCard}

@@ -4,6 +4,7 @@ export * as FeatureSchema from "./Feature";
 export * as BoardSchema from "./Board";
 export * as UserSchema from "./User";
 export * as WorkspaceSchema from "./Workspace";
+export * as Keycloak from "./Keycloak";
 
 export const COLLECTION_NAMES = [
   "cardlists",

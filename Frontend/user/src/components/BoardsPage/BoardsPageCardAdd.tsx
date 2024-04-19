@@ -4,7 +4,11 @@ import { useState } from 'react'
 import CreateBoardModal from './CreateBoardModal'
 import { useTheme } from '../Theme/themeContext'
 
-export function BoardsPageCardAdd() {
+interface BoardsPageCardAddProps {
+  workspaceId: string
+}
+
+export function BoardsPageCardAdd({ workspaceId }: BoardsPageCardAddProps) {
   const { colors } = useTheme()
   const [anchorEl, setAnchorEl] = useState<HTMLDivElement | null>(null)
   const [openModal, setOpenModal] = useState(false)
@@ -23,7 +27,7 @@ export function BoardsPageCardAdd() {
     <React.Fragment>
       <Box
         sx={{
-          width: 194,
+          maxWidth: 194,
           height: 96,
           padding: '8px',
           color: colors.text,
@@ -45,7 +49,14 @@ export function BoardsPageCardAdd() {
           <p className='text-sm font-semibold'>Create new board</p>
         </Box>
       </Box>
-      {openModal && <CreateBoardModal anchorEl={anchorEl} isOpen={openModal} handleCloseDialog={handleCloseDialog} />}
+      {openModal && (
+        <CreateBoardModal
+          anchorEl={anchorEl}
+          workspaceId={workspaceId}
+          isOpen={openModal}
+          handleCloseDialog={handleCloseDialog}
+        />
+      )}
     </React.Fragment>
   )
 }

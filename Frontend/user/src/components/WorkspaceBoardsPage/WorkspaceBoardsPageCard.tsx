@@ -1,64 +1,102 @@
 import { Box } from '@mui/material'
-import { BoardSubset } from '~/pages'
 import StarIcon from '@mui/icons-material/Star'
 import StarBorderOutlinedIcon from '@mui/icons-material/StarBorderOutlined'
 import { useState } from 'react'
-
-const cardBg01 =
-  'https://trello-backgrounds.s3.amazonaws.com/SharedBackground/480x269/46d55f978e5c638b665c3a8a56e787a3/photo-1707588883437-9b3709880e3b.jpg'
+import { Board } from '@trello-v2/shared/src/schemas/Board'
+import { BoardApiRTQ } from '~/api'
+import { Link, useParams } from 'react-router-dom'
+import { useTheme } from '../Theme/themeContext'
 
 interface WorkspaceBoardsPageCardProps {
-  currentBoard: BoardSubset
-  boards: BoardSubset[]
-  setBoards: (newState: BoardSubset[]) => void
+  currentBoard: Board
+  workspaceBoards: Board[] | null
+  setWorkspaceBoards: (newState: Board[]) => void
 }
 
-export function WorkspaceBoardsPageCard({ currentBoard, boards, setBoards }: WorkspaceBoardsPageCardProps) {
+export function WorkspaceBoardsPageCard({
+  currentBoard,
+  workspaceBoards,
+  setWorkspaceBoards
+}: WorkspaceBoardsPageCardProps) {
+  const { colors } = useTheme()
+  const { workspaceId } = useParams()
   const [isHovered, setIsHovered] = useState(false)
 
+  //API
+  const [editBoardByIdAPI] = BoardApiRTQ.BoardApiSlice.useEditBoardByIdMutation()
+
   function handleToggleStar() {
-    const updatedBoards = boards.map((board) => {
-      if (board._id === currentBoard._id) {
-        return { ...board, is_star: !currentBoard.is_star }
-      }
-      return board
+    editBoardByIdAPI({
+      _id: currentBoard._id!,
+      is_star: !currentBoard.is_star
     })
-    setBoards(updatedBoards)
+      .unwrap()
+      .then(() => {
+        const updatedWorkspaceBoards = workspaceBoards?.map((board) =>
+          board._id === currentBoard._id
+            ? {
+                ...currentBoard,
+                is_star: !currentBoard.is_star
+              }
+            : board
+        )
+        setWorkspaceBoards(updatedWorkspaceBoards!)
+        setIsHovered(!isHovered)
+      })
+      .catch((error) => {
+        console.error('ERROR: toggle board is_star', error)
+      })
   }
 
   return (
-    <Box
-      sx={{
-        width: 300,
-        height: 96,
-        padding: '8px',
-        backgroundImage: `url(${cardBg01})`,
-        '&:hover': { filter: 'brightness(90%)' }
-      }}
-      className='flex cursor-pointer flex-col justify-between rounded'
-      onMouseEnter={() => setIsHovered(true)}
-      onMouseLeave={() => setIsHovered(false)}
-    >
-      <Box sx={{ width: '100%', height: 20 }} className='flex items-center'>
-        <p style={{ fontSize: 16, fontWeight: 700 }} className='text-white'>
-          {currentBoard.name}
-        </p>
-      </Box>
-      <Box sx={{ width: '100%', height: 20 }} className='flex items-center justify-end'>
-        {(isHovered || currentBoard.is_star) && (
-          <Box
-            sx={{ marginRight: '4px' }}
-            onClick={handleToggleStar}
-            color={currentBoard.is_star ? 'primary' : 'default'}
+    <Link to={`/workspace/${workspaceId}/board/${currentBoard._id}`}>
+      <Box
+        sx={{
+          maxWidth: 300,
+          height: 96,
+          padding: '8px',
+          backgroundColor: currentBoard.background ? undefined : colors.button_hover,
+          backgroundImage:
+            currentBoard.background.charAt(0) === 'h' ? `url("${currentBoard.background}")` : currentBoard.background,
+          '&:hover': { filter: 'brightness(90%)' }
+        }}
+        className='flex cursor-pointer flex-col justify-between rounded'
+        onMouseEnter={() => setIsHovered(true)}
+        onMouseLeave={() => setIsHovered(false)}
+      >
+        <Box sx={{ width: '100%' }} className='flex place-items-center'>
+          <p
+            style={{
+              color: currentBoard.background ? '#ffffff' : colors.text,
+              fontSize: 16,
+              height: 40,
+              fontWeight: 700,
+              lineHeight: '1.2',
+              overflow: 'hidden',
+              textOverflow: 'ellipsis'
+            }}
           >
-            {currentBoard.is_star ? (
-              <StarIcon style={{ color: '#FFD700', fontSize: 18 }} />
-            ) : (
-              <StarBorderOutlinedIcon style={{ color: 'white', fontSize: 18 }} />
-            )}
-          </Box>
-        )}
+            {currentBoard.name}
+          </p>
+        </Box>
+        <Box sx={{ width: '100%', height: 20 }} className='flex items-center justify-end'>
+          {(isHovered || currentBoard.is_star) && (
+            <Box
+              sx={{ marginRight: '4px' }}
+              onMouseDown={() => {
+                handleToggleStar()
+              }}
+              color={currentBoard.is_star ? 'primary' : 'default'}
+            >
+              {currentBoard.is_star ? (
+                <StarIcon style={{ color: '#FFD700', fontSize: 18 }} />
+              ) : (
+                <StarBorderOutlinedIcon style={{ color: 'white', fontSize: 18 }} />
+              )}
+            </Box>
+          )}
+        </Box>
       </Box>
-    </Box>
+    </Link>
   )
 }

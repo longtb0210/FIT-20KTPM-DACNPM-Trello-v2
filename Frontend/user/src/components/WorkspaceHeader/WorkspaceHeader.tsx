@@ -1,4 +1,4 @@
-import React, { ChangeEvent, useEffect, useRef, useState } from 'react'
+import React, { useEffect, useState } from 'react'
 
 import { useTheme } from '~/components/Theme/themeContext'
 
@@ -9,14 +9,17 @@ import WorkspaceInfo from './WorkspaceInfo'
 import EditForm from './EditForm'
 import { WorkspaceApiRTQ } from '~/api'
 import { UpdateWorkspaceInfoRequest } from '@trello-v2/shared/dist/src/api/WorkspaceApi'
+import { useParams } from 'react-router-dom'
 interface HeaderWpSetting {
   visibility: string | undefined
 }
 
 export const WorkspaceHeader: React.FC<HeaderWpSetting> = ({ visibility }) => {
-  const { colors, darkMode } = useTheme()
+  const { darkMode } = useTheme()
+  const params = useParams()
+  const workspaceId = params.workspaceId
   const [workspaceInfo, setWorkspaceInfo] = useState<Workspace>()
-  const [visibilityState, setVisibilityState] = useState<string>('')
+  const [visibilityState, setVisibilityState] = useState<string | undefined>('')
   const [getWorkspaceInfo, { data: workspaceInfoRes }] =
     WorkspaceApiRTQ.WorkspaceApiSlice.useLazyGetWorkspaceInfoQuery()
   const [resetWorkspaceManually, setResetWorkspaceManually] = useState<boolean>(false)
@@ -32,13 +35,19 @@ export const WorkspaceHeader: React.FC<HeaderWpSetting> = ({ visibility }) => {
     members: []
   })
   useEffect(() => {
-    getWorkspaceInfo({ id: '6609a3b0e9b24bc694e69cf8' })
+    getWorkspaceInfo(workspaceId ? workspaceId : '')
   }, [resetWorkspaceManually])
+
+  useEffect(() => {
+    getWorkspaceInfo(workspaceId ? workspaceId : '')
+  }, [workspaceId])
+  useEffect(() => {
+    setVisibilityState(visibility)
+  }, [visibility])
   useEffect(() => {
     setWorkspaceInfo(workspaceInfoRes?.data)
-    console.log('My workspace123',workspaceInfoRes?.data)
     setFormData({
-      _id: '6609a3b0e9b24bc694e69cf8',
+      _id: workspaceId,
       name: workspaceInfoRes?.data.name,
       short_name: workspaceInfoRes?.data.short_name,
       description: workspaceInfoRes?.data.description,
@@ -60,7 +69,6 @@ export const WorkspaceHeader: React.FC<HeaderWpSetting> = ({ visibility }) => {
   }
 
   const handleCancelClick = () => {
-    // Handle cancel functionality here
     setIsEditing(false)
   }
 
@@ -69,10 +77,10 @@ export const WorkspaceHeader: React.FC<HeaderWpSetting> = ({ visibility }) => {
       <div className='my-4 flex max-w-2xl items-center space-x-4 pl-[10%]'>
         {!isEditing ? (
           <>
-            <LogoSection />
+            <LogoSection name={workspaceInfo?.name} />
             <WorkspaceInfo
               workspaceName={workspaceInfo?.name}
-              visibility={workspaceInfo?.visibility}
+              visibility={visibilityState}
               handleEditClick={handleEditClick}
             />
           </>

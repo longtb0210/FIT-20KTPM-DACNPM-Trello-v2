@@ -3,7 +3,6 @@ import { DbSchemas, TrelloApi } from '@trello-v2/shared'
 import { Model } from 'mongoose'
 
 export abstract class IUserService {
-
   abstract createUser(data: TrelloApi.UserApi.CreateUserRequest)
 
   abstract getAllUser()
@@ -26,13 +25,17 @@ export class UserService implements IUserService {
   constructor(
     @InjectModel(DbSchemas.COLLECTION_NAMES[3])
     private UserMModel: Model<DbSchemas.UserSchema.User>,
-    @InjectModel(DbSchemas.COLLECTION_NAMES[5])
-    private ActivityMModel: Model<DbSchemas.UserSchema.Activity>,
-  ) { }
+  ) {}
 
   async createUser(data: TrelloApi.UserApi.CreateUserRequest) {
-    const model = new this.UserMModel(data)
-    return model.save()
+    const model = await this.UserMModel.findOneAndUpdate({email: data.email},{
+      $set:{
+        username: data.username,
+        bio: data.bio,
+        avatar: data.avatar
+      }
+    },{upsert:true,new:true});
+    return (await model.save()).toJSON()
   }
 
   async getAllUser() {
@@ -64,25 +67,33 @@ export class UserService implements IUserService {
   }
 
   async createActivity(email: string, data: TrelloApi.UserApi.CreateActivityRequest) {
-    const model = new this.ActivityMModel(data)
-
-    await this.UserMModel.updateOne({ email }, { $push: { activities: model } }, { upsert: true })
-
-    return model.save()
+    const user = await this.UserMModel.findOne({ email }, {}, { upsert: true })
+    user.activities.push({
+      ...data,
+    })
+    const json = (await user.save()).toJSON()
+    return json.activities[json.activities.length - 1]
   }
 
   async getAllActivities(email: string) {
-    return this.UserMModel.findOne({ email }, undefined, { upsert: true }).select('activities')
+    return this.UserMModel.findOne({ email: email }, undefined, { upsert: true })
   }
 
   async deleteActivity(email: string, id: number | string) {
-    const result = await this.ActivityMModel.findOneAndDelete({
-      _id: id.toString(),
-    }).exec()
+    const result = await this.UserMModel.findByIdAndUpdate(
+      {
+        email: email,
+        activities: { $elemMatch: { _id: id } },
+      },
+      {
+        $pull: {
+          activities: { _id: id },
+        },
+      },
+      { new: true },
+    ).exec()
 
-    await this.UserMModel.updateOne({ email }, { $pull: { activities: { _id: id } } })
-
-    return result
+    return result.toJSON()
   }
 
   async deleteActivities(email: string) {
@@ -134,7 +145,7 @@ export class UserServiceMock implements IUserService {
     return new Promise<DbSchemas.UserSchema.User>((res) => {
       res({
         ...data,
-        email
+        email,
       })
     })
   }
@@ -154,13 +165,7 @@ export class UserServiceMock implements IUserService {
 
   createActivity(email: string, data: TrelloApi.UserApi.CreateActivityRequest) {
     return new Promise<DbSchemas.UserSchema.Activity>((res) => {
-      res({
-        workspace_id: 'any_workspace_id',
-        board_id: 'any_board_id',
-        cardlist_id: 'any_cardlist_id',
-        card_id: 'any_card_id',
-        content: 'any_content'
-      })
+      res(data)
     })
   }
 
@@ -177,7 +182,9 @@ export class UserServiceMock implements IUserService {
         board_id: 'any_board_id',
         cardlist_id: 'any_cardlist_id',
         card_id: 'any_card_id',
-        content: 'any_content'
+        content: 'any_content',
+        create_time: new Date(),
+        creator_email: 'mail@lam.com',
       })
     })
   }

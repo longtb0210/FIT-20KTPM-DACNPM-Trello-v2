@@ -1,7 +1,7 @@
 import { faXmark } from '@fortawesome/free-solid-svg-icons'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { Box, Grid, Popover } from '@mui/material'
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 // import moment from 'moment'
 import { useTheme } from '~/components/Theme/themeContext'
 import { Card } from '@trello-v2/shared/src/schemas/CardList'
@@ -25,6 +25,12 @@ export function CreateCardChecklistModal({
   setCurrentCard,
   handleClose
 }: CreateCardChecklistModalProps) {
+  const [profile, setProfile] = useState({ email: '', name: '' })
+  const storedProfile = localStorage.getItem('profile')
+  useEffect(() => {
+    const profileSave = storedProfile ? JSON.parse(storedProfile) : { email: '', name: '' }
+    setProfile({ ...profileSave })
+  }, [storedProfile])
   const { colors } = useTheme()
   const [textFieldValue, setTextFieldValue] = useState('')
 
@@ -35,10 +41,10 @@ export function CreateCardChecklistModal({
   // API
   const [addCardFeatureAPI] = CardApiRTQ.CardApiSlice.useAddCardFeatureMutation()
 
-  async function createChecklist() {
-    try {
-      const trimmedValue = textFieldValue.replace(/\s+/g, ' ').trim()
-      const response = await addCardFeatureAPI({
+  function createChecklist() {
+    const trimmedValue = textFieldValue.replace(/\s+/g, ' ').trim()
+    if (trimmedValue !== '') {
+      addCardFeatureAPI({
         cardlist_id: cardlistId,
         card_id: cardId,
         feature: {
@@ -47,22 +53,27 @@ export function CreateCardChecklistModal({
           items: []
         }
       })
-      const newActivity: Activity = {
-        workspace_id: '0',
-        board_id: '0',
-        cardlist_id: cardlistId,
-        card_id: cardId,
-        content: `TrelloUser added ${trimmedValue} to this card`
-        // time: moment().format()
-      }
-      const updatedCard: Card = {
-        ...currentCard,
-        features: [...currentCard.features, response.data.data],
-        activities: [...currentCard.activities, newActivity]
-      }
-      setCurrentCard(updatedCard)
-    } catch (error) {
-      console.error('Error while adding checklist to card:', error)
+        .unwrap()
+        .then((response) => {
+          const newActivity: Activity = {
+            workspace_id: '0',
+            board_id: '0',
+            cardlist_id: cardlistId,
+            card_id: cardId,
+            content: `<b>${profile.email}</b> added ${trimmedValue} to this card`,
+            create_time: new Date(),
+            creator_email: profile.email
+          }
+          const updatedCard: Card = {
+            ...currentCard,
+            features: [...currentCard.features, response.data],
+            activities: [...currentCard.activities, newActivity]
+          }
+          setCurrentCard(updatedCard)
+        })
+        .catch((error) => {
+          console.log('ERROR: create checklist - ', error)
+        })
     }
   }
 

@@ -5,6 +5,8 @@ import { FaRegCircleCheck } from 'react-icons/fa6'
 import { HiLink } from 'react-icons/hi'
 import { Workspace } from '@trello-v2/shared/src/schemas/Workspace'
 import { WorkspaceApiRTQ } from '~/api'
+import WorkspaceInfo from './WorkspaceInfo'
+import { isValidEmail } from '~/utils/fomatter'
 interface InviteFormProps {
   workspace: Workspace | undefined
 }
@@ -14,15 +16,15 @@ const InviteForm: React.FC<InviteFormProps> = ({ workspace }) => {
   const [isVisible, setIsVisible] = useState<boolean>(false)
   const [searchTerm, setSearchTerm] = useState<string>('')
   const [selectedEmail, setSelectedEmail] = useState<string[]>([])
-  const [isLoading, setIsLoading] = useState<boolean>(false)
+  // const [isLoading, setIsLoading] = useState<boolean>(false)
   const [originalEmails, setOriginalEmails] = useState<string[]>(['123@gmail.com', '456@gmail.com', '457@gmail.com'])
-  const [filteredEmails, setFilteredEmails] = useState<string[]>(originalEmails)
+  const [filteredEmails, setFilteredEmails] = useState<string[]>([])
   const [textFocus, setTextFocus] = useState(false)
   const containerRef = useRef<HTMLDivElement>(null)
   const containerRef_Form = useRef<HTMLDivElement>(null)
   const [linkToCopy, setLinkToCopy] = useState<string>('Link abcxyz')
   const [copied, setCopied] = useState(false)
-
+  const [workspaceInfo, setWorkspaceInfo] = useState<Workspace | undefined>()
   const copyToClipboard = async (text: string) => {
     try {
       await navigator.clipboard.writeText(text)
@@ -32,6 +34,9 @@ const InviteForm: React.FC<InviteFormProps> = ({ workspace }) => {
       console.error('Failed to copy:', err)
     }
   }
+  useEffect(() => {
+    setWorkspaceInfo(workspace)
+  }, [workspace])
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
       if (containerRef.current && !containerRef.current.contains(event.target as Node)) {
@@ -54,16 +59,16 @@ const InviteForm: React.FC<InviteFormProps> = ({ workspace }) => {
   const handleInputChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     const { value } = event.target
     setSearchTerm(value)
-
     // Filter emails based on the search term before the "@" symbol
-    const filtered = originalEmails.filter((email) => email.split('@')[0].toLowerCase().includes(value.toLowerCase()))
 
-    setFilteredEmails(filtered)
+    setFilteredEmails([value])
   }
 
   const handleEmailSelect = (email: string) => {
-    setSelectedEmail([...selectedEmail, email.split('@')[0]]) // Only the part before "@"
-    setSearchTerm('') // Set search term to show the selected email
+    if (isValidEmail(email)) {
+      setSelectedEmail([...selectedEmail, email]) // Only the part before "@"
+      setSearchTerm('') // Set search term to show the selected email
+    }
   }
 
   const handleClearEmail = (index: number) => {
@@ -76,15 +81,15 @@ const InviteForm: React.FC<InviteFormProps> = ({ workspace }) => {
   const handleSendInvite = () => {
     // Implement send invite functionality here
     // You can use selectedEmail to send the invite
-    console.log('Sending invite to:', selectedEmail)
     const members = selectedEmail.map((email) => ({
       role: 'member',
       email: email,
       status: 'member' // or you can omit this property if it's optional
     }))
-    if (workspace)
+
+    if (workspaceInfo)
       inviteMember2Workspace({
-        id: workspace._id,
+        id: workspaceInfo?._id,
         members: members
       })
     // Reset states or close the form after sending the invite
@@ -125,7 +130,7 @@ const InviteForm: React.FC<InviteFormProps> = ({ workspace }) => {
                 </div>
               )}
 
-              <div className='absolute right-0 top-0 mt-4 '>
+              <div className='absolute right-5 top-0 mt-4 '>
                 <button onClick={() => setIsVisible(false)}>
                   <AiOutlineClose className='rounded-md p-1  hover:bg-gray-300' size={`30px`} />
                 </button>
@@ -155,7 +160,7 @@ const InviteForm: React.FC<InviteFormProps> = ({ workspace }) => {
                         style={{ color: colors.text }}
                         className={` mr-2 flex flex-row items-center justify-center rounded-md px-2 text-sm ${darkMode ? 'bg-[#282e33] hover:bg-[#333c43]' : 'bg-gray-100 hover:bg-[#dcdfe4]'} `}
                       >
-                        <p className='pr-2'>{email + ''}</p>
+                        <p className='pr-2'>{email.split('@')[0] + ''}</p>
                         <button
                           key={index}
                           onClick={() => handleClearEmail(index)}
@@ -221,7 +226,7 @@ const InviteForm: React.FC<InviteFormProps> = ({ workspace }) => {
                 </button>
               )}
             </div>
-            {isLoading && <div>Loading...</div>}
+            {/* {isLoading && <div>Loading...</div>} */}
 
             {selectedEmail && selectedEmail.length > 0 && (
               <textarea

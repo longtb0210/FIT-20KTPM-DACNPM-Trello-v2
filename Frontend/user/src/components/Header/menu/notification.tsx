@@ -64,7 +64,7 @@ export default function Notification() {
             cursor: 'pointer'
           }}
         >
-          <Badge badgeContent={1} color='error'>
+          <Badge badgeContent={0} color='error'>
             <FontAwesomeIcon icon={faBell} style={{ width: '18px', height: '18px' }} />
           </Badge>
         </Box>
@@ -94,7 +94,7 @@ export default function Notification() {
                     sx={{
                       marginTop: '8px',
                       transition: 'all 0.1s ease-in',
-                      backgroundColor: colors.background,
+                      backgroundColor: colors.background_menu_header,
                       minWidth: '424px',
                       borderRadius: '4px'
                     }}
@@ -131,8 +131,25 @@ export default function Notification() {
                         Mark all as read
                       </Typography>
 
-                      <Box sx={{ display: 'flex', padding: '12px 0 12px 12px', backgroundColor: colors.bg_noti }}>
-                        <Box sx={{ width: '90%' }}>
+                      <Box
+                        sx={{
+                          // display: 'flex',
+                          padding: '12px 0 12px 0px'
+                          // backgroundColor: colors.bg_noti
+                        }}
+                      >
+                        <Typography
+                          variant='body1'
+                          sx={{
+                            fontSize: '16px',
+                            color: colors.text,
+                            textAlign: 'center'
+                            // padding: '14px'
+                          }}
+                        >
+                          Chưa có thông báo
+                        </Typography>
+                        {/* <Box sx={{ width: '90%' }}>
                           <Box
                             sx={{
                               backgroundImage:
@@ -247,7 +264,7 @@ export default function Notification() {
                             height: '16px',
                             margin: '0 auto'
                           }}
-                        ></Box>
+                        ></Box> */}
                       </Box>
                     </Box>
                   </MenuList>

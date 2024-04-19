@@ -1,24 +1,17 @@
-import React, { useState } from 'react'
-import { BoardsPageCard } from '~/components/BoardsPage/BoardsPageCard'
-import BoardsPageRow from '~/components/BoardsPage/BoardsPageRow'
+import { useEffect, useState } from 'react'
 import BoardsPageRowTemplate from '~/components/BoardsPage/BoardsPageRowTemplate'
-import BoardsPageWorkspaceControl from '~/components/BoardsPage/BoardsPageWorkspaceControl'
-import { useTheme } from '~/components/Theme/themeContext'
-
 import { faTrello } from '@fortawesome/free-brands-svg-icons'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
-import AccessTimeIcon from '@mui/icons-material/AccessTime'
-import StarIcon from '@mui/icons-material/Star'
-import { Box, Container, FormControl, Grid, MenuItem, Select, SelectChangeEvent } from '@mui/material'
+//import AccessTimeIcon from '@mui/icons-material/AccessTime'
+import { Box, FormControl, MenuItem, Select, SelectChangeEvent } from '@mui/material'
+import { Workspace } from '@trello-v2/shared/src/schemas/Workspace'
+import { BoardApiRTQ, WorkspaceApiRTQ } from '~/api'
+import BoardsPagegWorkspaceSection from '~/components/BoardsPage/BoardsPageWorkspaceSection'
+import { useTheme } from '~/components/Theme/themeContext'
+import { Board } from '@trello-v2/shared/src/schemas/Board'
+import PageWithSidebar from '../Templates'
 
 export type BoardTemplate = {
-  [x: string]: unknown
-  _id: string
-  name: string
-  is_star: boolean
-}
-
-export type BoardSubset = {
   [x: string]: unknown
   _id: string
   name: string
@@ -28,16 +21,6 @@ export type BoardSubset = {
 const data1: BoardTemplate[] = [
   { _id: '0', name: 'Project Management', is_star: false },
   { _id: '1', name: 'Kanban Template', is_star: false }
-]
-
-const data2: BoardSubset[] = [
-  { _id: '0', name: 'Project Trello', is_star: false },
-  { _id: '1', name: 'Board 2', is_star: false },
-  { _id: '2', name: 'Board 3', is_star: false },
-  { _id: '3', name: 'Board 4', is_star: false },
-  { _id: '4', name: 'Board 5', is_star: false },
-  { _id: '5', name: 'Board 6', is_star: false },
-  { _id: '6', name: 'Board 7', is_star: false }
 ]
 
 const categories = [
@@ -66,22 +49,54 @@ export function BoardsPageLabel({ title }: BoardsPageLabelProps) {
 
 export function BoardsPage() {
   const { colors } = useTheme()
-  const [recentlyViewBoardsState, setRecentlyViewBoardsState] = useState(data2)
   const [category, setCategory] = useState('')
+  const [allWorkspaces, setAllWorkspaces] = useState<Workspace[]>([])
+  const [allBoards, setAllBoards] = useState<Board[]>([])
+
+  //API
+  const [getAllWorkspacesAPI] = WorkspaceApiRTQ.WorkspaceApiSlice.useLazyGetAllWorkspaceQuery()
+  const [getAllBoardsAPI, { data: allBoardsData }] = BoardApiRTQ.BoardApiSlice.useLazyGetAllBoardQuery()
 
   function handleChange(event: SelectChangeEvent) {
     setCategory(event.target.value as string)
   }
 
+  function fetchAllWorkspaces() {
+    getAllWorkspacesAPI()
+      .unwrap()
+      .then((response) => {
+        setAllWorkspaces([...response.data.owner, ...response.data.member])
+      })
+      .catch((error) => {
+        console.log('ERROR: get all workspaces', error)
+      })
+  }
+
+  useEffect(() => {
+    fetchAllWorkspaces()
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [])
+
+  function fetchAllBoards() {
+    getAllBoardsAPI()
+      .unwrap()
+      .then((response) => {
+        setAllBoards(response.data)
+      })
+      .catch((error) => {
+        console.log('ERROR: get all boards', error)
+      })
+  }
+
+  useEffect(() => {
+    fetchAllBoards()
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [allBoardsData])
+
   return (
-    <Box sx={{ bgcolor: colors.background }} className='flex items-center justify-center'>
-      <Grid container sx={{ maxWidth: 1152 }}>
-        {/* (reserved) Left panel */}
-        <Grid item xs={3}>
-          <Container></Container>
-        </Grid>
-        {/* Boards Page */}
-        <Grid item xs={9} sx={{ padding: '40px 16px' }}>
+    <PageWithSidebar>
+      <Box sx={{ width: '100%' }} className='flex flex-row justify-start'>
+        <Box sx={{ width: '825px', minHeight: 'calc(100vh - 50px)' }}>
           {/* START: Board Templates section */}
           {/* Title */}
           <Box style={{ color: colors.text }} className='mb-1 mt-3 flex items-center'>
@@ -146,79 +161,67 @@ export function BoardsPage() {
           </p>
           {/* END: Board Templates section */}
           {/* START: Starred Boards section */}
-          <Box sx={{ height: 28 }}></Box>
-          {recentlyViewBoardsState.filter((board) => board.is_star === true).length != 0 && (
+          {/* <Box sx={{ height: 28 }}></Box>
+          {allBoards.filter((board) => board.is_star === true).length != 0 && (
             <React.Fragment>
-              {/* Title */}
               <Box style={{ color: colors.text }} className='my-3 flex items-center'>
                 <StarIcon style={{ fontSize: 24 }} />
                 <h2 style={{ fontSize: 16 }} className='ml-2 p-0 text-center font-bold'>
                   Starred boards
                 </h2>
               </Box>
-              {/* Board list */}
               <Grid container spacing={2}>
-                {recentlyViewBoardsState
+                {allBoards
                   .filter((board) => board.is_star === true)
-                  .map((board: BoardSubset, index: number) => (
+                  .map((board: Board, index: number) => (
                     <Grid item xs={3} key={index}>
                       <BoardsPageCard
+                        workspaceId={''}
                         currentBoard={board}
-                        boards={recentlyViewBoardsState}
-                        setBoards={setRecentlyViewBoardsState}
+                        workspaceBoards={null}
+                        setWorkspaceBoards={() => {}}
+                        allBoards={allBoards}
+                        setAllBoards={setAllBoards}
                       />
                     </Grid>
                   ))}
               </Grid>
             </React.Fragment>
-          )}
+          )} */}
           {/* END: Starred Boards section */}
-          <Box sx={{ height: 28 }}></Box>
+          {/* <Box sx={{ height: 28 }}></Box> */}
           {/* START: Recently Viewed Boards section */}
           {/* Title */}
-          <Box style={{ color: colors.text }} className='my-3 flex items-center'>
+          {/* <Box style={{ color: colors.text }} className='my-3 flex items-center'>
             <AccessTimeIcon style={{ fontSize: 24 }} />
             <h2 style={{ fontSize: 16 }} className='ml-2 p-0 text-center font-bold'>
               Recently viewed
             </h2>
-          </Box>
+          </Box> */}
           {/* Board list */}
-          <BoardsPageRow
+          {/* <BoardsPageRow
             boards={recentlyViewBoardsState}
             setBoards={setRecentlyViewBoardsState}
             enableAddBoard={true}
-          />
+          /> */}
+          {/* END: Recently Viewed Boards section */}
           {/* START: My Workspaces section */}
           <Box sx={{ height: 70 }}></Box>
-          <h1 style={{ color: colors.text }} className='p-0 text-lg font-bold'>
+          <h1 style={{ color: colors.text, fontSize: '16px' }} className='p-0 font-bold'>
             YOUR WORKSPACES
           </h1>
-          <Grid container className='flex justify-between'>
-            <Grid item xs={4}>
-              <Box sx={{ display: 'flex', alignItems: 'center' }} className='my-1'>
-                <Box
-                  sx={{ width: 32, height: 32, color: 'white' }}
-                  className='my-4 flex items-center justify-center rounded-md bg-gradient-to-b from-green-600 to-green-400'
-                >
-                  <p className='m-0 p-0 text-2xl font-bold leading-none'>Â</p>
-                </Box>
-                <h1 style={{ color: colors.text }} className='ml-3 p-0 text-lg font-semibold'>
-                  Âu Hồng Minh's workspace
-                </h1>
-              </Box>
-            </Grid>
-            <Grid item xs={7} className='flex items-center justify-end'>
-              <BoardsPageWorkspaceControl />
-            </Grid>
-          </Grid>
-          <BoardsPageRow
-            boards={recentlyViewBoardsState}
-            setBoards={setRecentlyViewBoardsState}
-            enableAddBoard={true}
-          />
+          {allWorkspaces &&
+            allWorkspaces.map((workspace, index) => (
+              <BoardsPagegWorkspaceSection
+                key={index}
+                currentWorkspace={workspace}
+                allBoards={allBoards}
+                setAllBoards={setAllBoards}
+              />
+            ))}
           {/* END: My Workspaces section */}
-        </Grid>
-      </Grid>
-    </Box>
+        </Box>
+      </Box>
+    </PageWithSidebar>
   )
 }

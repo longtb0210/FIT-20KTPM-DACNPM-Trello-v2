@@ -1,4 +1,4 @@
-import { Avatar, AvatarGroup, Box, Chip } from '@mui/material'
+import { Avatar, AvatarGroup, Box, Chip, Dialog } from '@mui/material'
 import StarBorderIcon from '@mui/icons-material/StarBorder'
 import { MdOutlineLock } from 'react-icons/md'
 import GroupTrelloIcon from '~/assets/GroupTrelloIcon.svg'
@@ -16,77 +16,64 @@ import More from './MoreMenu'
 import { useRef, useState } from 'react'
 import { MdGroups2 } from 'react-icons/md'
 import { MdPublic } from 'react-icons/md'
-import { BoardApiRTQ, WorkspaceApiRTQ } from '~/api'
+import { BoardApiRTQ, UserApiRTQ } from '~/api'
 import ChangeVisibility from './ChangeVisibility'
-
-// UserApiRTQ
-
-function stringToColor(string: string) {
-  let hash = 0
-  let i
-
-  /* eslint-disable no-bitwise */
-  for (i = 0; i < string.length; i += 1) {
-    hash = string.charCodeAt(i) + ((hash << 5) - hash)
-  }
-
-  let color = '#'
-
-  for (i = 0; i < 3; i += 1) {
-    const value = (hash >> (i * 8)) & 0xff
-    color += `00${value.toString(16)}`.slice(-2)
-  }
-  /* eslint-enable no-bitwise */
-
-  return color
-}
-
-function stringAvatar(name: string) {
-  return {
-    sx: {
-      width: 24,
-      height: 24,
-      fontSize: '14px',
-      '&:hover': {
-        bgcolor: 'primary.90',
-        cursor: 'pointer'
-      },
-      bgcolor: stringToColor(name)
-    },
-    children: `${name.split(' ')[0][0]}${name.split(' ')[1][0]}`
-  }
-}
-
-// interface Props {
-//   open: boolean
-//   handleDrawerClose: () => void
-// }
+import { stringAvatar } from '~/utils/StringAvatar'
+import ShareDialog from './ShareDialog'
+import { useParams } from 'react-router-dom'
+import { useNavigate } from 'react-router-dom'
 
 function BoardBar() {
   //get id
-  const url = window.location.href
-  const workspaceIndex = url.indexOf('workspace/')
-  const idsPart = url.substring(workspaceIndex + 'workspace/'.length)
-  const [workspaceId, boardId] = idsPart.split('&')
+  const { workspaceId, boardId } = useParams()
 
-  console.log('Workspace ID:', workspaceId)
-  console.log('Board ID:', boardId)
+  const [openShare, setOpenShare] = React.useState(false)
+
+  const handleClickOpenShare = () => {
+    setOpenShare(true)
+  }
+
+  const handleCloseShare = () => {
+    setOpenShare(false)
+  }
 
   //theme
   const { darkMode } = useTheme()
 
   //get api board
   const [getBoardById, { data: boardData }] = BoardApiRTQ.BoardApiSlice.useLazyGetBoardByIdQuery()
-  // const [getUserById] = UserApiRTQ.UserApiSlice.useLazyGetUserByIdQuery()
-  React.useEffect(() => {
-    getBoardById(boardId).then((a) => console.log(a))
-  }, [boardId, getBoardById])
-
-  console.log(boardData?.data)
+  const [getUserByEmail] = UserApiRTQ.UserApiSlice.useLazyGetUserByEmailQuery()
   //khai bao useState isStar
-  const [starred, setStarred] = useState<boolean>(
-    boardData?.data?.is_star !== undefined ? boardData?.data?.is_star : false
-  )
+  const [starred, setStarred] = useState<boolean>()
+  const [visibility, setVisibility] = useState<string>()
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const [boardMembers, setBoardMembers] = useState<any[]>([])
+  const storedProfile = localStorage.getItem('profile')
+  const [profile, setProFile] = React.useState({ email: '', name: '' })
+  React.useEffect(() => {
+    const profileSave = storedProfile ? JSON.parse(storedProfile) : { email: '', name: '' }
+    setProFile({ ...profileSave })
+
+    getBoardById(boardId).then(() => {
+      setStarred(boardData?.data?.is_star)
+      setVisibility(boardData?.data?.visibility[0])
+    })
+  }, [boardData?.data?.is_star, boardData?.data?.visibility, boardId, getBoardById])
+
+  React.useEffect(() => {
+    if (boardData && boardData.data && boardData.data.members_email) {
+      const fetchBoardMembers = async () => {
+        const members = []
+        // eslint-disable-next-line no-unsafe-optional-chaining
+        for (const emailValue of boardData.data?.members_email !== undefined ? boardData.data?.members_email : '') {
+          const userData = await getUserByEmail({ email: emailValue })
+          members.push(userData.data)
+        }
+        setBoardMembers(members)
+      }
+      fetchBoardMembers()
+    }
+  }, [boardData, getUserByEmail])
 
   const [anchor, setAnchor] = React.useState<null | HTMLElement>(null)
   const [popupContent, setPopupContent] = useState(<div>Kine</div>)
@@ -98,16 +85,22 @@ function BoardBar() {
   const open = Boolean(anchor)
   const [openMore, setOpen] = React.useState(false)
   const id = open ? 'simple-popup' : undefined
-  const [ChangeVisibilityApi] = WorkspaceApiRTQ.WorkspaceApiSlice.useChangeWorkspaceVisibilityMutation()
+  const [ChangeVisibilityApi] = BoardApiRTQ.BoardApiSlice.useEditBoardByIdMutation()
   const [editBoardById] = BoardApiRTQ.BoardApiSlice.useEditBoardByIdMutation()
 
-  const [visibility, setVisibility] = useState('private')
-
   const handleVisibilityChange = (newVisibility: string) => {
-    console.log('newVisibility: ' + newVisibility)
-    setVisibility(newVisibility)
-    ChangeVisibilityApi({ visibility: newVisibility, _id: workspaceId }).then(() => console.log('Updated'))
-    setAnchor(null)
+    if (newVisibility === 'private' || newVisibility === 'workspace' || newVisibility === 'public') {
+      // console.log('newVisibility: ' + newVisibility)
+      setVisibility(newVisibility)
+      if (boardId !== undefined) {
+        ChangeVisibilityApi({ visibility: newVisibility as 'private' | 'workspace' | 'public', _id: boardId }).then(
+          () => console.log('Updated Visibility')
+        )
+      }
+      setAnchor(null)
+    } else {
+      // Xử lý trường hợp `newVisibility` không hợp lệ tại đây
+    }
   }
 
   let Icon: React.ReactNode
@@ -134,40 +127,41 @@ function BoardBar() {
   }
 
   const inputRef = useRef<HTMLInputElement>(null)
+  // const [redirect, setRedirect] = useState(false) // Thêm state để điều hướng
+  const navigate = useNavigate() // Get the history object
 
   const handleChangeName = (event: React.KeyboardEvent) => {
     if (event.key == 'Enter') {
       event.preventDefault()
       const updatedName = inputRef.current?.value
-      console.log(updatedName)
-      if (updatedName) {
+      if (updatedName && boardId !== undefined) {
         editBoardById({
           _id: boardId,
           name: updatedName
         })
           .unwrap()
-          .then((response) => {
-            console.log(response)
-            alert('Thay đổi thành công')
-            window.location.reload()
+          .then(() => {
+            console.log('Navigating to home page...')
+            navigate('/')
           })
           .catch((error) => {
             console.error('Lỗi khi chỉnh sửa bảng:', error)
-            alert('Đã xảy ra lỗi khi thay đổi tên bảng')
+            console.log('Navigating to home page...')
+            navigate('/')
           })
       }
     }
   }
 
-  const handleClickToStar = () => {
-    setStarred(!starred)
-    console.log(starred)
-    editBoardById({
-      _id: boardId,
-      is_star: !boardData?.data?.is_star
-    }).then((response) => {
-      console.log(response)
-      alert('Thay đổi thành công')
+  async function handleClickToStar() {
+    await editBoardById({
+      _id: boardId !== undefined ? boardId : '',
+      is_star: !starred
+    }).then(() => {
+      // console.log(response)
+      setStarred(!starred)
+      console.log('Thay đổi tên thành công')
+      // window.location.reload()
     })
   }
 
@@ -191,7 +185,7 @@ function BoardBar() {
               className='mr-1 flex h-9 cursor-pointer content-center rounded-md border-none bg-[rgba(58,58,75,0.1)] px-1 py-1 text-[18px] font-bold leading-9 text-white hover:bg-[rgba(58,58,75,0.4)]'
               onKeyDown={handleChangeName}
               style={{
-                width: `${Math.max(boardData?.data?.name.length !== undefined ? boardData?.data?.name.length : 5, 1) * 10}px`
+                width: `${Math.max(boardData?.data?.name.length !== undefined ? boardData?.data?.name.length : 5, 1) * (boardData?.data?.name.length !== undefined ? (boardData?.data?.name.length < 10 ? 15 : 10) : 10)}px`
               }}
             />
           </Box>
@@ -361,32 +355,24 @@ function BoardBar() {
               padding: '0'
             }}
           >
-            {/* {boardData &&
-              boardData.data &&
-                boardData.data.members_email.map(async (email) => {
-
-                })
-              } */}
-            <Tooltip title='Trung kien'>
-              <Avatar {...stringAvatar('Trần Khương')} />
-            </Tooltip>
-            <Tooltip title='Hữu Chính'>
-              <Avatar {...stringAvatar('Hữu Chính')} />
-            </Tooltip>
-            <Tooltip title='Bảo Long'>
-              <Avatar {...stringAvatar('Bảo Long')} />
-            </Tooltip>
-            <Tooltip title='Trung kien'>
-              <Avatar {...stringAvatar('Trung Kien')} />
-            </Tooltip>
-            <Tooltip title='Trung kien'>
-              <Avatar {...stringAvatar('Trung Kien')} />
-            </Tooltip>
-            <Tooltip title='Trung kien'>
-              <Avatar {...stringAvatar('Trung Kien')} />
-            </Tooltip>
-            <Tooltip title='Bảo Long'>
-              <Avatar {...stringAvatar('Bảo Long')} />
+            {boardMembers &&
+              boardMembers.map((infoUser, index) => {
+                if (infoUser !== undefined) {
+                  return (
+                    <Tooltip key={index} title={infoUser.data.username}>
+                      <Avatar {...stringAvatar(infoUser.data.username, '10px')} />
+                    </Tooltip>
+                  )
+                } else {
+                  return (
+                    <Tooltip key={index} title='guest'>
+                      <Avatar {...stringAvatar('Guest', '10px')} />
+                    </Tooltip>
+                  )
+                }
+              })}
+            <Tooltip title={profile.name}>
+              <Avatar className='text-[12px]' {...stringAvatar(profile.name, '10px')} />
             </Tooltip>
           </AvatarGroup>
           <Tooltip title='Share'>
@@ -417,6 +403,7 @@ function BoardBar() {
                   }}
                 />
               }
+              onClick={handleClickOpenShare}
             />
           </Tooltip>
           <Tooltip title='More'>
@@ -464,6 +451,13 @@ function BoardBar() {
         {popupContent}
       </BasePopup>
       <More open={openMore} handleDrawerClose={handleDrawerClose} />
+      {boardId !== undefined && workspaceId !== undefined ? (
+        <ShareDialog open={openShare} handleCloseShare={handleCloseShare} boardID={boardId} workspaceId={workspaceId} />
+      ) : (
+        ''
+      )}
+      {/* <ShareDialog open={openShare} handleCloseShare={handleCloseShare} boardID={boardId} /> */}
+      {/* {redirect && <Link to='/'></Link>} */}
     </>
   )
 }

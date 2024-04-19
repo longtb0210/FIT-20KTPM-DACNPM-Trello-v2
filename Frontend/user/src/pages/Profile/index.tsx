@@ -3,7 +3,6 @@ import React, { useEffect, useState } from 'react'
 import { ActivityComponent, Header, Profile } from './components'
 import { useTheme } from '../../components/Theme/themeContext'
 import { User } from '@trello-v2/shared/src/schemas/User'
-import { mockUser } from './testData'
 import { UserApiRTQ } from '~/api'
 
 type AccountManagementProps = {
@@ -16,12 +15,22 @@ export const AccountManagement: React.FC<AccountManagementProps> = ({ page }) =>
   const [getUserInfo, { data: userInfoRes }] = UserApiRTQ.UserApiSlice.useLazyGetUserByEmailQuery()
   const [resetManually, setResetManually] = useState<boolean>()
   const { colors } = useTheme()
+  const [profile, setProfile] = React.useState({ email: '', name: '' })
+
+  const storedProfile = localStorage.getItem('profile')
+  useEffect(() => {
+    const profileSave = storedProfile ? JSON.parse(storedProfile) : { email: '', name: '' }
+    setProfile({ ...profileSave })
+    getUserInfo({
+      email: profile.email
+    })
+  }, [profile.email, storedProfile])
   useEffect(() => {
     setUserInfo(userInfoRes?.data)
   }, [userInfoRes])
   useEffect(() => {
     getUserInfo({
-      email: '1@gmail.com'
+      email: profile.email
     })
   }, [resetManually])
   useEffect(() => {
@@ -33,13 +42,14 @@ export const AccountManagement: React.FC<AccountManagementProps> = ({ page }) =>
   }
   const darkLightMode = {
     backgroundColor: colors.background,
-    color: colors.text
+    color: colors.text,
+    minHeight: 'calc(100vh - 50px)'
   }
   return (
     <div style={darkLightMode} className='font-sans'>
+      <Header userInfo={userInfo} onSelectTab={handleTabSelect} currentTab={selectedTab} />
       {selectedTab === 'profile' ? (
         <>
-          <Header userInfo={userInfo} onSelectTab={handleTabSelect} currentTab={selectedTab} />
           <Profile
             userInfo={userInfo}
             handleUpdateProfile={() => {
@@ -49,7 +59,6 @@ export const AccountManagement: React.FC<AccountManagementProps> = ({ page }) =>
         </>
       ) : (
         <>
-          <Header userInfo={userInfo} onSelectTab={handleTabSelect} currentTab={selectedTab} />
           <ActivityComponent userInfo={userInfo} />
         </>
       )}

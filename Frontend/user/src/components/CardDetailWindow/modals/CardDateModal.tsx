@@ -10,7 +10,7 @@ import { DateTimePicker, LocalizationProvider } from '@mui/x-date-pickers'
 import { useTheme } from '~/components/Theme/themeContext'
 import { Card } from '@trello-v2/shared/src/schemas/CardList'
 import { Feature_Date } from '@trello-v2/shared/src/schemas/Feature'
-import { CardApiRTQ } from '~/api'
+import { CardApiRTQ, CardlistApiRTQ } from '~/api'
 
 const reminderDateChoices: string[] = [
   'None',
@@ -53,6 +53,7 @@ export function SelectCardDatesModal({
   const [addCardFeatureAPI] = CardApiRTQ.CardApiSlice.useAddCardFeatureMutation()
   const [updateCardFeatureAPI] = CardApiRTQ.CardApiSlice.useUpdateCardFeatureMutation()
   const [deleteCardFeatureAPI] = CardApiRTQ.CardApiSlice.useDeleteCardFeatureMutation()
+  const [getCardlistByBoardIdAPI] = CardlistApiRTQ.CardListApiSlice.useLazyGetCardlistByBoardIdQuery()
 
   useEffect(() => {
     const featureDate = currentCard.features.find((feature) => feature.type === 'date') as Feature_Date
@@ -84,10 +85,10 @@ export function SelectCardDatesModal({
     setReminderDateValue(event.target.value as string)
   }
 
-  async function updateCardDates() {
+  function updateCardDates() {
     const featureDateIndex = currentCard.features.findIndex((feature) => feature.type === 'date')
     if (featureDateIndex === -1) {
-      const response = await addCardFeatureAPI({
+      addCardFeatureAPI({
         cardlist_id: cardlistId,
         card_id: cardId,
         feature: {
@@ -96,11 +97,20 @@ export function SelectCardDatesModal({
           due_date: dueDateValue!.toDate()
         }
       })
-      const updatedCard = {
-        ...currentCard,
-        features: [...currentCard.features, response.data.data]
-      }
-      setCurrentCard(updatedCard)
+        .unwrap()
+        .then((response) => {
+          const updatedCard = {
+            ...currentCard,
+            features: [...currentCard.features, response.data]
+          }
+          setCurrentCard(updatedCard)
+          getCardlistByBoardIdAPI({
+            id: boardId
+          })
+        })
+        .catch((error) => {
+          console.log('ERROR: add card dates - ', error)
+        })
     } else {
       const featureDate = currentCard.features[featureDateIndex] as Feature_Date
       updateCardFeatureAPI({
@@ -126,21 +136,30 @@ export function SelectCardDatesModal({
         )
       }
       setCurrentCard(updatedCard)
+      getCardlistByBoardIdAPI({
+        id: boardId
+      })
     }
   }
 
-  async function handleRemoveCardDate() {
+  function handleRemoveCardDate() {
     const featureDateIndex = currentCard.features.findIndex((feature) => feature.type === 'date')
     if (featureDateIndex === -1) {
       return
     } else {
       const featureDate = currentCard.features[featureDateIndex] as Feature_Date
-      const response = await deleteCardFeatureAPI({
+      deleteCardFeatureAPI({
         cardlist_id: cardlistId,
         card_id: cardId,
         feature_id: featureDate._id!
       })
-      setCurrentCard(response.data.data)
+        .unwrap()
+        .then((response) => {
+          setCurrentCard(response.data)
+        })
+        .catch((error) => {
+          console.log('ERROR: remove card dates - ', error)
+        })
     }
   }
 

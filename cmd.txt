@@ -1,2 +1,20 @@
 docker build -f Dockerfile.envoy -t lamlance/trello-envoy:latest .
+docker build -f Dockerfile.frontend -t lamlance/trello-frontend:user-latest .
+
+docker build -f Dockerfile.backend --build-arg SERVICE_NAME=${v} -t lamlance/trello-backend:${v}-latest .
 docker compose --env-file ./configs/.env -f docker-compose.backend.yml up
+
+helm install kubedb appscode/kubedb --version v2023.04.10 --namespace kubedb --create-namespace --set kubedb-provisioner.enabled=true --set kubedb-ops-manager.enabled=true --set kubedb-autoscaler.enabled=true --set kubedb-dashboard.enabled=true --set kubedb-schema-manager.enabled=true --set-file global.license=C:\\Users\\LAM\\Documents\\LAM\\DaiHoc\\Nam4-HK2\\Capstone\\FIT-20KTPM-DACNPM-Trello-v2\\configs\\kubedb.license.txt
+
+kubectl create -f mongodb-shard.yaml
+
+helm upgrade -i ingress-nginx ingress-nginx/ingress-nginx --namespace demo --create-namespace --set tcp.5070="demo/mongo-sh:27017"
+
+root
+BYu8OwOSl6k8xWNT
+
+default
+1F!1*MbKD(u3P((Z
+
+mongodb://root:BYu8OwOSl6k8xWNT@localhost:5070/trello?authSource=admin
+mongodb://MONGO_USER:MONGO_123@localhost:7000/trello?authSource=admin

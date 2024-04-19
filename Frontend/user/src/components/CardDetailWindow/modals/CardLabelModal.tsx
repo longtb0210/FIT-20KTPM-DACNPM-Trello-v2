@@ -6,6 +6,7 @@ import { ChangeEvent, useState } from 'react'
 import { useTheme } from '~/components/Theme/themeContext'
 import { Card } from '@trello-v2/shared/src/schemas/CardList'
 import { BoardLabel } from '@trello-v2/shared/src/schemas/Board'
+import { BoardApiRTQ } from '~/api'
 
 interface CardLabelListTileProps {
   currentLabel: BoardLabel
@@ -99,14 +100,9 @@ export function CardLabelListModal({
 }: CardLabelListModalProps) {
   const { colors } = useTheme()
   const [searchValue, setSearchValue] = useState<string>('')
-  const [boardLabelState, setBoardLabelState] = useState<BoardLabel[]>(boardLabels)
 
   function filterLabelList(event: React.ChangeEvent<HTMLInputElement>) {
     setSearchValue(event.currentTarget.value)
-    // Filter board label list
-    setBoardLabelState(
-      boardLabels.filter((label) => label.name.toLowerCase().includes(event.currentTarget.value.toLowerCase()))
-    )
   }
 
   function handleClose() {
@@ -193,7 +189,7 @@ export function CardLabelListModal({
         <p style={{ margin: '10px 0', color: colors.text }} className='text-xs font-semibold'>
           Labels
         </p>
-        {boardLabelState.map((label, index) => (
+        {boardLabels.map((label, index) => (
           <CardLabelListTile
             key={index}
             currentLabel={label}
@@ -369,7 +365,7 @@ export function CreateCardLabelModal({ anchorEl, setModalState, addBoardLabel }:
               width: '100%',
               height: 32,
               padding: '0 12px',
-              color: getContrastColor(selectedColor)
+              color: getContrastColor(selectedColor || '#ffffff')
             }}
             className='flex items-center rounded text-sm font-semibold'
           >
@@ -449,6 +445,7 @@ export function CreateCardLabelModal({ anchorEl, setModalState, addBoardLabel }:
 
 interface EditCardLabelModalProps {
   anchorEl: (EventTarget & HTMLDivElement) | null
+  boardId: string
   setModalState: (newState: boolean[]) => void
   currentCard: Card
   setCurrentCard: (newState: Card) => void
@@ -460,6 +457,7 @@ interface EditCardLabelModalProps {
 
 export function EditCardLabelModal({
   anchorEl,
+  boardId,
   setModalState,
   currentCard,
   setCurrentCard,
@@ -472,11 +470,19 @@ export function EditCardLabelModal({
   const [labelNameFieldValue, setLabelNameFieldValue] = useState<string>(currentLabel.name)
   const [selectedColor, setSelectedColor] = useState<string>(currentLabel.color)
 
+  const [editBoardLabelAPI] = BoardApiRTQ.BoardApiSlice.useEditBoardLabelMutation()
+
   function handleLabelNameFieldChange(event: ChangeEvent<HTMLInputElement>) {
     setLabelNameFieldValue(event.currentTarget.value)
   }
 
   function handleEditBoardLabel() {
+    editBoardLabelAPI({
+      boardId: boardId,
+      _id: currentLabel._id!,
+      color: selectedColor,
+      name: labelNameFieldValue
+    })
     // Update Board label list
     const updatedBoardLabel: BoardLabel[] = boardLabelState.map((label) => {
       return label._id === currentLabel._id ? { ...label, color: selectedColor, name: labelNameFieldValue } : label

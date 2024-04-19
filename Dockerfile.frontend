@@ -1,0 +1,22 @@
+FROM node:iron-alpine3.19 AS build
+
+ARG VITE_URL_API=https://trellobackend.azurewebsites.net
+ARG VITE_HOST_URL=https://trellofrontend.azurewebsites.net
+
+ENV VITE_URL_API=$VITE_URL_API
+ENV VITE_HOST_URL=$VITE_HOST_URL
+WORKDIR /app
+COPY . .
+RUN npm install
+RUN npm run build -w @trello-v2/shared
+RUN npm run build:notsc -w @trello-v2/user
+
+WORKDIR /app/node_modules
+RUN rm -r *
+
+FROM node:iron-alpine3.19
+EXPOSE 3000
+WORKDIR /app
+COPY --from=build /app/Frontend/react_server .
+RUN npm install
+CMD [ "npm","run","start" ]
